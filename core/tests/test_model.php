@@ -15,6 +15,7 @@ include_once "setup.php";
 
 class BaseModel extends AppModel {
     public $recursive = 0;
+    public $table = false;
 }
 
 class Post extends BaseModel {
@@ -56,8 +57,8 @@ class TestModel extends UnitTestCase {
                 "email" => "rafael@spaghettiphp.org"
             )
         );
-        $this->Post = new Post;
-        $this->Author = new Author;
+        $this->Post = ClassRegistry::get_object("Model", "Post");
+        $this->Author = ClassRegistry::get_object("Model", "Author");
         $this->Post->save_all($posts);
         $this->Author->save_all($authors);
         $this->Time = date("Y-m-d H:i:s");
@@ -204,7 +205,33 @@ class TestModel extends UnitTestCase {
             )
         );
         $this->assertEqual($expected, $results);
-  }
+    }
+    public function testGenerateAssociation() {
+        $this->Author->create_links();
+        $results = $this->Author->generate_association("has_many");
+        $expected = array(
+            "Post" => array(
+                "class_name" => "Post",
+                "foreign_key" => "author_id",
+                "conditions" => array(),
+                "order" => null,
+                "limit" => null,
+                "dependent" => false
+            )
+        );
+        $this->assertEqual($expected, $results);
+
+        $this->Post->create_links();
+        $results = $this->Post->generate_association("belongs_to");
+        $expected = array(
+            "Author" => array(
+                "class_name" => "Author",
+                "foreign_key" => "author_id",
+                "conditions" => array(),
+            )
+        );
+        $this->assertEqual($expected, $results);
+    }
 }
 
 ?>

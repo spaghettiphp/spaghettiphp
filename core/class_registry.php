@@ -22,7 +22,7 @@ class ClassRegistry extends Object {
         return $instance[0];
     }
     public function &set_object($type = "Model", $class = null) {
-        $self = ClassRegistry::get_instance();
+        $self =& ClassRegistry::get_instance();
         
         if(!class_exists($class)):
             if(!Spaghetti::import($type, Inflector::underscore($class))):
@@ -34,7 +34,7 @@ class ClassRegistry extends Object {
         return $self->objects[$type][$class];
     }
     public function &get_object($type = "Model", $class = null) {
-        $self = ClassRegistry::get_instance();
+        $self =& ClassRegistry::get_instance();
         
         if(!isset($self->objects[$type][$class])):
             return $self->set_object($type, $class);
@@ -43,7 +43,7 @@ class ClassRegistry extends Object {
         return $self->objects[$type][$class];
     }
     public function flush() {
-        $self = ClassRegistry::get_instance();
+        $self =& ClassRegistry::get_instance();
         $self->objects = array();
     }
 }

@@ -11,8 +11,17 @@
  */
 
 class Model extends Object {
-    public $id = null;
+    public $associations = array("has_many", "belongs_to", "has_one");
+    public $association_keys = array(
+        "has_many" => array("class_name", "foreign_key", "conditions", "order", "limit", "dependent"),
+        "belongs_to" => array("class_name", "foreign_key", "conditions"),
+        "has_one" => array("class_name", "foreign_key", "conditions", "dependent")
+    );
+    public $belongs_to = array();
+    public $has_many = array();
+    public $has_one = array();
     public $data = array();
+    public $id = null;
     public $recursive = 0;
     public $schema = array();
     public $table = null;
@@ -27,6 +36,7 @@ class Model extends Object {
         if($this->table !== false):
             $this->describe_table();
         endif;
+        $this->create_links();
     }
     public function __call($method, $params) {
         if(preg_match("/find_all_by_(.*)/", $method, $field)):
@@ -38,6 +48,8 @@ class Model extends Object {
     public function __set($field, $value = "") {
         if($this->schema[$field]):
             $this->data[$field] = $value;
+        elseif(is_subclass_of($value, "Model")):
+            $this->{$field} = $value;
         endif;
     }
     public function __get($field) {
@@ -74,6 +86,52 @@ class Model extends Object {
             );
         endforeach;
         return $this->schema = $model_schema;
+    }
+    public function create_links() {
+        foreach($this->associations as $type):
+            $association_type = $this->{$type};
+            foreach($association_type as $key => $assoc):
+                if(is_numeric($key)):
+                    $class = "";
+                    $data = array();
+                    unset($this->{$type}[$key]);
+                    if(is_array($assoc)):
+                        $data = $assoc;
+                        $assoc = $assoc["class_name"];
+                    endif;
+                    $this->{$type}[$assoc] = $data;
+                else:
+                    $assoc = $key;
+                endif;
+                #$this->{$assoc} = ClassRegistry::get_object("Model", $assoc);
+            endforeach;
+            $this->generate_association($type);
+        endforeach;
+    }
+    public function generate_association($type) {
+        foreach($this->{$type} as $class => $assoc):
+            foreach($this->association_keys[$type] as $key):
+                if(!isset($this->{$type}[$class][$key]) || $this->{$type}[$class][$key] === null):
+                    $data = null;
+                    switch($key):
+                        case "class_name":
+                            $data = $class;
+                            break;
+                        case "foreign_key":
+                            $data = $type == "belongs_to" ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
+                            break;
+                        case "conditions":
+                            $data = array();
+                            break;
+                        case "dependent":
+                            $data = false;
+                            break;
+                    endswitch;
+                    $this->{$type}[$class][$key] = $data;
+                endif;
+            endforeach;
+        endforeach;
+        return $this->{$type};
     }
     public function sql_query($type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
         $params = $this->sql_conditions($parameters);
@@ -154,6 +212,13 @@ class Model extends Object {
         
         if($recursion > 0):
             foreach($results as $key => $result):
+
+                //foreach($this->associations as $type):
+                //    foreach($this->{$type} as $assoc):
+                //        $results[$key][Inflector::underscore($assoc["class_name"])] = array();
+                //    endforeach;
+                //endforeach;
+
                 if(!empty($this->has_many)):
                     $model = ClassRegistry::get_object("Model", "Post");
                     $results[$key]["post"] = $model->find_all_by_author_id($result["id"]);
@@ -161,6 +226,8 @@ class Model extends Object {
                     $model = ClassRegistry::get_object("Model", "Author");
                     $results[$key]["author"] = $model->find_by_id($result["author_id"]);
                 endif;
+
+
             endforeach;
         endif;
         
