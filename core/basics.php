@@ -43,7 +43,7 @@ class Spaghetti extends Object {
         foreach($paths[$type] as $path):
             if(is_array($file)):
                 foreach($file as $file):
-                    $include = self::import($type, $file, $ext);
+                    $include = Spaghetti::import($type, $file, $ext);
                 endforeach;
                 return $include;
             else:
