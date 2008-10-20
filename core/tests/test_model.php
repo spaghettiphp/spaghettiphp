@@ -57,8 +57,8 @@ class TestModel extends UnitTestCase {
                 "email" => "rafael@spaghettiphp.org"
             )
         );
-        $this->Post = ClassRegistry::get_object("Model", "Post");
-        $this->Author = ClassRegistry::get_object("Model", "Author");
+        $this->Post = ClassRegistry::init("Post");
+        $this->Author = ClassRegistry::init("Author");
         $this->Post->save_all($posts);
         $this->Author->save_all($authors);
         $this->Time = date("Y-m-d H:i:s");
