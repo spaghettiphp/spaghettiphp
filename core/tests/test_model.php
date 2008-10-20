@@ -131,6 +131,19 @@ class TestModel extends UnitTestCase {
             )
         );
         $this->assertEqual($expected, $results);
+
+        $results = $this->Author->find_all(array(
+            "id BETWEEN" => array(0, 1)
+        ));
+        $expected = array(
+            array(
+                "id" => 1,
+                "name" => "Julio Greff",
+                "email" => "julio@spaghettiphp.org",
+                "created" => $this->Time
+            )
+        );
+        $this->assertEqual($expected, $results);
     }
     public function testGenerateAssociation() {
         $this->Author->create_links();

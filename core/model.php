@@ -182,6 +182,9 @@ class Model extends Object {
                         $field = "OR";
                     elseif(in_array($field, $logic)):
                         $field = strtoupper($field);
+                    elseif(preg_match("/([a-z]*) BETWEEN/", $field, $parts) && $this->schema[$parts[1]]):
+                        $sql .= "{$field} '" . join("' AND '", $value) . "'";
+                        continue;
                     else:
                         continue;
                     endif;
@@ -217,7 +220,6 @@ class Model extends Object {
     public function find_all($conditions = array(), $order = null, $limit = null, $recursion = null) {
         $recursion = pick($recursion, $this->recursion);
         $results = $this->fetch_results($this->sql_query("select", $conditions, null, $order, $limit));
-        
         if($recursion > 0):
             foreach($results as $key => $result):
                 foreach($this->associations as $type):
