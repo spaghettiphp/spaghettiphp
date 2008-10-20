@@ -52,7 +52,7 @@
  */
 
     require_once CORE . DS . "basics.php";
-    Spaghetti::import("Core", array("class_registry", "controller", "dispatcher", "filter", "inflector", "mapper", "misc", "model", "view"));
+    Spaghetti::import("Core", array("class_registry", "component", "controller", "dispatcher", "filter", "inflector", "mapper", "misc", "model", "view"));
     Spaghetti::import("App", array("config/settings", "config/routes", "config/database"));
     Spaghetti::import("Controller", "app_controller");
     Spaghetti::import("Model", "app_model");

@@ -35,19 +35,13 @@ class Controller extends Object {
             $this->uses = array($this->name);
         endif;
         $this->data = $_POST;
-        $this->load_components();
+        $this->Component =& new Component;
+        $this->Component->init($this);
         $this->load_models();
     }
     public function load_models() {
         foreach($this->uses as $model):
             $this->{$model} =& ClassRegistry::init($model);
-        endforeach;
-    }
-    public function load_components() {
-        #=>TODO: Load components through Component::load or something else
-        foreach($this->components as $component):
-            $component = "{$component}Component";
-            $this->{$component} =& ClassRegistry::init($component, "Component");
         endforeach;
     }
     public function before_filter() {

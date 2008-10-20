@@ -39,9 +39,28 @@ class ManualRenderController extends BaseController {
     }
 }
 
+class ComponentController extends BaseController {
+    public $components = array("Base");
+    public function test_action() {
+        
+    }
+}
+
 class BaseFilter extends Filter {
     public function start($file) {
         echo $file;
+    }
+}
+
+class BaseComponent extends Object {
+    public function initialize() {
+        echo "-initialized-";
+    }
+    public function startup() {
+        echo "-started up-";
+    }
+    public function shutdown() {
+        echo "-shut down-";
     }
 }
 
@@ -229,6 +248,13 @@ class TestDispatcher extends UnitTestCase {
         $this->dispatcher->dispatch();
         $results = ob_get_clean();
         $expected = "file.ext";
+        $this->assertEqual($expected, $results);
+
+        ob_start();
+        $this->dispatcher->parse_url("component/test_action/");
+        $this->dispatcher->dispatch();
+        $results = ob_get_clean();
+        $expected = "-initialized--started up--shut down-This should work!";
         $this->assertEqual($expected, $results);
     }
 }

@@ -30,7 +30,6 @@ class Dispatcher extends Object {
         
         $parts = array("here", "prefix", "controller", "action", "id", "extension", "params");
         preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:(\w*)\/?)?(?:(\w*)\/?)?(?:(\d)*)?(?:\.([\w]+))?(?:\/?(.*))?/", $url, $reg);
-        #preg_match("/^\/(?:({$prefixes})\/?(?![a-z]))?([^\d\/.:]*)?\/?([^\d\/.:]*)?\/?(\d*)?(?:\.([^.\/]{2,4}))?\/?(.*)/", $url, $reg);
         foreach($parts as $k => $key) {
             $this->path[$key] = $reg[$k];
         }
@@ -56,12 +55,15 @@ class Dispatcher extends Object {
         if($this->{$controller}):
             if(method_exists($this->{$controller}, $this->path["action"])):
                 $this->{$controller}->params = $this->path;
+                $this->{$controller}->Component->initialize($this->{$controller});
                 $this->{$controller}->before_filter();
+                $this->{$controller}->Component->startup($this->{$controller});
                 call_user_func_array(array(&$this->{$controller}, $this->path["action"]), array_merge(array($this->path["id"]), $this->path["params"]));
 
                 if($this->{$controller}->auto_render):
                     $this->{$controller}->render();
                 endif;
+                $this->{$controller}->Component->shutdown($this->{$controller});
                 echo $this->{$controller}->output;
                 
                 $this->{$controller}->after_filter();
