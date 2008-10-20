@@ -33,7 +33,7 @@ class View extends Object {
     public function load_helpers() {
         foreach($this->helpers as $helper):
             $class = Inflector::camelize("{$helper}_helper");
-            $this->loaded_helpers []= ClassRegistry::get_object("Helper", $class);
+            $this->loaded_helpers []= ClassRegistry::init($class);
         endforeach;
         return $this->loaded_helpers;
     }

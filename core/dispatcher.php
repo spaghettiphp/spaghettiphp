@@ -51,7 +51,7 @@ class Dispatcher extends Object {
         endif;
         
         $controller = Inflector::camelize("{$this->path['controller']}_controller");
-        $this->{$controller} =& ClassRegistry::get_object("Controller", $controller);
+        $this->{$controller} =& ClassRegistry::init($controller, "Controller");
 
         if($this->{$controller}):
             if(method_exists($this->{$controller}, $this->path["action"])):
@@ -82,7 +82,7 @@ class Dispatcher extends Object {
         echo $view->render("{$this->path['controller']}/{$this->path['action']}.p{$this->path['extension']}", false);
     }
     public function dispatch_filter() {
-        $filter =& ClassRegistry::get_object("Filter", Inflector::camelize("{$this->path['controller']}_filter"));
+        $filter =& ClassRegistry::init(Inflector::camelize("{$this->path['controller']}_filter"), "Filter");
         if($filter):
             preg_match("/{$this->path['controller']}\/?(.*)/", $this->url, $file);
             $filter->start($file[1]);

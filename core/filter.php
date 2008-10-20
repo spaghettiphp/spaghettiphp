@@ -26,7 +26,7 @@ class Filter extends Object {
         preg_match("/([^.]*).?([^.]+)?/", $content, $reg);
         $parts = array("full", "filename", "extension");
         foreach($parts as $k => $key) {
-            $this->file[$key] = $reg[$k];
+            $this->file[$key] = isset($reg[$k]) ? $reg[$k] : "";
         }
         return $this->file;
     }

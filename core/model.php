@@ -36,9 +36,11 @@ class Model extends Object {
         if($this->table !== false):
             $this->describe_table();
         endif;
+        ClassRegistry::add_object(get_class($this), $this);
         $this->create_links();
     }
     public function __call($method, $params) {
+        $params = array_merge($params, array(null, null, null, null));
         if(preg_match("/find_all_by_(.*)/", $method, $field)):
             return $this->find_all_by($field[1], $params[0], $params[1], $params[2], $params[3]);
         elseif(preg_match("/find_by_(.*)/", $method, $field)):
@@ -46,14 +48,14 @@ class Model extends Object {
         endif;
     }
     public function __set($field, $value = "") {
-        if($this->schema[$field]):
+        if(isset($this->schema[$field])):
             $this->data[$field] = $value;
         elseif(is_subclass_of($value, "Model")):
             $this->{$field} = $value;
         endif;
     }
     public function __get($field) {
-        if($this->schema[$field]):
+        if(isset($this->schema[$field])):
             return $this->data[$field];
         endif;
         return null;
@@ -103,7 +105,9 @@ class Model extends Object {
                 else:
                     $assoc = $key;
                 endif;
-                #$this->{$assoc} = ClassRegistry::get_object("Model", $assoc);
+                if(!isset($this->{$assoc})):
+                    $this->{$assoc} = ClassRegistry::init("$assoc");
+                endif;
             endforeach;
             $this->generate_association($type);
         endforeach;
@@ -212,22 +216,15 @@ class Model extends Object {
         
         if($recursion > 0):
             foreach($results as $key => $result):
-
-                //foreach($this->associations as $type):
-                //    foreach($this->{$type} as $assoc):
-                //        $results[$key][Inflector::underscore($assoc["class_name"])] = array();
-                //    endforeach;
-                //endforeach;
-
-                if(!empty($this->has_many)):
-                    $model = ClassRegistry::get_object("Model", "Post");
-                    $results[$key]["post"] = $model->find_all_by_author_id($result["id"]);
-                else:
-                    $model = ClassRegistry::get_object("Model", "Author");
-                    $results[$key]["author"] = $model->find_by_id($result["author_id"]);
-                endif;
-
-
+                foreach($this->associations as $type):
+                    foreach($this->{$type} as $assoc):
+                        if(isset($this->{$assoc["class_name"]}->schema[$assoc["foreign_key"]])):
+                            $results[$key][Inflector::underscore($assoc["class_name"])] = $this->{$assoc["class_name"]}->find_all_by($assoc["foreign_key"], $result["id"]);
+                        else:
+                            $results[$key][Inflector::underscore($assoc["class_name"])] = $this->{$assoc["class_name"]}->find_by("id", $result[$assoc["foreign_key"]]);
+                        endif;
+                    endforeach;
+                endforeach;
             endforeach;
         endif;
         
@@ -279,7 +276,7 @@ class Model extends Object {
             $data["modified"] = date("Y-m-d H:i:s");
         endif;
         
-        if($data["id"] && $this->exists($data["id"])):
+        if(isset($data["id"]) && $this->exists($data["id"])):
             $this->update(array("id" => $data["id"]), $data);
             $this->id = $data["id"];
         else:

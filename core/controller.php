@@ -40,14 +40,14 @@ class Controller extends Object {
     }
     public function load_models() {
         foreach($this->uses as $model):
-            $this->{$model} =& ClassRegistry::get_object("Model", $model);
+            $this->{$model} =& ClassRegistry::init($model);
         endforeach;
     }
     public function load_components() {
         #=>TODO: Load components through Component::load or something else
         foreach($this->components as $component):
             $component = "{$component}Component";
-            $this->{$component} =& ClassRegistry::get_object("Component", $component);
+            $this->{$component} =& ClassRegistry::init($component, "Component");
         endforeach;
     }
     public function before_filter() {
