@@ -40,11 +40,11 @@ class Model extends Object {
         $this->create_links();
     }
     public function __call($method, $params) {
-        $params = array_merge($params, array(null, null, null, null));
+        $params = array_merge($params, array(null, null, null, null, null));
         if(preg_match("/find_all_by_(.*)/", $method, $field)):
-            return $this->find_all_by($field[1], $params[0], $params[1], $params[2], $params[3]);
+            return $this->find_all_by($field[1], $params[0], $params[1], $params[2], $params[3], $params[4]);
         elseif(preg_match("/find_by_(.*)/", $method, $field)):
-            return $this->find_by($field[1], $params[0], $params[1], $params[2]);
+            return $this->find_by($field[1], $params[0], $params[1], $params[2], $params[3]);
         endif;
     }
     public function __set($field, $value = "") {
@@ -122,7 +122,7 @@ class Model extends Object {
                             $data = $class;
                             break;
                         case "foreign_key":
-                            $data = $type == "belongs_to" ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
+                            $data = ($type == "belongs_to" || $type == "has_one") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
                             break;
                         case "conditions":
                             $data = array();
@@ -180,6 +180,8 @@ class Model extends Object {
                         $field = "OR";
                     elseif(in_array($field, $logic)):
                         $field = strtoupper($field);
+                    else:
+                        continue;
                     endif;
                     $sql .= preg_replace("/' AND /", "' {$field} ", $this->sql_conditions($value));
                 else:
@@ -218,31 +220,33 @@ class Model extends Object {
             foreach($results as $key => $result):
                 foreach($this->associations as $type):
                     foreach($this->{$type} as $assoc):
+                        $condition = isset($conditions[Inflector::underscore($assoc["class_name"])]) ? $conditions[Inflector::underscore($assoc["class_name"])] : array();
+                        $condition = array_merge($condition, $assoc["conditions"]);
                         if(isset($this->{$assoc["class_name"]}->schema[$assoc["foreign_key"]])):
-                            $results[$key][Inflector::underscore($assoc["class_name"])] = $this->{$assoc["class_name"]}->find_all_by($assoc["foreign_key"], $result["id"]);
+                            $rows = $this->{$assoc["class_name"]}->find_all_by($assoc["foreign_key"], $result["id"], $condition, null /* Order */, null /* Limit */, $recursion - 1);
                         else:
-                            $results[$key][Inflector::underscore($assoc["class_name"])] = $this->{$assoc["class_name"]}->find_by("id", $result[$assoc["foreign_key"]]);
+                            $rows = $this->{$assoc["class_name"]}->find_by("id", $result[$assoc["foreign_key"]], $condition, null /* Order */, $recursion - 1);
                         endif;
+                        $results[$key][Inflector::underscore($assoc["class_name"])] = $rows;
                     endforeach;
                 endforeach;
             endforeach;
         endif;
-        
         return $results;
     }
-    public function find_all_by($field = "id", $value = null, $conditions = array(), $order = null, $limit = null) {
+    public function find_all_by($field = "id", $value = null, $conditions = array(), $order = null, $limit = null, $recursion = null) {
         if(!is_array($conditions)) $conditions = array();
         $conditions = array_merge(array($field => $value), $conditions);
-        return $this->find_all($conditions, $order, $limit);
+        return $this->find_all($conditions, $order, $limit, $recursion);
     }
-    public function find($conditions = array(), $order = null) {
-        $results = $this->find_all($conditions, $order, 1);
+    public function find($conditions = array(), $order = null, $recursion = null) {
+        $results = $this->find_all($conditions, $order, 1, $recursion);
         return $results[0];
     }
-    public function find_by($field = "id", $value = null, $conditions = array(), $order = null) {
+    public function find_by($field = "id", $value = null, $conditions = array(), $order = null, $recursion = null) {
         if(!is_array($conditions)) $conditions = array();
         $conditions = array_merge(array($field => $value), $conditions);
-        return $this->find($conditions, $order);
+        return $this->find($conditions, $order, $recursion);
     }
     public function create() {
         $this->id = null;

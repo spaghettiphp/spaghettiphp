@@ -28,6 +28,11 @@ class Author extends BaseModel {
     public $table = "authors";
 }
 
+class Profile extends BaseModel {
+    public $has_one = array("Author");
+    public $table = "profiles";
+}
+
 class TestModel extends UnitTestCase {
     public function setUp() {
         $posts = array(
@@ -57,17 +62,31 @@ class TestModel extends UnitTestCase {
                 "email" => "rafael@spaghettiphp.org"
             )
         );
+        $profiles = array(
+            array(
+                "author_id" => 1,
+                "url" => "http://juliogreff.net"
+            ),
+            array(
+                "author_id" => 2,
+                "url" => "http://rafaelmarin.net"
+            )
+        );
         $this->Post = ClassRegistry::init("Post");
         $this->Author = ClassRegistry::init("Author");
+        $this->Profile = ClassRegistry::init("Profile");
+        $this->Time = date("Y-m-d H:i:s");
         $this->Post->save_all($posts);
         $this->Author->save_all($authors);
-        $this->Time = date("Y-m-d H:i:s");
+        $this->Profile->save_all($profiles);
     }
     public function tearDown() {
         $this->Post->execute($this->Post->sql_query("truncate"));
         $this->Author->execute($this->Author->sql_query("truncate"));
+        $this->Profile->execute($this->Profile->sql_query("truncate"));
         $this->Post = null;
         $this->Author = null;
+        $this->Profile = null;
     }
     public function testSelect() {
         $results = $this->Author->find_all();
@@ -109,6 +128,32 @@ class TestModel extends UnitTestCase {
                 "name" => "Julio Greff",
                 "email" => "julio@spaghettiphp.org",
                 "created" => $this->Time
+            )
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testGenerateAssociation() {
+        $this->Author->create_links();
+        $results = $this->Author->generate_association("has_many");
+        $expected = array(
+            "Post" => array(
+                "class_name" => "Post",
+                "foreign_key" => "author_id",
+                "conditions" => array(),
+                "order" => null,
+                "limit" => null,
+                "dependent" => false
+            )
+        );
+        $this->assertEqual($expected, $results);
+
+        $this->Post->create_links();
+        $results = $this->Post->generate_association("belongs_to");
+        $expected = array(
+            "Author" => array(
+                "class_name" => "Author",
+                "foreign_key" => "author_id",
+                "conditions" => array(),
             )
         );
         $this->assertEqual($expected, $results);
@@ -205,29 +250,42 @@ class TestModel extends UnitTestCase {
             )
         );
         $this->assertEqual($expected, $results);
-    }
-    public function testGenerateAssociation() {
-        $this->Author->create_links();
-        $results = $this->Author->generate_association("has_many");
+
+        $results = $this->Profile->find_by_id(1, null, null, 1);
         $expected = array(
-            "Post" => array(
-                "class_name" => "Post",
-                "foreign_key" => "author_id",
-                "conditions" => array(),
-                "order" => null,
-                "limit" => null,
-                "dependent" => false
+            "id" => 1,
+            "author_id" => 1,
+            "url" => "http://juliogreff.net",
+            "author" => array(
+                "id" => 1,
+                "name" => "Julio Greff",
+                "email" => "julio@spaghettiphp.org",
+                "created" => $this->Time
             )
         );
         $this->assertEqual($expected, $results);
 
-        $this->Post->create_links();
-        $results = $this->Post->generate_association("belongs_to");
+        $results = $this->Author->find_by_id(1, array("post" => array("id >" => 1)), null, 2);
         $expected = array(
-            "Author" => array(
-                "class_name" => "Author",
-                "foreign_key" => "author_id",
-                "conditions" => array(),
+            "id" => 1,
+            "name" => "Julio Greff",
+            "email" => "julio@spaghettiphp.org",
+            "created" => $this->Time,
+            "post" => array(
+                array(
+                    "id" => 2,
+                    "author_id" => 1,
+                    "title" => "Model",
+                    "text" => "Testing Model",
+                    "created" => $this->Time,
+                    "modified" => $this->Time,
+                    "author" => array(
+                        "id" => 1,
+                        "name" => "Julio Greff",
+                        "email" => "julio@spaghettiphp.org",
+                        "created" => $this->Time
+                    )
+                )
             )
         );
         $this->assertEqual($expected, $results);
