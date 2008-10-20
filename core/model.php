@@ -25,6 +25,8 @@ class Model extends Object {
     public $recursive = 0;
     public $schema = array();
     public $table = null;
+    public $insert_id = null;
+    public $affected_rows = null;
     public function __construct($table = null) {
         if($this->table === null):
             if($table !== null):
@@ -261,12 +263,15 @@ class Model extends Object {
     }
     public function update($conditions = array(), $data = array()) {
         if($this->execute($this->sql_query("update", $conditions, $data))):
+            $this->affected_rows = mysql_affected_rows();
             return true;
         endif;
         return false;
     }
     public function insert($data = array()) {
         if($this->execute($this->sql_query("insert", $data))):
+            $this->insert_id = mysql_insert_id();
+            $this->affected_rows = mysql_affected_rows();
             return true;
         endif;
         return false;
@@ -312,6 +317,7 @@ class Model extends Object {
     }
     public function delete_all($conditions = array(), $order = null, $limit = null) {
         if($this->execute($this->sql_query("delete", $conditions, null, $order, $limit))):
+            $this->affected_rows = mysql_affected_rows();
             return true;
         endif;
         return false;
@@ -319,8 +325,11 @@ class Model extends Object {
     public function delete($id = null) {
         return $this->delete_all(array("id" => $id), null, 1);
     }
-    public function get_last_insert_id() {
-        return mysql_insert_id();
+    public function get_insert_id() {
+        return $this->insert_id;
+    }
+    public function get_affected_rows() {
+        return $this->affected_rows;
     }
 }
 
