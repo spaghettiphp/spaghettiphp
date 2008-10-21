@@ -14,7 +14,7 @@
 include_once "setup.php";
 
 class BaseModel extends AppModel {
-    public $recursive = 0;
+    public $recursion = 0;
     public $table = false;
 }
 
@@ -54,21 +54,21 @@ class TestModel extends UnitTestCase {
         );
         $authors = array(
             array(
+                "profile_id" => 1,
                 "name" => "Julio Greff",
                 "email" => "julio@spaghettiphp.org"
             ),
             array(
+                "profile_id" => 2,
                 "name" => "Rafael Marin",
                 "email" => "rafael@spaghettiphp.org"
             )
         );
         $profiles = array(
             array(
-                "author_id" => 1,
                 "url" => "http://juliogreff.net"
             ),
             array(
-                "author_id" => 2,
                 "url" => "http://rafaelmarin.net"
             )
         );
@@ -93,12 +93,14 @@ class TestModel extends UnitTestCase {
         $expected = array(
             array(
                 "id" => 1,
+                "profile_id" => 1,
                 "name" => "Julio Greff",
                 "email" => "julio@spaghettiphp.org",
                 "created" => $this->Time
             ),
             array(
                 "id" => 2,
+                "profile_id" => 2,
                 "name" => "Rafael Marin",
                 "email" => "rafael@spaghettiphp.org",
                 "created" => $this->Time
@@ -112,6 +114,7 @@ class TestModel extends UnitTestCase {
         $expected = array(
             array(
                 "id" => 2,
+                "profile_id" => 2,
                 "name" => "Rafael Marin",
                 "email" => "rafael@spaghettiphp.org",
                 "created" => $this->Time
@@ -125,6 +128,7 @@ class TestModel extends UnitTestCase {
         $expected = array(
             array(
                 "id" => 1,
+                "profile_id" => 1,
                 "name" => "Julio Greff",
                 "email" => "julio@spaghettiphp.org",
                 "created" => $this->Time
@@ -138,6 +142,7 @@ class TestModel extends UnitTestCase {
         $expected = array(
             array(
                 "id" => 1,
+                "profile_id" => 1,
                 "name" => "Julio Greff",
                 "email" => "julio@spaghettiphp.org",
                 "created" => $this->Time
@@ -155,7 +160,7 @@ class TestModel extends UnitTestCase {
                 "conditions" => array(),
                 "order" => null,
                 "limit" => null,
-                "dependent" => false
+                "dependent" => true
             )
         );
         $this->assertEqual($expected, $results);
@@ -176,6 +181,7 @@ class TestModel extends UnitTestCase {
         $expected = array(
             array(
                 "id" => 1,
+                "profile_id" => 1,
                 "name" => "Julio Greff",
                 "email" => "julio@spaghettiphp.org",
                 "created" => $this->Time,
@@ -200,6 +206,7 @@ class TestModel extends UnitTestCase {
             ),
             array(
                 "id" => 2,
+                "profile_id" => 2,
                 "name" => "Rafael Marin",
                 "email" => "rafael@spaghettiphp.org",
                 "created" => $this->Time,
@@ -228,6 +235,7 @@ class TestModel extends UnitTestCase {
                 "modified" => $this->Time,
                 "author" => array(
                     "id" => 1,
+                    "profile_id" => 1,
                     "name" => "Julio Greff",
                     "email" => "julio@spaghettiphp.org",
                     "created" => $this->Time
@@ -242,6 +250,7 @@ class TestModel extends UnitTestCase {
                 "modified" => $this->Time,
                 "author" => array(
                     "id" => 1,
+                    "profile_id" => 1,
                     "name" => "Julio Greff",
                     "email" => "julio@spaghettiphp.org",
                     "created" => $this->Time
@@ -256,6 +265,7 @@ class TestModel extends UnitTestCase {
                 "modified" => $this->Time,
                 "author" => array(
                     "id" => 2,
+                    "profile_id" => 2,
                     "name" => "Rafael Marin",
                     "email" => "rafael@spaghettiphp.org",
                     "created" => $this->Time
@@ -267,10 +277,10 @@ class TestModel extends UnitTestCase {
         $results = $this->Profile->find_by_id(1, null, null, 1);
         $expected = array(
             "id" => 1,
-            "author_id" => 1,
             "url" => "http://juliogreff.net",
             "author" => array(
                 "id" => 1,
+                "profile_id" => 1,
                 "name" => "Julio Greff",
                 "email" => "julio@spaghettiphp.org",
                 "created" => $this->Time
@@ -281,6 +291,7 @@ class TestModel extends UnitTestCase {
         $results = $this->Author->find_by_id(1, array("post" => array("id >" => 1)), null, 2);
         $expected = array(
             "id" => 1,
+            "profile_id" => 1,
             "name" => "Julio Greff",
             "email" => "julio@spaghettiphp.org",
             "created" => $this->Time,
@@ -294,6 +305,7 @@ class TestModel extends UnitTestCase {
                     "modified" => $this->Time,
                     "author" => array(
                         "id" => 1,
+                        "profile_id" => 1,
                         "name" => "Julio Greff",
                         "email" => "julio@spaghettiphp.org",
                         "created" => $this->Time
@@ -303,6 +315,38 @@ class TestModel extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
     }
+    public function testDelete() {
+        $this->Post->delete(3);
+        $results = $this->Post->find_all();
+        $expected = array(
+            array(
+                "id" => 1,
+                "author_id" => 1,
+                "title" => "Spaghetti",
+                "text" => "PHP Framework",
+                "created" => $this->Time,
+                "modified" => $this->Time
+            ),
+            array(
+                "id" => 2,
+                "author_id" => 1,
+                "title" => "Model",
+                "text" => "Testing Model",
+                "created" => $this->Time,
+                "modified" => $this->Time
+            )
+        );
+        $this->assertEqual($expected, $results);
+        
+        $this->Author->delete(1, true);
+        $results = $this->Post->find_all();
+        $expected = array();
+        $this->assertEqual($expected, $results);
+        
+        $this->Profile->delete(2, true);
+        $results = $this->Author->find_all();
+        $expected = array();
+        $this->assertEqual($expected, $results);
+    }
 }
-
 ?>

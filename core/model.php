@@ -22,7 +22,7 @@ class Model extends Object {
     public $has_one = array();
     public $data = array();
     public $id = null;
-    public $recursive = 0;
+    public $recursion = 1;
     public $schema = array();
     public $table = null;
     public $insert_id = null;
@@ -124,13 +124,13 @@ class Model extends Object {
                             $data = $class;
                             break;
                         case "foreign_key":
-                            $data = ($type == "belongs_to" || $type == "has_one") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
+                            $data = ($type == "belongs_to") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
                             break;
                         case "conditions":
                             $data = array();
                             break;
                         case "dependent":
-                            $data = false;
+                            $data = true;
                             break;
                     endswitch;
                     $this->{$type}[$class][$key] = $data;
@@ -226,10 +226,12 @@ class Model extends Object {
                     foreach($this->{$type} as $assoc):
                         $condition = isset($conditions[Inflector::underscore($assoc["class_name"])]) ? $conditions[Inflector::underscore($assoc["class_name"])] : array();
                         $condition = array_merge($condition, $assoc["conditions"]);
-                        if(isset($this->{$assoc["class_name"]}->schema[$assoc["foreign_key"]])):
-                            $rows = $this->{$assoc["class_name"]}->find_all_by($assoc["foreign_key"], $result["id"], $condition, null /* Order */, null /* Limit */, $recursion - 1);
+                        $field = isset($this->{$assoc["class_name"]}->schema[$assoc["foreign_key"]]) ? $assoc["foreign_key"] : "id";
+                        $value = isset($this->{$assoc["class_name"]}->schema[$assoc["foreign_key"]]) ? $result["id"] : $result[$assoc["foreign_key"]];
+                        if($type == "has_many"):
+                            $rows = $this->{$assoc["class_name"]}->find_all_by($field, $value, $condition, null, null, $recursion - 1);
                         else:
-                            $rows = $this->{$assoc["class_name"]}->find_by("id", $result[$assoc["foreign_key"]], $condition, null /* Order */, $recursion - 1);
+                            $rows = $this->{$assoc["class_name"]}->find_by($field, $value, $condition, null, $recursion - 1);
                         endif;
                         $results[$key][Inflector::underscore($assoc["class_name"])] = $rows;
                     endforeach;
@@ -324,8 +326,20 @@ class Model extends Object {
         endif;
         return false;
     }
-    public function delete($id = null) {
-        return $this->delete_all(array("id" => $id), null, 1);
+    public function delete($id = null, $dependent = false) {
+        $return = $this->delete_all(array("id" => $id), null, 1);
+        if($dependent):
+            foreach(array("has_many", "has_one") as $type):
+                foreach($this->{$type} as $model => $assoc):
+                    if($assoc["dependent"]):
+                        $this->{$model}->delete_all(array(
+                            $assoc["foreign_key"] => $id
+                        ));
+                    endif;
+                endforeach;
+            endforeach;
+        endif;
+        return $return;
     }
     public function get_insert_id() {
         return $this->insert_id;
