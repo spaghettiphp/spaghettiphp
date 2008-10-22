@@ -258,11 +258,11 @@ class Model extends Object {
         $this->id = null;
         $this->data = array();
     }
-    public function read($id = null) {
+    public function read($id = null, $recursion = null) {
         if($id != null):
             $this->id = $id;
         endif;
-        $this->data = $this->find(array("id" => $this->id));;
+        $this->data = $this->find(array("id" => $this->id), null, $recursion);
         return $this->data;
     }
     public function update($conditions = array(), $data = array()) {
@@ -296,10 +296,20 @@ class Model extends Object {
             if(isset($this->schema["created"]) && $this->schema["created"]["type"] == "datetime" && !isset($data["created"])):
                 $data["created"] = date("Y-m-d H:i:s");
             endif;
-            
             $this->insert($data);
-            $this->id = $this->get_last_insert_id();
+            $this->id = $this->get_insert_id();
         endif;
+        
+        foreach(array("has_one", "has_many") as $type):
+            foreach($this->{$type} as $class => $assoc):
+                $assoc_model = Inflector::underscore($class);
+                if(isset($data[$assoc_model])):
+                    $data[$assoc_model][$assoc["foreign_key"]] = $this->id;
+                    $this->{$class}->save($data[$assoc_model]);
+                endif;
+            endforeach;
+        endforeach;
+        
         return $this->data = $this->read($this->id);
     }
     public function save_all($data) {

@@ -348,5 +348,52 @@ class TestModel extends UnitTestCase {
         $expected = array();
         $this->assertEqual($expected, $results);
     }
+    public function testSave() {
+        $time = date("Y-m-d H:i:s");
+        $this->Profile->save(array(
+            "url" => "http://jaderubini.net",
+            "author" => array(
+                "name" => "Jader Rubini",
+                "email" => "jader@spaghettiphp.org"                
+            )
+        ));
+        $results = $this->Profile->find_by_id(3, null, null, 1);
+        $expected = array(
+            "id" => 3,
+            "url" => "http://jaderubini.net",
+            "author" => array(
+                "id" => 3,
+                "profile_id" => 3,
+                "name" => "Jader Rubini",
+                "email" => "jader@spaghettiphp.org",
+                "created" => $time,
+            ),
+        );
+        $this->assertEqual($expected, $results);
+
+        $this->Profile->save(array(
+            "id" => 1,
+            "url" => "http://juliogreff.blog.br",
+            "author" => array(
+                "id" => 1,
+                "name" => "Julio Greff",
+                "email" => "julio@juliogreff.net"                
+            )
+        ));
+        $results = $this->Profile->find_by_id(1, null, null, 1);
+        $expected = array(
+            "id" => 1,
+            "url" => "http://juliogreff.blog.br",
+            "author" => array(
+                "id" => 1,
+                "profile_id" => 1,
+                "name" => "Julio Greff",
+                "email" => "julio@juliogreff.net",
+                "created" => $this->Time,
+            ),
+        );
+        $this->assertEqual($expected, $results);
+    }
 }
+
 ?>
