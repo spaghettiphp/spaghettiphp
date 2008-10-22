@@ -161,7 +161,7 @@ class TestDispatcher extends UnitTestCase {
         $expected = array(
             "here" => "/admin",
             "prefix" => "admin",
-            "controller" => "",
+            "controller" => "home",
             "action" => "admin_index",
             "id" => "",
             "extension" => "htm",

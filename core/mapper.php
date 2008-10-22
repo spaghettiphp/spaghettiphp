@@ -50,7 +50,9 @@ class Mapper extends Object {
     }
     public function prefix($prefix = "") {
         $self = Mapper::get_instance();
-        return $self->prefixes []= $prefix;
+        $self->prefixes []= $prefix;
+        Mapper::connect("/$prefix", "/$prefix" . Mapper::get_route("/"));
+        return $prefix;
     }
     public function unset_prefix($prefix = "") {
         $self = Mapper::get_instance();
