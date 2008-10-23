@@ -11,7 +11,7 @@
  */
     
 class View extends Object {
-    public $helpers = array();
+    public $helpers = array("Html");
     public $loaded_helpers = array();
     public $controller;
     public $action;
@@ -32,8 +32,8 @@ class View extends Object {
     }
     public function load_helpers() {
         foreach($this->helpers as $helper):
-            $class = Inflector::camelize("{$helper}_helper");
-            $this->loaded_helpers []= ClassRegistry::init($class);
+            $class = "{$helper}Helper";
+            $this->loaded_helpers[Inflector::underscore($helper)] = ClassRegistry::init($class, "Helper");
         endforeach;
         return $this->loaded_helpers;
     }
