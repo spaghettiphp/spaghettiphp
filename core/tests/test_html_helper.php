@@ -14,7 +14,7 @@
 include_once "setup.php";
 Spaghetti::import("Helper", "html_helper");
 
-class TestMapper extends UnitTestCase {
+class TestHtmlHelper extends UnitTestCase {
     public function setUp() {
         $this->Html = new HtmlHelper;
     }
@@ -45,6 +45,42 @@ class TestMapper extends UnitTestCase {
         $results = $this->Html->tag("input", "NO!", array("type" => "text"), false);
         $expected = "<input type=\"text\" />";
         $this->assertEqual($expected, $results);
+    }
+    public function testLink() {
+        $results = $this->Html->link("link", "/home/index");
+        $expected = "/<a href=\"\/.*home\/index\">link<\/a>/";
+        $this->assertWantedPattern($expected, $results);
+
+        $results = $this->Html->link("link", "/home/index", null, true);
+        $expected = "/<a href=\"http:\/\/.*home\/index\">link<\/a>/";
+        $this->assertWantedPattern($expected, $results);
+
+        $results = $this->Html->link("link", "/home/index", array("target" => "_blank"));
+        $expected = "/<a href=\"\/.*home\/index\" target=\"_blank\">link<\/a>/";
+        $this->assertWantedPattern($expected, $results);
+
+        $results = $this->Html->link($this->Html->image("image.jpg", "image"), "/home/index");
+        $expected = "/<a href=\"\/.*home\/index\"><img src=\"\/.*images\/image\.jpg\" alt=\"image\" \/><\/a>/";
+        $this->assertWantedPattern($expected, $results);
+    }
+    public function testImage() {
+        $results = $this->Html->image("image.jpg", "image");
+        $expected = "/<img src=\"\/.*images\/image\.jpg\" alt=\"image\" \/>/";
+        $this->assertWantedPattern($expected, $results);
+
+        $results = $this->Html->image("image.jpg", "image", array("class" => "image"));
+        $expected = "/<img src=\"\/.*images\/image\.jpg\" alt=\"image\" class=\"image\" \/>/";
+        $this->assertWantedPattern($expected, $results);
+    }
+    public function testStylesheet() {
+        $results = $this->Html->stylesheet("styles.css");
+        $expected = "/<link href=\"\/.*styles\/styles\.css\" rel=\"stylesheet\" type=\"text\/css\" \/>/";
+        $this->assertWantedPattern($expected, $results);
+    }
+    public function testScript() {
+        $results = $this->Html->script("script.js");
+        $expected = "/<script src=\"\/.*scripts\/script\.js\" type=\"text\/javascript\"><\/script>/";
+        $this->assertWantedPattern($expected, $results);
     }
 }
 
