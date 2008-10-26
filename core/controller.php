@@ -63,6 +63,7 @@ class Controller extends Object {
         $this->before_render();
         $view = new View($this);
         $view->set($this->view_data);
+        $view->helpers = $this->helpers;
         $this->output .= $view->render($action, $layout);
         $this->auto_render = false;
         return $this->output;
