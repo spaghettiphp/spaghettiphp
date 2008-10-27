@@ -97,7 +97,7 @@ class View extends Object {
     }
     public function element($element = null, $params = array()) {
         $ext = $this->extension ? $this->extension : "phtm";
-        return $this->render_view(Spaghetti::import("View", "elements/{$element}", "phtm", true), $params);
+        return $this->render_view(Spaghetti::import("View", "_{$element}", $ext, true), $params);
     }
     public function set($var = null, $content = null) {
         if(is_array($var)):
