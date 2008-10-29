@@ -83,10 +83,10 @@ class View extends Object {
             $ext = $filename[1] ? $filename[1] : "phtm";
         endif;
         $filename = Spaghetti::import("Layout", $layout, $ext, true);
-        $data = array(
+        $data = array_merge(array(
             "content_for_layout" => $content,
-            "page_title" => $this->page_title
-        );
+            "page_title" => $this->page_title,
+        ), $this->view_data);
         if($filename):
             $out = $this->render_view($filename, $data);
             return $out;
