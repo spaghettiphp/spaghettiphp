@@ -1,6 +1,12 @@
 <?php
 /**
- *  Put description here
+ *  O arquivo basics.php contém quatro classes básicas para o funcionamento
+ *  do Spaghetti Framework. A classe Object é herdada por praticamente todas
+ *  as outras classes existentes dentro do core do Spaghetti. A classe Spaghetti
+ *  possui os métodos para importar os arquivos que serão solicitados ao longo
+ *  da sua execução. A classe Config estabelece as configurações necessárias
+ *  de banco de dados e de outras preferências da aplicação. A classe Error atua
+ *  na manipulação de erros provenientes de qualquer lugar da aplicação.
  *
  *  Licensed under The MIT License.
  *  Redistributions of files must retain the above copyright notice.
@@ -17,6 +23,15 @@ class Object {
     public function error($type = "", $details = array()) {
         new Error($type, $details);
     }
+    /**
+     * O método Object::transmit() transforma um array de opções em respectivas
+     * variáveis de classe que, portanto, são transmitidas para outra classe. Geralmente
+     * é utilizada na mudança de camadas, entre modelos e controladores ou controladores
+     * e visualizações.
+     *
+     * @param {Array} $arr Array de opções
+     * @return {Boolean}
+    */
     public function transmit($arr = array()) {
         foreach($arr as $key => $value) {
             $this->$key = $value;
@@ -26,6 +41,16 @@ class Object {
 }
 
 class Spaghetti extends Object {
+    /**
+     * O método Spaghetti::import() faz a importação dos arquivos necessários
+     * durante a execução do programa.
+     *
+     * @param {String} $type Contexto de onde será importado o arquivo
+     * @param {Mixed} $file Uma string com o nome do arquivo ou um array com nomes de arquivo
+     * @param {String} $ext Extensão de arquivo do(s) arquivo(s) a ser(em) importado(s)
+     * @param {Boolean} $return Define se o metodo retorna o caminho para o arquivo ou a cópia em buffer
+     * @return {Mixed}
+    */
     static function import($type = "Core", $file = "", $ext = "php", $return = false) {
         $paths = array(
             "Core" => array(CORE),
@@ -59,6 +84,13 @@ class Spaghetti extends Object {
 
 class Config extends Object {
     public $config = array();
+    /**
+     * O método Config::get_instance() retorna sempre o mesmo link de instância,
+     * para que os métodos estáticos possam ser usados com características de
+     * instâncias de objetos.
+     *
+     * @return {Resource}
+    */
     public function &get_instance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
@@ -66,10 +98,23 @@ class Config extends Object {
         endif;
         return $instance[0];
     }
+    /**
+     * O método Config::read() retorna o valor de uma configuração da aplicação.
+     *
+     * @param {String} $key Nome da chave (variável) da configuração
+     * @return {Mixed}
+     */
     static function read($key = "") {
         $self = self::get_instance();
         return $self->config[$key];
     }
+    /**
+     * O método Config::write() grava o valor de uma configuração da aplicação.
+     *
+     * @param {String} $key Nome da chave (variável) da configuração
+     * @param {String} $value Valor da chave (variável) da configuração
+     * @return {Mixed}
+     */
     static function write($key = "", $value = "") {
         $self = self::get_instance();
         $self->config[$key] = $value;
