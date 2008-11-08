@@ -29,8 +29,8 @@ class Object {
      * é utilizada na mudança de camadas, entre modelos e controladores ou controladores
      * e visualizações.
      *
-     * @param {Array} $arr Array de opções
-     * @return {Boolean}
+     * @param array $arr Array de opções
+     * @return boolean
     */
     public function transmit($arr = array()) {
         foreach($arr as $key => $value) {
@@ -45,11 +45,11 @@ class Spaghetti extends Object {
      * O método Spaghetti::import() faz a importação dos arquivos necessários
      * durante a execução do programa.
      *
-     * @param {String} $type Contexto de onde será importado o arquivo
-     * @param {Mixed} $file Uma string com o nome do arquivo ou um array com nomes de arquivo
-     * @param {String} $ext Extensão de arquivo do(s) arquivo(s) a ser(em) importado(s)
-     * @param {Boolean} $return Define se o metodo retorna o caminho para o arquivo ou a cópia em buffer
-     * @return {Mixed}
+     * @param string $type Contexto de onde será importado o arquivo
+     * @param mixed $file Uma string com o nome do arquivo ou um array com nomes de arquivo
+     * @param string $ext Extensão de arquivo do(s) arquivo(s) a ser(em) importado(s)
+     * @param boolean $return Define se o metodo retorna o caminho para o arquivo ou a cópia em buffer
+     * @return mixed Buffer do arquivo importado ou falso caso não consiga carregá-lo
     */
     static function import($type = "Core", $file = "", $ext = "php", $return = false) {
         $paths = array(
@@ -89,7 +89,7 @@ class Config extends Object {
      * para que os métodos estáticos possam ser usados com características de
      * instâncias de objetos.
      *
-     * @return {Resource}
+     * @return resource
     */
     public function &get_instance() {
         static $instance = array();
@@ -101,8 +101,8 @@ class Config extends Object {
     /**
      * O método Config::read() retorna o valor de uma configuração da aplicação.
      *
-     * @param {String} $key Nome da chave (variável) da configuração
-     * @return {Mixed}
+     * @param string $key Nome da chave (variável) da configuração
+     * @return mixed
      */
     static function read($key = "") {
         $self = self::get_instance();
@@ -111,9 +111,9 @@ class Config extends Object {
     /**
      * O método Config::write() grava o valor de uma configuração da aplicação.
      *
-     * @param {String} $key Nome da chave (variável) da configuração
-     * @param {String} $value Valor da chave (variável) da configuração
-     * @return {Mixed}
+     * @param string $key Nome da chave (variável) da configuração
+     * @param string $value Valor da chave (variável) da configuração
+     * @return mixed
      */
     static function write($key = "", $value = "") {
         $self = self::get_instance();

@@ -1,6 +1,8 @@
 <?php
 /**
- *  Put description here
+ *  A classe View é responsável por extrair o conteúdo enviado pelo controlador
+ *  e associá-lo ao view e layout correspondentes, fazendo também a inclusão
+ *  dos helpers necessários.
  *
  *  Licensed under The MIT License.
  *  Redistributions of files must retain the above copyright notice.
@@ -30,6 +32,13 @@ class View extends Object {
             $this->auto_layout = $controller->auto_layout;
         endif;
     }
+    /**
+     * View::load_helpers() faz a inclusão dos helpers necessários
+     * solicitados anteriormente pelo controlador e que agora serão usados
+     * pela view.
+     *
+     * @return array Array de objetos das classes dos helpers
+     */
     public function load_helpers() {
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
@@ -37,6 +46,16 @@ class View extends Object {
         endforeach;
         return $this->loaded_helpers;
     }
+    /**
+     * O método View::render_view() recebe o resultado do processamento do
+     * controlador atual e renderiza a view correspondente, retornando um HTML
+     * estático do conteúdo solicitado. Chama também o método responsável por
+     * extrair os helpers e associá-los ao view.
+     *
+     * @param string $filename Nome do arquivo de view
+     * @param array $extract_vars Variáveis a serem passadas para a view
+     * @return string HTML da view renderizada
+     */
     public function render_view($filename = null, $extract_vars = array()) {
         if(!is_string($filename)):
             return false;
@@ -51,6 +70,15 @@ class View extends Object {
         $out = ob_get_clean();
         return $out;
     }
+    /**
+     * View::render() é responsável por receber uma ação, um controlador e
+     * um layout e fazer as inclusões necessárias para a renderização da tela,
+     * chamando outros métodos para renderizar o view e o layout.
+     *
+     * @param string $action Nome da ação a ser chamada
+     * @param string $layout Nome do arquivo de layout
+     * @return string HTML final da renderização.
+     */
     public function render($action = null, $layout = null) {
         if($action === null):
             $action = "{$this->controller}/{$this->action}";
@@ -73,6 +101,15 @@ class View extends Object {
             return false;
         endif;
     }
+    /**
+     * O método View::render_layout() faz o buffer e a renderização do layout
+     * requisitado, incluindo a view correspondente a requisição atual e passando
+     * as variáveis definidas no controlador. Retorna o HTML processado, sem PHP.
+     *
+     * @param string $content Conteúdo a ser passado para o layout
+     * @param string layout Nome do arquivo de layout
+     * @return string HTML do layout renderizado
+     */
     public function render_layout($content = null, $layout = null) {
         if($layout === null):
             $layout = $this->layout;
@@ -95,10 +132,29 @@ class View extends Object {
             return false;
         endif;
     }
+    /**
+     * O método View::element() retorna o buffer do carregamento de um elemento,
+     * que são arquivos de views que são repetidos muitas vezes, e podem assim
+     * estar em um arquivo só. Isto é bastante útil para trechos repetidos de
+     * código PHTML, para que nem seja necessário criar um novo layout nem repetir
+     * este trecho a cada arquivo onde seja necessário.
+     *
+     * @param string $element Nome do arquivo elemento
+     * @param array $params Parâmetros opcionais a serem passados para o elemento
+     * @return string Buffer do arquivo solicitado
+     */
     public function element($element = null, $params = array()) {
         $ext = $this->extension ? $this->extension : "phtm";
         return $this->render_view(Spaghetti::import("View", "_{$element}", $ext, true), $params);
     }
+    /**
+     * View::set() é o método que grava as variáveis definidas no
+     * controlador que serão passadas para o view em seguida.
+     *
+     * @param mixed $var String com nome da variável ou array de variáveis e valores
+     * @param mixed $content Valor da variável, é aceito qualquer tipo de conteúdo
+     * @return mixed Retorna o conteúdo da variável gravada
+     */
     public function set($var = null, $content = null) {
         if(is_array($var)):
             foreach($var as $key => $value):
@@ -111,5 +167,4 @@ class View extends Object {
         return false;
     }
 }
-
 ?>
