@@ -145,7 +145,7 @@ class View extends Object {
      */
     public function element($element = null, $params = array()) {
         $ext = $this->extension ? "p{$this->extension}" : "phtm";
-        return $this->render_view(Spaghetti::import("View", "elements/_{$element}", $ext, true), $params);
+        return $this->render_view(Spaghetti::import("View", "_{$element}", $ext, true), $params);
     }
     /**
      * View::set() é o método que grava as variáveis definidas no
