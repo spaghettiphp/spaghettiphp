@@ -109,6 +109,30 @@ class TestDispatcher extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
 
+        $results = $this->dispatcher->parse_url("controller/action/1");
+        $expected = array(
+            "here" => "/controller/action/1",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "htm",
+            "params" => array()
+        );
+        $this->assertEqual($expected, $results);
+        
+        $results = $this->dispatcher->parse_url("controller/1");
+        $expected = array(
+            "here" => "/controller/1",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "index",
+            "id" => "1",
+            "extension" => "htm",
+            "params" => array()
+        );
+        $this->assertEqual($expected, $results);
+        
         $results = $this->dispatcher->parse_url("controller/action/1.xml/params/");
         $expected = array(
             "here" => "/controller/action/1.xml/params",

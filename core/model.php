@@ -32,7 +32,8 @@ class Model extends Object {
             if($table !== null):
                 $this->table = $table;
             else:
-                $this->table = Inflector::underscore(get_class($this));
+                $database = Config::read("database");
+                $this->table = $database["prefix"] . Inflector::underscore(get_class($this));
             endif;
         endif;
         if($this->table !== false):
