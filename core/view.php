@@ -1,8 +1,8 @@
 <?php
 /**
- *  A classe View È respons·vel por extrair o conte˙do enviado pelo controlador
- *  e associ·-lo ao view e layout correspondentes, fazendo tambÈm a inclus„o
- *  dos helpers necess·rios.
+ *  A classe View √© respons√°vel por extrair o conte√∫do enviado pelo controlador
+ *  e associ√°-lo ao view e layout correspondentes, fazendo tamb√©m a inclus√£o
+ *  dos helpers necess√°rios.
  *
  *  Licensed under The MIT License.
  *  Redistributions of files must retain the above copyright notice.
@@ -33,8 +33,8 @@ class View extends Object {
         endif;
     }
     /**
-     * View::load_helpers() faz a inclus„o dos helpers necess·rios
-     * solicitados anteriormente pelo controlador e que agora ser„o usados
+     * View::load_helpers() faz a inclus√£o dos helpers necess√°rios
+     * solicitados anteriormente pelo controlador e que agora ser√£o usados
      * pela view.
      *
      * @return array Array de objetos das classes dos helpers
@@ -47,13 +47,13 @@ class View extends Object {
         return $this->loaded_helpers;
     }
     /**
-     * O mÈtodo View::render_view() recebe o resultado do processamento do
+     * O m√©todo View::render_view() recebe o resultado do processamento do
      * controlador atual e renderiza a view correspondente, retornando um HTML
-     * est·tico do conte˙do solicitado. Chama tambÈm o mÈtodo respons·vel por
-     * extrair os helpers e associ·-los ao view.
+     * est√°tico do conte√∫do solicitado. Chama tamb√©m o m√©todo respons√°vel por
+     * extrair os helpers e associ√°-los ao view.
      *
      * @param string $filename Nome do arquivo de view
-     * @param array $extract_vars Vari·veis a serem passadas para a view
+     * @param array $extract_vars Vari√°veis a serem passadas para a view
      * @return string HTML da view renderizada
      */
     public function render_view($filename = null, $extract_vars = array()) {
@@ -71,13 +71,13 @@ class View extends Object {
         return $out;
     }
     /**
-     * View::render() È respons·vel por receber uma aÁ„o, um controlador e
-     * um layout e fazer as inclusıes necess·rias para a renderizaÁ„o da tela,
-     * chamando outros mÈtodos para renderizar o view e o layout.
+     * View::render() √© respons√°vel por receber uma a√ß√£o, um controlador e
+     * um layout e fazer as inclus√µes necess√°rias para a renderiza√ß√£o da tela,
+     * chamando outros m√©todos para renderizar o view e o layout.
      *
-     * @param string $action Nome da aÁ„o a ser chamada
+     * @param string $action Nome da a√ß√£o a ser chamada
      * @param string $layout Nome do arquivo de layout
-     * @return string HTML final da renderizaÁ„o.
+     * @return string HTML final da renderiza√ß√£o.
      */
     public function render($action = null, $layout = null) {
         if($action === null):
@@ -102,11 +102,11 @@ class View extends Object {
         endif;
     }
     /**
-     * O mÈtodo View::render_layout() faz o buffer e a renderizaÁ„o do layout
-     * requisitado, incluindo a view correspondente a requisiÁ„o atual e passando
-     * as vari·veis definidas no controlador. Retorna o HTML processado, sem PHP.
+     * O m√©todo View::render_layout() faz o buffer e a renderiza√ß√£o do layout
+     * requisitado, incluindo a view correspondente a requisi√ß√£o atual e passando
+     * as vari√°veis definidas no controlador. Retorna o HTML processado, sem PHP.
      *
-     * @param string $content Conte˙do a ser passado para o layout
+     * @param string $content Conte√∫do a ser passado para o layout
      * @param string layout Nome do arquivo de layout
      * @return string HTML do layout renderizado
      */
@@ -133,14 +133,14 @@ class View extends Object {
         endif;
     }
     /**
-     * O mÈtodo View::element() retorna o buffer do carregamento de um elemento,
-     * que s„o arquivos de views que s„o repetidos muitas vezes, e podem assim
-     * estar em um arquivo sÛ. Isto È bastante ˙til para trechos repetidos de
-     * cÛdigo PHTML, para que nem seja necess·rio criar um novo layout nem repetir
-     * este trecho a cada arquivo onde seja necess·rio.
+     * O m√©todo View::element() retorna o buffer do carregamento de um elemento,
+     * que s√£o arquivos de views que s√£o repetidos muitas vezes, e podem assim
+     * estar em um arquivo s√≥. Isto √© bastante √∫til para trechos repetidos de
+     * c√≥digo PHTML, para que nem seja necess√°rio criar um novo layout nem repetir
+     * este trecho a cada arquivo onde seja necess√°rio.
      *
      * @param string $element Nome do arquivo elemento
-     * @param array $params Par‚metros opcionais a serem passados para o elemento
+     * @param array $params Par√¢metros opcionais a serem passados para o elemento
      * @return string Buffer do arquivo solicitado
      */
     public function element($element = null, $params = array()) {
@@ -148,12 +148,12 @@ class View extends Object {
         return $this->render_view(Spaghetti::import("View", "_{$element}", $ext, true), $params);
     }
     /**
-     * View::set() È o mÈtodo que grava as vari·veis definidas no
-     * controlador que ser„o passadas para o view em seguida.
+     * View::set() √© o m√©todo que grava as vari√°veis definidas no
+     * controlador que ser√£o passadas para o view em seguida.
      *
-     * @param mixed $var String com nome da vari·vel ou array de vari·veis e valores
-     * @param mixed $content Valor da vari·vel, È aceito qualquer tipo de conte˙do
-     * @return mixed Retorna o conte˙do da vari·vel gravada
+     * @param mixed $var String com nome da vari√°vel ou array de vari√°veis e valores
+     * @param mixed $content Valor da vari√°vel, √© aceito qualquer tipo de conte√∫do
+     * @return mixed Retorna o conte√∫do da vari√°vel gravada
      */
     public function set($var = null, $content = null) {
         if(is_array($var)):

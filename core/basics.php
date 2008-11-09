@@ -1,12 +1,12 @@
 <?php
 /**
- *  O arquivo basics.php contÈm quatro classes b·sicas para o funcionamento
- *  do Spaghetti Framework. A classe Object È herdada por praticamente todas
+ *  O arquivo basics.php cont√©m quatro classes b√°sicas para o funcionamento
+ *  do Spaghetti Framework. A classe Object √© herdada por praticamente todas
  *  as outras classes existentes dentro do core do Spaghetti. A classe Spaghetti
- *  possui os mÈtodos para importar os arquivos que ser„o solicitados ao longo
- *  da sua execuÁ„o. A classe Config estabelece as configuraÁıes necess·rias
- *  de banco de dados e de outras preferÍncias da aplicaÁ„o. A classe Error atua
- *  na manipulaÁ„o de erros provenientes de qualquer lugar da aplicaÁ„o.
+ *  possui os m√©todos para importar os arquivos que ser√£o solicitados ao longo
+ *  da sua execu√ß√£o. A classe Config estabelece as configura√ß√µes necess√°rias
+ *  de banco de dados e de outras prefer√™ncias da aplica√ß√£o. A classe Error atua
+ *  na manipula√ß√£o de erros provenientes de qualquer lugar da aplica√ß√£o.
  *
  *  Licensed under The MIT License.
  *  Redistributions of files must retain the above copyright notice.
@@ -24,12 +24,12 @@ class Object {
         new Error($type, $details);
     }
     /**
-     * O mÈtodo Object::transmit() transforma um array de opÁıes em respectivas
-     * vari·veis de classe que, portanto, s„o transmitidas para outra classe. Geralmente
-     * È utilizada na mudanÁa de camadas, entre modelos e controladores ou controladores
-     * e visualizaÁıes.
+     * O m√©todo Object::transmit() transforma um array de op√ß√µes em respectivas
+     * vari√°veis de classe que, portanto, s√£o transmitidas para outra classe. Geralmente
+     * √© utilizada na mudan√ßa de camadas, entre modelos e controladores ou controladores
+     * e visualiza√ß√µes.
      *
-     * @param array $arr Array de opÁıes
+     * @param array $arr Array de op√ß√µes
      * @return boolean
     */
     public function transmit($arr = array()) {
@@ -42,14 +42,14 @@ class Object {
 
 class Spaghetti extends Object {
     /**
-     * O mÈtodo Spaghetti::import() faz a importaÁ„o dos arquivos necess·rios
-     * durante a execuÁ„o do programa.
+     * O m√©todo Spaghetti::import() faz a importa√ß√£o dos arquivos necess√°rios
+     * durante a execu√ß√£o do programa.
      *
-     * @param string $type Contexto de onde ser· importado o arquivo
+     * @param string $type Contexto de onde ser√° importado o arquivo
      * @param mixed $file Uma string com o nome do arquivo ou um array com nomes de arquivo
-     * @param string $ext Extens„o de arquivo do(s) arquivo(s) a ser(em) importado(s)
-     * @param boolean $return Define se o metodo retorna o caminho para o arquivo ou a cÛpia em buffer
-     * @return mixed Buffer do arquivo importado ou falso caso n„o consiga carreg·-lo
+     * @param string $ext Extens√£o de arquivo do(s) arquivo(s) a ser(em) importado(s)
+     * @param boolean $return Define se o metodo retorna o caminho para o arquivo ou a c√≥pia em buffer
+     * @return mixed Buffer do arquivo importado ou falso caso n√£o consiga carreg√°-lo
     */
     static function import($type = "Core", $file = "", $ext = "php", $return = false) {
         $paths = array(
@@ -85,9 +85,9 @@ class Spaghetti extends Object {
 class Config extends Object {
     public $config = array();
     /**
-     * O mÈtodo Config::get_instance() retorna sempre o mesmo link de inst‚ncia,
-     * para que os mÈtodos est·ticos possam ser usados com caracterÌsticas de
-     * inst‚ncias de objetos.
+     * O m√©todo Config::get_instance() retorna sempre o mesmo link de inst√¢ncia,
+     * para que os m√©todos est√°ticos possam ser usados com caracter√≠sticas de
+     * inst√¢ncias de objetos.
      *
      * @return resource
     */
@@ -99,9 +99,9 @@ class Config extends Object {
         return $instance[0];
     }
     /**
-     * O mÈtodo Config::read() retorna o valor de uma configuraÁ„o da aplicaÁ„o.
+     * O m√©todo Config::read() retorna o valor de uma configura√ß√£o da aplica√ß√£o.
      *
-     * @param string $key Nome da chave (vari·vel) da configuraÁ„o
+     * @param string $key Nome da chave (vari√°vel) da configura√ß√£o
      * @return mixed
      */
     static function read($key = "") {
@@ -109,10 +109,10 @@ class Config extends Object {
         return $self->config[$key];
     }
     /**
-     * O mÈtodo Config::write() grava o valor de uma configuraÁ„o da aplicaÁ„o.
+     * O m√©todo Config::write() grava o valor de uma configura√ß√£o da aplica√ß√£o.
      *
-     * @param string $key Nome da chave (vari·vel) da configuraÁ„o
-     * @param string $value Valor da chave (vari·vel) da configuraÁ„o
+     * @param string $key Nome da chave (vari√°vel) da configura√ß√£o
+     * @param string $value Valor da chave (vari√°vel) da configura√ß√£o
      * @return mixed
      */
     static function write($key = "", $value = "") {
