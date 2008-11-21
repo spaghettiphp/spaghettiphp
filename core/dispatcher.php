@@ -18,12 +18,11 @@ class Dispatcher extends Object {
     public $path = array();
     public $url = "";
     public function __construct($dispatch = true) {
-        $_GET["spaghetti_querystring"] = isset($_GET["spaghetti_querystring"]) ? $_GET["spaghetti_querystring"] : "";
-        $this->parse_url();
+        $this->parse_url($url);
         if($dispatch) return $this->dispatch();
     }
     public function parse_url($url = null) {
-        if($url === null) $url = isset($_GET["spaghetti_querystring"]) ? $_GET["spaghetti_querystring"] : "";
+        if($url === null) $url = str_replace(WEBROOT, "", $_SERVER["REQUEST_URI"]);
         $this->url = "/" . trim($url, "/");
         $url = Mapper::get_route($this->url);
         $prefixes = join("|", Mapper::get_prefixes());
