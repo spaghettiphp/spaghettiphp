@@ -187,6 +187,11 @@ class Model extends Object {
                         $sql .= "{$field} '" . join("' AND '", $value) . "'";
                         continue;
                     else:
+                        $values = array();
+                        foreach($value as $item):
+                            $values []= $this->sql_conditions(array($field => $item));
+                        endforeach;
+                        $sql .= "(" . join(" OR ", $values) . ") AND ";
                         continue;
                     endif;
                     $sql .= preg_replace("/' AND /", "' {$field} ", $this->sql_conditions($value));
