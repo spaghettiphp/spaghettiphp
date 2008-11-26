@@ -24,8 +24,8 @@ class Mapper extends Object {
         if(preg_match("/^[a-z]*:\/\//", $path)):
             return $path;
         endif;
-        $url = WEBROOT . trim($path, "/");
-        return $full ? HOST . $url : $url;
+        $url = WEBROOT . "/" . trim($path, "/");
+        return $full ? BASE_URL . $url : $url;
     }
     public function connect($url = "", $route = array()) {
         $self = Mapper::get_instance();

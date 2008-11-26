@@ -53,7 +53,7 @@ class HtmlHelper extends Helper {
         if(!is_array($attr)):
             $attr = array();
         endif;
-        $src_alt = array("src" => Mapper::url("app/webroot/images/{$src}", $full), "alt" => $alt);
+        $src_alt = array("src" => Mapper::url("/images/{$src}", $full), "alt" => $alt);
         $attr = array_merge($src_alt, $attr);
         return $this->output($this->tag("img", null, $attr, false));
     }
@@ -61,7 +61,7 @@ class HtmlHelper extends Helper {
         if(!is_array($attr)):
             $attr = array();
         endif;
-        $attrs = array("href" => Mapper::url("app/webroot/styles/{$href}", $full), "rel" => "stylesheet", "type" => "text/css");
+        $attrs = array("href" => Mapper::url("/styles/{$href}", $full), "rel" => "stylesheet", "type" => "text/css");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("link", null, $attr, false));
     }
@@ -69,7 +69,7 @@ class HtmlHelper extends Helper {
         if(!is_array($attr)):
             $attr = array();
         endif;
-        $attrs = array("src" => Mapper::url("app/webroot/scripts/{$src}", $full), "type" => "text/javascript");
+        $attrs = array("src" => Mapper::url("/scripts/{$src}", $full), "type" => "text/javascript");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("script", null, $attr));
     }

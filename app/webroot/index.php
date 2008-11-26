@@ -1,6 +1,8 @@
 <?php
 /**
- *  This file consists of the main definitions and includes for your Spaghetti app.
+ *  Spaghetti's index.php file. Where the magic takes place. In this file,
+ *  the only thing you have to define is your application's enviroment, whether
+ *  it's a test, development or production one.
  *  
  *  Spaghetti is licensed under the MIT License. By using this software, you agree
  *  with the terms specified below. The license agreement extends to all the files
@@ -35,29 +37,10 @@
  */
 
 /**
- * Here's where you define the names of the lib, core, root and app directories.
+ * Application environment (test|dev|production|...)
  */
-    $self = dirname($_SERVER["PHP_SELF"]);
-    while(in_array(basename($self), array("app", "core", "tests", "webroot"))):
-	$self = dirname($self);
-    endwhile;
+    define("APP_ENV", "dev");
+    require_once "../../spaghetti.php";
+    new Dispatcher();
 
-    define("DS", DIRECTORY_SEPARATOR);
-    define("ROOT", dirname(__FILE__));
-    define("BASE_URL", "http://" . $_SERVER["HTTP_HOST"]);
-    define("CORE", ROOT . DS . "core");
-    define("LIB", CORE . DS . "lib");
-    define("APP", ROOT . DS . "app");
-    define("WEBROOT", $self);
-
-/**
- * Includes the core files of Spaghetti.
- */
-
-    require_once CORE . DS . "basics.php";
-    Spaghetti::import("Core", array("class_registry", "component", "controller", "dispatcher", "filter", "helper", "inflector", "mapper", "misc", "model", "view"));
-    Spaghetti::import("App", array("config/settings", "config/routes", "config/database"));
-    Spaghetti::import("Controller", "app_controller");
-    Spaghetti::import("Model", "app_model");
-    
 ?>
