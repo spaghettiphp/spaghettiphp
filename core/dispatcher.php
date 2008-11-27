@@ -22,8 +22,8 @@ class Dispatcher extends Object {
         if($dispatch) return $this->dispatch();
     }
     public function parse_url($url = null) {
-        if($url === null) $url = substr($_SERVER["REQUEST_URI"], strlen(WEBROOT));
-        $this->url = "/" . trim($url, "/");
+        if($url === null) $url = Mapper::here();
+        $this->url = $url;
         $url = Mapper::get_route($this->url);
         $prefixes = join("|", Mapper::get_prefixes());
         

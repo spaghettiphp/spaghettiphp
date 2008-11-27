@@ -13,6 +13,12 @@
 class Mapper extends Object {
     public $prefixes = array();
     public $routes = array();
+    public $here = null;
+    public function __construct() {
+        if($this->here == null):
+            $this-> here = rtrim(substr($_SERVER["REQUEST_URI"], strlen(WEBROOT)), "/");
+        endif;
+    }
     public function &get_instance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
@@ -21,10 +27,13 @@ class Mapper extends Object {
         return $instance[0];
     }
     public function url($path = null, $full = false) {
-        if(preg_match("/^[a-z]*:\/\//", $path)):
+        if(preg_match("/^([a-z]*:\/\/|mailto:)/", $path)):
             return $path;
+        elseif(preg_match("/^\//", $path)):
+            $url = WEBROOT . $path;
+        else:
+            $url = WEBROOT . Mapper::here() . "/" . $path;
         endif;
-        $url = WEBROOT . "/" . trim($path, "/");
         return $full ? BASE_URL . $url : $url;
     }
     public function connect($url = "", $route = array()) {
@@ -46,7 +55,7 @@ class Mapper extends Object {
             $url = preg_replace($map, $route, $url);
         endforeach;
   
-          return rtrim($url, "/");
+        return rtrim($url, "/");
     }
     public function prefix($prefix = "") {
         $self = Mapper::get_instance();
@@ -62,6 +71,10 @@ class Mapper extends Object {
     public function get_prefixes() {
         $self = Mapper::get_instance();
         return $self->prefixes;
+    }
+    public function here() {
+        $self = Mapper::get_instance();
+        return $self->here;
     }
 }
 
