@@ -22,7 +22,7 @@ class Dispatcher extends Object {
         if($dispatch) return $this->dispatch();
     }
     public function parse_url($url = null) {
-        if($url === null) $url = str_replace(WEBROOT, "", $_SERVER["REQUEST_URI"]);
+        if($url === null) $url = substr($_SERVER["REQUEST_URI"], strlen(WEBROOT));
         $this->url = "/" . trim($url, "/");
         $url = Mapper::get_route($this->url);
         $prefixes = join("|", Mapper::get_prefixes());
