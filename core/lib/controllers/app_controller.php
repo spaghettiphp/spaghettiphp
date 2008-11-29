@@ -11,9 +11,7 @@
  */
 
 class AppController extends Controller {
-    function index() {
-	
-    }
+
 }
 
 ?>

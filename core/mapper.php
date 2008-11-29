@@ -34,6 +34,7 @@ class Mapper extends Object {
         else:
             $url = WEBROOT . Mapper::here() . "/" . $path;
         endif;
+        $url = str_replace("//", "/", $url);
         return $full ? BASE_URL . $url : $url;
     }
     public function connect($url = "", $route = array()) {
