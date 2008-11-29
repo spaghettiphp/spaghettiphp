@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Spaghetti Framework &mdash; Erro</title>
+    
+    <style type="text/css">
+        
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            text-align: center;
+        }
+        
+        body {
+            background: #EEE;
+            font: 12px "Arial","Verdana","Tahoma",sans-serif;
+            margin: 0 auto;
+            text-align: left;
+            width: 780px;
+        }
+        
+        #header {
+            background: #C00;
+            margin-top: 35px;
+            margin-bottom: 25px;
+            padding: 20px;
+        }
+        
+            #header h1 {
+                color: #760000;
+                font: bold 40px "Helvetica", "Arial", sans-serif;
+                letter-spacing: -2px;
+                margin-bottom: 10px;
+                width: 640px;
+            }
+            
+            #header h1 span.color1 {
+                color: #4B0000;
+            }
+            
+            #header h1 span.color2 {
+                color: #FFF;
+            }
+        
+        #content {
+            border: 1px solid #CCC;
+            border-width: 1px 0;
+            background: #FFF;
+            padding: 20px;
+        }
+        
+            #content h1 {
+                color: #AAA;
+                font: bold 32px "Helvetica", "Arial", sans-serif;
+                letter-spacing: -2px;
+            }
+            
+            #content p {
+                color: #666;
+                font-size: 13px;
+                line-height: 20px;
+            }
+        
+        #footer {
+            color: #666;
+            padding: 10px 20px;
+        }
+        
+            #footer small {
+                font-size: 11px;
+            }
+        
+    </style>
+    
+</head>
+<body>
+    
+    <?php $title = array(
+        "Ops, acho que deu algo errado.",
+        "<em>Houston, we have a problem!</em>",
+        "E agora, quem poder&aacute; nos defender?",
+        "Temos um problema que precisa ser corrigido.",
+        "Voc&ecirc; deveria dar uma olhada no erro abaixo.",
+        "A baga&ccedil;a n&atilde;o funciona.",
+    ); ?>
+    
+    <div id="header">
+        <h1><?php echo $title[rand(0,count($title)-1)]; ?></h1>
+        <img src="data:image/gif;base64,R0lGODlheQAgAMQAAMwAAOygoNlAQPzw8OJwcNIgIPbQ0NxQUPLAwOmQkM8QEP///9YwMPng4O+wsN9gYOaAgP//MwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEHABEALAAAAAB5ACAAAAX/ICCOZGmeaKqubOu+cCzPdG3fswI5DO7PhQeEIPjJBItF0egiJCElAaHFQCSvi0CB2UIquS3Ik+Ql9UyMARYLBau8y1the4qPHgjEg5wUCRpfJVYLEAp+CQZuK3A4CYQmCn1UfQ9JA3tmSVOKMIw3Vm18CysPS4AAgAmGJWILqy4CdiaxdCxBCQeeDAKvJ7tnJKCzkimAWgWFAcCsxCcFVgUKAVgJUYNJDYUkBQGAa4RwEGpJCL0A0uMLA9oJCGoNeXntBuTxCADPDbwOltUiBwgcyKq0YBMKNRDorXEwQkE6LIn8PLzSIEGsJPzWNHilQOGaRNfWOPq2IJEnAQ4Q/xwYkWCcA45qBhg0kRHCEgEK4xxQJqJAxj0OFzRYCYABvwFbvAQ4YMjnGBHTCDWN+kAIOQhYISAblNUmAE8jGATQMWdagxIEhWo10apEgST+DmYB4GTBMlRzwYoAFBFAkgAl6AH2+4jZqChJ4ihwdFaoH0xmQmoh0TbwgnsprNzj15elY70ARopgkIToCM0inlJu5iexiAfj9iS5OytjEsiVg11WgRq14a+uVx/WS3qBP9Ujco84KXRJ8BU6rixRLsK3CAUCuqrZXNIEY+CBkkvyYiAB1pbBkYugDj7OsucsijMEwN76SCyA7rW6C4gh6MpehHTbCOrRx1p7KBARw/80A6x3oG8jDZBHAAKg9pZQRBnl2n/jJSZAAHmsRWBhwg0THg6V1bcbYfOdtuJ9awzG4XDwmVAge6DZYJaDh5FAzz2gWfeAN9hANmNrC5h2AlxsJWFOjiwoAFlYf/FoR3FQFKckAEIuUEAsT9ZYWSQLtHgdAXRYcRZiC0yJYAyM4RILenbxOMBN3tABiD6H7DkCIOYsJyYxGSVAxwH0NAgAQWMtOh8gd+IjEJQrCIgFbiRpMsIB3wzAqZciqDGpAMsc2dNEV5jmkXQAfIoFApQu4sBDk4k3AJ0lbXkAkQj00IABRMFoSRumXhfAQzyQIM0Vt66y6xUGXHSiDL+cUNlZLoGGxUsKD6xaoAtfyqJsLL4IUAsnPLrRkTrotusCez94QZu79IrXIw0fummgK/X2+5sNIyFAhAA7kePvweneYNtH2SKM7gMBzFSDAO1Y4oC+Dmes8cYohAAAOw==" alt="Spaghetti PHP Logo" />
+    </div>
+    
+    <div id="content">
+        <?php echo $content_for_layout; ?>
+    </div>
+    
+    <div id="footer">
+        <small>Spaghetti Framework 0.1 beta</small>
+    </div>
+    
+</body>
+</html>
