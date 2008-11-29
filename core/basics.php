@@ -23,21 +23,6 @@ class Object {
     public function error($type = "", $details = array()) {
         new Error($type, $details);
     }
-    /**
-     * O método Object::transmit() transforma um array de opções em respectivas
-     * variáveis de classe que, portanto, são transmitidas para outra classe. Geralmente
-     * é utilizada na mudança de camadas, entre modelos e controladores ou controladores
-     * e visualizações.
-     *
-     * @param array $arr Array de opções
-     * @return boolean
-    */
-    public function transmit($arr = array()) {
-        foreach($arr as $key => $value) {
-            $this->$key = $value;
-        }
-        return true;
-    }
 }
 
 class Spaghetti extends Object {
@@ -126,7 +111,11 @@ class Error extends Object {
     public function __construct($type = "", $details = array()) {
         $view = new View;
         $filename = Inflector::underscore($type);
-        echo $view->render_layout($view->render_view(Spaghetti::import("View", "errors/{$filename}", "phtm", true), $details), "error.phtm");
+        if(!($view_file = Spaghetti::import("View", "errors/{$filename}", "phtm", true))):
+            $view_file = Spaghetti::import("View", "errors/missing_error", "phtm", true);
+            $details = array("error" => $type);
+        endif;
+        echo $view->render_layout($view->render_view($view_file, array("details" => $details)), "error.phtm");
         die();
     }
 }
