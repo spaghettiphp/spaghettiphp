@@ -39,7 +39,7 @@ class Dispatcher extends Object {
         else $this->path["params"] = array();
         if($this->path["extension"] == "") $this->path["extension"] = Config::read("default_extension");
         $this->path["here"] = $this->url;
-
+    
         return $this->path;
     }
     public function dispatch() {

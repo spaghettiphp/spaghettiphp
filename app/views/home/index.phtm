@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Spaghetti Framework &mdash; Seja bem vindo!</title>
+    
+    <?php echo $html->stylesheet("spaghetti.css"); ?>
+    
+    <script type="text/javascript">
+        window.onload = function(){
+            var list = document.getElementsByTagName("dl")
+            for(i=0; i<list.length; i++){
+                var dl = list[i];
+                var dt = dl.getElementsByTagName("dt")[0]
+                dt.onclick = function(e) {
+                    var dd = e.currentTarget.parentNode.getElementsByTagName("dd")[0]
+                    dd.style.display = (dd.style.display=="block")? "none" : "block"
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    
+    <div id="welcome">
+        <div id="header">
+            <h1>Seja bem vindo!</h1>
+            <h2>Seu Spaghetti j&aacute; est&aacute; funcionando. Seu Spaghetti j&aacute; est&aacute; funcionando.</h2>
+        </div>
+        
+        <hr />
+    
+        <div id="content">
+            <h3>Como come&ccedil;ar</h3>
+            <p>Caso voc&ecirc; ainda n&atilde;o saiba como o Spaghetti funciona, recomendamos que voc&ecirc; leia os <a href="http://spaghettiphp.org/tutorials">tutoriais</a> dispon&iacute;veis,
+            a <a href="http://spaghettiphp.org/documentation">documenta&ccedil;&atilde;o</a> e os <a href="http://spaghettiphp.org/screencasts">screencasts</a> que gravamos para tornar a sua aprendizagem ainda mais f&aacute;cil e r&aacute;pida.</p>
+            <p>Se voc&ecirc; j&aacute; conhece o Spaghetti ou j&aacute; entende o funcionamento de frameworks MVC, eis o que voc&ecirc; precisa fazer para come&ccedil;ar a se divertir:</p>
+            <dl>
+                <dt>1. Configure uma conex&atilde;o com o banco de dados</dt>
+                <dd>Essa &eacute; uma das poucas configura&ccedil;&otilde;es que voc&ecirc; precisa fazer, e por enquanto s&oacute; trabalhamos com MySQL. Especifique os dados de acesso ao seu banco no arquivo <em>/app/config/database.php</em>.</dd>
+            </dl>
+            <dl>
+                <dt>2. Crie um <em>model</em></dt>
+                <dd>Crie seus modelos de dados dentro da pasta <em>/app/models/</em>. Se, por exemplo, seu modelo se chamar <em>Post</em>, crie um arquivo <em>post.php</em> nesta pasta, e neste arquivo a classe <em>Post</em> que extende <em>AppModel</em>.</dd>
+            </dl>
+            <dl>
+                <dt>3. Crie um <em>controller</em></dt>
+                <dd>Se o seu <em>controller</em> se chamar <em>Posts</em>, crie um arquivo <em>posts_controller.php</em> na pasta <em>/app/controllers/</em>, e neste arquivo a classe <em>PostsController</em> que extende <em>AppController</em>.</dd>
+            </dl>
+            <dl>
+                <dt>4. Crie uma <em>action</em> em seu <em>controller</em></dt>
+                <dd>Para criar uma <em>action</em> em seu <em>controller</em>, crie um m&eacute;todo com o nome da <em>action</em> dentro da classe do <em>controller</em> correspondente. A <em>action</em> padr&atilde;o do <em>controller</em> deve ser o m&eacute;todo <em>index()</em>.</dd>
+            </dl>
+            <dl>
+                <dt>5. Crie uma <em>view</em> para sua <em>action</em></dt>
+                <dd>Para criar uma <em>view</em> em sua <em>action</em>, crie um arquivo na pasta <em>/app/views/nome_do_controller/nome_da_action.phtm</em>. Se voc&ecirc; quiser criar uma <em>view</em> para a <em>action shop</em> do <em>controller Products</em>, por exemplo, o arquivo da <em>view</em> ficar&aacute; <em>/app/views/products/shop.phtm</em>.</dd>
+            </dl>
+            <dl>
+                <dt>6. Crie um <em>layout</em> para sua aplica&ccedil;&atilde;o</dt>
+                <dd>O <em>layout</em> padr&atilde;o &eacute; o arquivo <em>/app/layouts/default.phtm</em>. Consulte a documenta&ccedil;&atilde;o para informa&ccedil;&otilde;es sobre a cria&ccedil;&atilde;o de m&uacute;ltiplos <em>layouts</em>.</dd>
+            </dl>
+        </div>
+        
+        <div id="sidebar">
+            <h3>Obter ajuda</h3>
+            <form method="post" action="http://spaghettiphp.org/search">
+                <label for="query">Pesquisa</label>
+                <input name="query" id="query" type="text" />
+                <button type="submit">Pesquisar</button>
+            </form>
+            <ul>
+                <li><a href="http://trac.spaghettiphp.org/wiki">Wiki</a></li>
+                <li><a href="http://spaghettiphp.org/documentation">Documenta&ccedil;&atilde;o</a></li>
+                <li><a href="http://spaghettiphp.org/tutorials">Tutoriais</a></li>
+                <li><a href="http://spaghettiphp.org/screencasts">Screencasts</a></li>
+                <li><a href="http://spaghettiphp.org/components">Componentes</a></li>
+                <li><a href="http://trac.spaghettiphp.org/">Reposit&oacute;rio de Vers&otilde;es</a></li>
+            </ul>
+
+            <h3>Extenda sua aplica&ccedil;&atilde;o</h3>
+            <p>Em nossa p&aacute;gina de <a href="http://spaghettiphp.org/components">componentes</a> voc&ecirc; pode extender as funcionalidades do Spaghetti, sem que voc&ecirc; precise reinventar a roda.</p>
+        </div>
+        
+        <hr />
+    
+    </div>
+    
+    <div id="footer">
+        <div class="left">
+            <strong>Spaghetti Web Development Framework</strong>
+            <ul>
+                <li><a href="http://trac.spaghettiphp.org/wiki">Wiki</a></li>
+                <li><a href="http://spaghettiphp.org/documentation">Documenta&ccedil;&atilde;o</a></li>
+                <li><a href="http://spaghettiphp.org/tutorials">Tutoriais</a></li>
+                <li><a href="http://spaghettiphp.org/screencasts">Screencasts</a></li>
+            </ul>
+        </div>
+        <div class="right">
+            Vers&atilde;o 0.1b
+        </div>
+    </div>
+    
+</body>
+</html>
