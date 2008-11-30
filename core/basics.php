@@ -109,7 +109,6 @@ class Config extends Object {
 
 class Error extends Object {
     public function __construct($type = "", $details = array()) {
-        echo "$type";
         $view = new View;
         $filename = Inflector::underscore($type);
         if(!($view_file = Spaghetti::import("View", "errors/{$filename}", "phtm", true))):
