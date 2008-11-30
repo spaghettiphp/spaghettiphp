@@ -23,10 +23,19 @@
 </head>
 <body>
     
+    <?php $messages = array(
+        "Seu Spaghetti j&aacute; est&aacute; funcionando. N&atilde;o &eacute; demais?",
+        "D&aacute; pra acreditar que o Spaghetti j&aacute; est&aacute; pronto para uso?",
+        "Que cheirinho bom. J&aacute; sei, &eacute; seu Spaghetti que est&aacute; pronto. Bom apetite!",
+        "Agora sim voc&ecirc; saber&aacute; o que &eacute; divers&atilde;o. Seu Spaghetti j&aacute; est&aacute; funcionando.",
+        "Spaghetti a pleno vapor! Comece agora a se divertir.",
+        "Estou louco para come&ccedil;ar, e voc&ecirc;?",
+    ); ?>
+    
     <div id="welcome">
         <div id="header">
             <h1>Seja bem vindo!</h1>
-            <h2>Seu Spaghetti j&aacute; est&aacute; funcionando. Seu Spaghetti j&aacute; est&aacute; funcionando.</h2>
+            <h2><?php echo $messages[array_rand($messages)]; ?></h2>
         </div>
         
         <hr />
