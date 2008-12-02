@@ -1,0 +1,2 @@
+<h1>A mensagem de erro <?php echo $Error; ?> n&atilde;o foi encontrada.</h1>
+<p>Seja bonzinho e aguarde uma solu&ccedil;&atilde;o para isso. Combinado?</p>
