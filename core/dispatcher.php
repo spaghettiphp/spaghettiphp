@@ -21,6 +21,13 @@ class Dispatcher extends Object {
         $this->parse_url($url);
         if($dispatch) return $this->dispatch();
     }
+    /**
+     * O método Dispatcher::parse_url() faz o parse da URL, identificando o prefixo,
+     * controller, action, id, extensão e parâmetros nesta URL.
+     *
+     * @param string $url URL a ser parseadad
+     * @return void
+     */
     public function parse_url($url = null) {
         if($url === null) $url = Mapper::here();
         $this->url = $url;
@@ -42,6 +49,12 @@ class Dispatcher extends Object {
 
         return $this->path;
     }
+    /**
+     * Dispatcher::dispatch() é o método que chama o controller e a action
+     * solicitada.
+     *
+     * @return void
+  */ 
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
         $controller =& ClassRegistry::init($controllerName, "Controller");

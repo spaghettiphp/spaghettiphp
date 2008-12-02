@@ -13,15 +13,43 @@
  */
     
 class View extends Object {
+    /**
+     * Helpers utilizados pela view, definidos no controller
+     */
     public $helpers = array("Html");
+    /**
+     * Array que armazena os helpers carregados
+     */
     public $loaded_helpers = array();
+    /**
+     * Nome do controller
+     */
     public $controller;
+    /**
+     * Nome da action
+     */
     public $action;
+    /**
+     * Extensão do arquivo do view
+     */
     public $extension;
+    /**
+     * Nome do layout
+     */
     public $layout;
+    /**
+     * Título da página HTML
+     */
     public $page_title;
+    /**
+     * Renderização automática do layout
+     */
     public $auto_layout = true;
+    /**
+     * Variáveis definidas no controller para serem passadas para a view.
+     */
     public $view_data = array();
+    
     public function __construct(&$controller = null) {
         if($controller):
             $this->controller = $controller->params("controller");

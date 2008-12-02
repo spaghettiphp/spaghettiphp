@@ -11,22 +11,53 @@
  */
 
 class Model extends Object {
+    /**
+     * Associações entre modelos disponíveis
+     */
     public $associations = array("has_many", "belongs_to", "has_one");
+    /**
+     * Chaves disponíveis para cada associação
+     */
     public $association_keys = array(
         "has_many" => array("class_name", "foreign_key", "conditions", "order", "limit", "dependent"),
         "belongs_to" => array("class_name", "foreign_key", "conditions"),
         "has_one" => array("class_name", "foreign_key", "conditions", "dependent")
     );
+    /**
+     * Associações do tipo Belongs To
+     */
     public $belongs_to = array();
+    /**
+     * Associações do tipo Has Many
+     */
     public $has_many = array();
+    /**
+     * Associações do tipo Has One
+     */
     public $has_one = array();
     public $data = array();
     public $id = null;
+    /**
+     * Nível de recursão padrão das consultas find
+     */
     public $recursion = 1;
+    /**
+     * Descrição da tabela do modelo
+     */
     public $schema = array();
+    /**
+     * Nome da tabela usada pelo modelo
+     */
     public $table = null;
+    /**
+     * ID do último registro inserido
+     */
     public $insert_id = null;
+    /**
+     * Registros afetados pela consulta
+     */
     public $affected_rows = null;
+    
     public function __construct($table = null) {
         if($this->table === null):
             if($table !== null):
@@ -342,6 +373,13 @@ class Model extends Object {
         endif;
         return false;
     }
+    /**
+     * O método Model::delete() exclui um registro da tabela do modelo, de acordo com
+     * o ID passado como parâmetro, e seus dependentes em associações de modelos, se
+     * houverem.
+     * 
+     * @return
+     */
     public function delete($id = null, $dependent = false) {
         $return = $this->delete_all(array("id" => $id), null, 1);
         if($dependent):
@@ -357,12 +395,21 @@ class Model extends Object {
         endif;
         return $return;
     }
+    /**
+     * O método Model::get_insert_id() retorna o ID do último registro inserido
+     * na tabela do modelo.
+     *
+     * @return integer
+     */
     public function get_insert_id() {
         return $this->insert_id;
     }
+    /**
+     * O método Model::get_affected_rows() retorna o número de registros afetados
+     * por uma consulta.
+     */
     public function get_affected_rows() {
         return $this->affected_rows;
     }
 }
-
 ?>
