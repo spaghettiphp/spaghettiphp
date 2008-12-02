@@ -1,2 +1,1 @@
-<h1>A view <?php echo $View; ?> n&atilde;o foi encontrada.</h1>
-<p>Seja bonzinho e aguarde uma solu&ccedil;&atilde;o para isso. Combinado?</p>
+<h1>A <em>view</em> <?php echo $View; ?> n&atilde;o foi encontrada.</h1>

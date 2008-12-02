@@ -1,2 +1,1 @@
 <h1>O <em>layout</em> <?php echo $layout; ?> n&atilde;o foi encontrado.</h1>
-<p>Verifique se existe o arquivo <em>/app/controllers/<?php echo Inflector::underscore($controller); ?>.php</em> e se dentro deste existe a classe <em><?php echo $controller; ?></em>.</p>

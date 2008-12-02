@@ -1,1 +1,1 @@
-missingError!
+<h1>A mensagem de erro <?php echo $error; ?> n&atilde;o foi encontrada.</h1>

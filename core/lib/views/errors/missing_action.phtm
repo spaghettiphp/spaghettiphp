@@ -1,2 +1,1 @@
 <h1>A <em>action</em> <?php echo $action; ?> n&atilde;o foi encontrada.</h1>
-<p>Verifique se existe no arquivo <em>/app/controllers/<?php echo Inflector::underscore($controller); ?>.php</em> e se dentro deste existe o m&eacute;todo <em><?php echo $action; ?></em>.</p>
