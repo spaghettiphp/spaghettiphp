@@ -14,28 +14,34 @@ class Model extends Object {
     /**
      * Associações entre modelos disponíveis
      */
-    public $associations = array("has_many", "belongs_to", "has_one");
+    public $associations = array("hasMany", "belongsTo", "hasOne");
     /**
      * Chaves disponíveis para cada associação
      */
-    public $association_keys = array(
-        "has_many" => array("class_name", "foreign_key", "conditions", "order", "limit", "dependent"),
-        "belongs_to" => array("class_name", "foreign_key", "conditions"),
-        "has_one" => array("class_name", "foreign_key", "conditions", "dependent")
+    public $associationKeys = array(
+        "hasMany" => array("className", "foreignKey", "conditions", "order", "limit", "dependent"),
+        "belongsTo" => array("className", "foreignKey", "conditions"),
+        "hasOne" => array("className", "foreignKey", "conditions", "dependent")
     );
     /**
      * Associações do tipo Belongs To
      */
-    public $belongs_to = array();
+    public $belongsTo = array();
     /**
      * Associações do tipo Has Many
      */
-    public $has_many = array();
+    public $hasMany = array();
     /**
      * Associações do tipo Has One
      */
-    public $has_one = array();
+    public $hasOne = array();
+    /**
+     * Dados do registro
+     */
     public $data = array();
+    /**
+     * ID do registro
+     */
     public $id = null;
     /**
      * Nível de recursão padrão das consultas find
@@ -52,11 +58,11 @@ class Model extends Object {
     /**
      * ID do último registro inserido
      */
-    public $insert_id = null;
+    public $insertId = null;
     /**
      * Registros afetados pela consulta
      */
-    public $affected_rows = null;
+    public $affectedRows = null;
     
     public function __construct($table = null) {
         if($this->table === null):
@@ -68,17 +74,17 @@ class Model extends Object {
             endif;
         endif;
         if($this->table !== false):
-            $this->describe_table();
+            $this->describeTable();
         endif;
-        ClassRegistry::add_object(get_class($this), $this);
-        $this->create_links();
+        ClassRegistry::addObject(get_class($this), $this);
+        $this->createLinks();
     }
     public function __call($method, $params) {
         $params = array_merge($params, array(null, null, null, null, null));
-        if(preg_match("/find_all_by_(.*)/", $method, $field)):
-            return $this->find_all_by($field[1], $params[0], $params[1], $params[2], $params[3], $params[4]);
-        elseif(preg_match("/find_by_(.*)/", $method, $field)):
-            return $this->find_by($field[1], $params[0], $params[1], $params[2], $params[3]);
+        if(preg_match("/findAllBy(.*)/", $method, $field)):
+            return $this->findAllBy($field[1], $params[0], $params[1], $params[2], $params[3], $params[4]);
+        elseif(preg_match("/findBy(.*)/", $method, $field)):
+            return $this->findBy($field[1], $params[0], $params[1], $params[2], $params[3]);
         endif;
     }
     public function __set($field, $value = "") {
@@ -94,7 +100,7 @@ class Model extends Object {
         endif;
         return null;
     }
-    public function &get_connection() {
+    public function &getConnection() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
             $instance[0] =& Model::connect();
@@ -107,12 +113,12 @@ class Model extends Object {
         mysql_selectdb($config["database"], $link);
         return $link;
     }
-    public function describe_table() {
-        $table_schema = $this->fetch_results($this->sql_query("describe"));
-        $model_schema = array();
-        foreach($table_schema as $field):
+    public function describeTable() {
+        $tableSchema = $this->fetchResults($this->sqlQuery("describe"));
+        $modelSchema = array();
+        foreach($tableSchema as $field):
             preg_match("/([a-z]*)\(?([0-9]*)?\)?/", $field["Type"], $type);
-            $model_schema[$field["Field"]] = array(
+            $modelSchema[$field["Field"]] = array(
                 "type" => $type[1],
                 "length" => $type[2],
                 "null" => $field["Null"] == "YES" ? true : false,
@@ -121,19 +127,19 @@ class Model extends Object {
                 "extra" => $field["Extra"]
             );
         endforeach;
-        return $this->schema = $model_schema;
+        return $this->schema = $modelSchema;
     }
-    public function create_links() {
+    public function createLinks() {
         foreach($this->associations as $type):
-            $association_type = $this->{$type};
-            foreach($association_type as $key => $assoc):
+            $associationType = $this->{$type};
+            foreach($associationType as $key => $assoc):
                 if(is_numeric($key)):
                     $class = "";
                     $data = array();
                     unset($this->{$type}[$key]);
                     if(is_array($assoc)):
                         $data = $assoc;
-                        $assoc = $assoc["class_name"];
+                        $assoc = $assoc["className"];
                     endif;
                     $this->{$type}[$assoc] = $data;
                 else:
@@ -143,20 +149,20 @@ class Model extends Object {
                     $this->{$assoc} = ClassRegistry::init("$assoc");
                 endif;
             endforeach;
-            $this->generate_association($type);
+            $this->generateAssociation($type);
         endforeach;
     }
-    public function generate_association($type) {
+    public function generateAssociation($type) {
         foreach($this->{$type} as $class => $assoc):
-            foreach($this->association_keys[$type] as $key):
+            foreach($this->associationKeys[$type] as $key):
                 if(!isset($this->{$type}[$class][$key]) || $this->{$type}[$class][$key] === null):
                     $data = null;
                     switch($key):
-                        case "class_name":
+                        case "className":
                             $data = $class;
                             break;
-                        case "foreign_key":
-                            $data = ($type == "belongs_to") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
+                        case "foreignKey":
+                            $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
                             break;
                         case "conditions":
                             $data = array();
@@ -171,9 +177,9 @@ class Model extends Object {
         endforeach;
         return $this->{$type};
     }
-    public function sql_query($type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
-        $params = $this->sql_conditions($parameters);
-        $values = $this->sql_conditions($values);
+    public function sqlQuery($type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
+        $params = $this->sqlConditions($parameters);
+        $values = $this->sqlConditions($values);
         if(is_array($order)):
             $orders = "";
             foreach($order as $key => $value):
@@ -198,10 +204,10 @@ class Model extends Object {
         );
         return $types[$type];
     }
-    public function sql_set($data = "") {
+    public function sqlSet($data = "") {
         return preg_replace("/' AND /", "', ", $data);
     }
-    public function sql_conditions($conditions) {
+    public function sqlConditions($conditions) {
         $sql = "";
         $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
         $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE");
@@ -220,18 +226,18 @@ class Model extends Object {
                     else:
                         $values = array();
                         foreach($value as $item):
-                            $values []= $this->sql_conditions(array($field => $item));
+                            $values []= $this->sqlConditions(array($field => $item));
                         endforeach;
                         $sql .= "(" . join(" OR ", $values) . ") AND ";
                         continue;
                     endif;
-                    $sql .= preg_replace("/' AND /", "' {$field} ", $this->sql_conditions($value));
+                    $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($value));
                 else:
                     if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$parts[1]]):
-                        $value = mysql_real_escape_string($value, Model::get_connection());
+                        $value = mysql_real_escape_string($value, Model::getConnection());
                         $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
                     elseif($this->schema[$field]):
-                        $value = mysql_real_escape_string($value, Model::get_connection());
+                        $value = mysql_real_escape_string($value, Model::getConnection());
                         $sql .= "{$field} = '{$value}' AND ";
                     endif;
                 endif;
@@ -243,9 +249,9 @@ class Model extends Object {
         return $sql;
     }
     public function execute($query) {
-        return mysql_query($query, Model::get_connection());
+        return mysql_query($query, Model::getConnection());
     }
-    public function fetch_results($query) {
+    public function fetchResults($query) {
         $results = array();
         if($query = $this->execute($query)):
             while($row = mysql_fetch_assoc($query)):
@@ -254,39 +260,39 @@ class Model extends Object {
         endif;
         return $results;
     }
-    public function find_all($conditions = array(), $order = null, $limit = null, $recursion = null) {
+    public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
         $recursion = pick($recursion, $this->recursion);
-        $results = $this->fetch_results($this->sql_query("select", $conditions, null, $order, $limit));
+        $results = $this->fetchResults($this->sqlQuery("select", $conditions, null, $order, $limit));
         if($recursion > 0):
             foreach($results as $key => $result):
                 foreach($this->associations as $type):
                     foreach($this->{$type} as $assoc):
-                        $condition = isset($conditions[Inflector::underscore($assoc["class_name"])]) ? $conditions[Inflector::underscore($assoc["class_name"])] : array();
+                        $condition = isset($conditions[Inflector::underscore($assoc["className"])]) ? $conditions[Inflector::underscore($assoc["className"])] : array();
                         $condition = array_merge($condition, $assoc["conditions"]);
-                        $field = isset($this->{$assoc["class_name"]}->schema[$assoc["foreign_key"]]) ? $assoc["foreign_key"] : "id";
-                        $value = isset($this->{$assoc["class_name"]}->schema[$assoc["foreign_key"]]) ? $result["id"] : $result[$assoc["foreign_key"]];
-                        if($type == "has_many"):
-                            $rows = $this->{$assoc["class_name"]}->find_all_by($field, $value, $condition, null, null, $recursion - 1);
+                        $field = isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]]) ? $assoc["foreignKey"] : "id";
+                        $value = isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]]) ? $result["id"] : $result[$assoc["foreignKey"]];
+                        if($type == "hasMany"):
+                            $rows = $this->{$assoc["className"]}->findAllBy($field, $value, $condition, null, null, $recursion - 1);
                         else:
-                            $rows = $this->{$assoc["class_name"]}->find_by($field, $value, $condition, null, $recursion - 1);
+                            $rows = $this->{$assoc["className"]}->findBy($field, $value, $condition, null, $recursion - 1);
                         endif;
-                        $results[$key][Inflector::underscore($assoc["class_name"])] = $rows;
+                        $results[$key][Inflector::underscore($assoc["className"])] = $rows;
                     endforeach;
                 endforeach;
             endforeach;
         endif;
         return $results;
     }
-    public function find_all_by($field = "id", $value = null, $conditions = array(), $order = null, $limit = null, $recursion = null) {
+    public function findAllBy($field = "id", $value = null, $conditions = array(), $order = null, $limit = null, $recursion = null) {
         if(!is_array($conditions)) $conditions = array();
         $conditions = array_merge(array($field => $value), $conditions);
-        return $this->find_all($conditions, $order, $limit, $recursion);
+        return $this->findAll($conditions, $order, $limit, $recursion);
     }
     public function find($conditions = array(), $order = null, $recursion = null) {
-        $results = $this->find_all($conditions, $order, 1, $recursion);
+        $results = $this->findAll($conditions, $order, 1, $recursion);
         return $results[0];
     }
-    public function find_by($field = "id", $value = null, $conditions = array(), $order = null, $recursion = null) {
+    public function findBy($field = "id", $value = null, $conditions = array(), $order = null, $recursion = null) {
         if(!is_array($conditions)) $conditions = array();
         $conditions = array_merge(array($field => $value), $conditions);
         return $this->find($conditions, $order, $recursion);
@@ -303,16 +309,16 @@ class Model extends Object {
         return $this->data;
     }
     public function update($conditions = array(), $data = array()) {
-        if($this->execute($this->sql_query("update", $conditions, $data))):
-            $this->affected_rows = mysql_affected_rows();
+        if($this->execute($this->sqlQuery("update", $conditions, $data))):
+            $this->affectedRows = mysql_affected_rows();
             return true;
         endif;
         return false;
     }
     public function insert($data = array()) {
-        if($this->execute($this->sql_query("insert", $data))):
-            $this->insert_id = mysql_insert_id();
-            $this->affected_rows = mysql_affected_rows();
+        if($this->execute($this->sqlQuery("insert", $data))):
+            $this->insertId = mysql_insert_id();
+            $this->affectedRows = mysql_affected_rows();
             return true;
         endif;
         return false;
@@ -337,19 +343,19 @@ class Model extends Object {
             $this->id = $this->get_insert_id();
         endif;
         
-        foreach(array("has_one", "has_many") as $type):
+        foreach(array("hasOne", "hasMany") as $type):
             foreach($this->{$type} as $class => $assoc):
-                $assoc_model = Inflector::underscore($class);
-                if(isset($data[$assoc_model])):
-                    $data[$assoc_model][$assoc["foreign_key"]] = $this->id;
-                    $this->{$class}->save($data[$assoc_model]);
+                $assocModel = Inflector::underscore($class);
+                if(isset($data[$assocModel])):
+                    $data[$assocModel][$assoc["foreignKey"]] = $this->id;
+                    $this->{$class}->save($data[$assocModel]);
                 endif;
             endforeach;
         endforeach;
         
         return $this->data = $this->read($this->id);
     }
-    public function save_all($data) {
+    public function saveAll($data) {
         if(isset($data[0]) && is_array($data[0])):
             foreach($data as $row):
                 $this->save($row);
@@ -360,15 +366,15 @@ class Model extends Object {
         return true;
     }
     public function exists($id = null) {
-        $row = $this->find_by_id($id);
+        $row = $this->findById($id);
         if(!empty($row)):
             return true;
         endif;
         return false;
     }
-    public function delete_all($conditions = array(), $order = null, $limit = null) {
-        if($this->execute($this->sql_query("delete", $conditions, null, $order, $limit))):
-            $this->affected_rows = mysql_affected_rows();
+    public function deleteAll($conditions = array(), $order = null, $limit = null) {
+        if($this->execute($this->sqlQuery("delete", $conditions, null, $order, $limit))):
+            $this->affectedRows = mysql_affected_rows();
             return true;
         endif;
         return false;
@@ -381,13 +387,13 @@ class Model extends Object {
      * @return
      */
     public function delete($id = null, $dependent = false) {
-        $return = $this->delete_all(array("id" => $id), null, 1);
+        $return = $this->deleteAll(array("id" => $id), null, 1);
         if($dependent):
-            foreach(array("has_many", "has_one") as $type):
+            foreach(array("hasMany", "hasOne") as $type):
                 foreach($this->{$type} as $model => $assoc):
                     if($assoc["dependent"]):
-                        $this->{$model}->delete_all(array(
-                            $assoc["foreign_key"] => $id
+                        $this->{$model}->deleteAll(array(
+                            $assoc["foreignKey"] => $id
                         ));
                     endif;
                 endforeach;
@@ -401,15 +407,15 @@ class Model extends Object {
      *
      * @return integer
      */
-    public function get_insert_id() {
-        return $this->insert_id;
+    public function getInsertId() {
+        return $this->insertId;
     }
     /**
      * O método Model::get_affected_rows() retorna o número de registros afetados
      * por uma consulta.
      */
-    public function get_affected_rows() {
-        return $this->affected_rows;
+    public function getAffectedRows() {
+        return $this->affectedRows;
     }
 }
 ?>

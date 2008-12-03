@@ -18,7 +18,7 @@ class Dispatcher extends Object {
     public $path = array();
     public $url = "";
     public function __construct($dispatch = true) {
-        $this->parse_url($url);
+        $this->parseUrl($url);
         if($dispatch) return $this->dispatch();
     }
     /**
@@ -28,11 +28,11 @@ class Dispatcher extends Object {
      * @param string $url URL a ser parseadad
      * @return void
      */
-    public function parse_url($url = null) {
+    public function parseUrl($url = null) {
         if($url === null) $url = Mapper::here();
         $this->url = $url;
-        $url = Mapper::get_route($this->url);
-        $prefixes = join("|", Mapper::get_prefixes());
+        $url = Mapper::getRoute($this->url);
+        $prefixes = join("|", Mapper::getPrefixes());
         
         $parts = array("here", "prefix", "controller", "action", "id", "extension", "params");
         preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:(\w*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?(.*))?/", $url, $reg);
@@ -54,7 +54,7 @@ class Dispatcher extends Object {
      * solicitada.
      *
      * @return void
-  */ 
+     */ 
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
         $controller =& ClassRegistry::init($controllerName, "Controller");
@@ -62,15 +62,15 @@ class Dispatcher extends Object {
         if($controller && method_exists($controller, $action)):
             $controller->params = $this->path;
             $controller->Component->initialize($controller);
-            $controller->before_filter();
+            $controller->beforeFilter();
             $controller->Component->startup($controller);
             call_user_func_array(array(&$controller, $action), array_merge(array($this->path["id"]), $this->path["params"]));
-            if($controller->auto_render):
+            if($controller->autoRender):
                 $controller->render();
             endif;
             $controller->Component->shutdown($controller);
             echo $controller->output;
-            $controller->after_filter();
+            $controller->afterFilter();
         elseif(Spaghetti::import("View", "{$this->path['controller']}/{$this->path['action']}", "p{$this->path['extension']}", true)):
             if(!$controller) $controller =& new Controller;
             $controller->params = $this->path;

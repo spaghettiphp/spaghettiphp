@@ -9,16 +9,16 @@
  *  @subpackage Spaghetti.Core.Controller
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-    
+
 class Controller extends Object {
     /**
      * Renderizar layout automaticamente
     */
-    public $auto_layout = true;
+    public $autoLayout = true;
     /**
      * Renderizar view automaticamente
     */
-    public $auto_render = true;
+    public $autoRender = true;
     /**
      * Componentes carregados no controller
     */
@@ -46,7 +46,7 @@ class Controller extends Object {
     /**
      * Título da página HTML
      */
-    public $page_title = "";
+    public $pageTitle = "";
     /**
      * Parâmetros da URL
      */
@@ -58,7 +58,7 @@ class Controller extends Object {
     /**
      * Variáveis passadas para a view
      */
-    public $view_data = array();
+    public $viewData = array();
     
     public function __construct() {
         /**
@@ -79,12 +79,15 @@ class Controller extends Object {
          * Define Controller::data com o conteúdo da variável global $_POST
          */
         $this->data = $_POST;
+        /**
+         * Inicializa os componentes
+         */
         $this->Component =& new Component;
         $this->Component->init($this);
         /**
          * Carrega os modelos
          */ 
-        $this->load_models();
+        $this->loadModels();
     }
     /**
      * Este método carrega os models associados através da propriedade
@@ -92,7 +95,7 @@ class Controller extends Object {
      *
      * @return void
      */
-    public function load_models() {
+    public function loadModels() {
         foreach($this->uses as $model):
             $this->{$model} =& ClassRegistry::init($model);
         endforeach;
@@ -100,7 +103,7 @@ class Controller extends Object {
     /**
      * Método a ser chamado antes de um filtro ser executado
      */
-    public function before_filter() {
+    public function beforeFilter() {
         return true;
     }
     /**
@@ -108,13 +111,13 @@ class Controller extends Object {
      *
      * @return bolean
      */
-    public function before_render() {
+    public function beforeRender() {
         return true;
     }
     /**
      * Método a ser chamado após a execução de um filtro
      */
-    public function after_filter() {
+    public function afterFilter() {
         return true;
     }
     /**
@@ -125,7 +128,7 @@ class Controller extends Object {
      * @param string $action Nome da ação
      * @return void
      */
-    public function set_action($action) {
+    public function setAction($action) {
         $this->params["action"] = $action;
         $args = func_get_args();
         unset($args[0]);
@@ -140,12 +143,12 @@ class Controller extends Object {
      * @return string Conteúdo da saída renderizada
      */
     public function render($action = null, $layout = null) {
-        $this->before_render();
+        $this->beforeRender();
         $view = new View($this);
-        $view->set($this->view_data);
+        $view->set($this->viewData);
         $view->helpers = $this->helpers;
         $this->output .= $view->render($action, $layout);
-        $this->auto_render = false;
+        $this->autoRender = false;
         return $this->output;
     }
     /**
@@ -167,7 +170,7 @@ class Controller extends Object {
      * @return
      */
     public function redirect($url = "", $status = null, $exit = true) {
-        $this->auto_render = false;
+        $this->autoRender = false;
         $codes = array(
             100 => "Continue",
             101 => "Switching Protocols",
@@ -230,8 +233,8 @@ class Controller extends Object {
             endforeach;
             return true;
         elseif($var !== null):
-            $this->view_data[$var] = $content;
-            return $this->view_data[$var];
+            $this->viewData[$var] = $content;
+            return $this->viewData[$var];
         endif;
         return false;
     }

@@ -12,7 +12,7 @@
 
 class FormHelper extends HtmlHelper {
     public function create() {
-        return $this->output($this->open_tag("form"));
+        return $this->output($this->openTag("form"));
     }
 }
 

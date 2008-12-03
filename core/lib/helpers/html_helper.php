@@ -11,7 +11,7 @@
  */
 
 class HtmlHelper extends Helper {
-    public function open_tag($tag = "", $attr = "", $close = true) {
+    public function openTag($tag = "", $attr = "", $close = true) {
         $html = "<{$tag}";
         if(($attr = $this->attr($attr)) != ""):
             $html .= " $attr";
@@ -19,13 +19,13 @@ class HtmlHelper extends Helper {
         $html .= ($close ? "" : " /") . ">";
         return $html;
     }
-    public function close_tag($tag = "") {
+    public function closeTag($tag = "") {
         return "</{$tag}>";
     }
     public function tag($tag = "", $content = "", $attr = array(), $close = true) {
-        $html = $this->open_tag($tag, $attr, $close);
+        $html = $this->openTag($tag, $attr, $close);
         if($close):
-            $html .= "{$content}" . $this->close_tag($tag);
+            $html .= "{$content}" . $this->closeTag($tag);
         endif;
         return $html;
     }

@@ -21,7 +21,7 @@ class ClassRegistry {
      *
      * @return resource
      */
-    public function &get_instance() {
+    public function &getInstance() {
         static $instance = array();
         if (!$instance):
 	    $instance[0] =& new ClassRegistry();
@@ -29,7 +29,7 @@ class ClassRegistry {
         return $instance[0];
     }
     public function &init($class, $type = "Model") {
-        $self =& ClassRegistry::get_instance();
+        $self =& ClassRegistry::getInstance();
         if($model =& $self->duplicate($class, $class)):
 	    return $model;
         elseif(class_exists($class) || Spaghetti::import($type, Inflector::underscore($class))):
@@ -47,8 +47,8 @@ class ClassRegistry {
      * @param object &$object Referência ao objeto a ser registrado
      * @return boolean
      */
-    public function add_object($key, &$object) {
-        $self =& ClassRegistry::get_instance();
+    public function addObject($key, &$object) {
+        $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects) === false):
 	    $self->objects[$key] =& $object;
 	    return true;
@@ -62,8 +62,8 @@ class ClassRegistry {
      * @param string $key Nome da chave
      * @return void
      */
-    public function remove_object($key) {
-        $self =& ClassRegistry::get_instance();
+    public function removeObject($key) {
+        $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects) === true):
 	    unset($self->objects[$key]);
         endif;
@@ -75,8 +75,8 @@ class ClassRegistry {
      * @param string $key Nome da chave
      * @return boolean Se a chave existe ou não.
      */
-    public function is_key_set($key) {
-        $self =& ClassRegistry::get_instance();
+    public function isKeySet($key) {
+        $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects)):
 	    return true;
         endif;
@@ -89,7 +89,7 @@ class ClassRegistry {
      * @return array
      */
     public function keys() {
-        $self =& ClassRegistry::get_instance();
+        $self =& ClassRegistry::getInstance();
         return array_keys($self->objects);
     }
     /**
@@ -100,7 +100,7 @@ class ClassRegistry {
      * @return resource Objeto
      */
     public function &get_object($key) {
-        $self =& ClassRegistry::get_instance();
+        $self =& ClassRegistry::getInstance();
         $key = $key;
         $return = false;
         if(isset($self->objects[$key])):
@@ -117,10 +117,10 @@ class ClassRegistry {
      * @return
      */
     public function &duplicate($alias, $class) {
-        $self =& ClassRegistry::get_instance();
+        $self =& ClassRegistry::getInstance();
         $duplicate = false;
-        if ($self->is_key_set($alias)):
-	    $model =& $self->get_object($alias);
+        if ($self->isKeySet($alias)):
+	    $model =& $self->getObject($alias);
 	    if(is_a($model, $class) || $model->alias === $class):
 		$duplicate =& $model;
 	    endif;
@@ -135,7 +135,7 @@ class ClassRegistry {
      * @return void
      */
     public function flush() {
-	$self =& ClassRegistry::get_instance();
+	$self =& ClassRegistry::getInstance();
 	$self->objects = array();
     }
 }

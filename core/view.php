@@ -20,7 +20,7 @@ class View extends Object {
     /**
      * Array que armazena os helpers carregados
      */
-    public $loaded_helpers = array();
+    public $loadedHelpers = array();
     /**
      * Nome do controller
      */
@@ -40,24 +40,24 @@ class View extends Object {
     /**
      * Título da página HTML
      */
-    public $page_title;
+    public $pageTitle;
     /**
      * Renderização automática do layout
      */
-    public $auto_layout = true;
+    public $autoLayout = true;
     /**
      * Variáveis definidas no controller para serem passadas para a view.
      */
-    public $view_data = array();
+    public $viewData = array();
     
     public function __construct(&$controller = null) {
         if($controller):
             $this->controller = $controller->params("controller");
             $this->action = $controller->params("action");
             $this->extension = $controller->params("extension");
-            $this->page_title = $controller->page_title;
+            $this->pageTitle = $controller->pageTitle;
             $this->layout = $controller->layout;
-            $this->auto_layout = $controller->auto_layout;
+            $this->autoLayout = $controller->autoLayout;
         endif;
     }
     /**
@@ -67,15 +67,15 @@ class View extends Object {
      *
      * @return array Array de objetos das classes dos helpers
      */
-    public function load_helpers() {
+    public function loadHelpers() {
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
-            $this->loaded_helpers[Inflector::underscore($helper)] = ClassRegistry::init($class, "Helper");
+            $this->loadedHelpers[Inflector::underscore($helper)] = ClassRegistry::init($class, "Helper");
         endforeach;
-        return $this->loaded_helpers;
+        return $this->loadedHelpers;
     }
     /**
-     * O método View::render_view() recebe o resultado do processamento do
+     * O método View::renderView() recebe o resultado do processamento do
      * controlador atual e renderiza a view correspondente, retornando um HTML
      * estático do conteúdo solicitado. Chama também o método responsável por
      * extrair os helpers e associá-los ao view.
@@ -84,15 +84,15 @@ class View extends Object {
      * @param array $extract_vars Variáveis a serem passadas para a view
      * @return string HTML da view renderizada
      */
-    public function render_view($filename = null, $extract_vars = array()) {
+    public function renderView($filename = null, $extractVars = array()) {
         if(!is_string($filename)):
             return false;
         endif;
-        if(empty($this->loaded_helpers) && !empty($this->helpers)):
-            $this->load_helpers();
+        if(empty($this->loadedHelpers) && !empty($this->helpers)):
+            $this->loadHelpers();
         endif;
-        $extract_vars = is_array($extract_vars) ? array_merge($extract_vars, $this->loaded_helpers) : $this->loaded_helpers;
-        extract($extract_vars, EXTR_SKIP);
+        $extractVars = is_array($extractVars) ? array_merge($extractVars, $this->loadedHelpers) : $this->loadedHelpers;
+        extract($extractVars, EXTR_SKIP);
         ob_start();
         include $filename;
         $out = ob_get_clean();
@@ -119,9 +119,9 @@ class View extends Object {
         $layout = $layout === null ? "{$this->layout}.{$ext}" : $layout;
         $filename = Spaghetti::import("View", $action, $ext, true);
         if($filename):
-            $out = $this->render_view($filename, $this->view_data);
-            if($layout && $this->auto_layout):
-                $out = $this->render_layout($out, $layout);
+            $out = $this->renderView($filename, $this->viewData);
+            if($layout && $this->autoLayout):
+                $out = $this->renderLayout($out, $layout);
             endif;
             return $out;
         else:
@@ -138,7 +138,7 @@ class View extends Object {
      * @param string layout Nome do arquivo de layout
      * @return string HTML do layout renderizado
      */
-    public function render_layout($content = null, $layout = null) {
+    public function renderLayout($content = null, $layout = null) {
         if($layout === null):
             $layout = $this->layout;
             $ext = "p{$this->extension}";
@@ -150,10 +150,10 @@ class View extends Object {
         $filename = Spaghetti::import("Layout", $layout, $ext, true);
         $data = array_merge(array(
             "content_for_layout" => $content,
-            "page_title" => $this->page_title,
-        ), $this->view_data);
+            "pageTitle" => $this->pageTitle,
+        ), $this->viewData);
         if($filename):
-            $out = $this->render_view($filename, $data);
+            $out = $this->renderView($filename, $data);
             return $out;
         else:
             $this->error("missingLayout", array("layout" => $layout, "extension" => $ext));
@@ -173,7 +173,7 @@ class View extends Object {
      */
     public function element($element = null, $params = array()) {
         $ext = $this->extension ? "p{$this->extension}" : "phtm";
-        return $this->render_view(Spaghetti::import("View", "_{$element}", $ext, true), $params);
+        return $this->renderView(Spaghetti::import("View", "_{$element}", $ext, true), $params);
     }
     /**
      * View::set() é o método que grava as variáveis definidas no
@@ -189,8 +189,8 @@ class View extends Object {
                 $this->set($key, $value);
             endforeach;
         elseif($var !== null):
-            $this->view_data[$var] = $content;
-            return $this->view_data[$var];
+            $this->viewData[$var] = $content;
+            return $this->viewData[$var];
         endif;
         return false;
     }

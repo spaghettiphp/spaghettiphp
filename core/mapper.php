@@ -19,7 +19,7 @@ class Mapper extends Object {
             $this->here = substr($_SERVER["REQUEST_URI"], strlen(WEBROOT));
         endif;
     }
-    public function &get_instance() {
+    public function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
             $instance[0] =& new Mapper();
@@ -38,18 +38,18 @@ class Mapper extends Object {
         return $full ? BASE_URL . $url : $url;
     }
     public function connect($url = "", $route = array()) {
-        $self = Mapper::get_instance();
+        $self = Mapper::getInstance();
         $url = rtrim($url, "/");
         return $self->routes[$url] = rtrim($route, "/");
     }
     public function disconnect($url = "") {
-        $self = Mapper::get_instance();
+        $self = Mapper::getInstance();
         $url = rtrim($url, "/");
         unset($self->routes[$url]);
         return true;
     }
-    public function get_route($url) {
-        $self = Mapper::get_instance();
+    public function getRoute($url) {
+        $self = Mapper::getInstance();
   
         foreach($self->routes as $map => $route):
             $map = "/^" . str_replace(array("/", ":any", ":part", ":num"), array("\/", "(.*)", "([^\/]*)", "([0-9]+)"), $map) . "\/?$/";
@@ -59,22 +59,22 @@ class Mapper extends Object {
         return rtrim($url, "/");
     }
     public function prefix($prefix = "") {
-        $self = Mapper::get_instance();
+        $self = Mapper::getInstance();
         $self->prefixes []= $prefix;
-        Mapper::connect("/$prefix", "/$prefix" . Mapper::get_route("/"));
+        Mapper::connect("/$prefix", "/$prefix" . Mapper::getRoute("/"));
         return $prefix;
     }
-    public function unset_prefix($prefix = "") {
-        $self = Mapper::get_instance();
+    public function unsetPrefix($prefix = "") {
+        $self = Mapper::getInstance();
         unset($self->prefixes[$prefix]);
         return true;
     }
-    public function get_prefixes() {
-        $self = Mapper::get_instance();
+    public function getPrefixes() {
+        $self = Mapper::getInstance();
         return $self->prefixes;
     }
     public function here() {
-        $self = Mapper::get_instance();
+        $self = Mapper::getInstance();
         return $self->here;
     }
 }

@@ -19,17 +19,17 @@ class BaseModel extends AppModel {
 }
 
 class Post extends BaseModel {
-    public $belongs_to = array("Author");
+    public $belongsTo = array("Author");
     public $table = "posts";
 }
 
 class Author extends BaseModel {
-    public $has_many = array("Post");
+    public $hasMany = array("Post");
     public $table = "authors";
 }
 
 class Profile extends BaseModel {
-    public $has_one = array("Author");
+    public $hasOne = array("Author");
     public $table = "profiles";
 }
 
@@ -76,20 +76,20 @@ class TestModel extends UnitTestCase {
         $this->Author = ClassRegistry::init("Author");
         $this->Profile = ClassRegistry::init("Profile");
         $this->Time = date("Y-m-d H:i:s");
-        $this->Post->save_all($posts);
-        $this->Author->save_all($authors);
-        $this->Profile->save_all($profiles);
+        $this->Post->saveAll($posts);
+        $this->Author->saveAll($authors);
+        $this->Profile->saveAll($profiles);
     }
     public function tearDown() {
-        $this->Post->execute($this->Post->sql_query("truncate"));
-        $this->Author->execute($this->Author->sql_query("truncate"));
-        $this->Profile->execute($this->Profile->sql_query("truncate"));
+        $this->Post->execute($this->Post->sqlQuery("truncate"));
+        $this->Author->execute($this->Author->sqlQuery("truncate"));
+        $this->Profile->execute($this->Profile->sqlQuery("truncate"));
         $this->Post = null;
         $this->Author = null;
         $this->Profile = null;
     }
     public function testSelect() {
-        $results = $this->Author->find_all();
+        $results = $this->Author->findAll();
         $expected = array(
             array(
                 "id" => 1,
@@ -108,7 +108,7 @@ class TestModel extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
 
-        $results = $this->Author->find_all(array(
+        $results = $this->Author->findAll(array(
             "id >" => 1
         ));
         $expected = array(
@@ -122,7 +122,7 @@ class TestModel extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
 
-        $results = $this->Author->find_all(array(
+        $results = $this->Author->findAll(array(
             "name LIKE" => "%ul%"
         ));
         $expected = array(
@@ -136,7 +136,7 @@ class TestModel extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
 
-        $results = $this->Author->find_all(array(
+        $results = $this->Author->findAll(array(
             "id BETWEEN" => array(0, 1)
         ));
         $expected = array(
@@ -151,8 +151,8 @@ class TestModel extends UnitTestCase {
         $this->assertEqual($expected, $results);
     }
     public function testGenerateAssociation() {
-        $this->Author->create_links();
-        $results = $this->Author->generate_association("has_many");
+        $this->Author->createLinks();
+        $results = $this->Author->generateAssociation("has_many");
         $expected = array(
             "Post" => array(
                 "class_name" => "Post",
@@ -165,19 +165,19 @@ class TestModel extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
 
-        $this->Post->create_links();
-        $results = $this->Post->generate_association("belongs_to");
+        $this->Post->createLinks();
+        $results = $this->Post->generateAssociation("belongsTo");
         $expected = array(
             "Author" => array(
-                "class_name" => "Author",
-                "foreign_key" => "author_id",
+                "className" => "Author",
+                "foreignKey" => "author_id",
                 "conditions" => array(),
             )
         );
         $this->assertEqual($expected, $results);
     }
     public function testSelectRelational() {
-        $results = $this->Author->find_all(null, null, null, 1);
+        $results = $this->Author->findAll(null, null, null, 1);
         $expected = array(
             array(
                 "id" => 1,
@@ -224,7 +224,7 @@ class TestModel extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
 
-        $results = $this->Post->find_all(null, null, null, 1);
+        $results = $this->Post->findAll(null, null, null, 1);
         $expected = array(
             array(
                 "id" => 1,
@@ -274,7 +274,7 @@ class TestModel extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
 
-        $results = $this->Profile->find_by_id(1, null, null, 1);
+        $results = $this->Profile->findById(1, null, null, 1);
         $expected = array(
             "id" => 1,
             "url" => "http://juliogreff.net",
@@ -288,7 +288,7 @@ class TestModel extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
 
-        $results = $this->Author->find_by_id(1, array("post" => array("id >" => 1)), null, 2);
+        $results = $this->Author->findById(1, array("post" => array("id >" => 1)), null, 2);
         $expected = array(
             "id" => 1,
             "profile_id" => 1,
@@ -317,7 +317,7 @@ class TestModel extends UnitTestCase {
     }
     public function testDelete() {
         $this->Post->delete(3);
-        $results = $this->Post->find_all();
+        $results = $this->Post->findAll();
         $expected = array(
             array(
                 "id" => 1,
@@ -339,12 +339,12 @@ class TestModel extends UnitTestCase {
         $this->assertEqual($expected, $results);
         
         $this->Author->delete(1, true);
-        $results = $this->Post->find_all();
+        $results = $this->Post->findAll();
         $expected = array();
         $this->assertEqual($expected, $results);
         
         $this->Profile->delete(2, true);
-        $results = $this->Author->find_all();
+        $results = $this->Author->findAll();
         $expected = array();
         $this->assertEqual($expected, $results);
     }
@@ -357,7 +357,7 @@ class TestModel extends UnitTestCase {
                 "email" => "jader@spaghettiphp.org"                
             )
         ));
-        $results = $this->Profile->find_by_id(3, null, null, 1);
+        $results = $this->Profile->findById(3, null, null, 1);
         $expected = array(
             "id" => 3,
             "url" => "http://jaderubini.net",
@@ -380,7 +380,7 @@ class TestModel extends UnitTestCase {
                 "email" => "julio@juliogreff.net"                
             )
         ));
-        $results = $this->Profile->find_by_id(1, null, null, 1);
+        $results = $this->Profile->findById(1, null, null, 1);
         $expected = array(
             "id" => 1,
             "url" => "http://juliogreff.blog.br",

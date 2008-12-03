@@ -24,19 +24,19 @@ class TestFilter extends UnitTestCase {
         $this->filter = null;
     }
     public function testParseFilename() {
-        $results = $this->filter->parse_filename("file.ext");
+        $results = $this->filter->parseFilename("file.ext");
         $expected = array("full" => "file.ext", "filename" => "file", "extension" => "ext");
         $this->assertEqual($expected, $results);
 
-        $results = $this->filter->parse_filename("folder/file.ext");
+        $results = $this->filter->parseFilename("folder/file.ext");
         $expected = array("full" => "folder/file.ext", "filename" => "folder/file", "extension" => "ext");
         $this->assertEqual($expected, $results);
 
-        $results = $this->filter->parse_filename("folder/file");
+        $results = $this->filter->parseFilename("folder/file");
         $expected = array("full" => "folder/file", "filename" => "folder/file", "extension" => "");
         $this->assertEqual($expected, $results);
         
-        $results = $this->filter->parse_filename(".htaccess");
+        $results = $this->filter->parseFilename(".htaccess");
         $expected = array("full" => ".htaccess", "filename" => "", "extension" => "htaccess");
         $this->assertEqual($expected, $results);
     }

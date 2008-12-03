@@ -76,7 +76,7 @@ class Config extends Object {
      *
      * @return resource
     */
-    public function &get_instance() {
+    public function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
             $instance[0] =& new Config();
@@ -90,7 +90,7 @@ class Config extends Object {
      * @return mixed
      */
     static function read($key = "") {
-        $self = self::get_instance();
+        $self = self::getInstance();
         return $self->config[$key];
     }
     /**
@@ -101,7 +101,7 @@ class Config extends Object {
      * @return mixed
      */
     static function write($key = "", $value = "") {
-        $self = self::get_instance();
+        $self = self::getInstance();
         $self->config[$key] = $value;
         return true;
     }
@@ -111,11 +111,11 @@ class Error extends Object {
     public function __construct($type = "", $details = array()) {
         $view = new View;
         $filename = Inflector::underscore($type);
-        if(!($view_file = Spaghetti::import("View", "errors/{$filename}", "phtm", true))):
-            $view_file = Spaghetti::import("View", "errors/missing_error", "phtm", true);
+        if(!($viewFile = Spaghetti::import("View", "errors/{$filename}", "phtm", true))):
+            $viewFile = Spaghetti::import("View", "errors/missing_error", "phtm", true);
             $details = array("error" => $type);
         endif;
-        echo $view->render_layout($view->render_view($view_file, array("details" => $details)), "error.phtm");
+        echo $view->renderLayout($view->renderView($viewFile, array("details" => $details)), "error.phtm");
         die();
     }
 }
