@@ -116,11 +116,11 @@ class View extends Object {
             $action = $filename[0];
             $ext = $filename[1] ? $filename[1] : "phtm";
         endif;
-        $layout = $layout === null ? "{$this->layout}.{$ext}" : $layout;
         $filename = Spaghetti::import("View", $action, $ext, true);
         if($filename):
             $out = $this->renderView($filename, $this->viewData);
-            if($layout && $this->autoLayout):
+            if($this->autoLayout && $this->layout):
+                $layout = $layout === null ? "{$this->layout}.{$ext}" : $layout;
                 $out = $this->renderLayout($out, $layout);
             endif;
             return $out;
