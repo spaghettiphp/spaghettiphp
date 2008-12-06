@@ -39,7 +39,6 @@
 /**
  * Application environment (test|dev|production|...)
  */
-    define("APP_ENV", "dev");
     require_once "spaghetti.php";
     new Dispatcher();
 

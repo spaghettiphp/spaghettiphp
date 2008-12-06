@@ -4,12 +4,16 @@
  * 
  */
 
-Config::write("database", array(
-    "host" => "localhost",
-    "user" => "root",
-    "password" => "",
-    "database" => "test_spg",
-    "prefix" => ""
-));
+$database = array(
+    "development" => array(
+        "host" => "localhost",
+        "user" => "root",
+        "password" => "",
+        "database" => "test_spg",
+        "prefix" => ""
+    )
+);
+
+Config::write("database", $database[Config::read("environment")]);
 
 ?>
