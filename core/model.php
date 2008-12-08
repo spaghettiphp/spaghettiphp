@@ -82,8 +82,10 @@ class Model extends Object {
     public function __call($method, $params) {
         $params = array_merge($params, array(null, null, null, null, null));
         if(preg_match("/findAllBy(.*)/", $method, $field)):
+            $field[1] = Inflector::underscore($field[1]);
             return $this->findAllBy($field[1], $params[0], $params[1], $params[2], $params[3], $params[4]);
         elseif(preg_match("/findBy(.*)/", $method, $field)):
+            $field[1] = Inflector::underscore($field[1]);
             return $this->findBy($field[1], $params[0], $params[1], $params[2], $params[3]);
         endif;
     }
@@ -195,11 +197,11 @@ class Model extends Object {
         endif;
         $types = array(
             "delete" => "DELETE" . if_string($flags, " {$flags}") . " FROM {$this->table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
-            "insert" => "INSERT" . if_string($flags, " {$flags}") . " INTO {$this->table} SET " . $this->sql_set($params),
+            "insert" => "INSERT" . if_string($flags, " {$flags}") . " INTO {$this->table} SET " . $this->sqlSet($params),
             "replace" => "REPLACE" . if_string($flags, " {$flags}") . " INTO {$this->table}" . if_string($params, " SET {$params}"),
             "select" => "SELECT" . if_string($flags, " {$flags}") . " * FROM {$this->table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "truncate" => "TRUNCATE TABLE {$this->table}",
-            "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$this->table} SET " . $this->sql_set($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
+            "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$this->table} SET " . $this->sqlSet($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "describe" => "DESCRIBE {$this->table}"
         );
         return $types[$type];

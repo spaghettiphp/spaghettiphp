@@ -58,7 +58,7 @@ class Dispatcher extends Object {
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
         $controller =& ClassRegistry::init($controllerName, "Controller");
-        $action = Inflector::camelize($this->path["action"]);
+        $action = preg_replace("/-/", "_", $this->path["action"]);
         if($controller && method_exists($controller, $action)):
             $controller->params = $this->path;
             $controller->Component->initialize($controller);
