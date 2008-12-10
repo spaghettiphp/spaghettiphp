@@ -16,7 +16,8 @@ class Mapper extends Object {
     public $here = null;
     public function __construct() {
         if($this->here == null):
-            $this->here = substr($_SERVER["REQUEST_URI"], strlen(WEBROOT));
+            $length = strlen(WEBROOT) == 1 ? 0 : strlen(WEBROOT);
+            $this->here = substr($_SERVER["REQUEST_URI"], $length);
         endif;
     }
     public function &getInstance() {
