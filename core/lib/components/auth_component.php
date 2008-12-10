@@ -1,21 +1,31 @@
 <?php
 
 class AuthComponent extends Object {
-    public $permissions = array();
+    public $permissions = null;
     public $loggedIn = false;
     public $controller = null;
     public $data = array();
     public $params = array();
-    public $userModel = null;
+    public $userModel = "Users";
+    public $userScope = array();
+    public $loginAction = "/users/login";
+    public $loginRedirect = "/";
+    public $logoutRedirect = "/";
+    public $fields = array(
+        "username" => "username",
+        "password" => "password"
+    );
     public function initialize(&$controller) {
         $this->controller = $controller;
         $this->params = $controller->params;
         $this->data = $controller->data;
-        $this->permissions = array(
-            "prefix" => array(),
-            "controller" => array("users" => true),
-            "action" => array()
-        );
+        if($this->permissions === null):
+            $this->permissions = array(
+                "prefix" => array(),
+                "controller" => array("users" => true),
+                "action" => array()
+            );
+        endif;
     }
     public function authorized() {
         $authorized = true;
@@ -39,7 +49,7 @@ class AuthComponent extends Object {
     }
     public function check() {
         if(!$this->authorized()):
-            $this->controller->redirect("/users/login");
+            $this->controller->redirect($this->loginAction);
             return false;
         endif;
         return true;
@@ -65,34 +75,40 @@ class AuthComponent extends Object {
         return true;
     }
     public function hashPasswords($data = array()) {
-        if(isset($data["password"])):
-            $data["password"] = md5($data["password"]);
+        if(isset($data[$this->fields["password"]])):
+            $data[$this->fields["password"]] = md5($data[$this->fields["password"]]);
         endif;
         return $data;
     }
     public function identify($data = array()) {
-        $this->userModel = ClassRegistry::init("Users");
-        $user = $this->userModel->find($data);
+        $userModel = ClassRegistry::init($this->userModel);
+        $user = $userModel->find(array_merge($this->userScope, $data));
         return $user;
     }
     public function login() {
-        if(!$this->loggedIn && !empty($this->data)):
-            $user = $this->identify($this->hashPasswords($this->data));
-            if(empty($user)):
-                $this->controller->set("authError", "wrongData");
-                return false;
-            else:
-                setcookie("user_id", $user["id"], null, "/");
-                setcookie("user_password", $user["password"], null, "/");
-                $this->loggedIn = true;
-                return true;
+        if(!$this->loggedIn):
+            if(!empty($this->data)):
+                $user = $this->identify($this->hashPasswords($this->data));
+                if(empty($user)):
+                    $this->controller->set("authError", "wrongData");
+                    return false;
+                else:
+                    setcookie("user_id", $user["id"], null, "/");
+                    setcookie("user_password", $user[$this->fields["password"]], null, "/");
+                    $this->loggedIn = true;
+                    $this->controller->redirect($this->loginRedirect);
+                    return true;
+                endif;
             endif;
+        else:
+            $this->controller->redirect($this->loginRedirect);
         endif;
     }
     public function logout() {
         setcookie("user_id", "", time() - 3600, "/");
         setcookie("user_password", "", time() - 3600, "/");
         $this->loggedIn = false;
+        $this->controller->redirect($this->logoutRedirect);
         return true;
     }
     public function user($field = null) {
