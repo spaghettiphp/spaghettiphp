@@ -265,7 +265,7 @@ class Model extends Object {
     public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
         $recursion = pick($recursion, $this->recursion);
         $results = $this->fetchResults($this->sqlQuery("select", $conditions, null, $order, $limit));
-        if($recursion > 0):
+        if($recursion >= 0):
             foreach($results as $key => $result):
                 foreach($this->associations as $type):
                     foreach($this->{$type} as $assoc):
@@ -273,7 +273,9 @@ class Model extends Object {
                         $condition = array_merge($condition, $assoc["conditions"]);
                         $field = isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]]) ? $assoc["foreignKey"] : "id";
                         $value = isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]]) ? $result["id"] : $result[$assoc["foreignKey"]];
-                        if($type == "hasMany"):
+                        if(($type == "hasMany" || $type == "hasOne") && $recursion == 0):
+                            continue;
+                        elseif($type == "hasMany"):
                             $rows = $this->{$assoc["className"]}->findAllBy($field, $value, $condition, null, null, $recursion - 1);
                         else:
                             $rows = $this->{$assoc["className"]}->findBy($field, $value, $condition, null, $recursion - 1);
