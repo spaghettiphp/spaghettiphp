@@ -38,10 +38,18 @@ class Mapper extends Object {
         $url = str_replace("//", "/", $url);
         return $full ? BASE_URL . $url : $url;
     }
-    public function connect($url = "", $route = array()) {
-        $self = Mapper::getInstance();
-        $url = rtrim($url, "/");
-        return $self->routes[$url] = rtrim($route, "/");
+    public function connect($url = "", $route = "") {
+        if(is_array($url)):
+            foreach($url as $key => $value):
+                Mapper::connect($key, $value);
+            endforeach;
+            return true;
+        elseif($url !== null):
+            $self = Mapper::getInstance();
+            $url = rtrim($url, "/");
+            return $self->routes[$url] = rtrim($route, "/");
+        endif;
+        return false;
     }
     public function disconnect($url = "") {
         $self = Mapper::getInstance();
@@ -61,9 +69,13 @@ class Mapper extends Object {
     }
     public function prefix($prefix = "") {
         $self = Mapper::getInstance();
-        $self->prefixes []= $prefix;
-        Mapper::connect("/$prefix", "/$prefix" . Mapper::getRoute("/"));
-        return $prefix;
+        if(is_array($prefix)) $prefixes = $prefix;
+        else $prefixes = func_get_args();
+        foreach($prefixes as $prefix):
+            $self->prefixes []= $prefix;
+            Mapper::connect("/$prefix", "/$prefix" . Mapper::getRoute("/"));
+        endforeach;
+        return true;
     }
     public function unsetPrefix($prefix = "") {
         $self = Mapper::getInstance();
