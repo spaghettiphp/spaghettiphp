@@ -1,1 +1,1 @@
-<h1>A <em>action</em> <?php echo $action; ?> n&atilde;o foi encontrada.</h1>
+<h1>A <em>action</em> <?php echo $details["action"] ?> n&atilde;o foi encontrada.</h1>

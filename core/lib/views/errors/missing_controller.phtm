@@ -1,1 +1,1 @@
-<h1>O <em>controller</em> <?php echo $controller; ?> n&atilde;o foi encontrado.</h1>
+<h1>O <em>controller</em> <?php echo $details["controller"] ?> n&atilde;o foi encontrado.</h1>

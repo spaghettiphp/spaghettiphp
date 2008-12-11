@@ -35,7 +35,7 @@ class ClassRegistry {
         elseif(class_exists($class) || Spaghetti::import($type, Inflector::underscore($class))):
 		    ${$class} =& new $class;
         else:
-		    $this->error("missing{$type}", array($type => $class));
+		    $this->error("missing{$type}", array(strtolower($type) => $class));
         endif;
         return ${$class};
     }

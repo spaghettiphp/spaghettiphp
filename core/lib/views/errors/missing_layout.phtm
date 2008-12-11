@@ -1,1 +1,1 @@
-<h1>O <em>layout</em> <?php echo $layout; ?> n&atilde;o foi encontrado.</h1>
+<h1>O <em>layout</em> <?php echo "{$details['layout']}.{$details['extension']}" ?> n&atilde;o foi encontrado.</h1>

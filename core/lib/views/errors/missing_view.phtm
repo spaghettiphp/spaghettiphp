@@ -1,1 +1,1 @@
-<h1>A <em>view</em> <?php echo $View; ?> n&atilde;o foi encontrada.</h1>
+<h1>A <em>view</em> <?php echo "{$details['view']}.{$details['extension']}" ?> n&atilde;o foi encontrada.</h1>

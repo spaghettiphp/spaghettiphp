@@ -1,1 +1,1 @@
-<h1>O <em>model</em> <?php echo $Model; ?> n&atilde;o foi encontrada.</h1>
+<h1>O <em>model</em> <?php echo $details["model"] ?> n&atilde;o foi encontrado.</h1>

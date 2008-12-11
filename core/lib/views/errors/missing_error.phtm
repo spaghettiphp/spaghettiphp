@@ -1,1 +1,1 @@
-<h1>A mensagem de erro <?php echo $error; ?> n&atilde;o foi encontrada.</h1>
+<h1>A mensagem de erro <?php echo $details["error"] ?> n&atilde;o foi encontrada.</h1>
