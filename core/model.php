@@ -266,23 +266,23 @@ class Model extends Object {
         $recursion = pick($recursion, $this->recursion);
         $results = $this->fetchResults($this->sqlQuery("select", $conditions, null, $order, $limit));
         if($recursion >= 0):
-            foreach($results as $key => $result):
-                foreach($this->associations as $type):
+            foreach($this->associations as $type):
+                if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
                     foreach($this->{$type} as $assoc):
-                        $condition = isset($conditions[Inflector::underscore($assoc["className"])]) ? $conditions[Inflector::underscore($assoc["className"])] : array();
-                        $condition = array_merge($condition, $assoc["conditions"]);
-                        $field = isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]]) ? $assoc["foreignKey"] : "id";
-                        $value = isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]]) ? $result["id"] : $result[$assoc["foreignKey"]];
-                        if(($type == "hasMany" || $type == "hasOne") && $recursion == 0):
-                            continue;
-                        elseif($type == "hasMany"):
-                            $rows = $this->{$assoc["className"]}->findAllBy($field, $value, $condition, null, null, $recursion - 1);
-                        else:
-                            $rows = $this->{$assoc["className"]}->findBy($field, $value, $condition, null, $recursion - 1);
-                        endif;
-                        $results[$key][Inflector::underscore($assoc["className"])] = $rows;
+                        foreach($results as $key => $result):
+                            if(isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]])):
+                                $assocCondition = array($assoc["foreignKey"] => $result["id"]);
+                            else:
+                                $assocCondition = array("id" => $result[$assoc["foreignKey"]]);
+                            endif;
+                            $attrCondition = isset($conditions[Inflector::underscore($assoc["className"])]) ? $conditions[Inflector::underscore($assoc["className"])] : array();
+                            $condition = array_merge($attrCondition, $assoc["conditions"], $assocCondition);
+                            $assocRecursion = $type != "belongsTo" ? $recursion - 2 : $recursion - 1;
+                            $rows = $this->{$assoc["className"]}->findAll($condition, null, null, $assocRecursion);
+                            $results[$key][Inflector::underscore($assoc["className"])] = $type == "hasMany" ? $rows : $rows[0];
+                        endforeach;
                     endforeach;
-                endforeach;
+                endif;
             endforeach;
         endif;
         return $results;
