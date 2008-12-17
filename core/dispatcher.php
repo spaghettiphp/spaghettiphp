@@ -35,7 +35,7 @@ class Dispatcher extends Object {
         $prefixes = join("|", Mapper::getPrefixes());
         
         $parts = array("here", "prefix", "controller", "action", "id", "extension", "params");
-        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:(\w*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?(.*))?/", $url, $reg);
+        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?(.*))?/", $url, $reg);
         foreach($parts as $k => $key) {
             $this->path[$key] = $reg[$k];
         }
@@ -71,7 +71,7 @@ class Dispatcher extends Object {
             $controller->Component->shutdown($controller);
             echo $controller->output;
             $controller->afterFilter();
-        elseif(Spaghetti::import("View", "{$this->path['controller']}/{$this->path['action']}", "p{$this->path['extension']}", true)):
+        elseif(Spaghetti::import("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$this->path['action']}", "p{$this->path['extension']}", true)):
             if(!$controller) $controller =& new Controller;
             $controller->params = $this->path;
             echo $controller->render();

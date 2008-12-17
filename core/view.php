@@ -52,7 +52,7 @@ class View extends Object {
     
     public function __construct(&$controller = null) {
         if($controller):
-            $this->controller = $controller->params("controller");
+            $this->controller = preg_replace("/-/", "_", $controller->params("controller"));
             $this->action = $controller->params("action");
             $this->extension = $controller->params("extension");
             $this->pageTitle = $controller->pageTitle;
