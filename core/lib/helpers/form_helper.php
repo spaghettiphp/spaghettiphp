@@ -24,15 +24,18 @@ class FormHelper extends HtmlHelper {
         return $this->output($form);
     }
     public function submit($submit = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("value" => $submit, "type" => "submit"), $attr), false));
+        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $submit, "type" => "submit"), $attr), false));
     }
-    public function text() {
-        
+    public function text($name = "", $value = "", $attr = array()) {
+        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "text"), $attr), false));
     }
-    public function textarea() {
-        
+    public function textarea($name = "", $value = "", $attr = array()) {
+        return $this->output($this->tag("textarea", $value, array_merge(array("name" => $name), $attr)));
     }
-    public function password() {
+    public function password($name = "", $value = "", $attr = array()) {
+        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "password"), $attr), false));
+    }
+    public function input() {
         
     }
 }

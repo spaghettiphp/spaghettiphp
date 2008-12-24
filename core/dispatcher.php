@@ -44,7 +44,7 @@ class Dispatcher extends Object {
         if($this->path["prefix"] != "") $this->path["action"] = "{$this->path['prefix']}_{$this->path['action']}";
         if($this->path["params"] != "") $this->path["params"] = split("/", $this->path["params"]);
         else $this->path["params"] = array();
-        if($this->path["extension"] == "") $this->path["extension"] = Config::read("default_extension");
+        if($this->path["extension"] == "") $this->path["extension"] = Config::read("defaultExtension");
         $this->path["here"] = $this->url;
 
         return $this->path;

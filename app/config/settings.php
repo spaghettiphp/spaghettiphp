@@ -4,7 +4,7 @@
  * 
  */
 
-Config::write("default_extension", "htm");
+Config::write("defaultExtension", "htm");
 Config::write("environment", "development");
 
 ?>
