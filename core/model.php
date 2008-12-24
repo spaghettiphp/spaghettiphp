@@ -236,10 +236,10 @@ class Model extends Object {
                     $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($value));
                 else:
                     if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$parts[1]]):
-                        $value = mysql_real_escape_string($value, Model::getConnection());
+                        $value = $this->escape($value);
                         $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
                     elseif($this->schema[$field]):
-                        $value = mysql_real_escape_string($value, Model::getConnection());
+                        $value = $this->escape($value);
                         $sql .= "{$field} = '{$value}' AND ";
                     endif;
                 endif;
@@ -420,6 +420,12 @@ class Model extends Object {
      */
     public function getAffectedRows() {
         return $this->affectedRows;
+    }
+    public function escape($data) {
+        if(get_magic_quotes_gpc()):
+            $data = stripslashes($data);
+        endif;
+        return mysql_real_escape_string($data, Model::getConnection());
     }
 }
 ?>
