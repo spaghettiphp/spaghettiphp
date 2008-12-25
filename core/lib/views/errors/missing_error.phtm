@@ -1,1 +1,2 @@
-<h1>A mensagem de erro <?php echo $details["error"] ?> n&atilde;o foi encontrada.</h1>
+<h1>A mensagem de erro <?php echo $details["error"] ?> não foi encontrada.</h1>
+<p>A view para a mensagem de erro <strong><?php echo $details["error"] ?></strong> não existe. Verifique se o arquivo <code>app/views/errors/<?php echo Inflector::underscore($details["error"]) ?>.phtm</code> realmente existe.</p>

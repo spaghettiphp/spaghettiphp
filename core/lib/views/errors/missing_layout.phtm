@@ -1,1 +1,2 @@
-<h1>O <em>layout</em> <?php echo "{$details['layout']}.{$details['extension']}" ?> n&atilde;o foi encontrado.</h1>
+<h1>O layout <?php echo $details["layout"] ?> não foi encontrado.</h1>
+<p>O layout <?php echo $details["layout"] ?> ainda não existe. Por favor, crie o arquivo <code>app/layouts/<?php echo "{$details['layout']}.p{$details['extension']}" ?></code></p>

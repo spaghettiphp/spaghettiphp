@@ -421,6 +421,10 @@ class Model extends Object {
     public function getAffectedRows() {
         return $this->affectedRows;
     }
+    /**
+     * O método Model::escape() prepara dados para uso em consultas SQL, retirando
+     * caracteres que possam ser perigosos, evitando possíveis ataques de SQL Injection.
+     */
     public function escape($data) {
         if(get_magic_quotes_gpc()):
             $data = stripslashes($data);

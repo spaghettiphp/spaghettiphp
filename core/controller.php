@@ -30,7 +30,7 @@ class Controller extends Object {
     /**
      * Helpers carregados nas views do controller
      */
-    public $helpers = array("Html");
+    public $helpers = array("Html", "Form");
     /**
      * Layout a ser renderizado
      */

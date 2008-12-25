@@ -1,6 +1,6 @@
 <?php
 /**
- *  This file consists of the main definitions and includes for your Spaghetti app.
+ *  Definições e inclusões necessários para o funcionamento do Spaghetti.
  *  
  *  Spaghetti is licensed under the MIT License. By using this software, you agree
  *  with the terms specified below. The license agreement extends to all the files
@@ -34,12 +34,14 @@
  *
  */
 
-/**
- * Here's where you define the names of the lib, core, root and app directories.
- */
+    /**
+     * Definição dos diretórios do Spaghetti. Você pode editar esses diretórios
+     * caso esteja usando o Spaghetti com uma estrutura de diretórios diferente
+     * da padrão.
+     */
     $self = dirname($_SERVER["PHP_SELF"]);
     while(in_array(basename($self), array("app", "core", "tests", "webroot"))):
-	$self = dirname($self);
+        $self = dirname($self);
     endwhile;
 
     define("DS", DIRECTORY_SEPARATOR);
@@ -50,12 +52,15 @@
     define("APP", ROOT . DS . "app");
     define("WEBROOT", $self);
 
-/**
- * Includes the core files of Spaghetti.
- */
-
+    /**
+     * Inclusão das classes básicas do Spaghetti.
+     */
     require_once CORE . DS . "basics.php";
     Spaghetti::import("Core", array("class_registry", "component", "controller", "dispatcher", "filter", "helper", "inflector", "mapper", "misc", "model", "view"));
+    /**
+     * Inclusão de configurações e classes básicas, seja da biblioteca ou da aplicação
+     * do usuário.
+     */
     Spaghetti::import("App", array("config/settings", "config/routes", "config/database"));
     Spaghetti::import("Controller", "app_controller");
     Spaghetti::import("Model", "app_model");

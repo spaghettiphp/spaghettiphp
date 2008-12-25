@@ -1,6 +1,8 @@
 <?php
 /**
- *  Put description here
+ *  AppModel é o model usado como base para todos os outros models da aplicação.
+ *  Como está na biblioteca, é usado apenas quando não houver outro AppModel
+ *  definido pelo usuário.
  *
  *  Licensed under The MIT License.
  *  Redistributions of files must retain the above copyright notice.
