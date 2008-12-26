@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Spaghetti Framework &mdash; Seja bem vindo!</title>
+    <title>Spaghetti* Framework &mdash; Seja bem vindo!</title>
     
     <?php echo $html->stylesheet("spaghetti.css"); ?>
     
@@ -24,7 +24,7 @@
     
     <div id="header">
         <div>
-            <h1>Seu Spaghetti acabou de sair do forno!</h1>
+            <h1>Seu Spaghetti* acabou de sair do forno!</h1>
             <p>
                 Mas essa provavelmente não é a tela que você havia planejado para sua aplicação.<br />
                 A boa notícia é que a parte divertida começa agora! Siga os passos abaixo para começar a se divertir com produtividade.
@@ -38,9 +38,9 @@
   
         <div id="content">
             <h2>Como come&ccedil;ar</h2>
-            <p>Caso voc&ecirc; ainda n&atilde;o saiba como o Spaghetti funciona, recomendamos que voc&ecirc; leia os <a href="http://spaghettiphp.org/tutorials">tutoriais</a> dispon&iacute;veis,
-            a <a href="http://spaghettiphp.org/documentation">documenta&ccedil;&atilde;o</a> e os <a href="http://spaghettiphp.org/screencasts">screencasts</a> que gravamos para tornar a sua aprendizagem ainda mais f&aacute;cil e r&aacute;pida.</p>
-            <p>Se voc&ecirc; j&aacute; conhece o Spaghetti ou j&aacute; entende o funcionamento de frameworks MVC, eis o que voc&ecirc; precisa fazer para come&ccedil;ar a se divertir:</p>
+            <p>Caso voc&ecirc; ainda n&atilde;o saiba como o Spaghetti* funciona, recomendamos que voc&ecirc; leia os <a href="http://spaghettiphp.org/tutorials">tutoriais</a> dispon&iacute;veis,
+            a <a href="http://spaghettiphp.org/docs">documenta&ccedil;&atilde;o</a> e os <a href="http://spaghettiphp.org/screencasts">screencasts</a> que gravamos para tornar a sua aprendizagem ainda mais f&aacute;cil e r&aacute;pida.</p>
+            <p>Se voc&ecirc; j&aacute; conhece o Spaghetti* ou j&aacute; entende o funcionamento de <i>frameworks</i> <acronym title="Model, View, Controller">MVC</acronym>, eis o que voc&ecirc; precisa fazer para come&ccedil;ar a se divertir:</p>
             
             <ol>
             <li>
@@ -49,7 +49,7 @@
             </li>
             <li>
                 <strong>Crie um <em>model</em></strong>
-                <p>Crie seus modelos de dados dentro da pasta <em class="mono">app/models/</em>. Se, por exemplo, seu modelo se chamar <em>Post</em>, crie um arquivo <em class="mono">post.php</em> nesta pasta, e neste arquivo a classe <em class="mono">Post</em> que extende <em class="mono">AppModel</em>.</p>
+                <p>Crie seus modelos de dados dentro da pasta <em class="mono">app/models/</em>. Se, por exemplo, seu modelo se chamar <em>Post</em>, crie um arquivo <em class="mono">post.php</em> nesta pasta, e neste arquivo a classe <em class="mono">Post</em> que estende <em class="mono">AppModel</em>.</p>
             </li>
             <li>
                 <strong>Crie um <em>controller</em></strong>
@@ -73,24 +73,26 @@
         
         <div id="sidebar">
             <h2>Obter ajuda</h2>
-            <form method="post" action="http://spaghettiphp.org/search">
-                <fieldset>
-                    <legend>Pesquisar na documentação</legend>
-                    <input name="query" id="query" type="text" />
-                    <button type="submit">Pesquisar</button>
-                </fieldset>
-            </form>
+				<form action="http://www.google.com/cse" id="cse-search-box">
+				  <fieldset>
+					<legend>Pesquisar</legend>
+				    <input type="hidden" name="cx" value="007024067038056169021:34yi_ggaqdg" />
+				    <input type="hidden" name="ie" value="UTF-8" />
+				    <input type="text" id="query" name="q" size="31" />
+				    <button type="submit" name="sa">Pesquisar</button>
+				  </fieldset>
+				</form>
+				<script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&lang=pt"></script>
             <ul>
-                <li><a href="http://trac.spaghettiphp.org/wiki">Wiki</a></li>
-                <li><a href="http://spaghettiphp.org/documentation">Documenta&ccedil;&atilde;o</a></li>
+                <li><a href="http://spaghettiphp.org/docs">Documenta&ccedil;&atilde;o</a></li>
                 <li><a href="http://spaghettiphp.org/tutorials">Tutoriais</a></li>
                 <li><a href="http://spaghettiphp.org/screencasts">Screencasts</a></li>
                 <li><a href="http://spaghettiphp.org/components">Componentes</a></li>
                 <li><a href="http://trac.spaghettiphp.org/">Reposit&oacute;rio de Vers&otilde;es</a></li>
             </ul>
 
-            <h2>Extenda sua aplica&ccedil;&atilde;o</h2>
-            <p>Em nossa p&aacute;gina de <a href="http://spaghettiphp.org/components">componentes</a> voc&ecirc; pode extender as funcionalidades do Spaghetti, sem que voc&ecirc; precise reinventar a roda.</p>
+            <h2>Estenda sua aplica&ccedil;&atilde;o</h2>
+            <p>Em nossa p&aacute;gina de <a href="http://spaghettiphp.org/components">componentes</a> voc&ecirc; pode estender as funcionalidades do Spaghetti*, sem que voc&ecirc; precise reinventar a roda.</p>
         </div>
         
         <hr />
@@ -99,14 +101,14 @@
             <div class="left">
                 <strong>Spaghetti Web Development Framework</strong>
                 <ul>
-                    <li><a href="http://trac.spaghettiphp.org/wiki">Wiki</a></li>
-                    <li><a href="http://spaghettiphp.org/documentation">Documenta&ccedil;&atilde;o</a></li>
+                    <li><a href="http://trac.spaghettiphp.org/">Trac</a></li>
+                    <li><a href="http://spaghettiphp.org/docss">Documenta&ccedil;&atilde;o</a></li>
                     <li><a href="http://spaghettiphp.org/tutorials">Tutoriais</a></li>
                     <li class="last"><a href="http://spaghettiphp.org/screencasts">Screencasts</a></li>
                 </ul>
             </div>
             <div class="right">
-                <?= $html->image("spaghetti.gif", "Spaghetti") ?> vers&atilde;o 0.1b
+                <?= $html->image("spaghetti.gif", "Spaghetti") ?> vers&atilde;o 0.1
             </div>
         </div>
     
