@@ -3,6 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="shortcut icon" href="http://trac.spaghettiphp.org/chrome/site/spaghettifavicon.png" type="image/png" />
     <title>Spaghetti* Framework &mdash; Seja bem vindo!</title>
     
     <?php echo $html->stylesheet("spaghetti.css"); ?>
@@ -108,7 +109,7 @@
                 </ul>
             </div>
             <div class="right">
-                <?= $html->image("spaghetti.gif", "Spaghetti") ?> vers&atilde;o 0.1
+                <?php echo $html->image("spaghetti.gif", "Spaghetti"); ?> vers&atilde;o 0.1
             </div>
         </div>
     
