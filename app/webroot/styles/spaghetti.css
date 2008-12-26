@@ -5,15 +5,17 @@
 
 html {
     text-align: center;
+    background-color: #e9e9e9;
 }
 
-body {
-    background: #EEE;
-    font: 12px "Arial","Verdana","Tahoma",sans-serif;
+body { background: #fff url(../images/footer.png) repeat-x bottom }
+
+#welcome {
+    width: 750px;
     margin: 0 auto;
-    text-align: left;
-    width: 700px;
 }
+
+li { list-style: none }
 
 hr {
     border: 0;
@@ -21,170 +23,206 @@ hr {
     visibility: hidden;
 }
 
-#welcome {
-    background: #C00 url(../images/bg.gif) top left no-repeat;
-    border: 2px solid #DDD;
-    border-width: 0 2px 2px 0;
-    margin: 35px 0 15px 0;
-    padding: 25px;
+fieldset { border: none }
+
+legend { display: none }
+
+/*
+Begin: Tipografia
+*/
+body, #content li p, input {
+    font-family: "Lucida Grande", Tahoma, Undotum, Arial, sans-serif;
+    font-size: 13px;
+    color: #888;
+    text-align: left;
 }
 
+h1, h2, #content li {
+    font-family: Helvetica, Undotum, Arial, sans-serif;
+    letter-spacing: -2px;
+    line-height: 1em;
+}
+h1 {
+    font-size: 36px;
+    color: #fff;
+    margin-bottom: 5px;
+}
+h2 {
+    font-size: 24px;
+    color: #c00;
+    margin-bottom: 10px;
+}
+
+p {
+    text-align: justify;
+    line-height: 1.5em;
+    margin-bottom: 15px;
+}
+
+a:link { color: #c00 }
+a:visited { color: #555 }
+a:hover, a:focus, a:active { text-decoration: none }
+
+em.mono {
+    font-family: "Lucida Console", "Courier New", monospace;
+    font-style: normal;
+}
+/*
+End: Tipografia
+*/
+
+/*
+Begin: Header
+*/
 #header {
-    margin-bottom: 50px;
-    width: 510px;
+    margin-bottom: 19px;
+    padding: 15px 0;
+    border-bottom: 1px solid #e3e3e3;
+    background: #c00;
 }
 
-    #header h1 {
-        color: #FFF;
-        font: bold 40px "Helvetica", "Arial", "Verdana", sans-serif;
-        letter-spacing: -2px;
-        margin-bottom: 10px;
-    }
-    
-    #header h2 {
-        color: #6D0000;
-        font: bold 26px "Helvetica", "Arial", "Verdana", sans-serif;
-        letter-spacing: -1px;
-    }
+#header div {
+    width: 650px;
+    margin: 0 auto;
+    padding-left: 100px;
+    background: url(../images/logo_header.gif) no-repeat 0 50%;
+}
 
+#header p { color: #f5cccc }
+/*
+End: Header
+*/
+
+/*
+Begin: Content
+*/
 #content {
     float: left;
-    width: 430px;
+    width: 450px;
 }
 
-    #content h3, #sidebar h3 {
-        color: #FFF;
-        font-size: 16px;
-        font-weight: normal;
-        margin-bottom: 15px;
-    }
+#content li {
+    list-style: decimal inside;
+    letter-spacing: -1px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
 
-    #content p {
-        color: #FFF;
-        line-height: 25px;
-        margin-bottom: 15px;
-    }
-    
-    #content a {
-        color: #FFB7BD;
-        font-weight: bold;
-        text-decoration: none;
-    }
-    
-        #content a:hover {
-            background: #6D0000;
-        }
-        
-    #content dl {
-        margin-bottom: 15px;
-    }
-    
-        #content dl dt {
-            color: #FFF;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        
-            #content dl dt:hover {
-                color: #FFB7BD;
-            }
-        
-        #content dl dd {
-            color: #FFF;
-            display: none;
-            line-height: 25px;
-            padding-left: 15px;
-        }
+#content li strong {
+    -moz-margin-start: -10px; /* código proprietário, eu sei... mas foi a única forma de deixar as coisas mais bonitas */
+    cursor: pointer;
+}
+#content li strong:hover {
+    color: #555;
+    text-decoration: underline;
+}
 
+#content li p {
+    display: none;
+    font-weight: normal;
+    letter-spacing: normal;
+    line-height: normal;
+    margin-bottom: 0;
+    padding: 5px 0 0 18px;
+}
+/*
+End: Content
+*/
+
+/*
+Begin: Sidebar
+*/
 #sidebar {
     float: right;
-    width: 170px;
+    width: 265px;
 }
 
-    #sidebar form {
-        margin-bottom: 15px;
-    }
-    
-        #sidebar form label {
-            display: none;
-        }
-        
-        #sidebar form input {
-            font-size: 13px;
-            margin-bottom: 4px;
-            padding: 2px;
-            width: 160px;
-        }
-        
-    #sidebar ul {
-        margin-left: 15px;
-        margin-bottom: 20px;
-    }
-    
-        #sidebar ul li {
-            color: #FFF;
-            list-style: square;
-            margin-bottom: 5px;  
-        }
-        
-        #sidebar ul li a {
-            color: #FFB7BD;
-            font-size: 13px;
-            font-weight: bold;
-            text-decoration: none;
-        }
-        
-    #sidebar p {
-        color: #FFF;
-        line-height: 25px;
-        margin-bottom: 15px;
-    }
-    
-    #sidebar a {
-        color: #FFB7BD;
-        font-weight: bold;
-        text-decoration: none;
-    }
-    
-        #sidebar a:hover {
-            background: #6D0000;
-        }
+#sidebar form {
+    height: 33px;
+    background: url(../images/form.png) no-repeat 0 0;
+}
 
+#sidebar input {
+    float: left;
+    width: 174px;
+    margin: 7px 0 0 5px;
+    border: none;
+    background: none
+}
+input:focus {
+    color: #333;
+    outline: 0;
+}
+
+#sidebar button {
+    text-indent: -9999px;
+    cursor: pointer;
+    float: right;
+    width: 75px;
+    height: 33px;
+    overflow: hidden;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+#sidebar ul { margin: 15px 0 30px }
+
+#sidebar li a {
+    color: #555;
+    text-indent: 18px;
+    line-height: 25px;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    background: url(../images/bullet-point.png) no-repeat 5px 50%;
+}
+#sidebar li a:hover, #sidebar li a:focus {
+    color: #c00;
+    background-color: #eaeaea;
+}
+/*
+End: Sidebar
+*/
+
+/*
+Begin: Footer
+*/
 #footer {
-    color: #999;
     font-size: 11px;
-    margin-bottom: 25px;
+    margin-top: 20px;
+    padding-top: 5px;
+    height: 102px;
 }
-
-    #footer ul {
-    }
-    
-    #footer ul li {
-        float: left;
-        list-style: none;
-        margin-right: 6px;
-    }
-    
-        #footer ul li a {
-            border-bottom: 1px dotted #CCC;
-            color: #888;
-            text-decoration: none;
-        }
 
 #footer .left {
-    background: url(../images/logofooter.gif) 10px 0 no-repeat;
-    height: 40px;
-    padding-left: 45px;
-    width: 300px;
+    float: left;
+    padding-left: 40px;
+    background: url(../images/logo_footer.gif) no-repeat 0 50%;
 }
 
-#footer .right {
-    float: right;
-    height: 40px;
-    margin-top: -40px;
-    padding-right: 15px;
-    text-align: right;
-    width: 150px;
+#footer ul { margin: 3px 0 0 -5px }
+
+#footer li {
+    display: inline;
+    padding: 0 7px 0 5px;
+    border-right: 1px solid;
 }
+#footer li.last { border: none }
+
+#footer a {
+    color: #888;
+    text-decoration: none;
+}
+#footer a:hover, #footer a:focus {
+    color: #000;
+    text-decoration: underline;
+}
+
+#footer .right { float: right }
+
+#footer img { vertical-align: text-bottom }
+/*
+End: Footer
+*/
