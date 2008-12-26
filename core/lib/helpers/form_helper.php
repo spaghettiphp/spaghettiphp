@@ -35,8 +35,39 @@ class FormHelper extends HtmlHelper {
     public function password($name = "", $value = "", $attr = array()) {
         return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "password"), $attr), false));
     }
-    public function input() {
-        
+    public function file($name = "", $attr = array()) {
+        return $this->output($this->openTag("input", array_merge(array("name" => $name, "type" => "file"), $attr), false));
+    }
+    public function select($name = "", $values = array(), $selected = "", $attr = array()) {
+        $options = "";
+        foreach($values as $key => $value):
+            $optionAttr = array("value" => $key);
+            if($key == $selected):
+                $optionAttr["selected"] = "selected";
+            endif;
+            $options .= $this->tag("option", $value, $optionAttr);
+        endforeach;
+        return $this->tag("select", $options, array_merge(array("name" => $name), $attr));
+    }
+    public function input($name = "", $value = "", $options = array()) {
+        $options = array_merge(array(
+            "type" => "text",
+            "label" => Inflector::humanize($name)
+        ), $options);
+        $type = $options["type"];
+        $label = $options["label"];
+        unset($options["type"]);
+        unset($options["label"]);
+        if($type == "select"):
+            $values = $options["options"];
+            unset($options["options"]);
+            $input = $this->select($name, $values, $value, $options);
+        elseif($type == "file"):
+            $input = $this->file($name, $options);
+        else:
+            $input = $this->{$type}($name, $value, $options);
+        endif;
+        return $label != false ? $this->tag("label", "{$label}\n{$input}") : $input;
     }
 }
 
