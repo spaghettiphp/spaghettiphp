@@ -57,18 +57,26 @@ class HtmlHelper extends Helper {
         $attr = array_merge($src_alt, $attr);
         return $this->output($this->tag("img", null, $attr, false));
     }
-    public function stylesheet($href = "", $full = false) {
-        if(!is_array($attr)):
-            $attr = array();
-        endif;
+    public function stylesheet($href = "", $attr = array(), $full = false) {
+		$tags = "";
+		if(is_array($href)):
+			foreach($href as $tag):
+				$tags .= HtmlHelper::stylesheet($tag, $attr, $full) . PHP_EOL;
+			endforeach;
+			return $tags;
+		endif;
         $attrs = array("href" => Mapper::url("/styles/{$href}", $full), "rel" => "stylesheet", "type" => "text/css");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("link", null, $attr, false));
     }
-    public function script($src = "", $full = false) {
-        if(!is_array($attr)):
-            $attr = array();
-        endif;
+    public function script($src = "", $attr = array(), $full = false) {
+		$tags = "";
+		if(is_array($src)):
+			foreach($src as $tag):
+				$tags .= HtmlHelper::script($tag, $attr, $full) . PHP_EOL;
+			endforeach;
+			return $tags;
+		endif;
         $attrs = array("src" => Mapper::url("/scripts/{$src}", $full), "type" => "text/javascript");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("script", null, $attr));
