@@ -58,7 +58,7 @@ class Dispatcher extends Object {
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
         $action = preg_replace("/-/", "_", $this->path["action"]);
-        if(Spaghetti::import("Controller", $controllerName, "php", true)):
+        if(Spaghetti::import("Controller", "{$this->path['controller']}_controller", "php", true)):
             $controller =& ClassRegistry::init($controllerName, "Controller");
         endif;
         if($controller && method_exists($controller, $action)):
