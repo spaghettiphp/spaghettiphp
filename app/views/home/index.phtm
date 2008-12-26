@@ -13,8 +13,8 @@
             var list = document.getElementsByTagName("ol")[0].getElementsByTagName("li");
             for(i=0; i<list.length; i++){
                 var title = list[i].getElementsByTagName("strong")[0]
-                title.onclick = function(e) {
-                    var text = e.currentTarget.parentNode.getElementsByTagName("p")[0]
+                title.onclick = function() {
+                    var text = this.parentNode.getElementsByTagName("p")[0]
                     text.style.display = (text.style.display=="block")? "none" : "block"
                 }
             }
