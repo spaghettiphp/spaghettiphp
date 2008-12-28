@@ -115,6 +115,12 @@ class Model extends Object {
         mysql_selectdb($config["database"], $link);
         return $link;
     }
+	public function beforeSave() {
+		return true;
+	}
+	public function afterSave() {
+		return true;
+	}
     public function describeTable() {
         $tableSchema = $this->fetchResults($this->sqlQuery("describe"));
         $modelSchema = array();
@@ -336,6 +342,7 @@ class Model extends Object {
             $data["modified"] = date("Y-m-d H:i:s");
         endif;
         
+		$this->beforeSave();
         if(isset($data["id"]) && $this->exists($data["id"])):
             $this->update(array("id" => $data["id"]), $data);
             $this->id = $data["id"];
@@ -346,13 +353,16 @@ class Model extends Object {
             $this->insert($data);
             $this->id = $this->get_insert_id();
         endif;
+		$this->afterSave();
         
         foreach(array("hasOne", "hasMany") as $type):
             foreach($this->{$type} as $class => $assoc):
                 $assocModel = Inflector::underscore($class);
                 if(isset($data[$assocModel])):
+					$this->beforeSave();
                     $data[$assocModel][$assoc["foreignKey"]] = $this->id;
                     $this->{$class}->save($data[$assocModel]);
+					$this->afterSave();
                 endif;
             endforeach;
         endforeach;
