@@ -115,12 +115,12 @@ class Model extends Object {
         mysql_selectdb($config["database"], $link);
         return $link;
     }
-	public function beforeSave() {
-		return true;
-	}
-	public function afterSave() {
-		return true;
-	}
+    public function beforeSave() {
+	return true;
+    }
+    public function afterSave() {
+	return true;
+    }
     public function describeTable() {
         $tableSchema = $this->fetchResults($this->sqlQuery("describe"));
         $modelSchema = array();
