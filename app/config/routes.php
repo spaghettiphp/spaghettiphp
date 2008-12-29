@@ -10,8 +10,8 @@
 
 /**
  * Essa rota define o controller padrão de sua aplicação, aquele que o usuário
- * verá toda vez que acessar a raíz de seu sistema. Você pode o controller que mais
- * fizer sentido para você
+ * verá toda vez que acessar a raíz de seu sistema. Você pode escolher o controller
+ * que mais fizer sentido para você
  */
 Mapper::connect("/", "/home");
 

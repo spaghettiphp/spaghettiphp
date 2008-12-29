@@ -47,8 +47,7 @@ class Spaghetti extends Object {
             "View" => array(APP . DS . "views", LIB . DS . "views"),
             "Layout" => array(APP . DS . "layouts", LIB . DS . "layouts"),
             "Component" => array(APP . DS . "components", LIB . DS . "components"),
-            "Helper" => array(APP . DS . "helpers", LIB . DS . "helpers"),
-            "Filter" => array(APP . DS . "filters", LIB . DS . "filters")
+            "Helper" => array(APP . DS . "helpers", LIB . DS . "helpers")
         );
         foreach($paths[$type] as $path):
             if(is_array($file)):
