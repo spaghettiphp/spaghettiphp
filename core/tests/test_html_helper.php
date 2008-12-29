@@ -12,7 +12,7 @@
  */
 
 include_once "setup.php";
-Spaghetti::import("Helper", "html_helper");
+App::import("Helper", "html_helper");
 
 class TestHtmlHelper extends UnitTestCase {
     public function setUp() {

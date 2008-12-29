@@ -58,7 +58,7 @@ class Dispatcher extends Object {
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
         $action = preg_replace("/-/", "_", $this->path["action"]);
-        if(Spaghetti::import("Controller", "{$this->path['controller']}_controller", "php", true)):
+        if(App::import("Controller", "{$this->path['controller']}_controller", "php", true)):
             $controller =& ClassRegistry::init($controllerName, "Controller");
         endif;
         if($controller && method_exists($controller, $action)):
@@ -73,7 +73,7 @@ class Dispatcher extends Object {
             $controller->Component->shutdown($controller);
             echo $controller->output;
             $controller->afterFilter();
-        elseif(Spaghetti::import("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}", true)):
+        elseif(App::import("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}", true)):
             if(!$controller) $controller =& new AppController;
             $controller->beforeFilter();
             $controller->params = $this->path;

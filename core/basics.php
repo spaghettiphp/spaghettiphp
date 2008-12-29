@@ -25,9 +25,9 @@ class Object {
     }
 }
 
-class Spaghetti extends Object {
+class App extends Object {
     /**
-     * O método Spaghetti::import() faz a importação dos arquivos necessários
+     * O método App::import() faz a importação dos arquivos necessários
      * durante a execução do programa.
      *
      * @param string $type Contexto de onde será importado o arquivo
@@ -47,12 +47,13 @@ class Spaghetti extends Object {
             "View" => array(APP . DS . "views", LIB . DS . "views"),
             "Layout" => array(APP . DS . "layouts", LIB . DS . "layouts"),
             "Component" => array(APP . DS . "components", LIB . DS . "components"),
-            "Helper" => array(APP . DS . "helpers", LIB . DS . "helpers")
+            "Helper" => array(APP . DS . "helpers", LIB . DS . "helpers"),
+            "Script" => array(ROOT . DS . "scripts"),
         );
         foreach($paths[$type] as $path):
             if(is_array($file)):
                 foreach($file as $file):
-                    $include = Spaghetti::import($type, $file, $ext);
+                    $include = App::import($type, $file, $ext);
                 endforeach;
                 return $include;
             else:
@@ -110,8 +111,8 @@ class Error extends Object {
     public function __construct($type = "", $details = array()) {
         $view = new View;
         $filename = Inflector::underscore($type);
-        if(!($viewFile = Spaghetti::import("View", "errors/{$filename}", "phtm", true))):
-            $viewFile = Spaghetti::import("View", "errors/missing_error", "phtm", true);
+        if(!($viewFile = App::import("View", "errors/{$filename}", "phtm", true))):
+            $viewFile = App::import("View", "errors/missing_error", "phtm", true);
             $details = array("error" => $type);
         endif;
         echo $view->renderLayout($view->renderView($viewFile, array("details" => $details)), "error.phtm");

@@ -32,7 +32,7 @@ class ClassRegistry {
         $self =& ClassRegistry::getInstance();
         if($model =& $self->duplicate($class, $class)):
 		    return $model;
-        elseif(class_exists($class) || Spaghetti::import($type, Inflector::underscore($class))):
+        elseif(class_exists($class) || App::import($type, Inflector::underscore($class))):
 		    ${$class} =& new $class;
         else:
 		    $this->error("missing{$type}", array(strtolower($type) => $class));

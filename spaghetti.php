@@ -56,13 +56,13 @@
      * Inclusão das classes básicas do Spaghetti.
      */
     require_once CORE . DS . "basics.php";
-    Spaghetti::import("Core", array("class_registry", "component", "controller", "dispatcher", "filter", "helper", "inflector", "mapper", "misc", "model", "view"));
+    App::import("Core", array("class_registry", "component", "controller", "dispatcher", "filter", "helper", "inflector", "mapper", "misc", "model", "view"));
     /**
      * Inclusão de configurações e classes básicas, seja da biblioteca ou da aplicação
      * do usuário.
      */
-    Spaghetti::import("App", array("config/settings", "config/routes", "config/database"));
-    Spaghetti::import("Controller", "app_controller");
-    Spaghetti::import("Model", "app_model");
+    App::import("App", array("config/settings", "config/routes", "config/database"));
+    App::import("Controller", "app_controller");
+    App::import("Model", "app_model");
     
 ?>

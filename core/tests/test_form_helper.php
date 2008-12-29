@@ -12,8 +12,8 @@
  */
 
 include_once "setup.php";
-Spaghetti::import("Helper", "html_helper");
-Spaghetti::import("Helper", "form_helper");
+App::import("Helper", "html_helper");
+App::import("Helper", "form_helper");
 
 class TestFormHelper extends UnitTestCase {
     public function setUp() {

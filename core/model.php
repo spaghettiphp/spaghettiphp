@@ -63,6 +63,8 @@ class Model extends Object {
      * Registros afetados pela consulta
      */
     public $affectedRows = null;
+
+	private $log = array();
     
     public function __construct($table = null) {
         if($this->table === null):
@@ -210,6 +212,9 @@ class Model extends Object {
             "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$this->table} SET " . $this->sqlSet($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "describe" => "DESCRIBE {$this->table}"
         );
+		
+		$this->log[] = $types[$type];
+		
         return $types[$type];
     }
     public function sqlSet($data = "") {
