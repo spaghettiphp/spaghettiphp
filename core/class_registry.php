@@ -24,18 +24,18 @@ class ClassRegistry {
     public function &getInstance() {
         static $instance = array();
         if (!$instance):
-		    $instance[0] =& new ClassRegistry();
+	    $instance[0] =& new ClassRegistry();
         endif;
         return $instance[0];
     }
     public function &init($class, $type = "Model") {
         $self =& ClassRegistry::getInstance();
         if($model =& $self->duplicate($class, $class)):
-		    return $model;
+	    return $model;
         elseif(class_exists($class) || App::import($type, Inflector::underscore($class))):
-		    ${$class} =& new $class;
+	    ${$class} =& new $class;
         else:
-		    $this->error("missing{$type}", array(strtolower($type) => $class));
+	    $this->error("missing{$type}", array(strtolower($type) => $class));
         endif;
         return ${$class};
     }
@@ -50,8 +50,8 @@ class ClassRegistry {
     public function addObject($key, &$object) {
         $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects) === false):
-		    $self->objects[$key] =& $object;
-			return true;
+	    $self->objects[$key] =& $object;
+	    return true;
         endif;
         return false;
     }
@@ -65,7 +65,7 @@ class ClassRegistry {
     public function removeObject($key) {
         $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects) === true):
-		    unset($self->objects[$key]);
+	    unset($self->objects[$key]);
         endif;
     }
     /**
@@ -78,7 +78,7 @@ class ClassRegistry {
     public function isKeySet($key) {
         $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects)):
-		    return true;
+	    return true;
         endif;
         return false;
     }
@@ -103,7 +103,7 @@ class ClassRegistry {
         $self =& ClassRegistry::getInstance();
         $return = false;
         if(isset($self->objects[$key])):
-		    $return =& $self->objects[$key];
+	    $return =& $self->objects[$key];
         endif;
         return $return;
     }
@@ -119,11 +119,11 @@ class ClassRegistry {
         $self =& ClassRegistry::getInstance();
         $duplicate = false;
         if ($self->isKeySet($alias)):
-			$model =& $self->getObject($alias);
-		    if(is_a($model, $class) || $model->alias === $class):
-				$duplicate =& $model;
-		    endif;
-		    unset($model);
+	    $model =& $self->getObject($alias);
+	    if(is_a($model, $class) || $model->alias === $class):
+		$duplicate =& $model;
+	    endif;
+	    unset($model);
         endif;
         return $duplicate;
     }
@@ -134,8 +134,8 @@ class ClassRegistry {
      * @return void
      */
     public function flush() {
-		$self =& ClassRegistry::getInstance();
-		$self->objects = array();
+	$self =& ClassRegistry::getInstance();
+	$self->objects = array();
     }
 }
 

@@ -38,9 +38,12 @@ class App extends Object {
     */
     static function import($type = "Core", $file = "", $ext = "php", $return = false) {
         $paths = array(
+			// Diretórios do core
             "Core" => array(CORE),
             "App" => array(APP, LIB),
             "Lib" => array(LIB),
+
+			// Diretórios da aplicação
             "Webroot" => array(WEBROOT),
             "Model" => array(APP . DS . "models", LIB . DS . "models"),
             "Controller" => array(APP . DS . "controllers", LIB . DS . "controllers"),
@@ -48,7 +51,12 @@ class App extends Object {
             "Layout" => array(APP . DS . "layouts", LIB . DS . "layouts"),
             "Component" => array(APP . DS . "components", LIB . DS . "components"),
             "Helper" => array(APP . DS . "helpers", LIB . DS . "helpers"),
-            "Script" => array(ROOT . DS . "scripts"),
+
+			// Diretórios do Shell
+            "Script" => array(ROOT . DS . "script"),
+            "Command" => array(ROOT. DS . "script" . DS . "commands"),
+            "Task" => array(ROOT. DS . "script" . DS . "tasks"),
+            "Template" => array(ROOT. DS . "script" . DS . "templates"),
         );
         foreach($paths[$type] as $path):
             if(is_array($file)):
