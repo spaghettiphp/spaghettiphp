@@ -1,0 +1,7 @@
+#! /usr/bin/php
+<?php
+require_once "spaghetti.php";
+App::import("Core", array("shell","filesystem","template","command","task"));
+
+new ShellDispatcher();    
+?>

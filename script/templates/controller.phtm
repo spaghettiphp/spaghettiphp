@@ -1,0 +1,17 @@
+<?php
+$content =
+"<?php
+class {$controllerName}Controller extends AppController {
+";
+foreach($methods as $method):
+$content .=
+"	function {$method}() {
+	
+	}
+";
+endforeach;
+$content .=
+"}
+?>";
+echo $content;
+?>

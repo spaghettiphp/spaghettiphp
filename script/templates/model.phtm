@@ -1,0 +1,10 @@
+<?php
+$content =
+"<?php
+class {$modelName}Model extends AppModel {";
+
+$content =
+"}
+?>";
+echo $content;
+?>
