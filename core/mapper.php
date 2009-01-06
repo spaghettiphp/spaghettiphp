@@ -17,7 +17,7 @@ class Mapper extends Object {
     public function __construct() {
         if($this->here == null):
             $length = strlen(WEBROOT) == 1 ? 0 : strlen(WEBROOT);
-            $this->here = rtrim(str_replace("//", "/", substr($_SERVER["REQUEST_URI"], $length)), "/");
+            $this->here = Mapper::normalize(substr($_SERVER["REQUEST_URI"], $length));
         endif;
     }
     public function &getInstance() {
@@ -27,15 +27,29 @@ class Mapper extends Object {
         endif;
         return $instance[0];
     }
+    public function normalize($url = "") {
+        if(preg_match("/^[a-z]+:/", $url)):
+            return $url;
+        endif;
+        $url = "/" . $url;
+        while(strpos($url, "//") !== false):
+            $url = str_replace("//", "/", $url);
+        endwhile;
+        $url = preg_replace("/\/$/", "", $url);
+        if(empty($url)):
+            $url = "/";
+        endif;
+        return $url;
+    }
     public function url($path = null, $full = false) {
-        if(preg_match("/^[a-z]*:/", $path)):
+        if(preg_match("/^[a-z]+:/", $path)):
             return $path;
         elseif(preg_match("/^\//", $path)):
             $url = WEBROOT . $path;
         else:
             $url = WEBROOT . Mapper::here() . "/" . $path;
         endif;
-        $url = str_replace("//", "/", $url);
+        $url = Mapper::normalize($url);
         return $full ? BASE_URL . $url : $url;
     }
     public function connect($url = "", $route = "") {

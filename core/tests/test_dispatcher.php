@@ -13,6 +13,12 @@
 
 include_once "setup.php";
 
+class TestController extends AppController {
+    public function index() {
+        
+    }
+}
+
 class TestDispatcher extends UnitTestCase {
     public function setUp() {
         $this->dispatcher = new Dispatcher(false);
@@ -23,6 +29,20 @@ class TestDispatcher extends UnitTestCase {
         Mapper::unsetPrefix("admin");
     }
     public function testParseEmptyUrl() {
+        $results = $this->dispatcher->parseUrl("");
+        $expected = array(
+            "here" => "/",
+            "prefix" => "",
+            "controller" => "home",
+            "action" => "index",
+            "id" => "",
+            "extension" => "htm",
+            "params" => array(),
+            "namedParams" => array()
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParseEmptyUrlWithSlash() {
         $results = $this->dispatcher->parseUrl("/");
         $expected = array(
             "here" => "/",
@@ -288,6 +308,20 @@ class TestDispatcher extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
     }
+    //public function testParseUrlWithQueryString() {
+    //    $results = $this->dispatcher->parseUrl("/?param=value");
+    //    $expected = array(
+    //        "here" => "/",
+    //        "prefix" => "",
+    //        "controller" => "home",
+    //        "action" => "index",
+    //        "id" => "",
+    //        "extension" => "htm",
+    //        "params" => array(),
+    //        "namedParams" => array("param" => "value")
+    //    );
+    //    $this->assertEqual($expected, $results);
+    //}
 }
 
 ?>

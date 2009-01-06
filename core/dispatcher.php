@@ -27,9 +27,9 @@ class Dispatcher extends Object {
      * @return array Array contendo a URL interpretada
      */
     public function parseUrl($url = null) {
-        if($url === null) $url = Mapper::here();
-        $this->url = $url;
-        $url = Mapper::getRoute($this->url);
+        if(is_null($url)) $url = Mapper::here();
+        $here = Mapper::normalize($url);
+        $url = Mapper::getRoute($url);
         $prefixes = join("|", Mapper::getPrefixes());
         
         $parts = array("here", "prefix", "controller", "action", "id", "extension", "params");
@@ -46,11 +46,12 @@ class Dispatcher extends Object {
                 $this->path["params"] []= $param;
             endif;
         endforeach;
-        if($this->path["action"] == "") $this->path["action"] = "index";
-        if($this->path["prefix"] != "") $this->path["action"] = "{$this->path['prefix']}_{$this->path['action']}";
-        if($this->path["extension"] == "") $this->path["extension"] = Config::read("defaultExtension");
-        $this->path["here"] = preg_replace("/(.+)\/$/", "$1", $this->url);
 
+        $this->path["here"] = $here;
+        if(empty($this->path["action"])) $this->path["action"] = "index";
+        if(!empty($this->path["prefix"])) $this->path["action"] = "{$this->path['prefix']}_{$this->path['action']}";
+        if(empty($this->path["extension"])) $this->path["extension"] = Config::read("defaultExtension");
+        
         return $this->path;
     }
     /**
