@@ -1,6 +1,6 @@
 <?php
 /**
- *  Put description here.
+ *  Suite de testes da classe Dispatcher.
  *
  *  Licensed under The MIT License.
  *  Redistributions of files must retain the above copyright notice.
@@ -13,67 +13,17 @@
 
 include_once "setup.php";
 
-class BaseController extends AppController {
-    public $uses = array();
-    public function render() {
-        $this->output = "";
-        if($this->viewData["id"]) $this->output .= "id: {$this->view_data['id']}\n";
-        if($this->viewData["param"]) $this->output .= "param: {$this->view_data['param']}\n";
-        $this->output .= "This should work!";
-        return $this->output;
-    }    
-}
-
-class AutoRenderController extends BaseController {
-    public function test_action($id = null, $first_param = null) {
-        $this->set("id", $id);
-        $this->set("param", $first_param);
-    }
-}
-
-class ManualRenderController extends BaseController {
-    public function test_action($id = null, $first_param = null) {
-        $this->set("id", $id);
-        $this->set("param", $first_param);
-        $this->render();
-    }
-}
-
-class ComponentController extends BaseController {
-    public $components = array("Base");
-    public function test_action() {
-        
-    }
-}
-
-class BaseFilter extends Filter {
-    public function start($file) {
-        echo $file;
-    }
-}
-
-class BaseComponent extends Object {
-    public function initialize() {
-        echo "-initialized-";
-    }
-    public function startup() {
-        echo "-started up-";
-    }
-    public function shutdown() {
-        echo "-shut down-";
-    }
-}
-
 class TestDispatcher extends UnitTestCase {
     public function setUp() {
-        $this->dispatcher =& new Dispatcher(false);
+        $this->dispatcher = new Dispatcher(false);
         Mapper::prefix("admin");
     }
     public function tearDown() {
         $this->dispatcher = null;
+        Mapper::unsetPrefix("admin");
     }
-    public function testParseUrl() {
-        $results = $this->dispatcher->parse_url("");
+    public function testParseEmptyUrl() {
+        $results = $this->dispatcher->parseUrl("/");
         $expected = array(
             "here" => "/",
             "prefix" => "",
@@ -81,11 +31,13 @@ class TestDispatcher extends UnitTestCase {
             "action" => "index",
             "id" => "",
             "extension" => "htm",
-            "params" => array()
+            "params" => array(),
+            "namedParams" => array()
         );
         $this->assertEqual($expected, $results);
-
-        $results = $this->dispatcher->parseUrl("controller");
+    }
+    public function testParseController() {
+        $results = $this->dispatcher->parseUrl("/controller");
         $expected = array(
             "here" => "/controller",
             "prefix" => "",
@@ -93,23 +45,27 @@ class TestDispatcher extends UnitTestCase {
             "action" => "index",
             "id" => "",
             "extension" => "htm",
-            "params" => array()
+            "params" => array(),
+            "namedParams" => array()
         );
         $this->assertEqual($expected, $results);
-
-        $results = $this->dispatcher->parseUrl("controller/action/id");
+    }
+    public function testParseControllerAction() {
+        $results = $this->dispatcher->parseUrl("/controller/action");
         $expected = array(
-            "here" => "/controller/action/id",
+            "here" => "/controller/action",
             "prefix" => "",
             "controller" => "controller",
             "action" => "action",
             "id" => "",
             "extension" => "htm",
-            "params" => array("id")
+            "params" => array(),
+            "namedParams" => array()
         );
         $this->assertEqual($expected, $results);
-
-        $results = $this->dispatcher->parseUrl("controller/action/1");
+    }
+    public function testParseControllerActionId() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1");
         $expected = array(
             "here" => "/controller/action/1",
             "prefix" => "",
@@ -117,11 +73,13 @@ class TestDispatcher extends UnitTestCase {
             "action" => "action",
             "id" => "1",
             "extension" => "htm",
-            "params" => array()
+            "params" => array(),
+            "namedParams" => array()
         );
         $this->assertEqual($expected, $results);
-        
-        $results = $this->dispatcher->parseUrl("controller/1");
+    }
+    public function testParseControllerId() {
+        $results = $this->dispatcher->parseUrl("/controller/1");
         $expected = array(
             "here" => "/controller/1",
             "prefix" => "",
@@ -129,156 +87,205 @@ class TestDispatcher extends UnitTestCase {
             "action" => "index",
             "id" => "1",
             "extension" => "htm",
-            "params" => array()
+            "params" => array(),
+            "namedParams" => array()
         );
         $this->assertEqual($expected, $results);
-        
-        $results = $this->dispatcher->parseUrl("controller/action/1.xml/params/");
+    }
+    public function testParseControllerActionIdParams() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/params");
         $expected = array(
-            "here" => "/controller/action/1.xml/params",
+            "here" => "/controller/action/1/params",
             "prefix" => "",
             "controller" => "controller",
             "action" => "action",
             "id" => "1",
-            "extension" => "xml",
-            "params" => array("params")
+            "extension" => "htm",
+            "params" => array("params"),
+            "namedParams" => array()
         );
         $this->assertEqual($expected, $results);
-
-        $results = $this->dispatcher->parseUrl("controller/action.xml");
+    }
+    public function testParseControllerExtension() {
+        $results = $this->dispatcher->parseUrl("/controller.html");
         $expected = array(
-            "here" => "/controller/action.xml",
+            "here" => "/controller.html",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "index",
+            "id" => "",
+            "extension" => "html",
+            "params" => array(),
+            "namedParams" => array()
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParseControllerActionExtension() {
+        $results = $this->dispatcher->parseUrl("/controller/action.html");
+        $expected = array(
+            "here" => "/controller/action.html",
             "prefix" => "",
             "controller" => "controller",
             "action" => "action",
             "id" => "",
-            "extension" => "xml",
-            "params" => array()
-        );
-        $this->assertEqual($expected, $results);
-
-        $results = $this->dispatcher->parseUrl("controller.xml");
-        $expected = array(
-            "here" => "/controller.xml",
-            "prefix" => "",
-            "controller" => "controller",
-            "action" => "index",
-            "id" => "",
-            "extension" => "xml",
-            "params" => array()
-        );
-        $this->assertEqual($expected, $results);
-
-        $results = $this->dispatcher->parseUrl("admin/controller/action");
-        $expected = array(
-            "here" => "/admin/controller/action",
-            "prefix" => "admin",
-            "controller" => "controller",
-            "action" => "admin_action",
-            "id" => "",
-            "extension" => "htm",
-            "params" => array()
-        );
-        $this->assertEqual($expected, $results);
-
-        $results = $this->dispatcher->parseUrl("admin");
-        $expected = array(
-            "here" => "/admin",
-            "prefix" => "admin",
-            "controller" => "home",
-            "action" => "admin_index",
-            "id" => "",
-            "extension" => "htm",
-            "params" => array()
-        );
-        $this->assertEqual($expected, $results);
-
-        $results = $this->dispatcher->parseUrl("administrator");
-        $expected = array(
-            "here" => "/administrator",
-            "prefix" => "",
-            "controller" => "administrator",
-            "action" => "index",
-            "id" => "",
-            "extension" => "htm",
-            "params" => array()
-        );
-        $this->assertEqual($expected, $results);
-
-        Mapper::connect("/admin", "/admin/home");
-        $results = $this->dispatcher->parseUrl("admin");
-        $expected = array(
-            "here" => "/admin",
-            "prefix" => "admin",
-            "controller" => "home",
-            "action" => "admin_index",
-            "id" => "",
-            "extension" => "htm",
-            "params" => array()
-        );
-        $this->assertEqual($expected, $results);
-
-        Mapper::connect("/dummy_route/", "/controller/");
-        $results = $this->dispatcher->parseUrl("/dummy_route");
-        $expected = array(
-            "here" => "/dummy_route",
-            "prefix" => "",
-            "controller" => "controller",
-            "action" => "index",
-            "id" => "",
-            "extension" => "htm",
-            "params" => array()
-        );
-        $this->assertEqual($expected, $results);
-
-        Mapper::connect("/dummy_route/:any", "/controller/$1");
-        $results = $this->dispatcher->parseUrl("dummy_route");
-        $expected = array(
-            "here" => "/dummy_route",
-            "prefix" => "",
-            "controller" => "controller",
-            "action" => "index",
-            "id" => "",
-            "extension" => "htm",
-            "params" => array()
+            "extension" => "html",
+            "params" => array(),
+            "namedParams" => array()
         );
         $this->assertEqual($expected, $results);
     }
-    public function testDispatch() {
-        ob_start();
-        $this->dispatcher->parseUrl("auto_render/test_action/");
-        $this->dispatcher->dispatch();
-        $results = ob_get_clean();
-        $expected = "This should work!";
+    public function testParseControllerActionIdExtension() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1.html");
+        $expected = array(
+            "here" => "/controller/action/1.html",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "html",
+            "params" => array(),
+            "namedParams" => array()
+        );
         $this->assertEqual($expected, $results);
-
-        ob_start();
-        $this->dispatcher->parseUrl("auto_render/test_action/1/dummy_param");
-        $this->dispatcher->dispatch();
-        $results = ob_get_clean();
-        $expected = "id: 1\nparam: dummy_param\nThis should work!";
+    }
+    public function testParseControllerActionIdExtensionParams() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1.html/params");
+        $expected = array(
+            "here" => "/controller/action/1.html/params",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "html",
+            "params" => array("params"),
+            "namedParams" => array()
+        );
         $this->assertEqual($expected, $results);
-
-        ob_start();
-        $this->dispatcher->parseUrl("manual_render/test_action/");
-        $this->dispatcher->dispatch();
-        $results = ob_get_clean();
-        $expected = "This should work!";
+    }
+    public function testParseControllerActionIdExtensionManyParams() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1.html/params/anotherParam");
+        $expected = array(
+            "here" => "/controller/action/1.html/params/anotherParam",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "html",
+            "params" => array("params", "anotherParam"),
+            "namedParams" => array()
+        );
         $this->assertEqual($expected, $results);
-
-        ob_start();
-        Config::write("filters", array("base"));
-        $this->dispatcher->parseUrl("base/file.ext");
-        $this->dispatcher->dispatch();
-        $results = ob_get_clean();
-        $expected = "file.ext";
+    }
+    public function testParsePrefixController() {
+        $results = $this->dispatcher->parseUrl("/admin/controller");
+        $expected = array(
+            "here" => "/admin/controller",
+            "prefix" => "admin",
+            "controller" => "controller",
+            "action" => "admin_index",
+            "id" => "",
+            "extension" => "htm",
+            "params" => array(),
+            "namedParams" => array()
+        );
         $this->assertEqual($expected, $results);
-
-        ob_start();
-        $this->dispatcher->parseUrl("component/test_action/");
-        $this->dispatcher->dispatch();
-        $results = ob_get_clean();
-        $expected = "-initialized--started up--shut down-This should work!";
+    }
+    public function testParsePrefix() {
+        $results = $this->dispatcher->parseUrl("/admin");
+        $expected = array(
+            "here" => "/admin",
+            "prefix" => "admin",
+            "controller" => "home",
+            "action" => "admin_index",
+            "id" => "",
+            "extension" => "htm",
+            "params" => array(),
+            "namedParams" => array()
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParseControllerWithEndingSlash() {
+        $results = $this->dispatcher->parseUrl("/controller/");
+        $expected = array(
+            "here" => "/controller",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "index",
+            "id" => "",
+            "extension" => "htm",
+            "params" => array(),
+            "namedParams" => array()
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParsePrefixWithEndingSlash() {
+        $results = $this->dispatcher->parseUrl("/admin/");
+        $expected = array(
+            "here" => "/admin",
+            "prefix" => "admin",
+            "controller" => "home",
+            "action" => "admin_index",
+            "id" => "",
+            "extension" => "htm",
+            "params" => array(),
+            "namedParams" => array()
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParseWithNamedParam() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/param:value");
+        $expected = array(
+            "here" => "/controller/action/1/param:value",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "htm",
+            "params" => array(),
+            "namedParams" => array("param" => "value")
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParseWithManyNamedParams() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/param:value/anotherParam:anotherValue");
+        $expected = array(
+            "here" => "/controller/action/1/param:value/anotherParam:anotherValue",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "htm",
+            "params" => array(),
+            "namedParams" => array("param" => "value", "anotherParam" => "anotherValue")
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParseWithNumberedAndNamedParam() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/param/param:value");
+        $expected = array(
+            "here" => "/controller/action/1/param/param:value",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "htm",
+            "params" => array("param"),
+            "namedParams" => array("param" => "value")
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParseWithNamedAndNumberedParam() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/param:value/param");
+        $expected = array(
+            "here" => "/controller/action/1/param:value/param",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "htm",
+            "params" => array("param"),
+            "namedParams" => array("param" => "value")
+        );
         $this->assertEqual($expected, $results);
     }
 }

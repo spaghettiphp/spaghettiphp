@@ -1,9 +1,7 @@
 <?php
 /**
- *  The Spaghetti.Dispatcher class is responsible for getting the
- *  querystring parameters from URL, parsing them, figuring out
- *  their meanings and including the necessary files, as well as
- *  calling and rendering the Controller.
+ *  A classe Dispatcher é responsável por receber os parâmetros passados ao Spaghetti*
+ *  através da URL, interpretá-los e direcioná-los para o respectivo controller.
  *
  *  Licensed under The MIT License.
  *  Redistributions of files must retain the above copyright notice.
@@ -18,15 +16,15 @@ class Dispatcher extends Object {
     public $path = array();
     public $url = "";
     public function __construct($dispatch = true) {
-        $this->parseUrl($url);
+        $this->parseUrl();
         if($dispatch) return $this->dispatch();
     }
     /**
-     * O método Dispatcher::parse_url() faz o parse da URL, identificando o prefixo,
-     * controller, action, id, extensão e parâmetros nesta URL.
+     * O método Dispatcher::parseUrl() faz a interpretação da URL, identificando
+     * prefixos, controller, action, id, extensão e parâmetros adicionais.
      *
-     * @param string $url URL a ser parseadad
-     * @return void
+     * @param string $url URL a ser interpretada
+     * @return array Array contendo a URL interpretada
      */
     public function parseUrl($url = null) {
         if($url === null) $url = Mapper::here();
@@ -40,20 +38,26 @@ class Dispatcher extends Object {
             $this->path[$key] = $reg[$k];
         }
         
+        $this->path["namedParams"] = $this->path["params"] = array();
+        foreach(split("/", $reg[6]) as $param):
+            if(preg_match("/([^:]*):([^:]*)/", $param, $reg)):
+                $this->path["namedParams"][$reg[1]] = $reg[2];
+            elseif($param != ""):
+                $this->path["params"] []= $param;
+            endif;
+        endforeach;
         if($this->path["action"] == "") $this->path["action"] = "index";
         if($this->path["prefix"] != "") $this->path["action"] = "{$this->path['prefix']}_{$this->path['action']}";
-        if($this->path["params"] != "") $this->path["params"] = split("/", $this->path["params"]);
-        else $this->path["params"] = array();
         if($this->path["extension"] == "") $this->path["extension"] = Config::read("defaultExtension");
-        $this->path["here"] = $this->url;
+        $this->path["here"] = preg_replace("/(.+)\/$/", "$1", $this->url);
 
         return $this->path;
     }
     /**
-     * Dispatcher::dispatch() é o método que chama o controller e a action
-     * solicitada.
+     * O método Dispatcher::dispatch() chama o controller e a action solicitados,
+     * além de inicializar componentes e renderizar a saída.
      *
-     * @return void
+     * @return mixed Instância do novo controller, ou falso em caso de erro
      */ 
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
@@ -73,14 +77,17 @@ class Dispatcher extends Object {
             $controller->Component->shutdown($controller);
             echo $controller->output;
             $controller->afterFilter();
+            return $controller;
         elseif(App::import("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}", true)):
             if(!$controller) $controller =& new AppController;
             $controller->beforeFilter();
             $controller->params = $this->path;
             echo $controller->render();
             $controller->afterFilter();
+            return $controller;
         else:
             $this->error("missingAction", array("controller" => $controllerName, "action" => $action));
+            return false;
         endif;
     }
 }

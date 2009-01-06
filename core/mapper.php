@@ -17,7 +17,7 @@ class Mapper extends Object {
     public function __construct() {
         if($this->here == null):
             $length = strlen(WEBROOT) == 1 ? 0 : strlen(WEBROOT);
-            $this->here = str_replace("//", "/", substr($_SERVER["REQUEST_URI"], $length));
+            $this->here = rtrim(str_replace("//", "/", substr($_SERVER["REQUEST_URI"], $length)), "/");
         endif;
     }
     public function &getInstance() {
@@ -28,7 +28,7 @@ class Mapper extends Object {
         return $instance[0];
     }
     public function url($path = null, $full = false) {
-        if(preg_match("/^([a-z]*:\/\/|mailto:)/", $path)):
+        if(preg_match("/^[a-z]*:/", $path)):
             return $path;
         elseif(preg_match("/^\//", $path)):
             $url = WEBROOT . $path;
