@@ -116,7 +116,7 @@ class View extends Object {
             $action = $filename[0];
             $ext = $filename[1] ? $filename[1] : "phtm";
         endif;
-        $filename = App::import("View", $action, $ext, true);
+        $filename = App::exists("View", $action, $ext);
         if($filename):
             $out = $this->renderView($filename, $this->viewData);
             if($this->autoLayout && $this->layout):
@@ -147,7 +147,7 @@ class View extends Object {
             $layout = $filename[0];
             $ext = $filename[1] ? $filename[1] : "phtm";
         endif;
-        $filename = App::import("Layout", $layout, $ext, true);
+        $filename = App::exists("Layout", $layout, $ext);
         $data = array_merge(array(
             "content_for_layout" => $content,
             "pageTitle" => $this->pageTitle,
@@ -173,7 +173,7 @@ class View extends Object {
      */
     public function element($element = null, $params = array()) {
         $ext = $this->extension ? "p{$this->extension}" : "phtm";
-        return $this->renderView(App::import("View", "_{$element}", $ext, true), $params);
+        return $this->renderView(App::exists("View", "_{$element}", $ext), $params);
     }
     /**
      * View::set() é o método que grava as variáveis definidas no

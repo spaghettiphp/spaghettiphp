@@ -14,6 +14,8 @@
 include_once "setup.php";
 
 class TestController extends AppController {
+    public $autoRender = false;
+    public $uses = array();
     public function index() {
         
     }
@@ -322,6 +324,12 @@ class TestDispatcher extends UnitTestCase {
     //    );
     //    $this->assertEqual($expected, $results);
     //}
+    
+    public function testDispatchWithExistingController() {
+        $this->dispatcher->parseUrl("/test");
+        $results = is_a($this->dispatcher->dispatch(), "TestController");
+        $this->assertTrue($results);
+    }
 }
 
 ?>

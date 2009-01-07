@@ -1,7 +1,7 @@
 <?php
 class Template extends Shell {
     public function render($filename = null, $data = array()) {
-        $file = App::import("Template", $filename, "phtm", true);
+        $file = App::exists("Template", $filename, "phtm");
         if($file):
             if(!is_string($file)):
 				return false;

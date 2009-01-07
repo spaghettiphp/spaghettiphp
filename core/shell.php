@@ -40,7 +40,7 @@ class ShellDispatcher extends Shell {
         $fileName = Inflector::underscore($this->arguments["command"])."_command";
         $className = Inflector::camelize($fileName);
         
-        if(App::import("Command", $fileName, "php", true)):
+        if(App::exists("Command", $fileName, "php")):
             $command =& ClassRegistry::init($className, "Command");
             call_user_func_array(array($command,"execute"), $this->arguments["params"]);
         else:

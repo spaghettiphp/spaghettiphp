@@ -27,9 +27,8 @@ class Dispatcher extends Object {
      * @return array Array contendo a URL interpretada
      */
     public function parseUrl($url = null) {
-        if(is_null($url)) $url = Mapper::here();
-        $here = Mapper::normalize($url);
-        $url = Mapper::getRoute($url);
+        $here = Mapper::normalize(is_null($url) ? Mapper::here() : $url);
+        $url = Mapper::getRoute($here);
         $prefixes = join("|", Mapper::getPrefixes());
         
         $parts = array("here", "prefix", "controller", "action", "id", "extension", "params");
@@ -63,33 +62,35 @@ class Dispatcher extends Object {
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
         $action = preg_replace("/-/", "_", $this->path["action"]);
-        if(App::import("Controller", "{$this->path['controller']}_controller", "php", true)):
-            $controller =& ClassRegistry::init($controllerName, "Controller");
-        endif;
-        if($controller && method_exists($controller, $action)):
-            $controller->params = $this->path;
-            $controller->Component->initialize($controller);
-            $controller->beforeFilter();
-            $controller->Component->startup($controller);
-            call_user_func_array(array(&$controller, $action), array_merge(array($this->path["id"]), $this->path["params"]));
-            if($controller->autoRender):
-                $controller->render();
+        
+        
+        if($controller =& ClassRegistry::load($controllerName, "Controller")):
+            if(!method_exists($controller, $action) && !App::exists("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
+                $this->error("missingAction", array("controller" => $controllerName, "action" => $action));
+                return false;
             endif;
-            $controller->Component->shutdown($controller);
-            echo $controller->output;
-            $controller->afterFilter();
-            return $controller;
-        elseif(App::import("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}", true)):
-            if(!$controller) $controller =& new AppController;
-            $controller->beforeFilter();
-            $controller->params = $this->path;
-            echo $controller->render();
-            $controller->afterFilter();
-            return $controller;
         else:
-            $this->error("missingAction", array("controller" => $controllerName, "action" => $action));
-            return false;
+            if(App::exists("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
+                $controller =& ClassRegistry::load("AppController", "Controller");
+            else:
+                $this->error("missingController", array("controller" => $controllerName));
+            endif;
         endif;
+
+        $controller->params = $this->path;
+        $controller->Component->initialize($controller);
+        $controller->beforeFilter();
+        $controller->Component->startup($controller);
+        if(method_exists($controller, $action)):
+            call_user_func_array(array(&$controller, $action), array_merge(array($this->path["id"]), $this->path["params"]));
+        endif;
+        if($controller->autoRender):
+            $controller->render();
+        endif;
+        $controller->Component->shutdown($controller);
+        echo $controller->output;
+        $controller->afterFilter();
+        return $controller;
     }
 }
 

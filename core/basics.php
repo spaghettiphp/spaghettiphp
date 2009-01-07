@@ -36,7 +36,20 @@ class App extends Object {
      * @param boolean $return Define se o metodo retorna o caminho para o arquivo ou a cópia em buffer
      * @return mixed Buffer do arquivo importado ou falso caso não consiga carregá-lo
     */
-    static function import($type = "Core", $file = "", $ext = "php", $return = false) {
+    static function import($type = "Core", $file = "", $ext = "php") {
+		if(is_array($file)):
+			foreach($file as $file):
+				$include = App::import($type, $file, $ext);
+			endforeach;
+			return $include;
+		else:
+			if($file_path = App::exists($type, $file, $ext)):
+				return include $file_path;
+			endif;
+		endif;
+        return false;
+    }
+	public function exists($type = "Core", $file = "", $ext = "php") {
         $paths = array(
 			// Diretórios do core
             "Core" => array(CORE),
@@ -59,20 +72,14 @@ class App extends Object {
             "Template" => array(ROOT. DS . "script" . DS . "templates"),
         );
         foreach($paths[$type] as $path):
-            if(is_array($file)):
-                foreach($file as $file):
-                    $include = App::import($type, $file, $ext);
-                endforeach;
-                return $include;
-            else:
-                $file_path = $path . DS . "{$file}.{$ext}";
-                if(file_exists($file_path)):
-                    return $return ? $file_path : include($file_path);
-                endif;
-            endif;
+			$file_path = $path . DS . "{$file}.{$ext}";
+			if(file_exists($file_path)):
+				return $file_path;
+			endif;
         endforeach;
         return false;
-    }
+		
+	}
 }
 
 class Config extends Object {
@@ -119,8 +126,8 @@ class Error extends Object {
     public function __construct($type = "", $details = array()) {
         $view = new View;
         $filename = Inflector::underscore($type);
-        if(!($viewFile = App::import("View", "errors/{$filename}", "phtm", true))):
-            $viewFile = App::import("View", "errors/missing_error", "phtm", true);
+        if(!($viewFile = App::exists("View", "errors/{$filename}", "phtm"))):
+            $viewFile = App::exists("View", "errors/missing_error", "phtm");
             $details = array("error" => $type);
         endif;
         echo $view->renderLayout($view->renderView($viewFile, array("details" => $details)), "error.phtm");
