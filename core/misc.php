@@ -41,4 +41,12 @@ function array_unset($array = array(), $index = "") {
     return $item;
 }
 
+function can_call_method(&$object, $method) {
+    if(method_exists($object, $method)):
+        $method = new ReflectionMethod($object, $method);
+        return $method->isPublic();
+    endif;
+    return false;
+}
+
 ?>

@@ -13,17 +13,26 @@
 
 include_once "setup.php";
 
+class DispatcherTest extends Dispatcher {
+    public function error() {
+        return false;
+    }
+}
+
 class TestController extends AppController {
     public $autoRender = false;
     public $uses = array();
     public function index() {
         
     }
+    private function privateMethod() {
+        
+    }
 }
 
 class TestDispatcher extends UnitTestCase {
     public function setUp() {
-        $this->dispatcher = new Dispatcher(false);
+        $this->dispatcher = new DispatcherTest(false);
         Mapper::prefix("admin");
     }
     public function tearDown() {
@@ -329,6 +338,21 @@ class TestDispatcher extends UnitTestCase {
         $this->dispatcher->parseUrl("/test");
         $results = is_a($this->dispatcher->dispatch(), "TestController");
         $this->assertTrue($results);
+    }
+    public function testDispatchWithMissingController() {
+        $this->dispatcher->parseUrl("/missing");
+        $results = $this->dispatcher->dispatch();
+        $this->assertFalse($results);
+    }
+    public function testDispatchWithMissingAction() {
+        $this->dispatcher->parseUrl("/test/missing");
+        $results = $this->dispatcher->dispatch();
+        $this->assertFalse($results);
+    }
+    public function testDispatchWithPrivateAction() {
+        $this->dispatcher->parseUrl("/test/privateMethod");
+        $results = $this->dispatcher->dispatch();
+        $this->assertFalse($results);
     }
 }
 

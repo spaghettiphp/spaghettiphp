@@ -32,7 +32,7 @@ class Dispatcher extends Object {
         $prefixes = join("|", Mapper::getPrefixes());
         
         $parts = array("here", "prefix", "controller", "action", "id", "extension", "params");
-        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?(.*))?/", $url, $reg);
+        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?(.*))?/i", $url, $reg);
         foreach($parts as $k => $key) {
             $this->path[$key] = $reg[$k];
         }
@@ -65,7 +65,7 @@ class Dispatcher extends Object {
         
         
         if($controller =& ClassRegistry::load($controllerName, "Controller")):
-            if(!method_exists($controller, $action) && !App::exists("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
+            if(!can_call_method($controller, $action) && !App::exists("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
                 $this->error("missingAction", array("controller" => $controllerName, "action" => $action));
                 return false;
             endif;
@@ -74,6 +74,7 @@ class Dispatcher extends Object {
                 $controller =& ClassRegistry::load("AppController", "Controller");
             else:
                 $this->error("missingController", array("controller" => $controllerName));
+                return false;
             endif;
         endif;
 
