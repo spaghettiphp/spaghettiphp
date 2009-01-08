@@ -40,15 +40,16 @@ class Dispatcher extends Object {
         $this->path["namedParams"] = $this->path["params"] = array();
         foreach(split("/", $reg[6]) as $param):
             if(preg_match("/([^:]*):([^:]*)/", $param, $reg)):
-                $this->path["namedParams"][$reg[1]] = $reg[2];
+                $this->path["namedParams"][$reg[1]] = urldecode($reg[2]);
             elseif($param != ""):
-                $this->path["params"] []= $param;
+                $this->path["params"] []= urldecode($param);
             endif;
         endforeach;
 
         $this->path["here"] = $here;
         if(empty($this->path["action"])) $this->path["action"] = "index";
         if(!empty($this->path["prefix"])) $this->path["action"] = "{$this->path['prefix']}_{$this->path['action']}";
+        if(empty($this->path["id"])) $this->path["id"] = null;
         if(empty($this->path["extension"])) $this->path["extension"] = Config::read("defaultExtension");
         
         return $this->path;
@@ -62,7 +63,6 @@ class Dispatcher extends Object {
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
         $action = preg_replace("/-/", "_", $this->path["action"]);
-        
         
         if($controller =& ClassRegistry::load($controllerName, "Controller")):
             if(!can_call_method($controller, $action) && !App::exists("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
@@ -82,8 +82,10 @@ class Dispatcher extends Object {
         $controller->Component->initialize($controller);
         $controller->beforeFilter();
         $controller->Component->startup($controller);
-        if(method_exists($controller, $action)):
-            call_user_func_array(array(&$controller, $action), array_merge(array($this->path["id"]), $this->path["params"]));
+        if(can_call_method($controller, $action)):
+            $params = $this->path["params"];
+            if(!is_null($this->path["id"])) $params = array_merge(array($this->path["id"]), $params);
+            call_user_func_array(array(&$controller, $action), $params);
         endif;
         if($controller->autoRender):
             $controller->render();

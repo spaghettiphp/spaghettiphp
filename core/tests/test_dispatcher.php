@@ -23,10 +23,12 @@ class TestController extends AppController {
     public $autoRender = false;
     public $uses = array();
     public function index() {
-        
+    }
+    public function id($firstParam = null, $secondParam = null) {
+        $this->output = $firstParam;
+        return $firstParam;
     }
     private function privateMethod() {
-        
     }
 }
 
@@ -319,6 +321,34 @@ class TestDispatcher extends UnitTestCase {
         );
         $this->assertEqual($expected, $results);
     }
+    public function testParseWithSpacedParams() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/param+with+space");
+        $expected = array(
+            "here" => "/controller/action/1/param+with+space",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "htm",
+            "params" => array("param with space"),
+            "namedParams" => array()
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function testParseWithSpacedNamedParams() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/name:param+with+space");
+        $expected = array(
+            "here" => "/controller/action/1/name:param+with+space",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "htm",
+            "params" => array(),
+            "namedParams" => array("name" => "param with space")
+        );
+        $this->assertEqual($expected, $results);
+    }
     //public function testParseUrlWithQueryString() {
     //    $results = $this->dispatcher->parseUrl("/?param=value");
     //    $expected = array(
@@ -353,6 +383,34 @@ class TestDispatcher extends UnitTestCase {
         $this->dispatcher->parseUrl("/test/privateMethod");
         $results = $this->dispatcher->dispatch();
         $this->assertFalse($results);
+    }
+    public function testDispatchWithId() {
+        $this->dispatcher->parseUrl("/test/id/1");
+        $controller = $this->dispatcher->dispatch();
+        $results = $controller->output;
+        $expected = 1;
+        $this->assertEqual($expected, $results);
+    }
+    public function testDispatchWithoutId() {
+        $this->dispatcher->parseUrl("/test/id");
+        $controller = $this->dispatcher->dispatch();
+        $results = $controller->output;
+        $expected = null;
+        $this->assertIdentical($expected, $results);
+    }
+    public function testDispatchWithIdAndParams() {
+        $this->dispatcher->parseUrl("/test/id/1/param");
+        $controller = $this->dispatcher->dispatch();
+        $results = $controller->output;
+        $expected = 1;
+        $this->assertEqual($expected, $results);
+    }
+    public function testDispatchWithParamsAndWithoutId() {
+        $this->dispatcher->parseUrl("/test/id/param");
+        $controller = $this->dispatcher->dispatch();
+        $results = $controller->output;
+        $expected = "param";
+        $this->assertEqual($expected, $results);
     }
 }
 
