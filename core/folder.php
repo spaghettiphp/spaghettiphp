@@ -28,7 +28,7 @@ class Folder {
 	*/
     }
     
-    public function is_dir() {
+    public function isDir() {
 	if(is_dir($this->path)):
 	    return true;
 	endif;
@@ -64,9 +64,6 @@ class Folder {
 	else:
 	    throw new FolderException("mkdir()");
 	endif;
-    }
-    
-    public function __destruct() {
     }
     
     /**
