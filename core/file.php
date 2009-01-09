@@ -1,50 +1,63 @@
 <?php
-class FileSystem extends Object {}
+
+abstract class FileSystem extends Object {
+}
 
 class File extends FileSystem {
-    public $path = "";
-    public $filename = "";
-    public $content = "";
-    public $writeType = "w";
-    public function __construct($path, $filename, $content, $writeType = null){
-        $this->path = trim($path, "/")."/";
-        $this->filename = $filename;
-        $this->content = $content;
-        $this->writeType = (is_null($writeType)) ? $this->writeType : $writeType;
+    private $file;
+    private $path;
+    private $filename;
+    private $mode;
+    public function __construct($name = null, $mode = "r") {
+        $this->file = fopen($name, $mode);
+        $this->path = dirname($name);
+        $this->filename = basename($name);
+        $this->mode = $mode;
     }
-    public function exists(){
-        if(file_exists($this->path.$this->filename))
-            return true;
-        return false;
+    public function __destruct() {
+        return fclose($this->file);
     }
-    public function save(){
-        $fileHandler = fopen($this->path.$this->filename, $this->writeType);
-        if($fileHandler):
-            fwrite($fileHandler, $this->content);
-            fclose($fileHandler);
-        else:
-            return false;
+    public function write($content = "") {
+        return fwrite($this->file, $content);
+    }
+    public function read($length = null) {
+        if(is_null($length)):
+            $length = $this->size();
         endif;
+        return fread($this->file, $length);
     }
-}
-/*
-class Folder extends FileSystem {
-    public $path = "";
-    public $chmod = 0755;
-    public function __construct($path, $chmod = null){
-        $this->path = trim($path, "/")."/";
-        $this->chmod = (is_null($chmod)) ? $this->chmod : $chmod;
+    public function size() {
+        return filesize($this->getPath());
     }
-    public function exists(){
-        if(is_dir($this->path))
+    public function rewind() {
+        return rewind($this->file);
+    }
+    public function gets($length = null) {
+        return fgets($this->file, $length);
+    }
+    public function eof() {
+        return feof($this->file);
+    }
+    public function rename($name = null) {
+        fclose($this->file);
+        if(rename($this->getPath(), $name)):
+            $this->file = fopen($name, $this->mode);
             return true;
+        endif;
         return false;
     }
-    public function save(){
-        if(@mkdir($this->path, $this->chmod, true))
-            return true;
-        return false;
+    public function getPath() {
+        return "{$this->path}/{$this->filename}";
+    }
+    static public function exists($path = null) {
+        return file_exists($path);
+    }
+    static public function get($file = null) {
+        return file_get_contents($file);
+    }
+    static public function put($file = null, $data = null) {
+        return file_put_contents($file, $data);
     }
 }
-*/
+
 ?>
