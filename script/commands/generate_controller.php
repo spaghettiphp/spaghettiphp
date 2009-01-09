@@ -18,8 +18,8 @@ class GenerateController extends Command {
             $this->error("controller name can't be blank");
         endif;
         
-        $fileName = "{$name}_controller";
-        $controllerName = Inflector::camelize($fileName);
+        $filename = "{$name}_controller";
+        $controllerName = Inflector::camelize($filename);
         $baseController = $controllerName == "AppController" ? "Controller" : "AppController";
         
         $methods = array_slice(func_get_args(), 1);
@@ -27,21 +27,32 @@ class GenerateController extends Command {
             $methods = array("index");
         endif;
 
-        //$folder = new Folder("app/views/{$name}");
-        //if($folder->isDir()):
-        //    $this->log("app/views/{$name}", "exists");
-        //else:
-        //    $folder->mkdir();
-        //    $this->log("app/views/{$name}", "created");
-        //endif;
-        
         $this->RenderView->template = "controller";
         $this->RenderView->data = array("name" => $controllerName, "methods" => $methods, "baseController" => $baseController);
         $content = $this->RenderView->execute();
+
+        $filepath = "app/controllers/{$filename}.php";
+        $this->log($filepath, File::exists($filepath) ? "modified" : "created");
+        $file = new File($filepath, "w");
+        $file->write($content);
+
+        $folder = new Folder("app/views/{$name}");
+        if($folder->isDir()):
+            $this->log("app/views/{$name}", "exists");
+        else:
+            $folder->mkdir();
+            $this->log("app/views/{$name}", "created");
+        endif;
         
-        $file = fopen(APP . DS . "controllers" . DS . "{$fileName}.php", "w");
-        fwrite($file, $content);
-        fclose($file);
+        foreach($methods as $method):
+            $viewFile = "app/views/{$name}/{$method}.phtm";
+            if(File::exists($viewFile)):
+                $this->log($viewFile, "exists");
+            else:
+                $this->log($viewFile, "created");
+                $file = new File($viewFile, "w");
+            endif;
+        endforeach;
     }
 }
 

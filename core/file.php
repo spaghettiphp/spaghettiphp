@@ -9,10 +9,10 @@ class File extends FileSystem {
     private $filename;
     private $mode;
     public function __construct($name = null, $mode = "r") {
-        $this->file = fopen($name, $mode);
         $this->path = dirname($name);
         $this->filename = basename($name);
         $this->mode = $mode;
+        $this->file = fopen($this->getPath(), $this->mode);
     }
     public function __destruct() {
         return fclose($this->file);
@@ -47,16 +47,13 @@ class File extends FileSystem {
         return false;
     }
     public function getPath() {
-        return "{$this->path}/{$this->filename}";
+        return self::path("{$this->path}/{$this->filename}");
     }
     static public function exists($path = null) {
-        return file_exists($path);
+        return file_exists(self::path($path));
     }
-    static public function get($file = null) {
-        return file_get_contents($file);
-    }
-    static public function put($file = null, $data = null) {
-        return file_put_contents($file, $data);
+    static public function path($filename = "") {
+        return ROOT . DS . $filename;
     }
 }
 

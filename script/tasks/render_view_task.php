@@ -9,7 +9,7 @@ class RenderViewTask extends Task {
     public function execute() {
 		$view = new View;
 		$content = $view->renderView(App::exists("Script", "templates/{$this->template}", "phtm"), $this->data);
-		return "<?php" . PHP_EOL . $content . PHP_EOL . "?>";
+		return "<?php\n\n{$content}\n\n?>";
     }
 }
 

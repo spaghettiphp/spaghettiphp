@@ -15,8 +15,7 @@
 $path = dirname(dirname(__FILE__));
 require_once $path . DIRECTORY_SEPARATOR . "spaghetti.php";
 
-#App::import("Core", array("shell", "command", "filesystem", "template", "task"));
-App::import("Core", array("shell", "command", "task", "folder"));
+App::import("Core", array("shell", "command", "task", "file", "folder"));
 
 new ShellDispatcher();
 
