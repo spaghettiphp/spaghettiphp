@@ -1,5 +1,5 @@
 <?php
-class Folder {
+class Folder extends FileSystem {
     
     public $path;
     private $_root = ROOT;
@@ -44,8 +44,14 @@ class Folder {
     public function rm() {
 		if(!@rmdir($this->path)):
 		    throw new FolderException("rm() - couldnt remove");
+			return false;
 		endif;
+		return true;
     }
+
+	public function rmdir(){
+		return $this->rm();
+	}
     
     public function mkdir($recursive = true) {
 		if(@mkdir($this->path, $recursive)):
