@@ -28,6 +28,13 @@ class Folder {
 	*/
     }
     
+    public function is_dir() {
+	if(is_dir($this->path)):
+	    return true;
+	endif;
+	return false;
+    }
+    
     public function ls($filter = true, $sort = "asc"){
 	$path = $this->path;
 	$sort = ($sort=="asc")? 0 : 1;
