@@ -8,6 +8,7 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Core.Controller
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
 
 class Controller extends Object {

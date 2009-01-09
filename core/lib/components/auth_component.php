@@ -8,6 +8,7 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Lib.Component.Auth
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
 
 class AuthComponent extends Object {

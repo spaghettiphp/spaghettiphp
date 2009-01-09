@@ -10,6 +10,7 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Core.View
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
     
 class View extends Object {

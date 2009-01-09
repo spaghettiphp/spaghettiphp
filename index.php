@@ -37,15 +37,15 @@
  */
 
     /**
-     * Inclui os arquivos necessários para o funcionamento do Spaghetti, incluindo
-     * os arquivos de configuração.
+     *  Inclui os arquivos necessários para o funcionamento do Spaghetti, incluindo
+     *  os arquivos de configuração.
      */
     require_once "spaghetti.php";
 
     /**
-     * É aqui onde toda a mágica começa. Inicializa o Dispatcher, interpretando
-     * URLs, chamando models, controllers, actions e dando início a todo o
-     * funcionamento do Spaghetti.
+     *  É aqui onde toda a mágica começa. Inicializa o Dispatcher, interpretando
+     *  URLs, chamando models, controllers, actions e dando início a todo o
+     *  funcionamento do Spaghetti.
      */
     new Dispatcher();
 

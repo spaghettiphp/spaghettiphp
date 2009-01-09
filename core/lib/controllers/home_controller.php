@@ -9,6 +9,7 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Lib.Controller.Home
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
 
 class HomeController extends AppController {

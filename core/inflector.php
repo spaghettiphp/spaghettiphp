@@ -10,6 +10,7 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Core.Inflector
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
 
 class Inflector extends Object {

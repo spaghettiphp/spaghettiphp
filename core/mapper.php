@@ -8,6 +8,7 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Core.Mapper
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
 
 class Mapper extends Object {

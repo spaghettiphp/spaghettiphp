@@ -35,9 +35,9 @@
  */
 
     /**
-     * Definição dos diretórios do Spaghetti. Você pode editar esses diretórios
-     * caso esteja usando o Spaghetti com uma estrutura de diretórios diferente
-     * da padrão.
+     *  Definição dos diretórios do Spaghetti. Você pode editar esses diretórios
+     *  caso esteja usando o Spaghetti com uma estrutura de diretórios diferente
+     *  da padrão.
      */
     $self = dirname($_SERVER["PHP_SELF"]);
     while(in_array(basename($self), array("app", "core", "tests", "webroot"))):
@@ -53,13 +53,13 @@
     define("WEBROOT", $self);
 
     /**
-     * Inclusão das classes básicas do Spaghetti.
+     *  Inclusão das classes básicas do Spaghetti.
      */
     require_once CORE . DS . "basics.php";
     App::import("Core", array("class_registry", "component", "controller", "dispatcher", "filter", "helper", "inflector", "mapper", "misc", "model", "view"));
     /**
-     * Inclusão de configurações e classes básicas, seja da biblioteca ou da aplicação
-     * do usuário.
+     *  Inclusão de configurações e classes básicas, seja da biblioteca ou da aplicação
+     *  do usuário.
      */
     App::import("App", array("config/settings", "config/routes", "config/database"));
     App::import("Controller", "app_controller");

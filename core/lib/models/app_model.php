@@ -10,6 +10,7 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Lib.Model.App
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
     
 class AppModel extends Model {

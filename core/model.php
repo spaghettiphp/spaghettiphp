@@ -8,6 +8,7 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Core.Model
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
 
 class Model extends Object {
@@ -64,7 +65,7 @@ class Model extends Object {
      */
     public $affectedRows = null;
 
-	private $log = array();
+    private $log = array();
     
     public function __construct($table = null) {
         if($this->table === null):
@@ -118,10 +119,10 @@ class Model extends Object {
         return $link;
     }
     public function beforeSave() {
-	return true;
+    return true;
     }
     public function afterSave() {
-	return true;
+    return true;
     }
     public function describeTable() {
         $tableSchema = $this->fetchResults($this->sqlQuery("describe"));
@@ -212,9 +213,9 @@ class Model extends Object {
             "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$this->table} SET " . $this->sqlSet($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "describe" => "DESCRIBE {$this->table}"
         );
-		
-		$this->log[] = $types[$type];
-		
+        
+        $this->log[] = $types[$type];
+        
         return $types[$type];
     }
     public function sqlSet($data = "") {
@@ -347,7 +348,7 @@ class Model extends Object {
             $data["modified"] = date("Y-m-d H:i:s");
         endif;
         
-	$this->beforeSave();
+    $this->beforeSave();
         if(isset($data["id"]) && $this->exists($data["id"])):
             $this->update(array("id" => $data["id"]), $data);
             $this->id = $data["id"];
@@ -358,16 +359,16 @@ class Model extends Object {
             $this->insert($data);
             $this->id = $this->get_insert_id();
         endif;
-	$this->afterSave();
+    $this->afterSave();
         
         foreach(array("hasOne", "hasMany") as $type):
             foreach($this->{$type} as $class => $assoc):
                 $assocModel = Inflector::underscore($class);
                 if(isset($data[$assocModel])):
-		    $this->beforeSave();
+            $this->beforeSave();
                     $data[$assocModel][$assoc["foreignKey"]] = $this->id;
                     $this->{$class}->save($data[$assocModel]);
-		    $this->afterSave();
+            $this->afterSave();
                 endif;
             endforeach;
         endforeach;
