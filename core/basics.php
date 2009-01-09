@@ -1,12 +1,7 @@
 <?php
 /**
- *  O arquivo basics.php contém quatro classes básicas para o funcionamento
- *  do Spaghetti Framework. A classe Object é herdada por praticamente todas
- *  as outras classes existentes dentro do core do Spaghetti. A classe Spaghetti
- *  possui os métodos para importar os arquivos que serão solicitados ao longo
- *  da sua execução. A classe Config estabelece as configurações necessárias
- *  de banco de dados e de outras preferências da aplicação. A classe Error atua
- *  na manipulação de erros provenientes de qualquer lugar da aplicação.
+ *  O arquivo basics.php contém algumas classes básicas para o funcionamento do
+ *  Spaghetti, como classes base e importação de arquivos.
  *
  *  Licensed under The MIT License.
  *  Redistributions of files must retain the above copyright notice.
@@ -14,49 +9,66 @@
  *  @package Spaghetti
  *  @subpackage Spaghetti.Core.Basics
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  */
 
+
+/**
+ *  Object é a classe básica do Spaghetti, fornecendo funcionalidade básica para
+ *  todas as outras classes do framework.
+ */
 class Object {
     public function log($message = "") {
-        
+        return $message;
     }
     public function error($type = "", $details = array()) {
         new Error($type, $details);
     }
 }
 
+/**
+ *  App é a classe que cuida da aplicação do Spaghetti, fazendo a verificação e
+ *  inclusão de arquivos.
+ */
 class App extends Object {
     /**
-     * O método App::import() faz a importação dos arquivos necessários
-     * durante a execução do programa.
+     *  App::import() faz a importação dos arquivos necessários
+     *  durante a execução do script.
      *
-     * @param string $type Contexto de onde será importado o arquivo
-     * @param mixed $file Uma string com o nome do arquivo ou um array com nomes de arquivo
-     * @param string $ext Extensão de arquivo do(s) arquivo(s) a ser(em) importado(s)
-     * @param boolean $return Define se o metodo retorna o caminho para o arquivo ou a cópia em buffer
-     * @return mixed Buffer do arquivo importado ou falso caso não consiga carregá-lo
+     *  @param string $type Contexto de onde será importado o arquivo
+     *  @param mixed $file Uma string com o nome do arquivo ou um array com nomes de arquivo
+     *  @param string $ext Extensão de arquivo do(s) arquivo(s) a ser(em) importado(s)
+     *  @return mixed Buffer do arquivo importado ou falso caso não consiga carregá-lo
     */
     static function import($type = "Core", $file = "", $ext = "php") {
-		if(is_array($file)):
-			foreach($file as $file):
-				$include = App::import($type, $file, $ext);
-			endforeach;
-			return $include;
-		else:
-			if($file_path = App::exists($type, $file, $ext)):
-				return include $file_path;
-			endif;
-		endif;
+        if(is_array($file)):
+            foreach($file as $file):
+                $include = App::import($type, $file, $ext);
+            endforeach;
+            return $include;
+        else:
+            if($file_path = App::exists($type, $file, $ext)):
+                return include $file_path;
+            endif;
+        endif;
         return false;
     }
-	public function exists($type = "Core", $file = "", $ext = "php") {
+    /**
+     *  App::exists verifica se um arquivo existe dentro de uma aplicação do Spaghetti;
+     *
+     *  @param string $type Contexto de onde reside o arquivo
+     *  @param string $file Nome do arquivo a ser verificado
+     *  @param string $ext Extensão do arquivo a ser verificado
+     *  @return mixed Caminho completo do arquivo ou falso caso o mesmo não exista
+     */
+    public function exists($type = "Core", $file = "", $ext = "php") {
         $paths = array(
-			// Diretórios do core
+            // Diretórios do Core
             "Core" => array(CORE),
             "App" => array(APP, LIB),
             "Lib" => array(LIB),
 
-			// Diretórios da aplicação
+            // Diretórios da Aplicação
             "Webroot" => array(WEBROOT),
             "Model" => array(APP . DS . "models", LIB . DS . "models"),
             "Controller" => array(APP . DS . "controllers", LIB . DS . "controllers"),
@@ -65,32 +77,30 @@ class App extends Object {
             "Component" => array(APP . DS . "components", LIB . DS . "components"),
             "Helper" => array(APP . DS . "helpers", LIB . DS . "helpers"),
 
-			// Diretórios do Shell
+            // Diretórios do Shell
             "Script" => array(ROOT . DS . "script"),
             "Command" => array(ROOT. DS . "script" . DS . "commands"),
             "Task" => array(ROOT. DS . "script" . DS . "tasks"),
             "Template" => array(ROOT. DS . "script" . DS . "templates"),
         );
+ 
         foreach($paths[$type] as $path):
-			$file_path = $path . DS . "{$file}.{$ext}";
-			if(file_exists($file_path)):
-				return $file_path;
-			endif;
+            $file_path = $path . DS . "{$file}.{$ext}";
+            if(file_exists($file_path)):
+                return $file_path;
+            endif;
         endforeach;
         return false;
-		
-	}
+        
+    }
 }
 
+/**
+ *  Config é a classe que toma conta de todas as configurações necessárias para
+ *  uma aplicação do Spaghetti.
+ */
 class Config extends Object {
     public $config = array();
-    /**
-     * O método Config::get_instance() retorna sempre o mesmo link de instância,
-     * para que os métodos estáticos possam ser usados com características de
-     * instâncias de objetos.
-     *
-     * @return resource
-    */
     public function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
@@ -99,21 +109,22 @@ class Config extends Object {
         return $instance[0];
     }
     /**
-     * O método Config::read() retorna o valor de uma configuração da aplicação.
+     *  Config::read() retorna o valor de uma determinada chave de configuração.
      *
-     * @param string $key Nome da chave (variável) da configuração
-     * @return mixed
+     *  @param string $key Nome da chave da configuração
+     *  @return mixed Valor de configuração da respectiva chave
      */
     static function read($key = "") {
         $self = self::getInstance();
         return $self->config[$key];
     }
     /**
-     * O método Config::write() grava o valor de uma configuração da aplicação.
+     *  Config::write() grava o valor de uma configuração da aplicação para determinada
+     *  chave.
      *
-     * @param string $key Nome da chave (variável) da configuração
-     * @param string $value Valor da chave (variável) da configuração
-     * @return mixed
+     *  @param string $key Nome da chave da configuração
+     *  @param string $value Valor da chave da configuração
+     *  @return boolean true
      */
     static function write($key = "", $value = "") {
         $self = self::getInstance();
@@ -122,6 +133,10 @@ class Config extends Object {
     }
 }
 
+/**
+ *  Error é a classe que trata os erros do Spaghetti, renderizando telas de erro
+ *  amigáveis através do sistema de Views.
+ */
 class Error extends Object {
     public function __construct($type = "", $details = array()) {
         $view = new View;

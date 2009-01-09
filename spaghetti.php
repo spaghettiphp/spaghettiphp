@@ -1,6 +1,6 @@
 <?php
 /**
- *  Definições e inclusões necessários para o funcionamento do Spaghetti.
+ *  Definições e inclusões necessários para o carregamento do Spaghetti.
  *  
  *  Spaghetti is licensed under the MIT License. By using this software, you agree
  *  with the terms specified below. The license agreement extends to all the files

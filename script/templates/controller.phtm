@@ -1,17 +1,7 @@
-<?php
-$content =
-"<?php
-class {$controllerName}Controller extends AppController {
-";
-foreach($methods as $method):
-$content .=
-"	function {$method}() {
-	
-	}
-";
-endforeach;
-$content .=
-"}
-?>";
-echo $content;
-?>
+class <?php echo $name ?> extends <?php echo $baseController ?> {
+<?php foreach($methods as $method): ?>
+    public function <?php echo $method ?>() {
+    
+    }
+<?php endforeach ?>
+}
