@@ -74,12 +74,14 @@ class Mapper extends Object {
     }
     public function getRoute($url) {
         $self = Mapper::getInstance();
-  
         foreach($self->routes as $map => $route):
-            $map = "/^" . str_replace(array("/", ":any", ":part", ":num"), array("\/", "(.*)", "([^\/]*)", "([0-9]+)"), $map) . "\/?$/";
-            $url = preg_replace($map, $route, $url);
+            $map = "/^" . str_replace(array("/", ":any", ":fragment", ":num"), array("\/", "(.+)", "([^\/]+)", "([0-9]+)"), $map) . "\/?$/";
+            $newUrl = preg_replace($map, $route, $url);
+            if($newUrl != $url):
+                $url = $newUrl;
+                break;
+            endif;
         endforeach;
-  
         return rtrim($url, "/");
     }
     public function prefix($prefix = "") {

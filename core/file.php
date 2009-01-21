@@ -33,7 +33,7 @@ class File extends FileSystem {
     }
     public function read($length = null) {
         if(is_null($length)):
-            $length = $this->size();
+            $length = $this->size() + 1;
         endif;
         return fread($this->file, $length);
     }
