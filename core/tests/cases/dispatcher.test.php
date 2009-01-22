@@ -6,7 +6,7 @@
  *  Redistributions of files must retain the above copyright notice.
  *  
  *  @package Spaghetti
- *  @subpackage Spaghetti.Tests.Dispatcher
+ *  @subpackage Spaghetti.Tests.Cases.Dispatcher
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
  * 
  */
@@ -17,7 +17,7 @@ class DispatcherTest extends Dispatcher {
     }
 }
 
-class TestController extends AppController {
+class DummyController extends AppController {
     public $autoRender = false;
     public $uses = array();
     public function index() {
@@ -363,8 +363,8 @@ class TestDispatcher extends UnitTestCase {
     //}
     
     public function testDispatchWithExistingController() {
-        $this->dispatcher->parseUrl("/test");
-        $results = is_a($this->dispatcher->dispatch(), "TestController");
+        $this->dispatcher->parseUrl("/dummy");
+        $results = is_a($this->dispatcher->dispatch(), "DummyController");
         $this->assertTrue($results);
     }
     public function testDispatchWithMissingController() {
@@ -373,38 +373,38 @@ class TestDispatcher extends UnitTestCase {
         $this->assertFalse($results);
     }
     public function testDispatchWithMissingAction() {
-        $this->dispatcher->parseUrl("/test/missing");
+        $this->dispatcher->parseUrl("/dummy/missing");
         $results = $this->dispatcher->dispatch();
         $this->assertFalse($results);
     }
     public function testDispatchWithPrivateAction() {
-        $this->dispatcher->parseUrl("/test/privateMethod");
+        $this->dispatcher->parseUrl("/dummy/privateMethod");
         $results = $this->dispatcher->dispatch();
         $this->assertFalse($results);
     }
     public function testDispatchWithId() {
-        $this->dispatcher->parseUrl("/test/id/1");
+        $this->dispatcher->parseUrl("/dummy/id/1");
         $controller = $this->dispatcher->dispatch();
         $results = $controller->output;
         $expected = 1;
         $this->assertEqual($expected, $results);
     }
     public function testDispatchWithoutId() {
-        $this->dispatcher->parseUrl("/test/id");
+        $this->dispatcher->parseUrl("/dummy/id");
         $controller = $this->dispatcher->dispatch();
         $results = $controller->output;
         $expected = null;
         $this->assertIdentical($expected, $results);
     }
     public function testDispatchWithIdAndParams() {
-        $this->dispatcher->parseUrl("/test/id/1/param");
+        $this->dispatcher->parseUrl("/dummy/id/1/param");
         $controller = $this->dispatcher->dispatch();
         $results = $controller->output;
         $expected = 1;
         $this->assertEqual($expected, $results);
     }
     public function testDispatchWithParamsAndWithoutId() {
-        $this->dispatcher->parseUrl("/test/id/param");
+        $this->dispatcher->parseUrl("/dummy/id/param");
         $controller = $this->dispatcher->dispatch();
         $results = $controller->output;
         $expected = "param";

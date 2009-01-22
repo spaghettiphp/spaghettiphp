@@ -6,7 +6,7 @@
  *  Redistributions of files must retain the above copyright notice.
  *  
  *  @package Spaghetti
- *  @subpackage Spaghetti.Tests.Mapper
+ *  @subpackage Spaghetti.Tests.Cases.Mapper
  *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
  * 
  */
