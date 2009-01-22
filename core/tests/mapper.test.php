@@ -11,8 +11,6 @@
  * 
  */
 
-include_once "setup.php";
-
 class TestMapper extends UnitTestCase {
     public function testNormalizeDoubleSlash() {
         $results = Mapper::normalize("/controller//action");

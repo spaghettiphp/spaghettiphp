@@ -11,8 +11,6 @@
  * 
  */
 
-include_once "setup.php";
-
 class DispatcherTest extends Dispatcher {
     public function error() {
         return false;
