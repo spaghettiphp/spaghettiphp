@@ -1,46 +1,61 @@
 <?php
 /**
- *  Spaghetti's index.php file. Where the magic takes place. In this file,
- *  the only thing you have to define is your application's enviroment, whether
- *  it's a test, development or production one.
- *  
- *  Spaghetti is licensed under the MIT License. By using this software, you agree
- *  with the terms specified below. The license agreement extends to all the files
- *  within this installation.
+ *  Esse é o arquivo de entrada para todas as requisições do Spaghetti. A partir
+ *  daqui todos os arquivos necessários são carregados e a mágica começa.
  *
- *  The MIT License
- *  
- *  Copyright (c) 2008 Julio Greff de Oliveira,
- *                     Rafael Marin Bortolotto.
- *  
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
- *  
- *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
- *  
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- *  THE SOFTWARE.
- *
- *  @package Spaghetti
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
 
 /**
- * Application environment (test|dev|production|...)
+ *  O Spaghetti suporta apenas a versão 5 do PHP. Um erro é gerado caso a versão
+ *  seja anterior a 5.0.
  */
-    define("APP_ENV", "dev");
-    require_once "../../spaghetti.php";
-    new Dispatcher();
+if(version_compare(PHP_VERSION, "5.0") < 0):
+    trigger_error("Spaghetti only works with PHP 5.0 or newer", E_USER_ERROR);
+endif;
+
+/**
+ *  Alias para DIRECTORY_SEPARATOR. Use para separar diretórios em definições de
+ *  constantes.
+ */
+define("DS", DIRECTORY_SEPARATOR);
+
+/**
+ *  Caminho completo para a instalação do Spaghetti.
+ */
+define("ROOT", dirname(dirname(dirname(__FILE__))));
+
+/**
+ *  URL do domínio em que a aplicação está instalada.
+ */
+define("BASE_URL", "http://" . $_SERVER["HTTP_HOST"]);
+
+/**
+ *  Definições dos caminhos do Spaghetti. Essas definições só precisam ser editadas
+ *  apenas se você está usando uma estrutura de diretórios diferente da distribuição.
+ */
+
+/**
+ *  Caminho completo para a pasta onde se encontram os arquivos do núcleo do Spaghetti.
+ */
+define("CORE", ROOT . DS . "core");
+/**
+ *  Caminho completo para a biblioteca do Spaghetti.
+ */
+define("LIB", CORE . DS . "lib");
+/**
+ *  Caminho completo para a pasta da aplicação do Spaghetti.
+ */
+define("APP", ROOT . DS . "app");
+
+/**
+ *  Inclui o arquivo de inicialização de todos os arquivos necessários para o
+ *  funcionamento de sua aplicação.
+ */
+require_once CORE . DS . "bootstrap.php";
+
+new Dispatcher();
 
 ?>

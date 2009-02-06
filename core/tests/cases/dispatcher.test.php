@@ -1,14 +1,10 @@
 <?php
 /**
- *  Suite de testes da classe Dispatcher.
+ *  Test Case de Dispatcher
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Tests.Cases.Dispatcher
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
- * 
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
+ *
  */
 
 class DispatcherTest extends Dispatcher {
@@ -350,7 +346,7 @@ class TestDispatcher extends UnitTestCase {
     //public function testParseUrlWithQueryString() {
     //    $results = $this->dispatcher->parseUrl("/?param=value");
     //    $expected = array(
-    //        "here" => "/",
+    //        "here" => "/?param=value",
     //        "prefix" => "",
     //        "controller" => "home",
     //        "action" => "index",
@@ -361,6 +357,34 @@ class TestDispatcher extends UnitTestCase {
     //    );
     //    $this->assertEqual($expected, $results);
     //}
+    public function parseUrlWithExtensionAfterParams() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/param.xml");
+        $expected = array(
+            "here" => "/controller/action/1/param.htm",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "xml",
+            "params" => array("param"),
+            "namedParams" => array()
+        );
+        $this->assertEqual($expected, $results);
+    }
+    public function parseUrlWithExtensionAfterNamedParams() {
+        $results = $this->dispatcher->parseUrl("/controller/action/1/name:param.xml");
+        $expected = array(
+            "here" => "/controller/action/1/param.htm",
+            "prefix" => "",
+            "controller" => "controller",
+            "action" => "action",
+            "id" => "1",
+            "extension" => "xml",
+            "params" => array(),
+            "namedParams" => array("name" => "param")
+        );
+        $this->assertEqual($expected, $results);
+    }
     
     public function testDispatchWithExistingController() {
         $this->dispatcher->parseUrl("/dummy");

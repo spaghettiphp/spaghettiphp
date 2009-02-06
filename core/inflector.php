@@ -4,12 +4,8 @@
  *  acentos e caracteres especiais, camelização, humanização, entre outros. E em
  *  breve abrigará também as funções de pluralização e singularização de nomes.
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Core.Inflector
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
 
@@ -21,7 +17,7 @@ class Inflector extends Object {
      * @param string $string String de entrada
      * @return string String de saída
      */
-    public function camelize($string = "") {
+    public static function camelize($string = "") {
         return str_replace(" ", "", ucwords(str_replace(array("_", "-"), " ", $string)));
     }
     /**
@@ -31,7 +27,7 @@ class Inflector extends Object {
      * @param string $string String de entrada
      * @return string String de saída
      */
-    public function humanize($string = "") {
+    public static function humanize($string = "") {
         return ucwords(str_replace(array("_", "-"), " ", $string));
     }
     /**
@@ -41,7 +37,7 @@ class Inflector extends Object {
      * @param string $string String de entrada
      * @return strign String de saída
      */
-    public function underscore($string = "") {
+    public static function underscore($string = "") {
         return strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $string));
     }
     /**
@@ -53,7 +49,7 @@ class Inflector extends Object {
      * @param string $replace String para substituição do espaço
      * @return string String de saída
      */
-    public function slug($string = "", $replace = "-") {
+    public static function slug($string = "", $replace = "-") {
         $map = array(
             "/À|à|Á|á|å|Ã|â|Ã|ã/" => "a",
             "/È|è|É|é|ê|ê|ẽ|Ë|ë/" => "e",

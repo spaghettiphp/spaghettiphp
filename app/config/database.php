@@ -7,10 +7,17 @@
 
 $database = array(
     "development" => array(
-        "host" => "localhost",
+        "host" => "host",
         "user" => "username",
-        "password" => "root",
-        "database" => "spaghetti",
+        "password" => "password",
+        "database" => "app",
+        "prefix" => ""
+    ),
+    "production" => array(
+        "host" => "host",
+        "user" => "username",
+        "password" => "password",
+        "database" => "app",
         "prefix" => ""
     )
 );

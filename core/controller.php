@@ -1,13 +1,9 @@
 <?php
 /**
- *  A classe Controller é responsável pela camada Controller da aplicação.
+ *  Short Description
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Core.Controller
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
 
@@ -83,7 +79,7 @@ class Controller extends Object {
         /**
          * Inicializa os componentes
          */
-        $this->Component =& new Component;
+        $this->Component = new Component;
         $this->Component->init($this);
         /**
          * Carrega os modelos
@@ -217,7 +213,7 @@ class Controller extends Object {
             header("HTTP/1.1 {$status} {$codes[$status]}");
         endif;
         header("Location: " . Mapper::url($url, true));
-        if($exit) die();
+        if($exit) $this->stop();
     }
     /**
      * O método Controller::set() define uma variável para ser

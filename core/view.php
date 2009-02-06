@@ -4,12 +4,8 @@
  *  e associá-lo ao view e layout correspondentes, fazendo também a inclusão
  *  dos helpers necessários.
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Core.View
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
     
@@ -117,7 +113,7 @@ class View extends Object {
             $action = $filename[0];
             $ext = $filename[1] ? $filename[1] : "phtm";
         endif;
-        $filename = App::exists("View", $action, $ext);
+        $filename = App::path("View", $action, $ext);
         if($filename):
             $out = $this->renderView($filename, $this->viewData);
             if($this->autoLayout && $this->layout):
@@ -148,7 +144,7 @@ class View extends Object {
             $layout = $filename[0];
             $ext = $filename[1] ? $filename[1] : "phtm";
         endif;
-        $filename = App::exists("Layout", $layout, $ext);
+        $filename = App::path("Layout", $layout, $ext);
         $data = array_merge(array(
             "content_for_layout" => $content,
             "pageTitle" => $this->pageTitle,
@@ -174,7 +170,7 @@ class View extends Object {
      */
     public function element($element = null, $params = array()) {
         $ext = $this->extension ? "p{$this->extension}" : "phtm";
-        return $this->renderView(App::exists("View", "_{$element}", $ext), $params);
+        return $this->renderView(App::path("View", "_{$element}", $ext), $params);
     }
     /**
      * View::set() é o método que grava as variáveis definidas no

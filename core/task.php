@@ -1,14 +1,10 @@
 <?php
 /**
- *  Put description here.
+ *  Short Description
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Core.Task
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
- * 
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
+ *
  */
 
 class Task extends Shell {

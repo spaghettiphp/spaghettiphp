@@ -1,20 +1,18 @@
 <?php
 /**
- *  Suite de testes da classe ClassRegistry.
+ *  Test Case de ClassRegistry
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Tests.Cases.ClassRegistry
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
- * 
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
+ *
  */
 
 class TestClassRegistry extends UnitTestCase {
     public function setUp() {
+        
     }
     public function tearDown() {
+        
     }
 }
 

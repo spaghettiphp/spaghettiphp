@@ -1,13 +1,9 @@
 <?php
 /**
- *  Put description here
+ *  Short Description
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Core.Model
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
 
@@ -47,7 +43,7 @@ class Model extends Object {
     /**
      * Nível de recursão padrão das consultas find
      */
-    public $recursion = 1;
+    public $recursion = 0;
     /**
      * Descrição da tabela do modelo
      */

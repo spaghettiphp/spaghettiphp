@@ -1,20 +1,16 @@
 <?php
 /**
- *  Put description here.
+ *  Short Description
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Core.Shell
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
- * 
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
+ *
  */
 
 class Shell extends Object {
     public function error($text = null) {
         $this->log($text, "error");
-        die();
+        $this->stop();
     }
     public function log($message = null, $type = "created") {
         printf("%15s  %s\n", $type, $message);

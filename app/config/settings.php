@@ -2,7 +2,6 @@
 /**
  * Esse é o arquivo das principais configurações do Spaghetti. Através delas,
  * você pode configurar o comportamento do núcleo do Spaghetti.
- * 
  */
 
 /**
@@ -17,5 +16,11 @@ Config::write("defaultExtension", "htm");
  * evitando que você tenha que redefiní-las a cada deploy.
  */
 Config::write("environment", "development");
+
+/**
+ *  debugMode define o nível de mensagens de erro que você receberá enquanto
+ *  estiver desenvolvendo.
+ */
+Config::write("debugMode", 1);
 
 ?>

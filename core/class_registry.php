@@ -3,41 +3,40 @@
  *  ClassRegistry faz o registro e gerenciamento de instâncias das classes utilizadas
  *  pelo Spaghetti, evitando a criação de várias instâncias de uma mesma classe.
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Core.ClassRegistry
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
 
 class ClassRegistry {
     public $objects = array();
-    public function &getInstance() {
+    public static function &getInstance() {
         static $instance = array();
         if (!$instance):
-            $instance[0] =& new ClassRegistry();
+            $instance[0] = new ClassRegistry();
         endif;
         return $instance[0];
     }
-    public function &load($class, $type = "Model") {
+    public static function &load($class, $type = "Model") {
         $self =& ClassRegistry::getInstance();
         if($object =& $self->duplicate($class, $class)):
             return $object;
-        elseif(class_exists($class) || App::import($type, Inflector::underscore($class))):
-            ${$class} =& new $class;
-        else:
-            return false;
+        elseif(!class_exists($class)):
+            if(App::path($type, Inflector::underscore($class))):
+                App::import($type, Inflector::underscore($class));
+            endif;
+        endif;
+        if(class_exists($class)):
+            ${$class} = new $class;
         endif;
         return ${$class};
     }
-    public function &init($class, $type = "Model") {
+    public static function &init($class, $type = "Model") {
         $self =& ClassRegistry::getInstance();
         if($model =& $self->duplicate($class, $class)):
             return $model;
         elseif(class_exists($class) || App::import($type, Inflector::underscore($class))):
-            ${$class} =& new $class;
+            ${$class} = new $class;
         else:
             $this->error("missing{$type}", array(strtolower($type) => $class));
         endif;
@@ -51,7 +50,7 @@ class ClassRegistry {
      *  @return boolean Verdadeiro se a instância foi adicionada, falso se a chave
      *  já existir
      */
-    public function addObject($key, &$object) {
+    public static function addObject($key, &$object) {
         $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects) === false):
             $self->objects[$key] =& $object;
@@ -65,7 +64,7 @@ class ClassRegistry {
      *  @param string $key Nome da chave
      *  @return boolean true
      */
-    public function removeObject($key) {
+    public static function removeObject($key) {
         $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects) === true):
             unset($self->objects[$key]);
@@ -78,7 +77,7 @@ class ClassRegistry {
      *  @param string $key Nome da chave
      *  @return boolean Verdadeiro se a chave está registrada
      */
-    public function isKeySet($key) {
+    public static function isKeySet($key) {
         $self =& ClassRegistry::getInstance();
         if(array_key_exists($key, $self->objects)):
             return true;
@@ -91,7 +90,7 @@ class ClassRegistry {
      *  @param string $key Nome da chave
      *  @return mixed Objeto correspondente a chave, falso se a chave não existe
      */
-    public function &getObject($key) {
+    public static function &getObject($key) {
         $self =& ClassRegistry::getInstance();
         $return = false;
         if(self::isKeySet($key)):
@@ -106,7 +105,7 @@ class ClassRegistry {
      *  @param object $class Instância da classe a ser buscada
      *  @return mixed Instância da classe, falso se não estiver definida no registro
      */
-    public function &duplicate($key, $class) {
+    public static function &duplicate($key, $class) {
         $self =& ClassRegistry::getInstance();
         $duplicate = false;
         if (self::isKeySet($key)):
@@ -123,7 +122,7 @@ class ClassRegistry {
      * 
      *  @return boolean true
      */
-    public function flush() {
+    public static function flush() {
         $self =& ClassRegistry::getInstance();
         $self->objects = array();
         return true;

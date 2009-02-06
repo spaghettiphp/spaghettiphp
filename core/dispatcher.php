@@ -1,18 +1,17 @@
 <?php
 /**
- *  A classe Dispatcher é responsável por receber os parâmetros passados ao Spaghetti*
+ *  Dispatcher é o responsável por receber os parâmetros passados ao Spaghetti*
  *  através da URL, interpretá-los e direcioná-los para o respectivo controller.
  *
- *  Licensed under The MIT License.
- *  Redistributions of files must retain the above copyright notice.
- *  
- *  @package Spaghetti
- *  @subpackage Spaghetti.Core.Dispatcher
- *  @license http://www.opensource.org/licenses/mit-license.php The MIT License
- * 
+ *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
+ *
  */
 
 class Dispatcher extends Object {
+    /**
+     *  URL interpretada por Dispatcher::parseUrl.
+     */
     public $path = array();
     public $url = "";
     public function __construct($dispatch = true) {
@@ -20,11 +19,10 @@ class Dispatcher extends Object {
         if($dispatch) return $this->dispatch();
     }
     /**
-     *  O método Dispatcher::parseUrl() faz a interpretação da URL, identificando
-     *  prefixos, controller, action, id, extensão e parâmetros adicionais.
+     *  Faz a interpretação da URL, identificando as partes da URL.
      * 
      *  @param string $url URL a ser interpretada
-     *  @return array Array contendo a URL interpretada
+     *  @return array URL interpretada
      */
     public function parseUrl($url = null) {
         $here = Mapper::normalize(is_null($url) ? Mapper::here() : $url);
@@ -55,22 +53,21 @@ class Dispatcher extends Object {
         return $this->path;
     }
     /**
-     *  O método Dispatcher::dispatch() chama o controller e a action solicitados,
-     *  além de inicializar componentes e renderizar a saída.
+     *  Chama o controller e a action solicitadas pela URL.
      * 
-     *  @return mixed Instância do novo controller, ou falso em caso de erro
+     *  @return mixed Instância do novo controller ou falso em caso de erro
      */ 
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
         $action = preg_replace("/-/", "_", $this->path["action"]);
         
         if($controller =& ClassRegistry::load($controllerName, "Controller")):
-            if(!can_call_method($controller, $action) && !App::exists("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
+            if(!can_call_method($controller, $action) && !App::path("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
                 $this->error("missingAction", array("controller" => $controllerName, "action" => $action));
                 return false;
             endif;
         else:
-            if(App::exists("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
+            if(App::path("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
                 $controller =& ClassRegistry::load("AppController", "Controller");
             else:
                 $this->error("missingController", array("controller" => $controllerName));
