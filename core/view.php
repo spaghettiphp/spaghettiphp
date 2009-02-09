@@ -170,7 +170,8 @@ class View extends Object {
      */
     public function element($element = null, $params = array()) {
         $ext = $this->extension ? "p{$this->extension}" : "phtm";
-        return $this->renderView(App::path("View", "_{$element}", $ext), $params);
+        $element = dirname($element) . DS . "_" . basename($element);
+        return $this->renderView(App::path("View", $element, $ext), $params);
     }
     /**
      * View::set() é o método que grava as variáveis definidas no
