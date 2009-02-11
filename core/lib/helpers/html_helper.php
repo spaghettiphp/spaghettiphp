@@ -50,7 +50,7 @@ class HtmlHelper extends Helper {
         if(!is_array($attr)):
             $attr = array();
         endif;
-        $src_alt = array("src" => Mapper::url("/images/{$src}", $full), "alt" => $alt);
+        $src_alt = array("src" => $this->internalUrl("/images", $src, $full), "alt" => $alt);
         $attr = array_merge($src_alt, $attr);
         return $this->output($this->tag("img", null, $attr, false));
     }
@@ -62,7 +62,7 @@ class HtmlHelper extends Helper {
             endforeach;
             return $tags;
         endif;
-        $attrs = array("href" => Mapper::url("/styles/{$href}", $full), "rel" => "stylesheet", "type" => "text/css");
+        $attrs = array("href" => $this->internalUrl("/styles", $src, $full), "rel" => "stylesheet", "type" => "text/css");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("link", null, $attr, false));
     }
@@ -74,9 +74,16 @@ class HtmlHelper extends Helper {
             endforeach;
             return $tags;
         endif;
-        $attrs = array("src" => Mapper::url("/scripts/{$src}", $full), "type" => "text/javascript");
+        $attrs = array("src" => $this->internalUrl("/scripts", $src, $full), "type" => "text/javascript");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("script", null, $attr));
+    }
+    public function internalUrl($path = "", $url = "", $full = false) {
+        if(preg_match("/^[a-z]+:/", $url)):
+            return $url;
+        else:
+            return Mapper::url("{$path}/{$url}", $full);
+        endif;
     }
 }
 
