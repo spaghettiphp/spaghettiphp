@@ -25,6 +25,10 @@ class Mapper extends Object {
      */
     private $base = null;
     /**
+     *  URL base da aplicação.
+     */
+    public $root = null;
+    /**
      *  Define a URL base e URL atual da aplicação.
      *
      *  @return void
@@ -138,7 +142,7 @@ class Mapper extends Object {
                 break;
             endif;
         endforeach;
-        return rtrim($url, "/");
+        return self::normalize($url);
     }
     /**
      *  Short Description
@@ -152,9 +156,28 @@ class Mapper extends Object {
         else $prefixes = func_get_args();
         foreach($prefixes as $prefix):
             $self->prefixes []= $prefix;
-            self::connect("/$prefix", "/$prefix" . self::getRoute("/"));
         endforeach;
         return true;
+    }
+    /**
+     *  Short Description
+     *
+     *  @param string $controller description
+     *  @return true
+     */
+    public static function root($controller = "") {
+        $self = self::getInstance();
+        $self->root = $controller;
+        return true;
+    }
+    /**
+     *  Short Description
+     *
+     *  @return string description
+     */
+    public static function getRoot() {
+        $self = self::getInstance();
+        return $self->root;
     }
     /**
      *  Remove um prefixo da lista

@@ -13,7 +13,7 @@
  * verá toda vez que acessar a raíz de seu sistema. Você pode escolher o controller
  * que mais fizer sentido para você
  */
-Mapper::connect("/", "/home");
+Mapper::root("home");
 
 /**
  * Caso você precise de um painel de administração, você pode descomentar a linha
