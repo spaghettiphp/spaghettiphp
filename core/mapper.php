@@ -25,7 +25,7 @@ class Mapper extends Object {
      */
     private $base = null;
     /**
-     *  URL base da aplicação.
+     *  Controller padrão da aplicação.
      */
     public $root = null;
     /**
@@ -145,6 +145,17 @@ class Mapper extends Object {
         return self::normalize($url);
     }
     /**
+     *  Define o controller padrão da aplicação
+     *
+     *  @param string $controller Controller a ser definido como padrão
+     *  @return true
+     */
+    public static function root($controller = "") {
+        $self = self::getInstance();
+        $self->root = $controller;
+        return true;
+    }
+    /**
      *  Short Description
      *
      *  @param string $prefix description
@@ -158,26 +169,6 @@ class Mapper extends Object {
             $self->prefixes []= $prefix;
         endforeach;
         return true;
-    }
-    /**
-     *  Short Description
-     *
-     *  @param string $controller description
-     *  @return true
-     */
-    public static function root($controller = "") {
-        $self = self::getInstance();
-        $self->root = $controller;
-        return true;
-    }
-    /**
-     *  Short Description
-     *
-     *  @return string description
-     */
-    public static function getRoot() {
-        $self = self::getInstance();
-        return $self->root;
     }
     /**
      *  Remove um prefixo da lista
@@ -216,6 +207,15 @@ class Mapper extends Object {
     public static function base() {
         $self = self::getInstance();
         return $self->base;
+    }
+    /**
+     *  Getter para Mapper::root
+     *
+     *  @return string Controller padrão da aplicação
+     */
+    public static function getRoot() {
+        $self = self::getInstance();
+        return $self->root;
     }
 }
 
