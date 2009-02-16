@@ -101,15 +101,15 @@ class Mapper extends Object {
      *  @param string $route description
      *  @return mixed description
      */
-    public static function connect($url = "", $route = "") {
+    public static function connect($url = null, $route = null) {
         if(is_array($url)):
             foreach($url as $key => $value):
                 self::connect($key, $value);
             endforeach;
             return true;
-        elseif($url !== null):
+        elseif(!is_null($url)):
             $self = self::getInstance();
-            $url = rtrim($url, "/");
+            $url = self::normalize($url);
             return $self->routes[$url] = rtrim($route, "/");
         endif;
         return false;
