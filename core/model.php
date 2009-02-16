@@ -104,7 +104,7 @@ class Model extends Object {
     public function &getConnection() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] =& Model::connect();
+            $instance[0] = Model::connect();
         endif;
         return $instance[0];
     }
