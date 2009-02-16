@@ -62,7 +62,7 @@ class HtmlHelper extends Helper {
             endforeach;
             return $tags;
         endif;
-        $attrs = array("href" => $this->internalUrl("/styles", $src, $full), "rel" => "stylesheet", "type" => "text/css");
+        $attrs = array("href" => $this->internalUrl("/styles", $href, $full), "rel" => "stylesheet", "type" => "text/css");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("link", null, $attr, false));
     }
