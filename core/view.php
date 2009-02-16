@@ -107,13 +107,13 @@ class View extends Object {
     public function render($action = null, $layout = null) {
         if($action === null):
             $action = "{$this->controller}/{$this->action}";
-            $ext = "p{$this->extension}";
+            $ext = $this->extension;
         else:
             $filename = preg_split("/\./", $action);
             $action = $filename[0];
-            $ext = $filename[1] ? $filename[1] : "phtm";
+            $ext = $filename[1] ? $filename[1] : "htm";
         endif;
-        $filename = App::path("View", $action, $ext);
+        $filename = App::path("View", "{$action}.{$ext}");
         if($filename):
             $out = $this->renderView($filename, $this->viewData);
             if($this->autoLayout && $this->layout):
@@ -138,13 +138,13 @@ class View extends Object {
     public function renderLayout($content = null, $layout = null) {
         if($layout === null):
             $layout = $this->layout;
-            $ext = "p{$this->extension}";
+            $ext = $this->extension;
         else:
             $filename = preg_split("/\./", $layout);
             $layout = $filename[0];
-            $ext = $filename[1] ? $filename[1] : "phtm";
+            $ext = $filename[1] ? $filename[1] : "htm";
         endif;
-        $filename = App::path("Layout", $layout, $ext);
+        $filename = App::path("Layout", "{$layout}.{$ext}");
         $data = array_merge(array(
             "content_for_layout" => $content,
             "pageTitle" => $this->pageTitle,
@@ -169,9 +169,9 @@ class View extends Object {
      * @return string Buffer do arquivo solicitado
      */
     public function element($element = null, $params = array()) {
-        $ext = $this->extension ? "p{$this->extension}" : "phtm";
+        $ext = $this->extension ? $this->extension : "htm";
         $element = dirname($element) . DS . "_" . basename($element);
-        return $this->renderView(App::path("View", $element, $ext), $params);
+        return $this->renderView(App::path("View", "{$element}.{$ext}"), $params);
     }
     /**
      * View::set() é o método que grava as variáveis definidas no
