@@ -45,6 +45,7 @@ class Dispatcher extends Object {
         endforeach;
 
         $this->path["here"] = $here;
+        if(empty($this->path["controller"])) $this->path["controller"] = Mapper::getRoot();
         if(empty($this->path["action"])) $this->path["action"] = "index";
         if(!empty($this->path["prefix"])) $this->path["action"] = "{$this->path['prefix']}_{$this->path['action']}";
         if(empty($this->path["id"])) $this->path["id"] = null;
