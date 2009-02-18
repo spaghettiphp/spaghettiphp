@@ -24,7 +24,11 @@ class AuthComponent extends Object {
     );
     public function initialize(&$controller) {
         $this->controller = $controller;
-        $this->params = $controller->params;
+        $this->params = array(
+            "prefix" => $controller->params["prefix"],
+            "controller" => $controller->params["controller"],
+            "action" => $controller->params["action"]
+        );
         $this->data = $controller->data;
         if($this->permissions === null):
             $this->permissions = array(
@@ -36,22 +40,23 @@ class AuthComponent extends Object {
     }
     public function authorized() {
         $authorized = true;
-        if($_COOKIE["user_id"] && $_COOKIE["user_password"]):
+        if(isset($_COOKIE["user_id"]) && isset($_COOKIE["user_password"])):
             $data = array("id" => $_COOKIE["user_id"], "password" => $_COOKIE["user_password"]);
             $identify = $this->identify($data);
             if(!empty($identify)):
                 $this->loggedIn = true;
-                $authorized = true;
+                return true;
             endif;
-        else:
-            foreach($this->params as $param => $value):
+        endif;
+        foreach($this->params as $param => $value):
+            if(isset($this->permissions[$param][$value])):
                 if($this->permissions[$param][$value] === false):
                     $authorized = false;
                 elseif($this->permissions[$param][$value] === true):
                     $authorized = true;
                 endif;
-            endforeach;
-        endif;
+            endif;
+        endforeach;
         return $authorized;
     }
     public function check() {
