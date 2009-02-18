@@ -136,11 +136,11 @@ class Error extends Object {
     public function __construct($type = "", $details = array()) {
         $view = new View;
         $filename = Inflector::underscore($type);
-        if(!($viewFile = App::path("View", "errors/{$filename}", "phtm"))):
-            $viewFile = App::path("View", "errors/missing_error", "phtm");
+        if(!($viewFile = App::path("View", "errors/{$filename}.htm"))):
+            $viewFile = App::path("View", "errors/missing_error.htm");
             $details = array("error" => $type);
         endif;
-        echo $view->renderLayout($view->renderView($viewFile, array("details" => $details)), "error.phtm");
+        echo $view->renderLayout($view->renderView($viewFile, array("details" => $details)), "error.htm");
         $this->stop();
     }
 }
