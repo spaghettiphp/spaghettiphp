@@ -302,7 +302,7 @@ class Model extends Object {
     }
     public function find($conditions = array(), $order = null, $recursion = null) {
         $results = $this->findAll($conditions, $order, 1, $recursion);
-        return $results[0];
+        return empty($results) ? array() : $results[0];
     }
     public function findBy($field = "id", $value = null, $conditions = array(), $order = null, $recursion = null) {
         if(!is_array($conditions)) $conditions = array();
