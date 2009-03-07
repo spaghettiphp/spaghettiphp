@@ -17,6 +17,7 @@ class Dispatcher extends Object {
      *  URL recebida através de Mapper::here.
      */
     public $url = "";
+    
     public function __construct($dispatch = true) {
         $this->parseUrl();
         if($dispatch) return $this->dispatch();

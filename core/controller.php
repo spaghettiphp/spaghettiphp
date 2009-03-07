@@ -1,6 +1,8 @@
 <?php
 /**
- *  Short Description
+ *  Controller permite que seja adicionada lógica a uma aplicação, além de prover
+ *  funcionalidades básicas, como renderização de views, redirecionamentos, acesso
+ *  a modelos de dados, entre outros.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -9,107 +11,79 @@
 
 class Controller extends Object {
     /**
-     * Renderizar layout automaticamente
+     *  Renderizar layout automaticamente.
     */
     public $autoLayout = true;
     /**
-     * Renderizar view automaticamente
+     *  Renderizar view automaticamente.
     */
     public $autoRender = true;
     /**
-     * Componentes carregados no controller
+     *  Componentes a serem carregados no controller.
     */
     public $components = array();
     /**
-     * $_POST
+     *  Classe Component.
+     */
+    public $Component = null;
+    /**
+     *  Valores enviados através de $_POST.
      */
     public $data = array();
     /**
-     * Helpers carregados nas views do controller
+     *  Helpers a serem carregados por uma view.
      */
     public $helpers = array("Html", "Form");
     /**
-     * Layout a ser renderizado
+     *  Layout a ser renderizado.
      */
     public $layout = "default";
     /**
-     * Nome do controller
+     *  Nome do controller.
      */
     public $name = null;
     /**
-     * Conteúdo de saída da view
+     *  Conteúdo de saída gerado por uma view.
      */
     public $output = "";
     /**
-     * Título da página HTML
+     *  Título da página.
      */
     public $pageTitle = "";
     /**
-     * Parâmetros da URL
+     *  Parâmetros parseados por Dispatcher.
      */
     public $params = array();
     /**
-     * Modelos utilizados pelo controller
+     *  Modelos utilizados pelo controller.
      */
     public $uses = null;
     /**
-     * Variáveis passadas para a view
+     *  Variáveis a serem enviadas para uma view.
      */
     public $viewData = array();
     
     public function __construct() {
-        /**
-         * Define o nome do controller com base no nome da classe
-         */
-        if($this->name === null && preg_match("/(.*)Controller/", get_class($this), $name)):
+        if(is_null($this->name) && preg_match("/(.*)Controller/", get_class($this), $name)):
             if($name[1] && $name[1] != "App"):
                 $this->name = $name[1];
-            elseif($this->uses === null):
+            elseif(is_null($this->uses)):
                 $this->uses = array();
             endif;
         endif;
-        if($this->uses === null):
+        if(is_null($this->uses)):
             $this->uses = array($this->name);
         endif;
         
-        /**
-         * Define Controller::data com o conteúdo da variável global $_POST
-         */
         $this->data = $_POST;
-        /**
-         * Inicializa os componentes
-         */
         $this->Component = new Component;
         $this->Component->init($this);
-        /**
-         * Carrega os modelos
-         */ 
         $this->loadModels();
     }
     /**
-     *  Define variáveis a serem passadas para uma view através de Controller::set.
+     *  Carrega todos os models associados ao controller.
      *
-     *  @param string $var Variável a ser gravada
-     *  @param mixed $value Valor da variável a ser gravada
      *  @return void
-     */
-    public function __set($var, $value) {
-        return $this->set($var, $value);
-    }
-    /**
-     *  Recupera valores de variáveis de Controller::viewData.
-     *
-     *  @param string $var Variável a ser lida
-     *  @return mixed Valor da variável
-     */
-    public function __get($var) {
-        return $this->get($var);
-    }
-    /**
-     * Este método carrega os models associados através da propriedade
-     * Controller::uses, registrando as classes no registro de classes.
-     *
-     * @return void
      */
     public function loadModels() {
         foreach($this->uses as $model):
@@ -117,46 +91,45 @@ class Controller extends Object {
         endforeach;
     }
     /**
-     * Método a ser chamado antes de um filtro ser executado
+     *  Callback executado antes de qualquer ação do controller.
+     *
+     *  @return true
      */
     public function beforeFilter() {
         return true;
     }
     /**
-     * Método a ser chamado antes da renderização da view
+     *  Callback executado antes da renderização de uma view.
      *
-     * @return bolean
+     *  @return true
      */
     public function beforeRender() {
         return true;
     }
     /**
-     * Método a ser chamado após a execução de um filtro
+     *  Callback executado após as ações do controller.
      */
     public function afterFilter() {
         return true;
     }
     /**
-     * O método Controller::set_action() define a ação solicitada pela URL,
-     * chamando o método do controller com o mesmo nome e passando os parâmetros
-     * da URL como parâmetros da função.
+     *  Redireciona uma action para outra.
      *
-     * @param string $action Nome da ação
-     * @return void
+     *  @param string $action Nome da action a ser redirecionada
+     *  @return mixed Retorno da action redirecionada
      */
     public function setAction($action) {
         $this->params["action"] = $action;
         $args = func_get_args();
         unset($args[0]);
-        call_user_func_array(array(&$this, $action), $args);
+        return call_user_func_array(array(&$this, $action), $args);
     }
     /**
-     * Renderiza a view da action atual, utilizando o layout informado. Cria uma
-     * nova instância da classe View.
+     *  Renderiza action atual, utilizando o layout informado.
      *
-     * @param string $action Nome da action a ser chamada
-     * @param string $layout Nome do layout
-     * @return string Conteúdo da saída renderizada
+     *  @param string $action Nome da action a ser renderizada
+     *  @param string $layout Nome do layout
+     *  @return string Conteúdo gerado pela view
      */
     public function render($action = null, $layout = null) {
         $this->beforeRender();
@@ -168,22 +141,21 @@ class Controller extends Object {
         return $this->output;
     }
     /**
-     * O método Controller::clear() limpa a saída para a view
+     *  Limpa o conteúdo de saída do controller
      *
-     * @return boolean
+     *  @return true
      */
     public function clear() {
         $this->output = "";
         return true;
     }
     /**
-     * Faz um redirecionamento enviando um cabeçalho HTTP com o código de status
-     * de acordo com a RFC(...)
+     *  Faz um redirecionamento enviando um cabeçalho HTTP com o código de status.
      *
-     * @param string $url URL para redirecionamento
-     * @param integer $status Código do status
-     * @param boolean $exit
-     * @return
+     *  @param string $url URL para redirecionamento
+     *  @param integer $status Código do status
+     *  @param boolean $exit
+     *  @return
      */
     public function redirect($url = "", $status = null, $exit = true) {
         $this->autoRender = false;
@@ -228,7 +200,7 @@ class Controller extends Object {
             503 => "Service Unavailable",
             504 => "Gateway Time-out"
         );
-        if($status !== null && isset($codes[$status])):
+        if(!is_null($status) && isset($codes[$status])):
             header("HTTP/1.1 {$status} {$codes[$status]}");
         endif;
         header("Location: " . Mapper::url($url, true));
@@ -248,7 +220,7 @@ class Controller extends Object {
             endforeach;
             return true;
         elseif(!is_null($var)):
-            $this->viewData[$var] = $content;
+            $this->viewData[$var] = $value;
             return $this->viewData[$var];
         endif;
         return false;
@@ -268,9 +240,12 @@ class Controller extends Object {
         return false;
     }
     /**
-     * return mixed
+     *  Retorna o valor de um parâmetro da URL
+     *
+     *  @param string $param Nome do valor a ser retornado
+     *  @return string Valor do parâmetro
      */
-    public function params($param = null) {
+    public function param($param = null) {
         return $this->params[$param];
     }
 }
