@@ -21,7 +21,7 @@ class FormHelper extends HtmlHelper {
         return $this->output($form);
     }
     public function submit($submit = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("value" => $submit, "type" => "submit"), $attr), false));
+        return $this->output($this->tag("button", $submit, array_merge(array("type" => "submit"), $attr)));
     }
     public function text($name = "", $value = "", $attr = array()) {
         return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "text"), $attr), false));
