@@ -87,6 +87,25 @@ class Controller extends Object {
         $this->loadModels();
     }
     /**
+     *  Define variáveis a serem passadas para uma view através de Controller::set.
+     *
+     *  @param string $var Variável a ser gravada
+     *  @param mixed $value Valor da variável a ser gravada
+     *  @return void
+     */
+    public function __set($var, $value) {
+        return $this->set($var, $value);
+    }
+    /**
+     *  Recupera valores de variáveis de Controller::viewData.
+     *
+     *  @param string $var Variável a ser lida
+     *  @return mixed Valor da variável
+     */
+    public function __get($var) {
+        return $this->get($var);
+    }
+    /**
      * Este método carrega os models associados através da propriedade
      * Controller::uses, registrando as classes no registro de classes.
      *
@@ -216,22 +235,35 @@ class Controller extends Object {
         if($exit) $this->stop();
     }
     /**
-     * O método Controller::set() define uma variável para ser
-     * passada para a view.
-     *
-     * @param string $var Nome da variável
-     * @param mixed $content Conteúdo da variável
-     * @return mixed
+     *  Define uma variável a ser passada para uma view.
+     * 
+     *  @param string $var Nome da variável
+     *  @param mixed $value Valor da variável
+     *  @return mixed
      */
-    public function set($var = null, $content = null) {
+    public function set($var = null, $value = null) {
         if(is_array($var)):
             foreach($var as $key => $value):
                 $this->set($key, $value);
             endforeach;
             return true;
-        elseif($var !== null):
+        elseif(!is_null($var)):
             $this->viewData[$var] = $content;
             return $this->viewData[$var];
+        endif;
+        return false;
+    }
+    /**
+     *  Recupera uma variável de Controller::viewData.
+     *
+     *  @param string $var Nome da variável a ser lida
+     *  @return mixed Valor da variável
+     */
+    public function get($var = null) {
+        if(!is_null($var)):
+            if(isset($this->viewData[$var])):
+                return $this->viewData[$var];
+            endif;
         endif;
         return false;
     }
