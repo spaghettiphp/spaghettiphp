@@ -339,12 +339,12 @@ class Model extends Object {
         if(empty($data)):
             $data = $this->data;
         endif;
-        
+
         if(isset($this->schema["modified"]) && $this->schema["modified"]["type"] == "datetime" && !isset($data["modified"])):
             $data["modified"] = date("Y-m-d H:i:s");
         endif;
         
-    $this->beforeSave();
+        $this->beforeSave();
         if(isset($data["id"]) && $this->exists($data["id"])):
             $this->update(array("id" => $data["id"]), $data);
             $this->id = $data["id"];
@@ -355,7 +355,7 @@ class Model extends Object {
             $this->insert($data);
             $this->id = $this->get_insert_id();
         endif;
-    $this->afterSave();
+        $this->afterSave();
         
         foreach(array("hasOne", "hasMany") as $type):
             foreach($this->{$type} as $class => $assoc):
