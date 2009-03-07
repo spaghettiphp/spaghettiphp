@@ -13,7 +13,11 @@ class Dispatcher extends Object {
      *  URL interpretada por Dispatcher::parseUrl.
      */
     public $path = array();
+    /**
+     *  URL recebida através de Mapper::here.
+     */
     public $url = "";
+    
     public function __construct($dispatch = true) {
         $this->parseUrl();
         if($dispatch) return $this->dispatch();

@@ -35,6 +35,9 @@ class FormHelper extends HtmlHelper {
     public function file($name = "", $attr = array()) {
         return $this->output($this->openTag("input", array_merge(array("name" => $name, "type" => "file"), $attr), false));
     }
+    public function hidden($name = "", $value = "", $attr = array()) {
+        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "hidden"), $attr), false));
+    }
     public function select($name = "", $values = array(), $selected = "", $attr = array()) {
         $options = "";
         foreach($values as $key => $value):

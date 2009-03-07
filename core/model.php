@@ -60,9 +60,11 @@ class Model extends Object {
      * Registros afetados pela consulta
      */
     public $affectedRows = null;
+    /**
+     *  Campo de chave primária.
+     */
+    public $primaryKey = null;
 
-    private $log = array();
-    
     public function __construct($table = null) {
         if($this->table === null):
             if($table !== null):
@@ -72,9 +74,11 @@ class Model extends Object {
                 $this->table = $database["prefix"] . Inflector::underscore(get_class($this));
             endif;
         endif;
+        
         if($this->table !== false):
             $this->describeTable();
         endif;
+        
         ClassRegistry::addObject(get_class($this), $this);
         $this->createLinks();
     }
@@ -133,6 +137,9 @@ class Model extends Object {
                 "key" => $field["Key"],
                 "extra" => $field["Extra"]
             );
+            if(is_null($this->primaryKey) && $field["Key"] == "PRI"):
+                $this->primaryKey = $field["Field"];
+            endif;
         endforeach;
         return $this->schema = $modelSchema;
     }
@@ -169,7 +176,7 @@ class Model extends Object {
                             $data = $class;
                             break;
                         case "foreignKey":
-                            $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
+                            $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this)) . "_{$this->primaryKey}";
                             break;
                         case "conditions":
                             $data = array();
@@ -279,9 +286,9 @@ class Model extends Object {
                     foreach($this->{$type} as $assoc):
                         foreach($results as $key => $result):
                             if(isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]])):
-                                $assocCondition = array($assoc["foreignKey"] => $result["id"]);
+                                $assocCondition = array($assoc["foreignKey"] => $result[$this->primaryKey]);
                             else:
-                                $assocCondition = array("id" => $result[$assoc["foreignKey"]]);
+                                $assocCondition = array($this->primaryKey => $result[$assoc["foreignKey"]]);
                             endif;
                             $attrCondition = isset($conditions[Inflector::underscore($assoc["className"])]) ? $conditions[Inflector::underscore($assoc["className"])] : array();
                             $condition = array_merge($attrCondition, $assoc["conditions"], $assocCondition);
@@ -317,7 +324,7 @@ class Model extends Object {
         if($id != null):
             $this->id = $id;
         endif;
-        $this->data = $this->find(array("id" => $this->id), null, $recursion);
+        $this->data = $this->find(array($this->primaryKey => $this->id), null, $recursion);
         return $this->data;
     }
     public function update($conditions = array(), $data = array()) {
@@ -339,15 +346,15 @@ class Model extends Object {
         if(empty($data)):
             $data = $this->data;
         endif;
-        
+
         if(isset($this->schema["modified"]) && $this->schema["modified"]["type"] == "datetime" && !isset($data["modified"])):
             $data["modified"] = date("Y-m-d H:i:s");
         endif;
         
-    $this->beforeSave();
-        if(isset($data["id"]) && $this->exists($data["id"])):
-            $this->update(array("id" => $data["id"]), $data);
-            $this->id = $data["id"];
+        $this->beforeSave();
+        if(isset($data[$this->primaryKey]) && $this->exists($data[$this->primaryKey])):
+            $this->update(array($this->primaryKey => $data[$this->primaryKey]), $data);
+            $this->id = $data[$this->primaryKey];
         else:
             if(isset($this->schema["created"]) && $this->schema["created"]["type"] == "datetime" && !isset($data["created"])):
                 $data["created"] = date("Y-m-d H:i:s");
@@ -355,16 +362,16 @@ class Model extends Object {
             $this->insert($data);
             $this->id = $this->get_insert_id();
         endif;
-    $this->afterSave();
+        $this->afterSave();
         
         foreach(array("hasOne", "hasMany") as $type):
             foreach($this->{$type} as $class => $assoc):
                 $assocModel = Inflector::underscore($class);
                 if(isset($data[$assocModel])):
-            $this->beforeSave();
+                    $this->beforeSave();
                     $data[$assocModel][$assoc["foreignKey"]] = $this->id;
                     $this->{$class}->save($data[$assocModel]);
-            $this->afterSave();
+                    $this->afterSave();
                 endif;
             endforeach;
         endforeach;
@@ -382,7 +389,8 @@ class Model extends Object {
         return true;
     }
     public function exists($id = null) {
-        $row = $this->findById($id);
+        $method = "findBy" . Inflector::camelize($this->primaryKey);
+        $row = $this->$method($id);
         if(!empty($row)):
             return true;
         endif;
@@ -403,7 +411,7 @@ class Model extends Object {
      * @return
      */
     public function delete($id = null, $dependent = false) {
-        $return = $this->deleteAll(array("id" => $id), null, 1);
+        $return = $this->deleteAll(array($this->primaryKey => $id), null, 1);
         if($dependent):
             foreach(array("hasMany", "hasOne") as $type):
                 foreach($this->{$type} as $model => $assoc):
