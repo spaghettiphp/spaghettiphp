@@ -49,9 +49,9 @@ class View extends Object {
     
     public function __construct(&$controller = null) {
         if($controller):
-            $this->controller = preg_replace("/-/", "_", $controller->params("controller"));
-            $this->action = $controller->params("action");
-            $this->extension = $controller->params("extension");
+            $this->controller = preg_replace("/-/", "_", $controller->param("controller"));
+            $this->action = $controller->param("action");
+            $this->extension = $controller->param("extension");
             $this->pageTitle = $controller->pageTitle;
             $this->layout = $controller->layout;
             $this->autoLayout = $controller->autoLayout;
