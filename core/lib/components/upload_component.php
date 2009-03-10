@@ -1,6 +1,8 @@
 <?php
 /**
- *  Short Description
+ *  UploadComponent facilita a tarefa de enviar arquivos do cliente para o servidor,
+ *  provendo funções para mover e apagar o arquivo, validação, controle de erros,
+ *  entre outros.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -8,11 +10,31 @@
  */
 
 class UploadComponent extends Object {
+    /**
+     *  Tipos de arquivo permitidos.
+     */
     public $allowedTypes = array("jpg", "jpeg", "gif", "png");
-    public $maxSize = 2; /* MB */
+    /**
+     *  Tamanho máximo permitido (em MB).
+     */
+    public $maxSize = 2;
+    /**
+     *  Caminho padrão dos arquivos enviados a partir de /app
+     */
     public $path = "/";
+    /**
+     *  Arquivos enviados pelo cliente.
+     */
     public $files = array();
+    /**
+     *  Erros gerados durante o upload.
+     */
     public $errors = array();
+    /**
+     *  Inicializa o componente, padronizando o componente de $_FILES.
+     *
+     *  @return void
+     */
     public function initialize() {
         foreach($_FILES as $file => $content):
             if(is_array($content["name"])):
@@ -31,6 +53,12 @@ class UploadComponent extends Object {
             endif;
         endforeach;
     }
+    /**
+     *  Valida determinado arquivo.
+     *
+     *  @param array $file Arquivo a ser validado
+     *  @return boolean Verdadeiro quando o arquivo é válido
+     */
     public function validates($file = array()) {
         if($file["size"] > $this->maxSize * 1024 * 1024):
             return $this->error("FileSizeExceeded");
@@ -43,6 +71,15 @@ class UploadComponent extends Object {
         endif;
         return true;
     }
+    /**
+     *  Move um arquivo enviado pelo cliente para determinado local na aplicação,
+     *  fazendo as validações necessárias.
+     *
+     *  @param array $file Arquivo a ser movido
+     *  @param string $path Caminho para enviar o arquivo
+     *  @param string $name Novo nome do arquivo
+     *  @return boolean Verdadeiro se o arquivo foi movido
+     */
     public function upload($file = array(), $path = null, $name = null) {
         $path = is_null($path) ? $this->path : $path;
         $name = is_null($name) ? $file["name"] : $name;
@@ -60,6 +97,13 @@ class UploadComponent extends Object {
             return false;
         endif;
     }
+    /**
+     *  Apaga um arquivo.
+     *
+     *  @param string $filename Nome do arquivo a ser apagado
+     *  @param string $path Caminho onde reside o arquivo
+     *  @return boolean Verdadeiro se o arquivo foi apagado.
+     */
     public function delete($filename = "", $path = null) {
         $path = is_null($path) ? $this->path : $path;
         $file = APP . $path . DS . $filename;
@@ -73,13 +117,40 @@ class UploadComponent extends Object {
             return $this->error("CantFindFile");
         endif;
     }
+    /**
+     *  Retorna a extensão de um arquivo.
+     *
+     *  @param string $filename Nome do arquivo
+     *  @return string Extensão do arquivo
+     */
     public function ext($filename = "") {
         return trim(substr($filename, strrpos($filename, ".") + 1, strlen($filename)));
     }
+    /**
+     *  Adiciona um novo erro ao componente.
+     *
+     *  @param string $message Mensagem de erro
+     *  @return false
+     */
     public function error($message = "") {
         $this->errors []= $message;
         return false;
     }
+    /**
+     *  Limpa os erros gerados pelo componente.
+     *
+     *  @return true
+     */
+    public function clear() {
+        $this->errors = array();
+        return true;
+    }
+    /**
+     *  Reconhece erros de upload através de $_FILES.
+     *
+     *  @param int $error Código de erro
+     *  @return mixed Mensagem de erro, ou falso caso não hajam erros.
+     */
     public function uploadError($error = 0) {
         $message = false;
         switch($error):
