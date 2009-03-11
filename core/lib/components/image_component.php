@@ -1,6 +1,7 @@
 <?php
 /**
- *  Short Description
+ *  UploadComponent provê funcionalidades para a manipulação de imagens, como corte,
+ *  redimensionamento, conversão entre formatos e geração de thumbnails.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -8,7 +9,13 @@
  */
 
 class ImageComponent extends Object {
+    /**
+     *  Tipos de imagens suportados.
+     */
     private $imageTypes = array("gif", "jpeg", "jpeg" => "jpg", "png");
+    /**
+     *  Parâmetros padrão para os métodos do componente.
+     */
     private $params = array(
         "height" => 0,
         "width" => 0,
@@ -18,6 +25,13 @@ class ImageComponent extends Object {
         "quality" => 80,
         "filename" => false
     );
+    /**
+     *  Redimensiona uma imagem.
+     *
+     *  @param string $filename Imagem a ser manipulada
+     *  @param array $params Parâmetros para a manipulação da imagem
+     *  @return mixed Imagem gerada pelo componente
+     */
     public function resize($filename = null, $params = array()) {
         $params = array_merge($this->params, $params);
         $inputExt = $this->ext($filename);
@@ -47,6 +61,13 @@ class ImageComponent extends Object {
         
         return $fnOutput($output, $filename, $params["quality"], PNG_ALL_FILTERS);
     }
+    /**
+     *  Converte uma imagem de um formato para outro.
+     *
+     *  @param string $filename Imagem a ser convertida
+     *  @param array $params Parâmetros para a conversão da imagem
+     *  @return mixed Imagem convertida
+     */
     public function convert($filename = null, $params = array()) {
         $resize = $this->resize($filename, $params);
         if(!$params["keep"]):
@@ -54,6 +75,12 @@ class ImageComponent extends Object {
         endif;
         return $resize;
     }
+    /**
+     *  Retorna a extensão do arquivo de uma imagem.
+     *
+     *  @param string $filename Nome da imagem
+     *  @return string Extensão do arquivo, falso caso não seja uma imagem válida.
+     */
     public function ext($filename = "") {
         $ext = trim(substr($filename, strrpos($filename, ".") + 1, strlen($filename)));
         if(in_array($ext, $this->imageTypes)):
