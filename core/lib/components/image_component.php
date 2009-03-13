@@ -33,6 +33,7 @@ class ImageComponent extends Object {
      *  @return mixed Imagem gerada pelo componente
      */
     public function resize($filename = null, $params = array()) {
+        $filename = $this->filePath($filename);
         $params = array_merge($this->params, $params);
         $inputExt = $this->ext($filename);
         $outputExt = $this->ext($params["filename"] ? $params["filename"] : $filename);
@@ -56,7 +57,7 @@ class ImageComponent extends Object {
         imagecopyresampled($output, $input, 0, 0, $params["x"], $params["y"], $params["width"], $params["height"], $width, $height);
         
         if($params["filename"]):
-            $filename = $params["filename"];
+            $filename = $this->filePath($params["filename"]);
         endif;
         
         return $fnOutput($output, $filename, $params["quality"], PNG_ALL_FILTERS);
@@ -71,7 +72,7 @@ class ImageComponent extends Object {
     public function convert($filename = null, $params = array()) {
         $resize = $this->resize($filename, $params);
         if(!$params["keep"]):
-            unlink($filename);
+            unlink($this->filePath($filename));
         endif;
         return $resize;
     }
@@ -91,6 +92,15 @@ class ImageComponent extends Object {
             return $ext;
         endif;
         return false;
+    }
+    /**
+     *  Retorna o caminho de um arquivo a partir de /app.
+     *
+     *  @param string $filename Nome do arquivo
+     *  @return string Caminho do arquivo
+     */
+    public function filePath($filename = "") {
+        return APP . DS . $filename;
     }
 }
 
