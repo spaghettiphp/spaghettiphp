@@ -64,15 +64,16 @@ class Dispatcher extends Object {
      */ 
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
-        $action = normalize($this->path["action"]);
+        $action = Inflector::hyphenToUnderscore($this->path["action"]);
+        $controllerFile = Inflector::hyphenToUnderscore($this->path["controller"]);
         
         if($controller =& ClassRegistry::load($controllerName, "Controller")):
-            if(!can_call_method($controller, $action) && !App::path("View", normalize($this->path["controller"]) . "/{$action}", "{$this->path['extension']}.php")):
+            if(!can_call_method($controller, $action) && !App::path("View", "{$controllerFile}/{$action}.{$this->path['extension']}")):
                 $this->error("missingAction", array("controller" => $controllerName, "action" => $action));
                 return false;
             endif;
         else:
-            if(App::path("View", normalize($this->path["controller"]) . "/{$action}", "{$this->path['extension']}.php")):
+            if(App::path("View", "{$controllerFile}/{$action}.{$this->path['extension']}")):
                 $controller =& ClassRegistry::load("AppController", "Controller");
             else:
                 $this->error("missingController", array("controller" => $controllerName));
@@ -97,10 +98,6 @@ class Dispatcher extends Object {
         $controller->afterFilter();
         return $controller;
     }
-}
-
-function normalize($str) {
-    return str_replace("-", "_", $str);
 }
 
 ?>

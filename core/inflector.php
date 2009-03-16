@@ -69,6 +69,9 @@ class Inflector extends Object {
         );
         return strtolower(preg_replace(array_keys($map), array_values($map), $string));
     }
+    public static function hyphenToUnderscore($string = "") {
+        return str_replace("-", "_", $string);
+    }
 }
 
 ?>
