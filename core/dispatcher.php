@@ -64,15 +64,15 @@ class Dispatcher extends Object {
      */ 
     public function dispatch() {
         $controllerName = Inflector::camelize("{$this->path['controller']}_controller");
-        $action = preg_replace("/-/", "_", $this->path["action"]);
+        $action = normalize($this->path["action"]);
         
         if($controller =& ClassRegistry::load($controllerName, "Controller")):
-            if(!can_call_method($controller, $action) && !App::path("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
+            if(!can_call_method($controller, $action) && !App::path("View", normalize($this->path["controller"]) . "/{$action}", "{$this->path['extension']}.php")):
                 $this->error("missingAction", array("controller" => $controllerName, "action" => $action));
                 return false;
             endif;
         else:
-            if(App::path("View", preg_replace("/-/", "_", $this->path["controller"]) . "/{$action}", "p{$this->path['extension']}")):
+            if(App::path("View", normalize($this->path["controller"]) . "/{$action}", "{$this->path['extension']}.php")):
                 $controller =& ClassRegistry::load("AppController", "Controller");
             else:
                 $this->error("missingController", array("controller" => $controllerName));
@@ -97,6 +97,10 @@ class Dispatcher extends Object {
         $controller->afterFilter();
         return $controller;
     }
+}
+
+function normalize($str) {
+    return str_replace("-", "_", $str);
 }
 
 ?>
