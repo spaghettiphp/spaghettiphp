@@ -82,9 +82,9 @@ class Dispatcher extends Object {
         endif;
 
         $controller->params = $this->path;
-        $controller->Component->initialize($controller);
+        $controller->initialize();
         $controller->beforeFilter();
-        $controller->Component->startup($controller);
+        $controller->startup();
         if(can_call_method($controller, $action)):
             $params = $this->path["params"];
             if(!is_null($this->path["id"])) $params = array_merge(array($this->path["id"]), $params);
@@ -93,7 +93,7 @@ class Dispatcher extends Object {
         if($controller->autoRender):
             $controller->render();
         endif;
-        $controller->Component->shutdown($controller);
+        $controller->shutdown($controller);
         echo $controller->output;
         $controller->afterFilter();
         return $controller;

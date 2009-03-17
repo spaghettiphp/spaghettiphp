@@ -23,10 +23,6 @@ class Controller extends Object {
     */
     public $components = array();
     /**
-     *  Classe Component.
-     */
-    public $Component = null;
-    /**
      *  Valores enviados através de $_POST.
      */
     public $data = array();
@@ -76,9 +72,33 @@ class Controller extends Object {
         endif;
         
         $this->data = $_POST;
-        $this->Component = new Component;
-        $this->Component->init($this);
+        $this->loadComponents();
         $this->loadModels();
+    }
+    public function loadComponents() {
+        foreach($this->components as $component):
+            $component = "{$component}Component";
+            if(!$this->{$component} = ClassRegistry::init($component, "Component")):
+                $this->error("missingComponent", array("component" => $component));
+            endif;
+        endforeach;
+        return true;
+    }
+    public function initialize() {
+        foreach($this->components as $component):
+            $component->initialize($this);
+        endforeach;
+        return true;
+    }
+    public function startup() {
+        foreach($this->components as $component):
+            $component->startup($this);
+        endforeach;
+    }
+    public function shutdown() {
+        foreach($this->components as $component):
+            $component->shutdown($this);
+        endforeach;
     }
     /**
      *  Carrega todos os models associados ao controller.
