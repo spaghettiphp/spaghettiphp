@@ -84,21 +84,16 @@ class Controller extends Object {
         endforeach;
         return true;
     }
-    public function initialize() {
+    public function componentEvent($event = null) {
         foreach($this->components as $component):
-            $component->initialize($this);
+            $className = "{$component}Component";
+            if(can_call_method($this->$className, $event)):
+                $this->$className->{$event}($this);
+            else:
+                trigger_error("Can't call method {$event} in {$className}", E_USER_WARNING);
+            endif;
         endforeach;
         return true;
-    }
-    public function startup() {
-        foreach($this->components as $component):
-            $component->startup($this);
-        endforeach;
-    }
-    public function shutdown() {
-        foreach($this->components as $component):
-            $component->shutdown($this);
-        endforeach;
     }
     /**
      *  Carrega todos os models associados ao controller.
