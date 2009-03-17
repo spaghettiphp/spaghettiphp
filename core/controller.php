@@ -75,6 +75,11 @@ class Controller extends Object {
         $this->loadComponents();
         $this->loadModels();
     }
+    /**
+     *  Carrega todos os componentes associados ao controller.
+     *
+     *  @return true
+     */
     public function loadComponents() {
         foreach($this->components as $component):
             $component = "{$component}Component";
@@ -84,6 +89,12 @@ class Controller extends Object {
         endforeach;
         return true;
     }
+    /**
+     *  Executa um evento em todos os componentes do controller.
+     *
+     *  @param string $event Evento a ser executado
+     *  @return true
+     */
     public function componentEvent($event = null) {
         foreach($this->components as $component):
             $className = "{$component}Component";
@@ -98,12 +109,13 @@ class Controller extends Object {
     /**
      *  Carrega todos os models associados ao controller.
      *
-     *  @return void
+     *  @return true
      */
     public function loadModels() {
         foreach($this->uses as $model):
             $this->{$model} =& ClassRegistry::init($model);
         endforeach;
+        return true;
     }
     /**
      *  Callback executado antes de qualquer ação do controller.
