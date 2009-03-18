@@ -8,8 +8,8 @@
  */
 
 /**
- *  Object é a classe herdada por todas as outras classes do Spaghetti, provendo
- *  funcionalidade básica para o framework.
+ *  Object é a classe abstrata herdada por todas as outras classes do Spaghetti,
+ *  provendo funcionalidade básica para o framework.
  */
 abstract class Object {
     private function log($message = "") {
