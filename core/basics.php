@@ -12,13 +12,13 @@
  *  provendo funcionalidade básica para o framework.
  */
 abstract class Object {
-    private function log($message = "") {
+    protected function log($message = "") {
         return $message;
     }
-    private function error($type = "", $details = array()) {
+    protected function error($type = "", $details = array()) {
         new Error($type, $details);
     }
-    private function stop($status = null) {
+    protected function stop($status = null) {
         exit($status);
     }
 }
