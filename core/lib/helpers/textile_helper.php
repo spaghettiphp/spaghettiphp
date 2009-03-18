@@ -1,191 +1,13 @@
 <?php
-
 /**
- * Example: get XHTML from a given Textile-markup string ($string)
+ *  TextileHelper é um parser que transforma textos escritos com a linguagem de
+ *  marcação Textile (http://textile.thresholdstate.com/) em marcação HTML.
  *
- *        $textile = new Textile;
- *        echo $textile->TextileThis($string);
+ *  @author    Dean Allen <dean@textism.com>
+ *  @license   http://www.opensource.org/licenses/bsd-license.php The BSD License
+ *  @copyright Copyright 2003-2004, Dean Allen <dean@textism.com>
  *
  */
-
-/*
-$Id: classTextile.php 216 2006-10-17 22:31:53Z zem $
-$LastChangedRevision: 216 $
-*/
-
-/*
-
-_____________
-T E X T I L E
-
-A Humane Web Text Generator
-
-Version 2.0
-
-Copyright (c) 2003-2004, Dean Allen <dean@textism.com>
-All rights reserved.
-
-Thanks to Carlo Zottmann <carlo@g-blog.net> for refactoring
-Textile's procedural code into a class framework
-
-Additions and fixes Copyright (c) 2006 Alex Shiels http://thresholdstate.com/
-
-_____________
-L I C E N S E
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice,
-  this list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-* Neither the name Textile nor the names of its contributors may be used to
-  endorse or promote products derived from this software without specific
-  prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
-
-_________
-U S A G E
-
-Block modifier syntax:
-
-    Header: h(1-6).
-    Paragraphs beginning with 'hn. ' (where n is 1-6) are wrapped in header tags.
-    Example: h1. Header... -> <h1>Header...</h1>
-
-    Paragraph: p. (also applied by default)
-    Example: p. Text -> <p>Text</p>
-
-    Blockquote: bq.
-    Example: bq. Block quotation... -> <blockquote>Block quotation...</blockquote>
-
-    Blockquote with citation: bq.:http://citation.url
-    Example: bq.:http://textism.com/ Text...
-    ->  <blockquote cite="http://textism.com">Text...</blockquote>
-
-    Footnote: fn(1-100).
-    Example: fn1. Footnote... -> <p id="fn1">Footnote...</p>
-
-    Numeric list: #, ##
-    Consecutive paragraphs beginning with # are wrapped in ordered list tags.
-    Example: <ol><li>ordered list</li></ol>
-
-    Bulleted list: *, **
-    Consecutive paragraphs beginning with * are wrapped in unordered list tags.
-    Example: <ul><li>unordered list</li></ul>
-
-Phrase modifier syntax:
-
-           _emphasis_   ->   <em>emphasis</em>
-           __italic__   ->   <i>italic</i>
-             *strong*   ->   <strong>strong</strong>
-             **bold**   ->   <b>bold</b>
-         ??citation??   ->   <cite>citation</cite>
-       -deleted text-   ->   <del>deleted</del>
-      +inserted text+   ->   <ins>inserted</ins>
-        ^superscript^   ->   <sup>superscript</sup>
-          ~subscript~   ->   <sub>subscript</sub>
-               @code@   ->   <code>computer code</code>
-          %(bob)span%   ->   <span class="bob">span</span>
-
-        ==notextile==   ->   leave text alone (do not format)
-
-       "linktext":url   ->   <a href="url">linktext</a>
- "linktext(title)":url  ->   <a href="url" title="title">linktext</a>
-
-           !imageurl!   ->   <img src="imageurl" />
-  !imageurl(alt text)!  ->   <img src="imageurl" alt="alt text" />
-    !imageurl!:linkurl  ->   <a href="linkurl"><img src="imageurl" /></a>
-
-ABC(Always Be Closing)  ->   <acronym title="Always Be Closing">ABC</acronym>
-
-
-Table syntax:
-
-    Simple tables:
-
-        |a|simple|table|row|
-        |And|Another|table|row|
-
-        |_. A|_. table|_. header|_.row|
-        |A|simple|table|row|
-
-    Tables with attributes:
-
-        table{border:1px solid black}.
-        {background:#ddd;color:red}. |{}| | | |
-
-
-Applying Attributes:
-
-    Most anywhere Textile code is used, attributes such as arbitrary css style,
-    css classes, and ids can be applied. The syntax is fairly consistent.
-
-    The following characters quickly alter the alignment of block elements:
-
-        <  ->  left align    ex. p<. left-aligned para
-        >  ->  right align       h3>. right-aligned header 3
-        =  ->  centred           h4=. centred header 4
-        <> ->  justified         p<>. justified paragraph
-
-    These will change vertical alignment in table cells:
-
-        ^  ->  top         ex. |^. top-aligned table cell|
-        -  ->  middle          |-. middle aligned|
-        ~  ->  bottom          |~. bottom aligned cell|
-
-    Plain (parentheses) inserted between block syntax and the closing dot-space
-    indicate classes and ids:
-
-        p(hector). paragraph -> <p class="hector">paragraph</p>
-
-        p(#fluid). paragraph -> <p id="fluid">paragraph</p>
-
-        (classes and ids can be combined)
-        p(hector#fluid). paragraph -> <p class="hector" id="fluid">paragraph</p>
-
-    Curly {brackets} insert arbitrary css style
-
-        p{line-height:18px}. paragraph -> <p style="line-height:18px">paragraph</p>
-
-        h3{color:red}. header 3 -> <h3 style="color:red">header 3</h3>
-
-    Square [brackets] insert language attributes
-
-        p[no]. paragraph -> <p lang="no">paragraph</p>
-
-        %[fr]phrase% -> <span lang="fr">phrase</span>
-
-    Usually Textile block element syntax requires a dot and space before the block
-    begins, but since lists don't, they can be styled just using braces
-
-        #{color:blue} one  ->  <ol style="color:blue">
-        # big                   <li>one</li>
-        # list                  <li>big</li>
-                                <li>list</li>
-                               </ol>
-
-    Using the span tag to style a phrase
-
-        It goes like this, %{color:red}the fourth the fifth%
-              -> It goes like this, <span style="color:red">the fourth the fifth</span>
-
-*/
 
 // define these before including this file to override the standard glyphs
 @define('txt_quote_single_open',  '&#8216;');
@@ -203,7 +25,7 @@ Applying Attributes:
 @define('txt_registered',         '&#174;');
 @define('txt_copyright',          '&#169;');
 
-class TextileComponent extends Component {
+class TextileHelper extends Helper {
     public $hlgn;
     public $vlgn;
     public $clas;

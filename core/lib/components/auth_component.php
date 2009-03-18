@@ -7,7 +7,7 @@
  *
  */
 
-class AuthComponent extends Object {
+class AuthComponent extends Component {
     public $permissions = null;
     public $loggedIn = false;
     public $controller = null;

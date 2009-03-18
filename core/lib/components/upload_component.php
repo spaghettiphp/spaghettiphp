@@ -9,7 +9,7 @@
  *
  */
 
-class UploadComponent extends Object {
+class UploadComponent extends Component {
     /**
      *  Tipos de arquivo permitidos.
      */

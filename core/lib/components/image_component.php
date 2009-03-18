@@ -8,7 +8,7 @@
  *
  */
 
-class ImageComponent extends Object {
+class ImageComponent extends Component {
     /**
      *  Tipos de imagens suportados.
      */

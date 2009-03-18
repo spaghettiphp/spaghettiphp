@@ -1,67 +1,15 @@
 <?php
 /**
- * Akismet anti-comment spam service
+ *  AkismetComponent facilita o controle de spam em sua aplicação, fazendo uso da
+ *  API do Akismet, usando uma chave do WordPress.
  *
- * The class in this package allows use of the {@link http://akismet.com Akismet} anti-comment spam service in any PHP5 application.
+ *  @author	   Alex Potsides
+ *  @license   http://www.opensource.org/licenses/bsd-license.php The BSD License
+ *  @copyright Copyright Alex Potsides (http://www.achingbrain.net)
  *
- * This service performs a number of checks on submitted data and returns whether or not the data is likely to be spam.
- *
- * Please note that in order to use this class, you must have a vaild {@link http://wordpress.com/api-keys/ WordPress API key}.  They are free for non/small-profit types and getting one will only take a couple of minutes.  
- *
- * For commercial use, please {@link http://akismet.com/commercial/ visit the Akismet commercial licensing page}.
- *
- * Please be aware that this class is PHP5 only.  Attempts to run it under PHP4 will most likely fail.
- *
- * See the Akismet class documentation page linked to below for usage information.
- *
- * @package		akismet
- * @author		Alex Potsides, {@link http://www.achingbrain.net http://www.achingbrain.net}
- * @version		0.4
- * @copyright	Alex Potsides, {@link http://www.achingbrain.net http://www.achingbrain.net}
- * @license		http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-/**
- *	The Akismet PHP5 Class
- *
- *  This class takes the functionality from the Akismet WordPress plugin written by {@link http://photomatt.net/ Matt Mullenweg} and allows it to be integrated into any PHP5 application or website.
- *
- *  The original plugin is {@link http://akismet.com/download/ available on the Akismet website}.
- *
- *  <b>Usage:</b>
- *  <code>
- *    $akismet = new Akismet('http://www.example.com/blog/', 'aoeu1aoue');
- *    $akismet->setCommentAuthor($name);
- *    $akismet->setCommentAuthorEmail($email);
- *    $akismet->setCommentAuthorURL($url);
- *    $akismet->setCommentContent($comment);
- *    $akismet->setPermalink('http://www.example.com/blog/alex/someurl/');
- *    if($akismet->isCommentSpam())
- *      // store the comment but mark it as spam (in case of a mis-diagnosis)
- *    else
- *      // store the comment normally
- *  </code>
- *
- *  Optionally you may wish to check if your WordPress API key is valid as in the example below.
- * 
- * <code>
- *   $akismet = new Akismet('http://www.example.com/blog/', 'aoeu1aoue');
- *   
- *   if($akismet->isKeyValid()) {
- *     // api key is okay
- *   } else {
- *     // api key is invalid
- *   }
- * </code>
- *
- *	@package	akismet
- *	@name		Akismet
- *	@version	0.4
- *  @author		Alex Potsides
- *  @link		http://www.achingbrain.net/
- */
 class AkismetComponent extends Component {
-	
 	private $version = '0.4';
 	public $wordPressAPIKey;
 	public $blogURL;
