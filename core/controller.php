@@ -78,13 +78,14 @@ class Controller extends Object {
     /**
      *  Carrega todos os componentes associados ao controller.
      *
-     *  @return true
+     *  @return boolean
      */
     public function loadComponents() {
         foreach($this->components as $component):
             $component = "{$component}Component";
             if(!$this->{$component} = ClassRegistry::load($component, "Component")):
                 $this->error("missingComponent", array("component" => $component));
+                return false;
             endif;
         endforeach;
         return true;
@@ -93,7 +94,7 @@ class Controller extends Object {
      *  Executa um evento em todos os componentes do controller.
      *
      *  @param string $event Evento a ser executado
-     *  @return true
+     *  @return void
      */
     public function componentEvent($event = null) {
         foreach($this->components as $component):
@@ -104,17 +105,17 @@ class Controller extends Object {
                 trigger_error("Can't call method {$event} in {$className}", E_USER_WARNING);
             endif;
         endforeach;
-        return true;
     }
     /**
      *  Carrega todos os models associados ao controller.
      *
-     *  @return true
+     *  @return boolean
      */
     public function loadModels() {
         foreach($this->uses as $model):
             if(!$this->{$model} = ClassRegistry::load($model)):
                 $this->error("missingModel", array("model" => $model));
+                return false;
             endif;
         endforeach;
         return true;
@@ -137,6 +138,8 @@ class Controller extends Object {
     }
     /**
      *  Callback executado após as ações do controller.
+     *
+     *  @return true
      */
     public function afterFilter() {
         return true;
@@ -183,8 +186,8 @@ class Controller extends Object {
      *
      *  @param string $url URL para redirecionamento
      *  @param integer $status Código do status
-     *  @param boolean $exit
-     *  @return
+     *  @param boolean $exit Verdadeiro para encerrar o script após o redirecionamento
+     *  @return void
      */
     public function redirect($url = "", $status = null, $exit = true) {
         $this->autoRender = false;
@@ -240,7 +243,7 @@ class Controller extends Object {
      * 
      *  @param string $var Nome da variável
      *  @param mixed $value Valor da variável
-     *  @return mixed
+     *  @return mixed Valor da variável
      */
     public function set($var = null, $value = null) {
         if(is_array($var)):
