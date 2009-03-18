@@ -7,7 +7,7 @@
  *
  */
 
-class Component extends Object {
+abstract class Component extends Object {
     public function initialize(&$controller) {
         return true;
     }

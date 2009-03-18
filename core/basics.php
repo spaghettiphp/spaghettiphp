@@ -11,14 +11,14 @@
  *  Object é a classe herdada por todas as outras classes do Spaghetti, provendo
  *  funcionalidade básica para o framework.
  */
-class Object {
-    public function log($message = "") {
+abstract class Object {
+    private function log($message = "") {
         return $message;
     }
-    public function error($type = "", $details = array()) {
+    private function error($type = "", $details = array()) {
         new Error($type, $details);
     }
-    public function stop($status = null) {
+    private function stop($status = null) {
         exit($status);
     }
 }
@@ -96,7 +96,7 @@ class Config extends Object {
     /**
      *  Definições de configurações.
      */
-    public $config = array();
+    private $config = array();
     public static function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):

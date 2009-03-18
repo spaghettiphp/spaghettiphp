@@ -7,7 +7,7 @@
  *
  */
 
-class Helper extends Object {
+abstract class Helper extends Object {
     public function output($out = "") {
         return $out;
     }
