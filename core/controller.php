@@ -83,7 +83,7 @@ class Controller extends Object {
     public function loadComponents() {
         foreach($this->components as $component):
             $component = "{$component}Component";
-            if(!$this->{$component} = ClassRegistry::init($component, "Component")):
+            if(!$this->{$component} = ClassRegistry::load($component, "Component")):
                 $this->error("missingComponent", array("component" => $component));
             endif;
         endforeach;
@@ -113,7 +113,9 @@ class Controller extends Object {
      */
     public function loadModels() {
         foreach($this->uses as $model):
-            $this->{$model} =& ClassRegistry::init($model);
+            if(!$this->{$model} = ClassRegistry::load($model)):
+                $this->error("missingModel", array("model" => $model));
+            endif;
         endforeach;
         return true;
     }
