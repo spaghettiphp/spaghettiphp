@@ -124,7 +124,7 @@ class UploadComponent extends Component {
      *  @return string Extensão do arquivo
      */
     public function ext($filename = "") {
-        return trim(substr($filename, strrpos($filename, ".") + 1, strlen($filename)));
+        return strtolower(trim(substr($filename, strrpos($filename, ".") + 1, strlen($filename))));
     }
     /**
      *  Adiciona um novo erro ao componente.

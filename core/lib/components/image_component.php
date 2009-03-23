@@ -83,7 +83,7 @@ class ImageComponent extends Component {
      *  @return string Extensão do arquivo, falso caso não seja uma imagem válida.
      */
     public function ext($filename = "") {
-        $ext = trim(substr($filename, strrpos($filename, ".") + 1, strlen($filename)));
+        $ext = strtolower(trim(substr($filename, strrpos($filename, ".") + 1, strlen($filename))));
         if(in_array($ext, $this->imageTypes)):
             $key = array_search($ext, $this->imageTypes);
             if(is_string($key)):
