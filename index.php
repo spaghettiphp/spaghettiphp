@@ -1,6 +1,6 @@
 <?php
 /**
- *  Esse arquivo é carregado somente se mod_rewrite ou .htaccess não são suportados.
+ *  Esse arquivo é carregado somente se mod_rewrite ou .htaccess não são suportados ou habilitados no servidor.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
