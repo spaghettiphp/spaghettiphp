@@ -60,6 +60,9 @@ class UploadComponent extends Component {
      *  @return boolean Verdadeiro quando o arquivo é válido
      */
     public function validates($file = array()) {
+        if(empty($file) && !isset($file["name"])):
+            return $this->error("InvalidParam");
+        endif;
         if($file["size"] > $this->maxSize * 1024 * 1024):
             return $this->error("FileSizeExceeded");
         endif;
