@@ -1,12 +1,15 @@
 <?php
 /**
- * Aqui você deve definir suas configurações de banco de dados. Essas são as únicas
- * configurações necessárias para rodar uma aplicação do Spaghetti.
+ * Aqui você deve definir suas configurações de banco de dados, todas de acordo
+ * com um determinado ambiente de desenvolvimento. Você pode definir quantos
+ * ambientes quantos forem necessários. Essas são as únicas configurações
+ * necessárias para rodar uma aplicação com o Spaghetti.
  * 
  */
 
-$database = array(
+Config::write("database", array(
     "development" => array(
+        "driver" => "mysql",
         "host" => "host",
         "user" => "username",
         "password" => "password",
@@ -14,18 +17,13 @@ $database = array(
         "prefix" => ""
     ),
     "production" => array(
+        "driver" => "mysql",
         "host" => "host",
         "user" => "username",
         "password" => "password",
         "database" => "app",
         "prefix" => ""
     )
-);
-
-/**
- * A linha seguinte serve apenas para definir o banco de dados de acordo com o
- * ambiente em que a aplicação está rodando.    
- */
-Config::write("database", $database[Config::read("environment")]);
+));
 
 ?>

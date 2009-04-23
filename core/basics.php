@@ -66,6 +66,7 @@ class App extends Object {
             "Lib" => array(LIB),
 
             "Model" => array(APP . DS . "models", LIB . DS . "models"),
+            "Datasource" => array(APP . DS . "models/datasources", CORE . DS . "datasources"),
             "Controller" => array(APP . DS . "controllers", LIB . DS . "controllers"),
             "View" => array(APP . DS . "views", LIB . DS . "views"),
             "Layout" => array(APP . DS . "layouts", LIB . DS . "layouts"),
