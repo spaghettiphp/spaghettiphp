@@ -28,12 +28,12 @@ class Connection extends Object {
         return $instance[0];
     }
     /**
-     *  Abre uma nova conexão ou retoma conexões já abertas.
+     *  Cria uma instância de um datasource ou retorna outra instância existente.
      *
      *  @param string $environment Configuração de ambiente a ser usada
-     *  @return object Conexão estabelecida
+     *  @return object Instância do datasource
      */
-    public static function &getConnection($environment = null) {
+    public static function &getDatasource($environment = null) {
         $self = self::getInstance();
         $environment = is_null($environment) ? Config::read("environment") : $environment;
         if(isset($self->config[$environment])):

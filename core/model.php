@@ -108,7 +108,9 @@ class Model extends Object {
     public function &getConnection() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = Model::connect();
+            $datasource = Connection::getDatasource();
+            $datasource->connect();
+            $instance[0] = $datasource->getConnection();
         endif;
         return $instance[0];
     }
