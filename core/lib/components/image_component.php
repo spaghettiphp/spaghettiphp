@@ -1,6 +1,6 @@
 <?php
 /**
- *  UploadComponent provê funcionalidades para a manipulação de imagens, como corte,
+ *  ImageComponent provê funcionalidades para a manipulação de imagens, como corte,
  *  redimensionamento, conversão entre formatos e geração de thumbnails.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
