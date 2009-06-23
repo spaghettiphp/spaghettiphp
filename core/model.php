@@ -21,43 +21,43 @@ class Model extends Object {
         "hasOne" => array("className", "foreignKey", "conditions", "dependent")
     );
     /**
-     * Associações do tipo Belongs To
+     *  Associações do tipo Belongs To
      */
     public $belongsTo = array();
     /**
-     * Associações do tipo Has Many
+     *  Associações do tipo Has Many
      */
     public $hasMany = array();
     /**
-     * Associações do tipo Has One
+     *  Associações do tipo Has One
      */
     public $hasOne = array();
     /**
-     * Dados do registro
+     *  Dados do registro
      */
     public $data = array();
     /**
-     * ID do registro
+     *  ID do registro
      */
     public $id = null;
     /**
-     * Nível de recursão padrão das consultas find
+     *  Nível de recursão padrão das consultas find
      */
     public $recursion = 0;
     /**
-     * Descrição da tabela do modelo
+     *  Descrição da tabela do modelo
      */
     public $schema = array();
     /**
-     * Nome da tabela usada pelo modelo
+     *  Nome da tabela usada pelo modelo
      */
     public $table = null;
     /**
-     * ID do último registro inserido
+     *  ID do último registro inserido
      */
     public $insertId = null;
     /**
-     * Registros afetados pela consulta
+     *  Registros afetados pela consulta
      */
     public $affectedRows = null;
     /**
@@ -74,11 +74,9 @@ class Model extends Object {
                 $this->table = $database["prefix"] . Inflector::underscore(get_class($this));
             endif;
         endif;
-        
-        if($this->table !== false):
+        if($this->table && empty($this->schema)):
             $this->describeTable();
         endif;
-        
         ClassRegistry::addObject(get_class($this), $this);
         $this->createLinks();
     }
@@ -271,18 +269,10 @@ class Model extends Object {
         $db =& self::getConnection();
         return $db->query($query);
     }
-    public function fetchResults($query) {
-        $results = array();
-        if($query = $this->query($query)):
-            while($row = mysql_fetch_assoc($query)):
-                $results []= $row;
-            endwhile;
-        endif;
-        return $results;
-    }
     public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
+        $db =& self::getConnection();
         $recursion = pick($recursion, $this->recursion);
-        $results = $this->fetchResults($this->sqlQuery("select", $conditions, null, $order, $limit));
+        $results = $db->fetchAll($this->sqlQuery("select", $conditions, null, $order, $limit));
         if($recursion >= 0):
             foreach($this->associations as $type):
                 if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
@@ -407,11 +397,11 @@ class Model extends Object {
         return false;
     }
     /**
-     * O método Model::delete() exclui um registro da tabela do modelo, de acordo com
-     * o ID passado como parâmetro, e seus dependentes em associações de modelos, se
-     * houverem.
-     * 
-     * @return
+     *  O método Model::delete() exclui um registro da tabela do modelo, de acordo com
+     *  o ID passado como parâmetro, e seus dependentes em associações de modelos, se
+     *  houverem.
+     *
+     *  @return
      */
     public function delete($id = null, $dependent = false) {
         $return = $this->deleteAll(array($this->primaryKey => $id), null, 1);
