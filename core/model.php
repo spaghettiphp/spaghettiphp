@@ -64,6 +64,10 @@ class Model extends Object {
      *  Campo de chave primária.
      */
     public $primaryKey = null;
+    /**
+     *  Configuração de ambiente a ser usada.
+     */
+    public $environment = null;
 
     public function __construct($table = null) {
         if(is_null($this->table)):
@@ -71,7 +75,8 @@ class Model extends Object {
                 $this->table = $table;
             else:
                 $database = Config::read("database");
-                $this->table = $database["prefix"] . Inflector::underscore(get_class($this));
+                $environment = is_null($this->environment) ? Config::read("environment") : $this->environment;
+                $this->table = $database[$environment]["prefix"] . Inflector::underscore(get_class($this));
             endif;
         endif;
         if($this->table && empty($this->schema)):
@@ -108,10 +113,10 @@ class Model extends Object {
      *
      *  @return object Datasource em uso
      */
-    public static function &getConnection() {
+    public static function &getConnection($environment = null) {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = Connection::getDatasource();
+            $instance[0] = Connection::getDatasource($environment);
         endif;
         return $instance[0];
     }
@@ -127,7 +132,7 @@ class Model extends Object {
      *  @return array Descrição da tabela do banco de dados
      */
     public function describeTable() {
-        $db =& self::getConnection();
+        $db =& self::getConnection($this->environment);
         $schema = $db->describe($this->table);
         if(is_null($this->primaryKey)):
             foreach($schema as $field => $describe):
@@ -266,11 +271,11 @@ class Model extends Object {
      *  @return mixed Resultado da consulta
      */
     public function query($query) {
-        $db =& self::getConnection();
+        $db =& self::getConnection($this->environment);
         return $db->query($query);
     }
     public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
-        $db =& self::getConnection();
+        $db =& self::getConnection($this->environment);
         $recursion = pick($recursion, $this->recursion);
         $results = $db->fetchAll($this->sqlQuery("select", $conditions, null, $order, $limit));
         if($recursion >= 0):
