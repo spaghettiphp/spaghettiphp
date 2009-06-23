@@ -13,7 +13,7 @@ abstract class Datasource extends Object {
     }
     abstract public function connect();
     abstract public function disconnect();
-    abstract public function query($sql);
+    abstract public function query($sql = null);
 }
 
 ?>
