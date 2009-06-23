@@ -14,9 +14,9 @@ class Connection extends Object {
      */
     private $config = array();
     /**
-     *  Conexões ao banco de dados já estabelecidas.
+     *  Datasources já instanciados.
      */
-    private $connections = array();
+    private $datasources = array();
     public function __construct() {
         $this->config = Config::read("database");
     }
@@ -43,11 +43,11 @@ class Connection extends Object {
             return false;
         endif;
         $datasource = Inflector::camelize("{$config['driver']}_datasource");
-        if(isset($self->connections[$environment])):
-            return $self->connections[$environment];
+        if(isset($self->datasources[$environment])):
+            return $self->datasources[$environment];
         elseif(self::loadDatasource($datasource)):
-            $self->connections[$environment] = new $datasource($config);
-            return $self->connections[$environment];
+            $self->datasources[$environment] = new $datasource($config);
+            return $self->datasources[$environment];
         else:
             trigger_error("Can't find {$datasource} datasource", E_USER_ERROR);
             return false;
