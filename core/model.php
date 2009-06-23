@@ -262,13 +262,19 @@ class Model extends Object {
         endif;
         return $sql;
     }
-    public function execute($query) {
+    /**
+     *  Executa uma consulta diretamente no datasource.
+     *
+     *  @param string $query Consulta a ser executada
+     *  @return mixed Resultado da consulta
+     */
+    public function query($query) {
         $db =& self::getConnection();
         return $db->query($query);
     }
     public function fetchResults($query) {
         $results = array();
-        if($query = $this->execute($query)):
+        if($query = $this->query($query)):
             while($row = mysql_fetch_assoc($query)):
                 $results []= $row;
             endwhile;
@@ -326,14 +332,14 @@ class Model extends Object {
         return $this->data;
     }
     public function update($conditions = array(), $data = array()) {
-        if($this->execute($this->sqlQuery("update", $conditions, $data))):
+        if($this->query($this->sqlQuery("update", $conditions, $data))):
             $this->affectedRows = mysql_affected_rows();
             return true;
         endif;
         return false;
     }
     public function insert($data = array()) {
-        if($this->execute($this->sqlQuery("insert", $data))):
+        if($this->query($this->sqlQuery("insert", $data))):
             $this->insertId = mysql_insert_id();
             $this->affectedRows = mysql_affected_rows();
             return true;
@@ -395,7 +401,7 @@ class Model extends Object {
         return false;
     }
     public function deleteAll($conditions = array(), $order = null, $limit = null) {
-        if($this->execute($this->sqlQuery("delete", $conditions, null, $order, $limit))):
+        if($this->query($this->sqlQuery("delete", $conditions, null, $order, $limit))):
             $this->affectedRows = mysql_affected_rows();
             return true;
         endif;
