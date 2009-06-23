@@ -66,8 +66,8 @@ class Model extends Object {
     public $primaryKey = null;
 
     public function __construct($table = null) {
-        if($this->table === null):
-            if($table !== null):
+        if(is_null($this->table)):
+            if(!is_null($table)):
                 $this->table = $table;
             else:
                 $database = Config::read("database");
@@ -123,24 +123,23 @@ class Model extends Object {
     public function afterSave() {
         return true;
     }
+    /**
+     *  Descreve a tabela do banco de dados.
+     *
+     *  @return array Descrição da tabela do banco de dados
+     */
     public function describeTable() {
-        $tableSchema = $this->fetchResults($this->sqlQuery("describe"));
-        $modelSchema = array();
-        foreach($tableSchema as $field):
-            preg_match("/([a-z]*)\(?([0-9]*)?\)?/", $field["Type"], $type);
-            $modelSchema[$field["Field"]] = array(
-                "type" => $type[1],
-                "length" => $type[2],
-                "null" => $field["Null"] == "YES" ? true : false,
-                "default" => $field["Default"],
-                "key" => $field["Key"],
-                "extra" => $field["Extra"]
-            );
-            if(is_null($this->primaryKey) && $field["Key"] == "PRI"):
-                $this->primaryKey = $field["Field"];
-            endif;
-        endforeach;
-        return $this->schema = $modelSchema;
+        $db =& self::getConnection();
+        $schema = $db->describe($this->table);
+        if(is_null($this->primaryKey)):
+            foreach($schema as $field => $describe):
+                if($describe["key"] == "PRI"):
+                    $this->primaryKey = $field;
+                    break;
+                endif;
+            endforeach;
+        endif;
+        return $this->schema = $schema;
     }
     public function createLinks() {
         foreach($this->associations as $type):
