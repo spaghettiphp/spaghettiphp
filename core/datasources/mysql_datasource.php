@@ -13,14 +13,14 @@ class MysqlDatasource extends Datasource {
     /**
      *  Conecta ao banco de dados.
      *
-     *  @return boolean Verdadeiro se a conexão foi estabelecida
+     *  @return resource Conexão com o banco de dados
      */
     public function connect() {
         $this->connection = mysql_connect($this->config["host"], $this->config["user"], $this->config["password"]);
         if(mysql_select_db($this->config["database"], $this->connection)):
             $this->connected = true;
         endif;
-        return $this->connected;
+        return $this->connection;
     }
     /**
      *  Desconecta do banco de dados.
@@ -28,11 +28,22 @@ class MysqlDatasource extends Datasource {
      *  @return boolean Verdadeiro caso a conexão tenha sido desfeita
      */
     public function disconnect() {
-		$this->connected = !mysql_close($this->connection);
+		if(mysql_close($this->connection)):
+			$this->connected = false;
+			$this->connection = null;
+		endif;
 		return !$this->connected;
     }
+	/**
+	 *  Retorna a conexão com o banco de dados
+	 *
+	 *  @return resource Conexão com o banco de dados
+	 */
     public function &getConnection() {
-        return ($this->connected) ? $this->connection : false;
+		if(!$this->connected):
+			$this->connect();
+		endif;
+        return $this->connection;
     }
 }
 

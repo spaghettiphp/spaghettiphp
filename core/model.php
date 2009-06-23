@@ -105,26 +105,19 @@ class Model extends Object {
         endif;
         return null;
     }
-    public function &getConnection() {
+    public static function &getConnection() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
             $datasource = Connection::getDatasource();
-            $datasource->connect();
             $instance[0] = $datasource->getConnection();
         endif;
         return $instance[0];
     }
-    public function connect() {
-        $config = Config::read("database");
-        $link = mysql_connect($config["host"], $config["user"], $config["password"]);
-        mysql_selectdb($config["database"], $link);
-        return $link;
-    }
     public function beforeSave() {
-    return true;
+        return true;
     }
     public function afterSave() {
-    return true;
+        return true;
     }
     public function describeTable() {
         $tableSchema = $this->fetchResults($this->sqlQuery("describe"));
@@ -219,8 +212,6 @@ class Model extends Object {
             "describe" => "DESCRIBE {$this->table}"
         );
         
-        $this->log[] = $types[$type];
-        
         return $types[$type];
     }
     public function sqlSet($data = "") {
@@ -268,7 +259,7 @@ class Model extends Object {
         return $sql;
     }
     public function execute($query) {
-        return mysql_query($query, Model::getConnection());
+        return mysql_query($query, self::getConnection());
     }
     public function fetchResults($query) {
         $results = array();
