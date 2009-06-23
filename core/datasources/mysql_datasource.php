@@ -35,7 +35,8 @@ class MysqlDatasource extends Datasource {
 		return !$this->connected;
     }
 	/**
-	 *  Retorna a conexão com o banco de dados
+	 *  Retorna a conexão com o banco de dados, ou conecta caso a conexão ainda
+	 *  não tenha sido estabelecida.
 	 *
 	 *  @return resource Conexão com o banco de dados
 	 */
@@ -45,6 +46,15 @@ class MysqlDatasource extends Datasource {
 		endif;
         return $this->connection;
     }
+	/**
+	 *  Short description.
+	 *
+	 *  @param string $sql Consulta SQL a ser executada
+	 *  @return mixed Resultado da consulta
+	 */
+	public function query($sql) {
+		return mysql_query($sql, $this->getConnection());
+	}
 }
 
 ?>

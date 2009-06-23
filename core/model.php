@@ -105,11 +105,15 @@ class Model extends Object {
         endif;
         return null;
     }
+    /**
+     *  Retorna o datasource em uso.
+     *
+     *  @return object Datasource em uso
+     */
     public static function &getConnection() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
-            $datasource = Connection::getDatasource();
-            $instance[0] = $datasource->getConnection();
+            $instance[0] = Connection::getDatasource();
         endif;
         return $instance[0];
     }
@@ -259,7 +263,8 @@ class Model extends Object {
         return $sql;
     }
     public function execute($query) {
-        return mysql_query($query, self::getConnection());
+        $db =& self::getConnection();
+        return $db->query($query);
     }
     public function fetchResults($query) {
         $results = array();
@@ -442,7 +447,7 @@ class Model extends Object {
         if(get_magic_quotes_gpc()):
             $data = stripslashes($data);
         endif;
-        return mysql_real_escape_string($data, Model::getConnection());
+        return $data; #mysql_real_escape_string($data, Model::getConnection());
     }
 }
 ?>

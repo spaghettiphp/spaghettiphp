@@ -11,6 +11,9 @@ abstract class Datasource extends Object {
     public function __construct($config = array()) {
         $this->config = $config;
     }
+    abstract public function connect();
+    abstract public function disconnect();
+    abstract public function query($sql);
 }
 
 ?>
