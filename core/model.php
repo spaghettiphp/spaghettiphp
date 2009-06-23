@@ -192,78 +192,6 @@ class Model extends Object {
         endforeach;
         return $this->{$type};
     }
-    public function sqlQuery($type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
-        $params = $this->sqlConditions($parameters);
-        $values = $this->sqlConditions($values);
-        if(is_array($order)):
-            $orders = "";
-            foreach($order as $key => $value):
-                if(!is_numeric($key)):
-                    $value = "{$key} {$value}";
-                endif;
-                $orders .= "{$value},";
-            endforeach;
-            $order = trim($orders, ",");
-        endif;
-        if(is_array($flags)):
-            $flags = join(" ", $flags);
-        endif;
-        $types = array(
-            "delete" => "DELETE" . if_string($flags, " {$flags}") . " FROM {$this->table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
-            "insert" => "INSERT" . if_string($flags, " {$flags}") . " INTO {$this->table} SET " . $this->sqlSet($params),
-            "replace" => "REPLACE" . if_string($flags, " {$flags}") . " INTO {$this->table}" . if_string($params, " SET {$params}"),
-            "select" => "SELECT" . if_string($flags, " {$flags}") . " * FROM {$this->table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
-            "truncate" => "TRUNCATE TABLE {$this->table}",
-            "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$this->table} SET " . $this->sqlSet($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
-            "describe" => "DESCRIBE {$this->table}"
-        );
-        
-        return $types[$type];
-    }
-    public function sqlSet($data = "") {
-        return preg_replace("/' AND /", "', ", $data);
-    }
-    public function sqlConditions($conditions) {
-        $sql = "";
-        $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
-        $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE");
-        if(is_array($conditions)):
-            foreach($conditions as $field => $value):
-                if(is_string($value) && is_numeric($field)):
-                    $sql .= "{$value} AND ";
-                elseif(is_array($value)):
-                    if(is_numeric($field)):
-                        $field = "OR";
-                    elseif(in_array($field, $logic)):
-                        $field = strtoupper($field);
-                    elseif(preg_match("/([a-z]*) BETWEEN/", $field, $parts) && $this->schema[$parts[1]]):
-                        $sql .= "{$field} '" . join("' AND '", $value) . "'";
-                        continue;
-                    else:
-                        $values = array();
-                        foreach($value as $item):
-                            $values []= $this->sqlConditions(array($field => $item));
-                        endforeach;
-                        $sql .= "(" . join(" OR ", $values) . ") AND ";
-                        continue;
-                    endif;
-                    $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($value));
-                else:
-                    if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$parts[1]]):
-                        $value = $this->escape($value);
-                        $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
-                    elseif($this->schema[$field]):
-                        $value = $this->escape($value);
-                        $sql .= "{$field} = '{$value}' AND ";
-                    endif;
-                endif;
-            endforeach;
-            $sql = trim($sql, " AND ");
-        else:
-            $sql = $conditions;
-        endif;
-        return $sql;
-    }
     /**
      *  Executa uma consulta diretamente no datasource.
      *
@@ -277,7 +205,7 @@ class Model extends Object {
     public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
         $db =& self::getConnection($this->environment);
         $recursion = pick($recursion, $this->recursion);
-        $results = $db->fetchAll($this->sqlQuery("select", $conditions, null, $order, $limit));
+        $results = $db->fetchAll($db->sqlQuery($this->table, "select", $conditions, null, $order, $limit));
         if($recursion >= 0):
             foreach($this->associations as $type):
                 if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
@@ -326,14 +254,16 @@ class Model extends Object {
         return $this->data;
     }
     public function update($conditions = array(), $data = array()) {
-        if($this->query($this->sqlQuery("update", $conditions, $data))):
+        $db =& self::getConnection($this->environment);
+        if($this->query($db->sqlQuery($this->table, "update", $conditions, $data))):
             $this->affectedRows = mysql_affected_rows();
             return true;
         endif;
         return false;
     }
     public function insert($data = array()) {
-        if($this->query($this->sqlQuery("insert", $data))):
+        $db =& self::getConnection($this->environment);
+        if($this->query($db->sqlQuery($this->table, "insert", $data))):
             $this->insertId = mysql_insert_id();
             $this->affectedRows = mysql_affected_rows();
             return true;
@@ -395,7 +325,8 @@ class Model extends Object {
         return false;
     }
     public function deleteAll($conditions = array(), $order = null, $limit = null) {
-        if($this->query($this->sqlQuery("delete", $conditions, null, $order, $limit))):
+        $db =& self::getConnection($this->environment);
+        if($this->query($db->sqlQuery($this->table, "delete", $conditions, null, $order, $limit))):
             $this->affectedRows = mysql_affected_rows();
             return true;
         endif;
@@ -439,15 +370,6 @@ class Model extends Object {
     public function getAffectedRows() {
         return $this->affectedRows;
     }
-    /**
-     * O método Model::escape() prepara dados para uso em consultas SQL, retirando
-     * caracteres que possam ser perigosos, evitando possíveis ataques de SQL Injection.
-     */
-    public function escape($data) {
-        if(get_magic_quotes_gpc()):
-            $data = stripslashes($data);
-        endif;
-        return $data; #mysql_real_escape_string($data, Model::getConnection());
-    }
 }
+
 ?>

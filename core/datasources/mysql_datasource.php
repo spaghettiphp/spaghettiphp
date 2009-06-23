@@ -12,6 +12,7 @@ class MysqlDatasource extends Datasource {
     private $connection;
 	private $results;
     public $connected = false;
+
     /**
      *  Conecta ao banco de dados.
      *
@@ -160,6 +161,86 @@ class MysqlDatasource extends Datasource {
             $this->schema[$table] = $schema;
         endif;
         return $this->schema[$table];
+    }
+
+
+
+    public function sqlQuery($table, $type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
+        $params = $this->sqlConditions($table, $parameters);
+        $values = $this->sqlConditions($table, $values);
+        if(is_array($order)):
+            $orders = "";
+            foreach($order as $key => $value):
+                if(!is_numeric($key)):
+                    $value = "{$key} {$value}";
+                endif;
+                $orders .= "{$value},";
+            endforeach;
+            $order = trim($orders, ",");
+        endif;
+        if(is_array($flags)):
+            $flags = join(" ", $flags);
+        endif;
+        $types = array(
+            "delete" => "DELETE" . if_string($flags, " {$flags}") . " FROM {$table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
+            "insert" => "INSERT" . if_string($flags, " {$flags}") . " INTO {$table} SET " . $this->sqlSet($params),
+            "replace" => "REPLACE" . if_string($flags, " {$flags}") . " INTO {$table}" . if_string($params, " SET {$params}"),
+            "select" => "SELECT" . if_string($flags, " {$flags}") . " * FROM {$table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
+            "truncate" => "TRUNCATE TABLE {$table}",
+            "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$table} SET " . $this->sqlSet($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}")
+        );
+        
+        return $types[$type];
+    }
+    public function sqlSet($data = "") {
+        return preg_replace("/' AND /", "', ", $data);
+    }
+    public function sqlConditions($table, $conditions) {
+        $sql = "";
+        $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
+        $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE");
+        if(is_array($conditions)):
+            foreach($conditions as $field => $value):
+                if(is_string($value) && is_numeric($field)):
+                    $sql .= "{$value} AND ";
+                elseif(is_array($value)):
+                    if(is_numeric($field)):
+                        $field = "OR";
+                    elseif(in_array($field, $logic)):
+                        $field = strtoupper($field);
+                    elseif(preg_match("/([a-z]*) BETWEEN/", $field, $parts) && $this->schema[$parts[1]]):
+                        $sql .= "{$field} '" . join("' AND '", $value) . "'";
+                        continue;
+                    else:
+                        $values = array();
+                        foreach($value as $item):
+                            $values []= $this->sqlConditions($table, array($field => $item));
+                        endforeach;
+                        $sql .= "(" . join(" OR ", $values) . ") AND ";
+                        continue;
+                    endif;
+                    $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($table, $value));
+                else:
+                    if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$parts[1]]):
+                        $value = $this->escape($value);
+                        $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
+                    elseif($this->schema[$field]):
+                        $value = $this->escape($value);
+                        $sql .= "{$field} = '{$value}' AND ";
+                    endif;
+                endif;
+            endforeach;
+            $sql = trim($sql, " AND ");
+        else:
+            $sql = $conditions;
+        endif;
+        return $sql;
+    }
+    public function escape($data) {
+        if(get_magic_quotes_gpc()):
+            $data = stripslashes($data);
+        endif;
+        return mysql_real_escape_string($data, $this->getConnection());
     }
 }
 
