@@ -202,6 +202,42 @@ class Model extends Object {
         $db =& self::getConnection($this->environment);
         return $db->query($query);
     }
+    /**
+     *  Short description.
+     *
+     *  @param string $type
+     *  @param array $params
+     *  @return array
+     */
+    public function find($type = "all", $params = array()) {
+        $db =& self::getConnection($this->environment);
+        return $db->renderSql("select", array(
+            "table" => $this->table,
+            "fields" => $params["fields"]
+        ));
+    }
+    /**
+     *  Apaga um registro do banco de dados.
+     *
+     *  @param integer $id
+     *  @return boolean
+     */
+    public function delete($id = null) {
+        $db =& self::getConnection($this->environment);
+        if($db->delete($this->table, $id)):
+            return true;
+        endif;
+        return false;
+    }
+
+    public function deleteAll($conditions = array(), $order = null, $limit = null) {
+        $db =& self::getConnection($this->environment);
+        if($this->query($db->sqlQuery($this->table, "delete", $conditions, null, $order, $limit))):
+            $this->affectedRows = mysql_affected_rows();
+            return true;
+        endif;
+        return false;
+    }
     public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
         $db =& self::getConnection($this->environment);
         $recursion = pick($recursion, $this->recursion);
@@ -232,10 +268,6 @@ class Model extends Object {
         if(!is_array($conditions)) $conditions = array();
         $conditions = array_merge(array($field => $value), $conditions);
         return $this->findAll($conditions, $order, $limit, $recursion);
-    }
-    public function find($conditions = array(), $order = null, $recursion = null) {
-        $results = $this->findAll($conditions, $order, 1, $recursion);
-        return empty($results) ? array() : $results[0];
     }
     public function findBy($field = "id", $value = null, $conditions = array(), $order = null, $recursion = null) {
         if(!is_array($conditions)) $conditions = array();
@@ -323,29 +355,6 @@ class Model extends Object {
             return true;
         endif;
         return false;
-    }
-    public function deleteAll($conditions = array(), $order = null, $limit = null) {
-        $db =& self::getConnection($this->environment);
-        if($this->query($db->sqlQuery($this->table, "delete", $conditions, null, $order, $limit))):
-            $this->affectedRows = mysql_affected_rows();
-            return true;
-        endif;
-        return false;
-    }
-    public function delete($id = null, $dependent = false) {
-        $return = $this->deleteAll(array($this->primaryKey => $id), null, 1);
-        if($dependent):
-            foreach(array("hasMany", "hasOne") as $type):
-                foreach($this->{$type} as $model => $assoc):
-                    if($assoc["dependent"]):
-                        $this->{$model}->deleteAll(array(
-                            $assoc["foreignKey"] => $id
-                        ));
-                    endif;
-                endforeach;
-            endforeach;
-        endif;
-        return $return;
     }
     public function getInsertId() {
         return $this->insertId;

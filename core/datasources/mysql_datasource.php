@@ -163,8 +163,32 @@ class MysqlDatasource extends Datasource {
         return $this->schema[$table];
     }
 
-
-
+	public function create() {
+		
+	}
+	public function read() {
+		
+	}
+	public function update() {
+		
+	}
+	public function delete($table = null, $conditions = null) {
+		return true;
+	}
+	public function renderSql($type, $data = array()) {
+		switch($type):
+			case "select":
+				return "SELECT " . join(", ", $data["fields"]) . " FROM {$data['table']}";
+			case "delete":
+				return "DELETE FROM {$data['table']} WHERE id = {$data['id']}";
+			case "insert":
+				return false;
+			case "update":
+				return false;
+		endswitch;
+	}
+	
+	
     public function sqlQuery($table, $type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
         $params = $this->sqlConditions($table, $parameters);
         $values = $this->sqlConditions($table, $values);
