@@ -173,7 +173,11 @@ class MysqlDatasource extends Datasource {
 		
 	}
 	public function delete($table = null, $conditions = null) {
-		return true;
+		$query = $this->renderSql("delete", array(
+			"table" => $table,
+			"id" => $conditions
+		));
+		return $this->query($query) ? true : false;
 	}
 	public function renderSql($type, $data = array()) {
 		switch($type):

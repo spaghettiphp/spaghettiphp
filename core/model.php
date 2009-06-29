@@ -219,8 +219,8 @@ class Model extends Object {
     /**
      *  Apaga um registro do banco de dados.
      *
-     *  @param integer $id
-     *  @return boolean
+     *  @param integer $id ID do registro a ser apagado
+     *  @return boolean Verdadeiro caso o registro tenha sido apagado
      */
     public function delete($id = null) {
         $db =& self::getConnection($this->environment);
