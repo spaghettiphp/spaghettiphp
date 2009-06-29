@@ -332,13 +332,6 @@ class Model extends Object {
         endif;
         return false;
     }
-    /**
-     *  O método Model::delete() exclui um registro da tabela do modelo, de acordo com
-     *  o ID passado como parâmetro, e seus dependentes em associações de modelos, se
-     *  houverem.
-     *
-     *  @return
-     */
     public function delete($id = null, $dependent = false) {
         $return = $this->deleteAll(array($this->primaryKey => $id), null, 1);
         if($dependent):
@@ -354,19 +347,9 @@ class Model extends Object {
         endif;
         return $return;
     }
-    /**
-     * O método Model::get_insert_id() retorna o ID do último registro inserido
-     * na tabela do modelo.
-     *
-     * @return integer
-     */
     public function getInsertId() {
         return $this->insertId;
     }
-    /**
-     * O método Model::get_affected_rows() retorna o número de registros afetados
-     * por uma consulta.
-     */
     public function getAffectedRows() {
         return $this->affectedRows;
     }

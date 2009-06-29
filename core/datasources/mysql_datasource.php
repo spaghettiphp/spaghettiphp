@@ -208,7 +208,7 @@ class MysqlDatasource extends Datasource {
                         $field = "OR";
                     elseif(in_array($field, $logic)):
                         $field = strtoupper($field);
-                    elseif(preg_match("/([a-z]*) BETWEEN/", $field, $parts) && $this->schema[$parts[1]]):
+                    elseif(preg_match("/([a-z]*) BETWEEN/", $field, $parts) && $this->schema[$table][$parts[1]]):
                         $sql .= "{$field} '" . join("' AND '", $value) . "'";
                         continue;
                     else:
@@ -221,10 +221,10 @@ class MysqlDatasource extends Datasource {
                     endif;
                     $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($table, $value));
                 else:
-                    if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$parts[1]]):
+                    if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$table][$parts[1]]):
                         $value = $this->escape($value);
                         $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
-                    elseif($this->schema[$field]):
+                    elseif($this->schema[$table][$field]):
                         $value = $this->escape($value);
                         $sql .= "{$field} = '{$value}' AND ";
                     endif;
