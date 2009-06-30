@@ -98,7 +98,7 @@ class FormHelper extends HtmlHelper {
 		//month select options
 		for($i=1;$i<13;$i++):
 			$select_month .= '<option value="'.$i.'"';
-			if($i==$current_moth) $select_month .= ' selected="selected"';
+			if($i==$current_month) $select_month .= ' selected="selected"';
 			$select_month .= '>'.$i.'</option>';
 		endfor;
 		
