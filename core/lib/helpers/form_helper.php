@@ -69,6 +69,55 @@ class FormHelper extends HtmlHelper {
         endif;
         return $label != false ? $this->tag("label", "{$label}\n{$input}") : $input;
     }
+	public function dateselect($name="date",$start_year=1980,$end_year=null,$current_month=null,$current_day=null,$current_year=null)
+	{
+		//if default values are not passed, default values should be the current date
+		$year_now = (int)date("Y");
+		$day_now = (int)date("d");
+		$month_now = (int)date("m");
+		if(!$end_year) $end_year = $year_now;
+		if(!$current_year) $current_year = $year_now;
+		if(!$current_month) $current_moth = $month_now;
+		if(!$current_day) $current_day = $day_now;
+		
+		//day select
+		$select_day = '<select name="'.$name.'[d]" id="'.$name.'_day">';
+		
+		//day select options
+		for($i=1;$i<32;$i++):
+			$select_day .= '<option value="'.$i.'"';
+			if($i==$current_day) $select_day .= ' selected="selected"';
+			$select_day .= '>'.$i.'</option>';
+		endfor;
+		
+		$select_day .= "</select>";
+		
+		//month select
+		$select_month = '<select name="'.$name.'[m]" id="'.$name.'_month">';
+		
+		//month select options
+		for($i=1;$i<13;$i++):
+			$select_month .= '<option value="'.$i.'"';
+			if($i==$current_month) $select_month .= ' selected="selected"';
+			$select_month .= '>'.$i.'</option>';
+		endfor;
+		
+		$select_month .= "</select>";
+		
+		//year select
+		$select_year = '<select name="'.$name.'[y]" id="'.$name.'_year">';
+		
+		//year select options
+		for($i=$start_year;$i<$end_year+1;$i++):
+			$select_year .= '<option value="'.$i.'"';
+			if($i==$current_year) $select_year .= ' selected="selected"';
+			$select_year .= '>'.$i.'</option>';
+		endfor;
+		
+		$select_year .= "</select>";
+		
+		return $select_day.$select_month.$select_year;
+	}
 }
 
 ?>
