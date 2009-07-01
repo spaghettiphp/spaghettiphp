@@ -77,7 +77,7 @@ class FormHelper extends HtmlHelper {
 		$month_now = (int)date("m");
 		if(!$end_year) $end_year = $year_now;
 		if(!$current_year) $current_year = $year_now;
-		if(!$current_month) $current_moth = $month_now;
+		if(!$current_month) $current_month = $month_now;
 		if(!$current_day) $current_day = $day_now;
 		
 		//day select
