@@ -203,7 +203,7 @@ class Model extends Object {
     public function find($params = array()) {
         $db =& self::getConnection($this->environment);
         $params = array_merge(
-            array("fields" => join(",", array_keys($this->schema)), "conditions" => array(), "order" => null, "limit" => null, "recursion" => $this->recursion),
+            array("fields" => array_keys($this->schema), "conditions" => array(), "order" => null, "limit" => null, "recursion" => $this->recursion),
             $params
         );
         $results = $db->read($this->table, $params);

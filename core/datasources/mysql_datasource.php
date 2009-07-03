@@ -167,7 +167,14 @@ class MysqlDatasource extends Datasource {
 		
 	}
 	public function read($table = null, $params = array()) {
-        return $this->fetchAll($this->sqlQuery($table, "select", $params["conditions"], $params["fields"], $params["order"], $params["limit"]));
+		$query = $this->renderSql("select", array(
+			"table" => $table,
+			"fields" => (is_array($f = $params["fields"])) ? join(",", $f) : $f,
+			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
+			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
+			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
+		));
+        return $this->fetchAll($query);
 	}
 	public function update() {
 		
@@ -186,7 +193,7 @@ class MysqlDatasource extends Datasource {
 	private function renderSql($type, $data = array()) {
 		switch($type):
 			case "select":
-				return "SELECT " . join(", ", $data["fields"]) . " FROM {$data['table']}";
+				return "SELECT {$data['fields']} FROM {$data['table']} {$data['conditions']}";
 			case "delete":
 				return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
 			case "insert":
