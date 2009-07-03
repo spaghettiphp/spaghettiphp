@@ -125,6 +125,11 @@ class Model extends Object {
         endif;
         return $this->schema = $schema;
     }
+    /**
+     *  Gera as associações do modelo.
+     *
+     *  @return void
+     */
     public function createLinks() {
         foreach($this->associations as $type):
             $associations =& $this->{$type};
@@ -151,6 +156,12 @@ class Model extends Object {
             endforeach;
         endforeach;
     }
+    /**
+     *  Define os parâmetros padrão para as associações.
+     *
+     *  @param string $type Tipo da associação
+     *  @return true
+     */
     public function generateAssociation($type) {
         $associations =& $this->{$type};
         foreach($associations as $k => $assoc):
