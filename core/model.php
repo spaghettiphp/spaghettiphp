@@ -141,8 +141,11 @@ class Model extends Object {
                 endif;
                 $className = $associations[$key]["className"];
                 if(!isset($this->{$className})):
-                    ### HEI ###
-                    $this->{$className} = ClassRegistry::load($className);
+                    if($class =& ClassRegistry::load($className)):
+                        $this->{$className} = $class;
+                    else:
+                        $this->error("missingModel", array("model" => $className));
+                    endif;
                 endif;
                 $this->generateAssociation($type);
             endforeach;
