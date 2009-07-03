@@ -16,9 +16,9 @@ class Model extends Object {
      * Chaves disponíveis para cada associação
      */
     public $associationKeys = array(
-        "hasMany" => array("className", "foreignKey", "conditions", "order", "limit", "dependent"),
-        "belongsTo" => array("className", "foreignKey", "conditions"),
-        "hasOne" => array("className", "foreignKey", "conditions", "dependent")
+        "hasMany" => array("foreignKey", "conditions", "order", "limit"),
+        "belongsTo" => array("foreignKey", "conditions"),
+        "hasOne" => array("foreignKey", "conditions")
     );
     /**
      *  Associações do tipo Belongs To
