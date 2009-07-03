@@ -107,12 +107,6 @@ class Model extends Object {
         endif;
         return $instance[0];
     }
-    public function beforeSave() {
-        return true;
-    }
-    public function afterSave() {
-        return true;
-    }
     /**
      *  Descreve a tabela do banco de dados.
      *
@@ -182,6 +176,8 @@ class Model extends Object {
         $db =& self::getConnection($this->environment);
         return $db->query($query);
     }
+
+
     /**
      *  Short description.
      *
@@ -204,20 +200,28 @@ class Model extends Object {
      */
     public function delete($id = null) {
         $db =& self::getConnection($this->environment);
-        if($db->delete($this->table, $id)):
+        $params = array("conditions" => array(array($this->primaryKey => $id)));
+        if($this->exists($id) && $this->deleteAll($params)):
             return true;
         endif;
         return false;
     }
-
-    public function deleteAll($conditions = array(), $order = null, $limit = null) {
+    /**
+     *  Apaga registros do banco de dados.
+     *
+     *  @param array $params Parâmetros a serem usados na operação
+     *  @return boolean Verdadeiro caso os registros tenham sido apagados.
+     */
+    public function deleteAll($params = array()) {
         $db =& self::getConnection($this->environment);
-        if($this->query($db->sqlQuery($this->table, "delete", $conditions, null, $order, $limit))):
-            $this->affectedRows = mysql_affected_rows();
-            return true;
-        endif;
-        return false;
+        $params = array_merge(
+            array("conditions" => array(), "order" => null, "limit" => null),
+            $params
+        );
+        return $db->delete($this->table, $params);
     }
+    
+    
     public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
         $db =& self::getConnection($this->environment);
         $recursion = pick($recursion, $this->recursion);
@@ -329,8 +333,7 @@ class Model extends Object {
         return true;
     }
     public function exists($id = null) {
-        $method = "findBy" . Inflector::camelize($this->primaryKey);
-        $row = $this->$method($id);
+        $row = $this->findAllById($id);
         if(!empty($row)):
             return true;
         endif;

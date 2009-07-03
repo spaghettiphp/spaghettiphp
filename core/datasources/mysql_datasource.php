@@ -172,19 +172,23 @@ class MysqlDatasource extends Datasource {
 	public function update() {
 		
 	}
-	public function delete($table = null, $conditions = null) {
+	public function delete($table = null, $params = null) {
 		$query = $this->renderSql("delete", array(
 			"table" => $table,
-			"id" => $conditions
+			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
+			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
+			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
 		));
 		return $this->query($query) ? true : false;
 	}
-	public function renderSql($type, $data = array()) {
+	
+	
+	private function renderSql($type, $data = array()) {
 		switch($type):
 			case "select":
 				return "SELECT " . join(", ", $data["fields"]) . " FROM {$data['table']}";
 			case "delete":
-				return "DELETE FROM {$data['table']} WHERE id = {$data['id']}";
+				return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
 			case "insert":
 				return false;
 			case "update":
