@@ -95,19 +95,6 @@ class Model extends Object {
             return $this->findBy($field[1], $params[0], $params[1], $params[2], $params[3]);
         endif;
     }
-    public function __set($field, $value = "") {
-        if(isset($this->schema[$field])):
-            $this->data[$field] = $value;
-        elseif(is_subclass_of($value, "Model")):
-            $this->{$field} = $value;
-        endif;
-    }
-    public function __get($field) {
-        if(isset($this->schema[$field])):
-            return $this->data[$field];
-        endif;
-        return null;
-    }
     /**
      *  Retorna o datasource em uso.
      *
