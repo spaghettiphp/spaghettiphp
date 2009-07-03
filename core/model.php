@@ -206,8 +206,44 @@ class Model extends Object {
             array("fields" => join(",", array_keys($this->schema)), "conditions" => array(), "order" => null, "limit" => null, "recursion" => $this->recursion),
             $params
         );
-        return $db->read($this->table, $params);
+        $results = $db->read($this->table, $params);
+        if($params["recursion"] >= 0):
+            $this->findDependent($results, $params["recursion"]);
+        endif;
+        return $results;
     }
+    /**
+     *  Short description.
+     *
+     *  @param array $results
+     *  @param integer $recursion
+     *  @return void
+     */
+    public function findDependent(&$results, $recursion = 0) {
+        foreach($this->associations as $type):
+            if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
+                foreach($this->{$type} as $name => $assoc):
+                    foreach($results as $key => $result):
+                        if(isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]])):
+                            $assocCondition = array($assoc["foreignKey"] => $result[$this->primaryKey]);
+                        else:
+                            $assocCondition = array($this->primaryKey => $result[$assoc["foreignKey"]]);
+                        endif;
+                        #$attrCondition = isset($conditions[Inflector::underscore($assoc["className"])]) ? $conditions[Inflector::underscore($assoc["className"])] : array();
+                        #$condition = array_merge($attrCondition, $assoc["conditions"], $assocCondition);
+                        $condition = $assocCondition;
+                        $assocRecursion = $type != "belongsTo" ? $recursion - 2 : $recursion - 1;
+                        $rows = $this->{$assoc["className"]}->find(array(
+                            "conditions" => $condition,
+                            "recursion" => $assocRecursion
+                        ));
+                        $results[$key][Inflector::underscore($name)] = $type == "hasMany" ? $rows : $rows[0];
+                    endforeach;
+                endforeach;
+            endif;
+        endforeach;
+    }
+    
     
     
     /**
