@@ -110,7 +110,7 @@ class ClassRegistry {
         $duplicate = false;
         if (self::isKeySet($key)):
             $object =& self::getObject($key);
-            if(is_a($object, $class)):
+            if($object instanceof $class):
                 $duplicate =& $object;
             endif;
             unset($object);

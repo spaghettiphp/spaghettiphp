@@ -146,51 +146,44 @@ class Model extends Object {
     }
     public function createLinks() {
         foreach($this->associations as $type):
-            $associationType = $this->{$type};
-            foreach($associationType as $key => $assoc):
+            $associations =& $this->{$type};
+            foreach($associations as $key => $assoc):
                 if(is_numeric($key)):
-                    $class = "";
-                    $data = array();
-                    unset($this->{$type}[$key]);
+                    $key = array_unset($associations, $key);
                     if(is_array($assoc)):
-                        $data = $assoc;
-                        $assoc = $assoc["className"];
+                        $associations[$key["className"]] = $key;
+                    else:
+                        $associations[$key] = array("className" => $key);
                     endif;
-                    $this->{$type}[$assoc] = $data;
-                else:
-                    $assoc = $key;
+                elseif(!isset($assoc["className"])):
+                    $associations[$key]["className"] = $key;
                 endif;
-                if(!isset($this->{$assoc})):
-                    $this->{$assoc} = ClassRegistry::init("$assoc");
+                $className = $associations[$key]["className"];
+                if(!isset($this->{$className})):
+                    $this->{$className} = ClassRegistry::init($className);
                 endif;
+                $this->generateAssociation($type);
             endforeach;
-            $this->generateAssociation($type);
         endforeach;
     }
     public function generateAssociation($type) {
-        foreach($this->{$type} as $class => $assoc):
+        $associations =& $this->{$type};
+        foreach($associations as $k => $assoc):
             foreach($this->associationKeys[$type] as $key):
-                if(!isset($this->{$type}[$class][$key]) || $this->{$type}[$class][$key] === null):
+                if(!isset($assoc[$key])):
                     $data = null;
                     switch($key):
-                        case "className":
-                            $data = $class;
-                            break;
                         case "foreignKey":
                             $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this)) . "_{$this->primaryKey}";
                             break;
                         case "conditions":
                             $data = array();
-                            break;
-                        case "dependent":
-                            $data = true;
-                            break;
                     endswitch;
-                    $this->{$type}[$class][$key] = $data;
+                    $associations[$k][$key] = $data;
                 endif;
             endforeach;
         endforeach;
-        return $this->{$type};
+        return true;
     }
     /**
      *  Executa uma consulta diretamente no datasource.
