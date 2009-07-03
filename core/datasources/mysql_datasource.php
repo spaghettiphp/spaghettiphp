@@ -166,13 +166,13 @@ class MysqlDatasource extends Datasource {
 	public function create() {
 		
 	}
-	public function read() {
-		
+	public function read($table = null, $params = array()) {
+        return $this->fetchAll($this->sqlQuery($table, "select", $params["conditions"], $params["fields"], $params["order"], $params["limit"]));
 	}
 	public function update() {
 		
 	}
-	public function delete($table = null, $params = null) {
+	public function delete($table = null, $params = array()) {
 		$query = $this->renderSql("delete", array(
 			"table" => $table,
 			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
@@ -217,7 +217,7 @@ class MysqlDatasource extends Datasource {
             "delete" => "DELETE" . if_string($flags, " {$flags}") . " FROM {$table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "insert" => "INSERT" . if_string($flags, " {$flags}") . " INTO {$table} SET " . $this->sqlSet($params),
             "replace" => "REPLACE" . if_string($flags, " {$flags}") . " INTO {$table}" . if_string($params, " SET {$params}"),
-            "select" => "SELECT" . if_string($flags, " {$flags}") . " * FROM {$table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
+            "select" => "SELECT" . if_string($flags, " {$flags}") . " {$values} FROM {$table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "truncate" => "TRUNCATE TABLE {$table}",
             "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$table} SET " . $this->sqlSet($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}")
         );
