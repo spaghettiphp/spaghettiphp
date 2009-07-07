@@ -268,7 +268,6 @@ class Model extends Object {
             array("conditions" => array(), "order" => null, "limit" => null),
             $params
         );
-        return array_merge($params, compact("data"));
         return $db->update($this->table, array_merge($params, compact("data")));
     }
     /**

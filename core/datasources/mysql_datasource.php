@@ -195,7 +195,8 @@ class MysqlDatasource extends Datasource {
 			"table" => $table,
 			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
 			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
-			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
+			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}",
+			"values" => $this->sqlSet($this->sqlConditions($table, $params["data"]))
 		));
 		return $this->query($query);
 	}
