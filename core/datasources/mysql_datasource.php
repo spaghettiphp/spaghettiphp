@@ -163,8 +163,13 @@ class MysqlDatasource extends Datasource {
         return $this->schema[$table];
     }
 
-	public function create() {
-		
+	public function create($table = null, $params = array()) {
+		$query = $this->renderSql("insert", array(
+			"table" => $table,
+			"fields" => join(",", array_keys($params)),
+			"values" => "'" . join("','", $params) . "'"
+		));
+		return $this->query($query);
 	}
 	public function read($table = null, $params = array()) {
 		$query = $this->renderSql("select", array(
@@ -197,7 +202,7 @@ class MysqlDatasource extends Datasource {
 			case "delete":
 				return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
 			case "insert":
-				return false;
+				return "INSERT INTO {$data['table']}({$data['fields']}) VALUES({$data['values']})";
 			case "update":
 				return false;
 		endswitch;

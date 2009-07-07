@@ -245,7 +245,16 @@ class Model extends Object {
     }
     
     
-    
+    /**
+     *  Insere um registro no banco de dados.
+     *
+     *  @param array $data Dados a serem inseridos
+     *  @return boolean Verdadeiro se o registro foi salvo
+     */
+    public function insert($data = array()) {
+        $db =& self::getConnection($this->environment);
+        return $db->create($this->table, $data);
+    }
     /**
      *  Apaga um registro do banco de dados.
      *
@@ -326,15 +335,6 @@ class Model extends Object {
     public function update($conditions = array(), $data = array()) {
         $db =& self::getConnection($this->environment);
         if($this->query($db->sqlQuery($this->table, "update", $conditions, $data))):
-            $this->affectedRows = mysql_affected_rows();
-            return true;
-        endif;
-        return false;
-    }
-    public function insert($data = array()) {
-        $db =& self::getConnection($this->environment);
-        if($this->query($db->sqlQuery($this->table, "insert", $data))):
-            $this->insertId = mysql_insert_id();
             $this->affectedRows = mysql_affected_rows();
             return true;
         endif;
