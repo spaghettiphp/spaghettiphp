@@ -283,44 +283,8 @@ class Model extends Object {
         );
         return $db->delete($this->table, $params);
     }
-    
-    
-    public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
-        $db =& self::getConnection($this->environment);
-        $recursion = pick($recursion, $this->recursion);
-        $results = $db->fetchAll($db->sqlQuery($this->table, "select", $conditions, null, $order, $limit));
-        if($recursion >= 0):
-            foreach($this->associations as $type):
-                if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
-                    foreach($this->{$type} as $name => $assoc):
-                        foreach($results as $key => $result):
-                            if(isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]])):
-                                $assocCondition = array($assoc["foreignKey"] => $result[$this->primaryKey]);
-                            else:
-                                $assocCondition = array($this->primaryKey => $result[$assoc["foreignKey"]]);
-                            endif;
-                            $attrCondition = isset($conditions[Inflector::underscore($assoc["className"])]) ? $conditions[Inflector::underscore($assoc["className"])] : array();
-                            $condition = array_merge($attrCondition, $assoc["conditions"], $assocCondition);
-                            $assocRecursion = $type != "belongsTo" ? $recursion - 2 : $recursion - 1;
-                            $rows = $this->{$assoc["className"]}->findAll($condition, null, null, $assocRecursion);
-                            $results[$key][Inflector::underscore($name)] = $type == "hasMany" ? $rows : $rows[0];
-                        endforeach;
-                    endforeach;
-                endif;
-            endforeach;
-        endif;
-        return $results;
-    }
-    public function findAllBy($field = "id", $value = null, $conditions = array(), $order = null, $limit = null, $recursion = null) {
-        if(!is_array($conditions)) $conditions = array();
-        $conditions = array_merge(array($field => $value), $conditions);
-        return $this->findAll($conditions, $order, $limit, $recursion);
-    }
-    public function findBy($field = "id", $value = null, $conditions = array(), $order = null, $recursion = null) {
-        if(!is_array($conditions)) $conditions = array();
-        $conditions = array_merge(array($field => $value), $conditions);
-        return $this->find($conditions, $order, $recursion);
-    }
+
+
     public function create() {
         $this->id = null;
         $this->data = array();
