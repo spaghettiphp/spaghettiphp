@@ -163,6 +163,9 @@ class MysqlDatasource extends Datasource {
         return $this->schema[$table];
     }
 
+	/**
+	 *  Short description.
+	 */
 	public function create($table = null, $params = array()) {
 		$query = $this->renderSql("insert", array(
 			"table" => $table,
@@ -171,6 +174,9 @@ class MysqlDatasource extends Datasource {
 		));
 		return $this->query($query);
 	}
+	/**
+	 *  Short description.
+	 */
 	public function read($table = null, $params = array()) {
 		$query = $this->renderSql("select", array(
 			"table" => $table,
@@ -181,9 +187,21 @@ class MysqlDatasource extends Datasource {
 		));
         return $this->fetchAll($query);
 	}
-	public function update() {
-		
+	/**
+	 *  Short description.
+	 */
+	public function update($table = null, $params = array()) {
+		$query = $this->renderSql("update", array(
+			"table" => $table,
+			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
+			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
+			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
+		));
+		return $this->query($query);
 	}
+	/**
+	 *  Short description.
+	 */
 	public function delete($table = null, $params = array()) {
 		$query = $this->renderSql("delete", array(
 			"table" => $table,
@@ -204,7 +222,7 @@ class MysqlDatasource extends Datasource {
 			case "insert":
 				return "INSERT INTO {$data['table']}({$data['fields']}) VALUES({$data['values']})";
 			case "update":
-				return false;
+				return "UPDATE {$data['table']} SET {$data['values']} {$data['conditions']} {$data['order']} {$data['limit']}";
 		endswitch;
 	}
 	

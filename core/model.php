@@ -256,6 +256,22 @@ class Model extends Object {
         return $db->create($this->table, $data);
     }
     /**
+     *  Short description.
+     *
+     *  @param array $conditions
+     *  @param array $data
+     *  @return boolean
+     */
+    public function update($params = array(), $data = array()) {
+        $db =& self::getConnection($this->environment);
+        $params = array_merge(
+            array("conditions" => array(), "order" => null, "limit" => null),
+            $params
+        );
+        return array_merge($params, compact("data"));
+        return $db->update($this->table, array_merge($params, compact("data")));
+    }
+    /**
      *  Apaga um registro do banco de dados.
      *
      *  @param integer $id ID do registro a ser apagado
@@ -296,14 +312,8 @@ class Model extends Object {
         $this->data = $this->find(array($this->primaryKey => $this->id), null, $recursion);
         return $this->data;
     }
-    public function update($conditions = array(), $data = array()) {
-        $db =& self::getConnection($this->environment);
-        if($this->query($db->sqlQuery($this->table, "update", $conditions, $data))):
-            $this->affectedRows = mysql_affected_rows();
-            return true;
-        endif;
-        return false;
-    }
+
+
     public function save($data = array()) {
         if(empty($data)):
             $data = $this->data;
