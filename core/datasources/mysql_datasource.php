@@ -228,33 +228,6 @@ class MysqlDatasource extends Datasource {
 	}
 	
 	
-    public function sqlQuery($table, $type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
-        $params = $this->sqlConditions($table, $parameters);
-        $values = $this->sqlConditions($table, $values);
-        if(is_array($order)):
-            $orders = "";
-            foreach($order as $key => $value):
-                if(!is_numeric($key)):
-                    $value = "{$key} {$value}";
-                endif;
-                $orders .= "{$value},";
-            endforeach;
-            $order = trim($orders, ",");
-        endif;
-        if(is_array($flags)):
-            $flags = join(" ", $flags);
-        endif;
-        $types = array(
-            "delete" => "DELETE" . if_string($flags, " {$flags}") . " FROM {$table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
-            "insert" => "INSERT" . if_string($flags, " {$flags}") . " INTO {$table} SET " . $this->sqlSet($params),
-            "replace" => "REPLACE" . if_string($flags, " {$flags}") . " INTO {$table}" . if_string($params, " SET {$params}"),
-            "select" => "SELECT" . if_string($flags, " {$flags}") . " {$values} FROM {$table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
-            "truncate" => "TRUNCATE TABLE {$table}",
-            "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$table} SET " . $this->sqlSet($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}")
-        );
-        
-        return $types[$type];
-    }
     public function sqlSet($data = "") {
         return preg_replace("/' AND /", "', ", $data);
     }

@@ -33,10 +33,6 @@ class Model extends Object {
      */
     public $hasOne = array();
     /**
-     *  Dados do registro
-     */
-    public $data = array();
-    /**
      *  ID do registro
      */
     public $id = null;
@@ -243,8 +239,20 @@ class Model extends Object {
             endif;
         endforeach;
     }
-    
-    
+    /**
+     *  Verifica se um registro existe no banco de dados.
+     *
+     *  @param integer $id ID do registro a ser verificado
+     *  @return boolean Verdadeiro se o registro existe
+     */
+    public function exists($id = null) {
+        $row = $this->find(array(
+            "conditions" => array(
+                $this->primaryKey => $id
+            )
+        ));
+        return !empty($row);
+    }
     /**
      *  Insere um registro no banco de dados.
      *
@@ -256,11 +264,11 @@ class Model extends Object {
         return $db->create($this->table, $data);
     }
     /**
-     *  Short description.
+     *  Atualiza registros no banco de dados.
      *
-     *  @param array $conditions
-     *  @param array $data
-     *  @return boolean
+     *  @param array $params Parâmetros  para os registros a serem atualizados
+     *  @param array $data Dados a serem inseridos
+     *  @return boolean Verdadeiro se os registros foram atualizado
      */
     public function update($params = array(), $data = array()) {
         $db =& self::getConnection($this->environment);
@@ -269,6 +277,25 @@ class Model extends Object {
             $params
         );
         return $db->update($this->table, array_merge($params, compact("data")));
+    }
+    /**
+     *  Short description.
+     *
+     *  @param array $data
+     *  @return boolean
+     */
+    public function save($data = array()) {
+        $id = isset($data[$this->primaryKey]) ? $data[$this->primaryKey] : null;
+        if(!is_null($id) && $this->exists($id)):
+            return $this->update(array(
+                "conditions" => array(
+                    $this->primaryKey => $id
+                ),
+                "limit" => 1
+            ), $data);
+        else:
+            return $this->insert($data);
+        endif;
     }
     /**
      *  Apaga um registro do banco de dados.
@@ -300,20 +327,7 @@ class Model extends Object {
     }
 
 
-    public function create() {
-        $this->id = null;
-        $this->data = array();
-    }
-    public function read($id = null, $recursion = null) {
-        if($id != null):
-            $this->id = $id;
-        endif;
-        $this->data = $this->find(array($this->primaryKey => $this->id), null, $recursion);
-        return $this->data;
-    }
-
-
-    public function save($data = array()) {
+    public function _save($data = array()) {
         if(empty($data)):
             $data = $this->data;
         endif;
@@ -348,29 +362,6 @@ class Model extends Object {
         endforeach;
         
         return $this->data = $this->read($this->id);
-    }
-    public function saveAll($data) {
-        if(isset($data[0]) && is_array($data[0])):
-            foreach($data as $row):
-                $this->save($row);
-            endforeach;
-        else:
-            return $this->save($data);
-        endif;
-        return true;
-    }
-    public function exists($id = null) {
-        $row = $this->findAllById($id);
-        if(!empty($row)):
-            return true;
-        endif;
-        return false;
-    }
-    public function getInsertId() {
-        return $this->insertId;
-    }
-    public function getAffectedRows() {
-        return $this->affectedRows;
     }
 }
 
