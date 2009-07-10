@@ -285,7 +285,11 @@ class Model extends Object {
      *  @return boolean
      */
     public function save($data = array()) {
+        $date = date("Y-m-d H:i:s");
         $id = isset($data[$this->primaryKey]) ? $data[$this->primaryKey] : null;
+        if(isset($this->schema["modified"]) && !isset($data["modified"])):
+            $data["modified"] = $date;
+        endif;
         if(!is_null($id) && $this->exists($id)):
             return $this->update(array(
                 "conditions" => array(
@@ -294,6 +298,9 @@ class Model extends Object {
                 "limit" => 1
             ), $data);
         else:
+            if(isset($this->schema["created"]) && !isset($data["created"])):
+                $data["created"] = $date;
+            endif;
             return $this->insert($data);
         endif;
     }
@@ -324,44 +331,6 @@ class Model extends Object {
             $params
         );
         return $db->delete($this->table, $params);
-    }
-
-
-    public function _save($data = array()) {
-        if(empty($data)):
-            $data = $this->data;
-        endif;
-
-        if(isset($this->schema["modified"]) && $this->schema["modified"]["type"] == "datetime" && !isset($data["modified"])):
-            $data["modified"] = date("Y-m-d H:i:s");
-        endif;
-        
-        $this->beforeSave();
-        if(isset($data[$this->primaryKey]) && $this->exists($data[$this->primaryKey])):
-            $this->update(array($this->primaryKey => $data[$this->primaryKey]), $data);
-            $this->id = $data[$this->primaryKey];
-        else:
-            if(isset($this->schema["created"]) && $this->schema["created"]["type"] == "datetime" && !isset($data["created"])):
-                $data["created"] = date("Y-m-d H:i:s");
-            endif;
-            $this->insert($data);
-            $this->id = $this->get_insert_id();
-        endif;
-        $this->afterSave();
-        
-        foreach(array("hasOne", "hasMany") as $type):
-            foreach($this->{$type} as $class => $assoc):
-                $assocModel = Inflector::underscore($class);
-                if(isset($data[$assocModel])):
-                    $this->beforeSave();
-                    $data[$assocModel][$assoc["foreignKey"]] = $this->id;
-                    $this->{$class}->save($data[$assocModel]);
-                    $this->afterSave();
-                endif;
-            endforeach;
-        endforeach;
-        
-        return $this->data = $this->read($this->id);
     }
 }
 
