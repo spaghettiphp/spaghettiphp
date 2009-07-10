@@ -76,7 +76,7 @@ class Model extends Object {
             endif;
         endif;
         if($this->table && empty($this->schema)):
-            $this->describeTable();
+            $this->describe();
         endif;
         ClassRegistry::addObject(get_class($this), $this);
         $this->createLinks();
@@ -108,7 +108,7 @@ class Model extends Object {
      *
      *  @return array Descrição da tabela do banco de dados
      */
-    public function describeTable() {
+    public function describe() {
         $db =& self::getConnection($this->environment);
         $schema = $db->describe($this->table);
         if(is_null($this->primaryKey)):
@@ -187,14 +187,11 @@ class Model extends Object {
         $db =& self::getConnection($this->environment);
         return $db->query($query);
     }
-
-
     /**
-     *  Short description.
+     *  Busca registros no banco de dados.
      *
-     *  @param string $type
-     *  @param array $params
-     *  @return array
+     *  @param array $params Parâmetros a serem usados na busca
+     *  @return array Resultados da busca
      */
     public function find($params = array()) {
         $db =& self::getConnection($this->environment);
@@ -209,10 +206,10 @@ class Model extends Object {
         return $results;
     }
     /**
-     *  Short description.
+     *  Busca registros dependentes.
      *
-     *  @param array $results
-     *  @param integer $recursion
+     *  @param array $results Resultados obtidos em uma consula
+     *  @param integer $recursion Nível de recursão
      *  @return void
      */
     public function findDependent(&$results, $recursion = 0) {
@@ -279,10 +276,10 @@ class Model extends Object {
         return $db->update($this->table, array_merge($params, compact("data")));
     }
     /**
-     *  Short description.
+     *  Salva um registro no banco de dados.
      *
-     *  @param array $data
-     *  @return boolean
+     *  @param array $data Dados a serem salvos
+     *  @return boolean Verdadeiro se o registro foi salvo
      */
     public function save($data = array()) {
         $date = date("Y-m-d H:i:s");
