@@ -69,6 +69,13 @@ class Inflector extends Object {
         );
         return strtolower(preg_replace(array_keys($map), array_values($map), $string));
     }
+    /**
+     * O método Inflector::hyphenToUnderscore() substitui o hífens "-" na string pelo caractere
+     * underscore "_".
+     *
+     * @param string $string String de entrada
+     * @return string String de saída
+     */
     public static function hyphenToUnderscore($string = "") {
         return str_replace("-", "_", $string);
     }
