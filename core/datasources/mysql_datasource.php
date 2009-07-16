@@ -164,7 +164,11 @@ class MysqlDatasource extends Datasource {
     }
 
 	/**
-	 *  Short description.
+	 *  Insere um registro na tabela do banco de dados.
+	 *
+	 *  @param string $table Tabela a receber os dados
+	 *  @param array $params Parâmetros da consulta
+	 *  @return boolean Verdadeiro se os dados foram inseridos
 	 */
 	public function create($table = null, $params = array()) {
 		$query = $this->renderSql("insert", array(
@@ -175,7 +179,11 @@ class MysqlDatasource extends Datasource {
 		return $this->query($query);
 	}
 	/**
-	 *  Short description.
+	 *  Busca registros em uma tabela do banco de dados.
+	 *
+	 *  @param string $table Tabela a ser consultada
+	 *  @param array $params Parâmetros da consulta
+	 *  @return array Resultados da busca
 	 */
 	public function read($table = null, $params = array()) {
 		$query = $this->renderSql("select", array(
@@ -188,7 +196,11 @@ class MysqlDatasource extends Datasource {
         return $this->fetchAll($query);
 	}
 	/**
-	 *  Short description.
+	 *  Atualiza registros em uma tabela do banco de dados.
+	 *
+	 *  @param string $table Tabela a receber os dados
+	 *  @param array $params Parâmetros da consulta
+	 *  @return boolean Verdadeiro se os dados foram atualizados
 	 */
 	public function update($table = null, $params = array()) {
 		$query = $this->renderSql("update", array(
@@ -201,7 +213,11 @@ class MysqlDatasource extends Datasource {
 		return $this->query($query);
 	}
 	/**
-	 *  Short description.
+	 *  Remove registros da tabela do banco de dados.
+	 *
+	 *  @param string $table Tabela onde estão os registros
+	 *  @param array $params Parâmetros da consulta
+	 *  @return boolean Verdadeiro se os dados foram excluídos
 	 */
 	public function delete($table = null, $params = array()) {
 		$query = $this->renderSql("delete", array(
@@ -212,8 +228,13 @@ class MysqlDatasource extends Datasource {
 		));
 		return $this->query($query) ? true : false;
 	}
-	
-	
+	/**
+	 *	Cria uma consulta SQL baseada de acordo com alguns parâmetros.
+	 *
+	 *	@param string $type Tipo da consulta
+	 *	@param array $data Parâmetros da consulta
+	 *	@return string Consulta SQL
+	 */
 	private function renderSql($type, $data = array()) {
 		switch($type):
 			case "select":
