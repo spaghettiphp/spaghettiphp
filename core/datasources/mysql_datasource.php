@@ -167,14 +167,14 @@ class MysqlDatasource extends Datasource {
 	 *  Insere um registro na tabela do banco de dados.
 	 *
 	 *  @param string $table Tabela a receber os dados
-	 *  @param array $params Parâmetros da consulta
+	 *  @param array $data Dados a serem inseridos
 	 *  @return boolean Verdadeiro se os dados foram inseridos
 	 */
-	public function create($table = null, $params = array()) {
+	public function create($table = null, $data = array()) {
         $insertFields = $insertValues = array();
         $schema = $this->describe($table);
-        foreach($params as $field => $value):
-            $column = isset($schema[$field]["type"]) ? $this->column($schema[$field]["type"]) : null;
+        foreach($data as $field => $value):
+            $column = isset($schema[$field]) ? $this->column($schema[$field]["type"]) : null;
             $insertFields []= $field;
             $insertValues []= $this->value($value, $column);
         endforeach;
