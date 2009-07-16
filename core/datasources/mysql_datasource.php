@@ -210,12 +210,18 @@ class MysqlDatasource extends Datasource {
 	 *  @return boolean Verdadeiro se os dados foram atualizados
 	 */
 	public function update($table = null, $params = array()) {
+        $updateValues = array();
+        $schema = $this->describe($table);
+        foreach($params["data"] as $field => $value):
+            $column = isset($schema[$field]) ? $this->column($schema[$field]["type"]) : null;
+            $updateValues []= $field . "=" . $this->value($value, $column);
+        endforeach;
 		$query = $this->renderSql("update", array(
 			"table" => $table,
 			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
 			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
 			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}",
-			"values" => $this->sqlSet($this->sqlConditions($table, $params["data"]))
+			"values" => join(",", $updateValues)
 		));
 		return $this->query($query);
 	}
@@ -277,9 +283,6 @@ class MysqlDatasource extends Datasource {
     }
 	
 	
-    public function sqlSet($data = "") {
-        return preg_replace("/' AND /", "', ", $data);
-    }
     public function sqlConditions($table, $conditions) {
         $sql = "";
         $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
