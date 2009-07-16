@@ -171,11 +171,18 @@ class MysqlDatasource extends Datasource {
 	 *  @return boolean Verdadeiro se os dados foram inseridos
 	 */
 	public function create($table = null, $params = array()) {
+        $insertFields = $insertValues = array();
+        $schema = $this->describe($table);
+        foreach($params as $field => $value):
+            $column = isset($schema[$field]["type"]) ? $this->column($schema[$field]["type"]) : null;
+            $insertFields []= $field;
+            $insertValues []= $this->value($value, $column);
+        endforeach;
 		$query = $this->renderSql("insert", array(
-			"table" => $table,
-			"fields" => join(",", array_keys($params)),
-			"values" => "'" . join("','", $params) . "'"
-		));
+            "table" => $table,
+            "fields" => join(",", $insertFields),
+            "values" => join(",", $insertValues)
+        ));
 		return $this->query($query);
 	}
 	/**
@@ -247,6 +254,27 @@ class MysqlDatasource extends Datasource {
 				return "UPDATE {$data['table']} SET {$data['values']} {$data['conditions']} {$data['order']} {$data['limit']}";
 		endswitch;
 	}
+    /**
+     *  Escapa um valor para uso em consultas SQL.
+     *
+     *  @param string $value Valor a ser escapado
+     *  @return string Valor escapado
+     */
+    public function value($value = "", $column = null) {
+        switch($column):
+            case "boolean":
+                return $value === true ? 1 : ($value === false ? false : !empty($value));
+            case "integer":
+            case "float":
+                if($value === ""):
+                    return "NULL";
+                elseif(is_numeric($value)):
+                    return $value;
+                endif;
+            default:
+                return "'" . mysql_real_escape_string($value, $this->connection) . "'";
+        endswitch;
+    }
 	
 	
     public function sqlSet($data = "") {
