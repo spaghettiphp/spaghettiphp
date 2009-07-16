@@ -281,8 +281,13 @@ class MysqlDatasource extends Datasource {
                 return "'" . mysql_real_escape_string($value, $this->connection) . "'";
         endswitch;
     }
-	
-	
+	/**
+	 *  Short description.
+	 *
+	 *  @param string $table
+	 *  @param array $conditions
+	 *  @return string
+	 */
     public function sqlConditions($table, $conditions) {
         $sql = "";
         $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
@@ -310,10 +315,10 @@ class MysqlDatasource extends Datasource {
                     $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($table, $value));
                 else:
                     if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$table][$parts[1]]):
-                        $value = $this->escape($value);
+                        $value = $this->value($value);
                         $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
                     elseif($this->schema[$table][$field]):
-                        $value = $this->escape($value);
+                        $value = $this->value($value);
                         $sql .= "{$field} = '{$value}' AND ";
                     endif;
                 endif;
@@ -323,12 +328,6 @@ class MysqlDatasource extends Datasource {
             $sql = $conditions;
         endif;
         return $sql;
-    }
-    public function escape($data) {
-        if(get_magic_quotes_gpc()):
-            $data = stripslashes($data);
-        endif;
-        return mysql_real_escape_string($data, $this->getConnection());
     }
 }
 
