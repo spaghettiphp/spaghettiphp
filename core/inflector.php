@@ -31,8 +31,8 @@ class Inflector extends Object {
         return ucwords(str_replace(array("_", "-"), " ", $string));
     }
     /**
-     * Este método remove espaços de uma string e converte as letras para caixa-baixa.
-     * Ex.: A Casa Amarela => a-casa-amarela
+     * Este método substitui os espaços de uma string pelo "_" e converte as letras para caixa-baixa.
+     * Ex.: A Casa Amarela => a_casa_amarela
      *
      * @param string $string String de entrada
      * @return strign String de saída
@@ -69,6 +69,13 @@ class Inflector extends Object {
         );
         return strtolower(preg_replace(array_keys($map), array_values($map), $string));
     }
+    /**
+     * O método Inflector::hyphenToUnderscore() substitui o hífens "-" na string pelo caractere
+     * underscore "_".
+     *
+     * @param string $string String de entrada
+     * @return string String de saída
+     */
     public static function hyphenToUnderscore($string = "") {
         return str_replace("-", "_", $string);
     }
