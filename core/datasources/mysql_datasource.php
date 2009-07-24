@@ -355,6 +355,14 @@ class MysqlDatasource extends Datasource {
         endif;
         return $sql;
     }
+    /**
+     *  Retorna o ID do último registro inserido.
+     *
+     *  @return integer ID do último registro inserido
+     */
+	public function getInsertId() {
+		return mysql_insert_id($this->getConnection());
+	}
 }
 
 ?>

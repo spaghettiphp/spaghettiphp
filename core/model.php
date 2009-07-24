@@ -309,20 +309,20 @@ class Model extends Object {
      *  @return boolean Verdadeiro se o registro foi salvo
      */
     public function save($data = array()) {
-        $date = date("Y-m-d H:i:s");
-        $id = isset($data[$this->primaryKey]) ? $data[$this->primaryKey] : null;
-        
+        $this->id = isset($data[$this->primaryKey]) ? $data[$this->primaryKey] : null;
         foreach($data as $field => $value):
-            if(!isset($this->schema[$field])) unset($data[$field]);
+            if(!isset($this->schema[$field])):
+                unset($data[$field]);
+            endif;
         endforeach;
-        
+        $date = date("Y-m-d H:i:s");
         if(isset($this->schema["modified"]) && !isset($data["modified"])):
             $data["modified"] = $date;
         endif;
-        if(!is_null($id) && $this->exists($id)):
-            return $this->update(array(
+        if(!is_null($this->id) && $this->exists($this->id)):
+            $save = $this->update(array(
                 "conditions" => array(
-                    $this->primaryKey => $id
+                    $this->primaryKey => $this->id
                 ),
                 "limit" => 1
             ), $data);
@@ -330,8 +330,10 @@ class Model extends Object {
             if(isset($this->schema["created"]) && !isset($data["created"])):
                 $data["created"] = $date;
             endif;
-            return $this->insert($data);
+            $save = $this->insert($data);
+            $this->id = $this->getInsertId();
         endif;
+        return $save;
     }
     /**
      *  Apaga um registro do banco de dados.
@@ -360,6 +362,15 @@ class Model extends Object {
             $params
         );
         return $db->delete($this->table, $params);
+    }
+    /**
+     *  Retorna o ID do último registro inserido.
+     *
+     *  @return integer ID do último registro inserido
+     */
+    public function getInsertId() {
+        $db =& self::getConnection($this->environment);
+        return $db->getInsertId();
     }
 }
 
