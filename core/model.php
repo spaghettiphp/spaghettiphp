@@ -188,6 +188,33 @@ class Model extends Object {
         return $db->query($query);
     }
     /**
+     *  Inicia uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi iniciada
+     */
+    public function begin() {
+        $db =& self::getConnection($this->environment);
+        return $db->begin();
+    }
+    /**
+     *  Completa uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi completada
+     */
+    public function commit() {
+        $db =& self::getConnection($this->environment);
+        return $db->commit();
+    }
+    /**
+     *  Cancela uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi cancelada
+     */
+    public function rollback() {
+        $db =& self::getConnection($this->environment);
+        return $db->rollback();
+    }
+    /**
      *  Busca registros no banco de dados.
      *
      *  @param array $params Parâmetros a serem usados na busca
@@ -284,6 +311,11 @@ class Model extends Object {
     public function save($data = array()) {
         $date = date("Y-m-d H:i:s");
         $id = isset($data[$this->primaryKey]) ? $data[$this->primaryKey] : null;
+        
+        foreach($data as $field => $value):
+            if(!isset($this->schema[$field])) unset($data[$field]);
+        endforeach;
+        
         if(isset($this->schema["modified"]) && !isset($data["modified"])):
             $data["modified"] = $date;
         endif;
@@ -328,33 +360,6 @@ class Model extends Object {
             $params
         );
         return $db->delete($this->table, $params);
-    }
-    /**
-     *  Inicia uma transação SQL.
-     *
-     *  @return boolean Verdadeiro se a transação foi iniciada
-     */
-    public function begin() {
-        $db =& self::getConnection($this->environment);
-        return $db->begin();
-    }
-    /**
-     *  Completa uma transação SQL.
-     *
-     *  @return boolean Verdadeiro se a transação foi completada
-     */
-    public function commit() {
-        $db =& self::getConnection($this->environment);
-        return $db->commit();
-    }
-    /**
-     *  Cancela uma transação SQL.
-     *
-     *  @return boolean Verdadeiro se a transação foi cancelada
-     */
-    public function rollback() {
-        $db =& self::getConnection($this->environment);
-        return $db->rollback();
     }
 }
 
