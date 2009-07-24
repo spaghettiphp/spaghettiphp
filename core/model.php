@@ -329,6 +329,33 @@ class Model extends Object {
         );
         return $db->delete($this->table, $params);
     }
+    /**
+     *  Inicia uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi iniciada
+     */
+    public function begin() {
+        $db =& self::getConnection($this->environment);
+        return $db->begin();
+    }
+    /**
+     *  Completa uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi completada
+     */
+    public function commit() {
+        $db =& self::getConnection($this->environment);
+        return $db->commit();
+    }
+    /**
+     *  Cancela uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi cancelada
+     */
+    public function rollback() {
+        $db =& self::getConnection($this->environment);
+        return $db->rollback();
+    }
 }
 
 ?>

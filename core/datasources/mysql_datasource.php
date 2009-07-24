@@ -11,6 +11,7 @@ class MysqlDatasource extends Datasource {
 	private $schema = array();
     private $connection;
 	private $results;
+	private $transactionStarted = false;
     public $connected = false;
 
     /**
@@ -162,7 +163,32 @@ class MysqlDatasource extends Datasource {
         endif;
         return $this->schema[$table];
     }
-
+    /**
+     *  Inicia uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi iniciada
+     */
+    public function begin() {
+        return $this->transactionStarted = $this->query("START TRANSACTION");
+    }
+    /**
+     *  Completa uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi completada
+     */
+    public function commit() {
+        $this->transactionStarted = !$this->query("COMMIT");
+        return !$this->transactionStarted;
+    }
+    /**
+     *  Cancela uma transação SQL.
+     *
+     *  @return boolean Verdadeiro se a transação foi cancelada
+     */
+    public function rollback() {
+        $this->transactionStarted = !$this->query("ROLLBACK");
+        return !$this->transactionStarted;
+    }
 	/**
 	 *  Insere um registro na tabela do banco de dados.
 	 *
