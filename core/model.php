@@ -241,11 +241,19 @@ class Model extends Object {
                     $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($value));
                 else:
                     if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$parts[1]]):
-                        $value = $this->escape($value);
-                        $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
+                        if(is_null($value)):
+                            $sql .= "{$parts[1]} {$parts[2]} NULL AND ";
+                        else:
+                            $value = $this->escape($value);
+                            $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
+                        endif;
                     elseif($this->schema[$field]):
-                        $value = $this->escape($value);
-                        $sql .= "{$field} = '{$value}' AND ";
+                        if(is_null($value)):
+                            $sql .= "{$field} = NULL AND ";
+                        else:
+                            $value = $this->escape($value);
+                            $sql .= "{$field} = '{$value}' AND ";
+                        endif;
                     endif;
                 endif;
             endforeach;
