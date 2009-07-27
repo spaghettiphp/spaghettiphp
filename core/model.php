@@ -323,26 +323,37 @@ class Model extends Object {
         if(!$exists && isset($this->schema["created"]) && !isset($data["created"])):
             $data["created"] = $date;
         endif;
-        $data = $this->beforeSave($data);
+        if(!($data = $this->beforeSave($data))) return false;
         if(!is_null($this->id) && $exists):
             $save = $this->update(array(
                 "conditions" => array($this->primaryKey => $this->id),
                 "limit" => 1
             ), $data);
+            $created = false;
         else:
             $save = $this->insert($data);
+            $created = true;
             $this->id = $this->getInsertId();
         endif;
+        $this->afterSave($created);
         return $save;
     }
     /**
-     *  Short Description
+     *  Short Description.
      *
      *  @param array $data
      *  @return array
      */
-    public function beforeSave($data = array()) {
+    public function beforeSave($data) {
         return $data;
+    }
+    /**
+     *  Short Description.
+     *
+     *  @return boolean
+     */
+    public function afterSave($created) {
+        return $created;
     }
     /**
      *  Apaga um registro do banco de dados.
