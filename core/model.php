@@ -314,6 +314,20 @@ class Model extends Object {
         $conditions = array_merge(array($field => $value), $conditions);
         return $this->find($conditions, $order, $recursion);
     }
+    public function all($params = array()) {
+        $params = array_merge(
+            array("conditions" => array(), "order" => null, "recursion" => null, "limit" => null),
+            $params
+        );
+        return $this->findAll($params["conditions"], $params["order"], $params["limit"], $params["recursion"]);
+    }
+    public function first($params = array()) {
+        $params = array_merge(
+            array("conditions" => array(), "order" => null, "recursion" => null),
+            $params
+        );
+        return $this->find($params["conditions"], $params["order"], $params["recursion"]);
+    }
     public function create() {
         $this->id = null;
         $this->data = array();
@@ -358,7 +372,7 @@ class Model extends Object {
                 $data["created"] = date("Y-m-d H:i:s");
             endif;
             $this->insert($data);
-            $this->id = $this->get_insert_id();
+            $this->id = $this->getInsertId();
         endif;
         $this->afterSave();
         
