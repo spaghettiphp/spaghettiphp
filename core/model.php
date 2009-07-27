@@ -353,15 +353,24 @@ class Model extends Object {
             $this->insert($data);
             $this->id = $this->get_insert_id();
         endif;
-		$this->afterSave();
+        $this->afterSave();
         
+        /**
+         * correção para trabalhar com hasOne
+         * inserção e alteração em pleno funcionamento
+         * by Victor Feitoza - obrigado!
+         */
         foreach(array("hasOne", "hasMany") as $type):
             foreach($this->{$type} as $class => $assoc):
                 $assocModel = Inflector::underscore($class);
-                if(isset($data[$assocModel])):
+                //if(isset($data[$assocModel])):
+                if(is_object($this->{$class})):
 					$this->beforeSave();
-                    $data[$assocModel][$assoc["foreignKey"]] = $this->id;
-                    $this->{$class}->save($data[$assocModel]);
+                    //$data[$assocModel][$assoc["foreignKey"]] = $this->id;
+                    $data['id'] = $data[$assocModel.'_id'];
+                    $data[$assoc["foreignKey"]] = $this->id;
+                    //$this->{$class}->save($data[$assocModel]);
+                    $this->{$class}->save($data);
 					$this->afterSave();
                 endif;
             endforeach;
