@@ -319,21 +319,30 @@ class Model extends Object {
         if(isset($this->schema["modified"]) && !isset($data["modified"])):
             $data["modified"] = $date;
         endif;
-        if(!is_null($this->id) && $this->exists($this->id)):
+        $exists = $this->exists($this->id);
+        if(!$exists && isset($this->schema["created"]) && !isset($data["created"])):
+            $data["created"] = $date;
+        endif;
+        $data = $this->beforeSave($data);
+        if(!is_null($this->id) && $exists):
             $save = $this->update(array(
-                "conditions" => array(
-                    $this->primaryKey => $this->id
-                ),
+                "conditions" => array($this->primaryKey => $this->id),
                 "limit" => 1
             ), $data);
         else:
-            if(isset($this->schema["created"]) && !isset($data["created"])):
-                $data["created"] = $date;
-            endif;
             $save = $this->insert($data);
             $this->id = $this->getInsertId();
         endif;
         return $save;
+    }
+    /**
+     *  Short Description
+     *
+     *  @param array $data
+     *  @return array
+     */
+    public function beforeSave($data = array()) {
+        return $data;
     }
     /**
      *  Apaga um registro do banco de dados.
