@@ -152,7 +152,7 @@ class MysqlDatasource extends Datasource {
             $schema = array();
             foreach($columns as $column):
                 $schema[$column["Field"]] = array(
-                    "type" => $column["Type"],
+                    "type" => $this->column($column["Type"]),
                     "null" => $column["Null"] == "YES" ? true : false,
                     "default" => $column["Default"],
                     "key" => $column["Key"],
@@ -200,7 +200,7 @@ class MysqlDatasource extends Datasource {
         $insertFields = $insertValues = array();
         $schema = $this->describe($table);
         foreach($data as $field => $value):
-            $column = isset($schema[$field]) ? $this->column($schema[$field]["type"]) : null;
+            $column = isset($schema[$field]) ? $schema[$field]["type"] : null;
             $insertFields []= $field;
             $insertValues []= $this->value($value, $column);
         endforeach;
@@ -239,7 +239,7 @@ class MysqlDatasource extends Datasource {
         $updateValues = array();
         $schema = $this->describe($table);
         foreach($params["data"] as $field => $value):
-            $column = isset($schema[$field]) ? $this->column($schema[$field]["type"]) : null;
+            $column = isset($schema[$field]) ? $schema[$field]["type"] : null;
             $updateValues []= $field . "=" . $this->value($value, $column);
         endforeach;
 		$query = $this->renderSql("update", array(
@@ -274,7 +274,7 @@ class MysqlDatasource extends Datasource {
 	 *	@param array $data Parâmetros da consulta
 	 *	@return string Consulta SQL
 	 */
-	private function renderSql($type, $data = array()) {
+	public function renderSql($type, $data = array()) {
 		switch($type):
 			case "select":
 				return "SELECT {$data['fields']} FROM {$data['table']} {$data['conditions']}";
@@ -343,8 +343,8 @@ class MysqlDatasource extends Datasource {
                     if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$table][$parts[1]]):
                         $value = $this->value($value);
                         $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
-                    elseif($this->schema[$table][$field]):
-                        $value = $this->value($value, $this->column($this->schema[$table][$field]["type"]));
+                    elseif(isset($this->schema[$table][$field])):
+                        $value = $this->value($value, $this->schema[$table][$field]["type"]);
                         $sql .= "{$field} = '{$value}' AND ";
                     endif;
                 endif;
