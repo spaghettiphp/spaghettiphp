@@ -28,6 +28,21 @@ class ClassRegistry {
         endif;
         return $instance[0];
     }
+    // método importada da versao 0.2 do Spaghetti*
+    public static function &load($class, $type = "Model") {
+        $self =& ClassRegistry::getInstance();
+        if($object =& $self->duplicate($class, $class)):
+            return $object;
+        elseif(!class_exists($class)):
+            //if(App::path($type, Inflector::underscore($class))):
+                Spaghetti::import($type, Inflector::underscore($class));
+            //endif;
+        endif;
+        if(class_exists($class)):
+            ${$class} = new $class;
+        endif;
+        return ${$class};
+    }
     public function &init($class, $type = "Model") {
         $self =& ClassRegistry::getInstance();
         if($model =& $self->duplicate($class, $class)):

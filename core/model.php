@@ -137,53 +137,52 @@ class Model extends Object {
         endforeach;
         return $this->schema = $modelSchema;
     }
+    // método importado da versao 0.2 do Spaghetti*
     public function createLinks() {
         foreach($this->associations as $type):
-            $associationType = $this->{$type};
-            foreach($associationType as $key => $assoc):
+            $associations =& $this->{$type};
+            foreach($associations as $key => $assoc):
                 if(is_numeric($key)):
-                    $class = "";
-                    $data = array();
-                    unset($this->{$type}[$key]);
+                    $key = array_unset($associations, $key);
                     if(is_array($assoc)):
-                        $data = $assoc;
-                        $assoc = $assoc["className"];
+                        $associations[$key["className"]] = $key;
+                    else:
+                        $associations[$key] = array("className" => $key);
                     endif;
-                    $this->{$type}[$assoc] = $data;
-                else:
-                    $assoc = $key;
+                elseif(!isset($assoc["className"])):
+                    $associations[$key]["className"] = $key;
                 endif;
-                if(!isset($this->{$assoc})):
-                    $this->{$assoc} = ClassRegistry::init("$assoc");
+                $className = $associations[$key]["className"];
+                if(!isset($this->{$className})):
+                    if($class =& ClassRegistry::load($className)):
+                        $this->{$className} = $class;
+                    else:
+                        $this->error("missingModel", array("model" => $className));
+                    endif;
                 endif;
+                $this->generateAssociation($type);
             endforeach;
-            $this->generateAssociation($type);
         endforeach;
     }
+    // método importado da versao 0.2 do Spaghetti*
     public function generateAssociation($type) {
-        foreach($this->{$type} as $class => $assoc):
+        $associations =& $this->{$type};
+        foreach($associations as $k => $assoc):
             foreach($this->associationKeys[$type] as $key):
-                if(!isset($this->{$type}[$class][$key]) || $this->{$type}[$class][$key] === null):
+                if(!isset($assoc[$key])):
                     $data = null;
                     switch($key):
-                        case "className":
-                            $data = $class;
-                            break;
                         case "foreignKey":
-                            $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
+                            $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this)) . "Id";
                             break;
                         case "conditions":
                             $data = array();
-                            break;
-                        case "dependent":
-                            $data = true;
-                            break;
                     endswitch;
-                    $this->{$type}[$class][$key] = $data;
+                    $associations[$k][$key] = $data;
                 endif;
             endforeach;
         endforeach;
-        return $this->{$type};
+        return true;
     }
     public function sqlQuery($type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
         $params = $this->sqlConditions($parameters);
@@ -285,7 +284,7 @@ class Model extends Object {
                             $condition = array_merge($attrCondition, $assoc["conditions"], $assocCondition);
                             $assocRecursion = $type != "belongsTo" ? $recursion - 2 : $recursion - 1;
                             $rows = $this->{$assoc["className"]}->findAll($condition, null, null, $assocRecursion);
-                            $results[$key][Inflector::underscore($assoc["className"])] = $type == "hasMany" ? $rows : $rows[0];
+                            $results[$key][Inflector::underscore($name)] = $type == "hasMany" ? $rows : $rows[0];
                         endforeach;
                     endforeach;
                 endif;
