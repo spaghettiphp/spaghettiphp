@@ -81,14 +81,24 @@ class Model extends Object {
         ClassRegistry::addObject(get_class($this), $this);
         $this->createLinks();
     }
-    public function __call($method, $params) {
-        $params = array_merge($params, array(null, null, null, null, null));
-        if(preg_match("/findAllBy(.*)/", $method, $field)):
-            $field[1] = Inflector::underscore($field[1]);
-            return $this->findAllBy($field[1], $params[0], $params[1], $params[2], $params[3], $params[4]);
-        elseif(preg_match("/findBy(.*)/", $method, $field)):
-            $field[1] = Inflector::underscore($field[1]);
-            return $this->findBy($field[1], $params[0], $params[1], $params[2], $params[3]);
+    /**
+     *  Chama métodos de atalho para firstBy<field> e allBy<field>.
+     *
+     *  @param string $method Nome do método chamado
+     *  @param array $condition Parmâmetros passados pelo método
+     *  @return array Resultado do método, erro caso o método não exista
+     */
+    public function __call($method, $condition) {
+        if(preg_match("/(all|first)By([\w]+)/", $method, $match)):
+            $field = Inflector::underscore($match[2]);
+            $params = array("conditions" => array($field => $condition[0]));
+            if(isset($condition[1])):
+                $params = array_merge($params, $condition[1]);
+            endif;
+            return $this->{$match[1]}($params);
+        else:
+            trigger_error("Call to undefined method Model::{$method}()", E_USER_ERROR);
+            return false;
         endif;
     }
     /**
@@ -220,7 +230,7 @@ class Model extends Object {
      *  @param array $params Parâmetros a serem usados na busca
      *  @return array Resultados da busca
      */
-    public function find($params = array()) {
+    public function all($params = array()) {
         $db =& self::getConnection($this->environment);
         $params = array_merge(
             array("fields" => array_keys($this->schema), "conditions" => array(), "order" => null, "limit" => null, "recursion" => $this->recursion),
@@ -231,6 +241,13 @@ class Model extends Object {
             $this->findDependent($results, $params["recursion"]);
         endif;
         return $results;
+    }
+    public function first($params = array()) {
+        $params = array_merge(
+            array("limit" => 1),
+            $params
+        );
+        return $this->all($params);
     }
     /**
      *  Busca registros dependentes.
@@ -253,7 +270,7 @@ class Model extends Object {
                         #$condition = array_merge($attrCondition, $assoc["conditions"], $assocCondition);
                         $condition = $assocCondition;
                         $assocRecursion = $type != "belongsTo" ? $recursion - 2 : $recursion - 1;
-                        $rows = $this->{$assoc["className"]}->find(array(
+                        $rows = $this->{$assoc["className"]}->all(array(
                             "conditions" => $condition,
                             "recursion" => $assocRecursion
                         ));
@@ -270,7 +287,7 @@ class Model extends Object {
      *  @return boolean Verdadeiro se o registro existe
      */
     public function exists($id = null) {
-        $row = $this->find(array(
+        $row = $this->first(array(
             "conditions" => array(
                 $this->primaryKey => $id
             )

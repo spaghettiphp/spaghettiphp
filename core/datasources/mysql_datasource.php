@@ -344,7 +344,7 @@ class MysqlDatasource extends Datasource {
                         $value = $this->value($value);
                         $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
                     elseif($this->schema[$table][$field]):
-                        $value = $this->value($value);
+                        $value = $this->value($value, $this->column($this->schema[$table][$field]["type"]));
                         $sql .= "{$field} = '{$value}' AND ";
                     endif;
                 endif;
