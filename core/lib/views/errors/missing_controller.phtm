@@ -1,0 +1,2 @@
+<h1>O controller <strong><?php echo $details["controller"] ?></strong> não foi encontrado.</h1>
+<p>Não foi possível encontrar o controller <strong><?php echo $details["controller"] ?></strong>. É possível que o arquivo <code>app/controllers/<?php echo Inflector::underscore($details["controller"]) ?>.php</code> não exista, ou que a classe <strong><?php echo $details["controller"] ?></strong> não esteja definida.</p>

@@ -1,0 +1,2 @@
+<h1>A action <strong><?php echo $details["action"] ?></strong> não foi encontrada.</h1>
+<p>Não foi possível encontrar a action <strong><?php echo $details["action"] ?></strong>. Certifique-se de que existe um método <?php echo $details["action"] ?> na classe <strong><?php echo $details["controller"] ?></strong>, e que existe a action possua sua respectiva view.</p>
