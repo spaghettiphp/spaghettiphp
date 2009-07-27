@@ -18,7 +18,7 @@ class Dispatcher extends Object {
     public $path = array();
     public $url = "";
     public function __construct($dispatch = true) {
-        $this->parseUrl($url);
+        $this->parseUrl();
         if($dispatch) return $this->dispatch();
     }
     /**
@@ -41,6 +41,7 @@ class Dispatcher extends Object {
         }
         
         if($this->path["action"] == "") $this->path["action"] = "index";
+        if($this->path["id"] == "") $this->path["id"] = null;
         if($this->path["prefix"] != "") $this->path["action"] = "{$this->path['prefix']}_{$this->path['action']}";
         if($this->path["params"] != "") $this->path["params"] = split("/", $this->path["params"]);
         else $this->path["params"] = array();
@@ -66,7 +67,9 @@ class Dispatcher extends Object {
             $controller->Component->initialize($controller);
             $controller->beforeFilter();
             $controller->Component->startup($controller);
-            call_user_func_array(array(&$controller, $action), array_merge(array($this->path["id"]), $this->path["params"]));
+            $params = $this->path["params"];
+            if(!is_null($this->path["id"])) $params = array_merge(array($this->path["id"]), $this->path["params"]);
+            call_user_func_array(array(&$controller, $action), $params);
             if($controller->autoRender):
                 $controller->render();
             endif;
