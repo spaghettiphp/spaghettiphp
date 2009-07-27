@@ -339,18 +339,19 @@ class Model extends Object {
         return $save;
     }
     /**
-     *  Short Description.
+     *  Callback executado antes de salvar um registro.
      *
-     *  @param array $data
-     *  @return array
+     *  @param array $data Dados a serem salvos
+     *  @return array Dados a serem salvos, falso para cancelar o salvamento
      */
     public function beforeSave($data) {
         return $data;
     }
     /**
-     *  Short Description.
+     *  Callback executado após salvar um registro.
      *
-     *  @return boolean
+     *  @param boolean $created Verdadeiro se o registro foi criado
+     *  @return boolean Verdadeiro se o registro foi criado, falso se foi atualizado
      */
     public function afterSave($created) {
         return $created;
