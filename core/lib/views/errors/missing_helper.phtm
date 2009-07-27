@@ -1,0 +1,2 @@
+<h1>O helper <?php echo $details["helper"] ?> não foi encontrado.</h1>
+<p>O arquivo <code>app/helpers/<?php echo Inflector::underscore($details['helper']) ?>.php</code> não pôde ser encontrado. Verifique se ele existe!</p>
