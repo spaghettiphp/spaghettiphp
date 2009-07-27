@@ -62,7 +62,7 @@ class Mapper extends Object {
   
         foreach($self->routes as $map => $route):
             $map = "/^" . str_replace(array("/", ":any", ":part", ":num"), array("\/", "(.*)", "([^\/]*)", "([0-9]+)"), $map) . "\/?$/";
-            $url = preg_replace($map, $route, $url);
+            if(preg_match($map, $url)) $url = preg_replace($map, $route, $url);
         endforeach;
   
         return rtrim($url, "/");
