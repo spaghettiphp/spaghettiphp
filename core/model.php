@@ -184,9 +184,10 @@ class Model extends Object {
         endforeach;
         return true;
     }
-    public function sqlQuery($type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null) {
+    public function sqlQuery($type = "select", $parameters = array(), $values = array(), $order = null, $limit = null, $flags = null, $fields = array()) {
         $params = $this->sqlConditions($parameters);
         $values = $this->sqlConditions($values);
+        $fields = empty($fields) ? "*" : join(",", $fields);
         if(is_array($order)):
             $orders = "";
             foreach($order as $key => $value):
@@ -204,7 +205,7 @@ class Model extends Object {
             "delete" => "DELETE" . if_string($flags, " {$flags}") . " FROM {$this->table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "insert" => "INSERT" . if_string($flags, " {$flags}") . " INTO {$this->table} SET " . $this->sqlSet($params),
             "replace" => "REPLACE" . if_string($flags, " {$flags}") . " INTO {$this->table}" . if_string($params, " SET {$params}"),
-            "select" => "SELECT" . if_string($flags, " {$flags}") . " * FROM {$this->table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
+            "select" => "SELECT" . if_string($flags, " {$flags}") . " {$fields} FROM {$this->table}" . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "truncate" => "TRUNCATE TABLE {$this->table}",
             "update" => "UPDATE" . if_string($flags, " {$flags}") . " {$this->table} SET " . $this->sqlSet($values) . if_string($params, " WHERE {$params}") . if_string($order, " ORDER BY {$order}") . if_string($limit, " LIMIT {$limit}"),
             "describe" => "DESCRIBE {$this->table}"
@@ -275,9 +276,9 @@ class Model extends Object {
         endif;
         return $results;
     }
-    public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null) {
+    public function findAll($conditions = array(), $order = null, $limit = null, $recursion = null, $fields = array()) {
         $recursion = pick($recursion, $this->recursion);
-        $results = $this->fetchResults($this->sqlQuery("select", $conditions, null, $order, $limit));
+        $results = $this->fetchResults($this->sqlQuery("select", $conditions, null, $order, $limit, null, $fields));
         if($recursion >= 0):
             foreach($this->associations as $type):
                 if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
@@ -305,8 +306,8 @@ class Model extends Object {
         $conditions = array_merge(array($field => $value), $conditions);
         return $this->findAll($conditions, $order, $limit, $recursion);
     }
-    public function find($conditions = array(), $order = null, $recursion = null) {
-        $results = $this->findAll($conditions, $order, 1, $recursion);
+    public function find($conditions = array(), $order = null, $recursion = null, $fields = array()) {
+        $results = $this->findAll($conditions, $order, 1, $recursion, $fields);
         return $results[0];
     }
     public function findBy($field = "id", $value = null, $conditions = array(), $order = null, $recursion = null) {
@@ -316,17 +317,17 @@ class Model extends Object {
     }
     public function all($params = array()) {
         $params = array_merge(
-            array("conditions" => array(), "order" => null, "recursion" => null, "limit" => null),
+            array("conditions" => array(), "order" => null, "recursion" => null, "limit" => null, "fields" => array()),
             $params
         );
-        return $this->findAll($params["conditions"], $params["order"], $params["limit"], $params["recursion"]);
+        return $this->findAll($params["conditions"], $params["order"], $params["limit"], $params["recursion"], $params["fields"]);
     }
     public function first($params = array()) {
         $params = array_merge(
-            array("conditions" => array(), "order" => null, "recursion" => null),
+            array("conditions" => array(), "order" => null, "recursion" => null, "fields" => array()),
             $params
         );
-        return $this->find($params["conditions"], $params["order"], $params["recursion"]);
+        return $this->find($params["conditions"], $params["order"], $params["recursion"], $params["fields"]);
     }
     public function create() {
         $this->id = null;
