@@ -281,7 +281,7 @@ class Model extends Object {
         if($recursion >= 0):
             foreach($this->associations as $type):
                 if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
-                    foreach($this->{$type} as $assoc):
+                    foreach($this->{$type} as $name => $assoc):
                         foreach($results as $key => $result):
                             if(isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]])):
                                 $assocCondition = array($assoc["foreignKey"] => $result["id"]);
