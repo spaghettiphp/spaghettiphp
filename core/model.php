@@ -379,13 +379,32 @@ class Model extends Object {
      *  @param integer $id ID do registro a ser apagado
      *  @return boolean Verdadeiro caso o registro tenha sido apagado
      */
-    public function delete($id = null) {
+    public function delete($id = null, $dependent = true) {
         $db =& self::getConnection($this->environment);
-        $params = array("conditions" => array(array($this->primaryKey => $id)));
+        $params = array("conditions" => array($this->primaryKey => $id));
         if($this->exists($id) && $this->deleteAll($params)):
+            if($dependent):
+                $this->deleteDependent($id);
+            endif;
             return true;
         endif;
         return false;
+    }
+    /**
+     *  Short description.
+     *
+     *  @param integer $id
+     *  @return true
+     */
+    public function deleteDependent($id = null) {
+        foreach(array("hasOne", "hasMany") as $type):
+            foreach($this->{$type} as $model => $assoc):
+                $this->{$assoc["className"]}->deleteAll(array("conditions" => array(
+                    $assoc["foreignKey"] => $id
+                )));
+            endforeach;
+        endforeach;
+        return true;
     }
     /**
      *  Apaga registros do banco de dados.
