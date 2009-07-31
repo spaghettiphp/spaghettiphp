@@ -49,14 +49,6 @@ class Model extends Object {
      */
     public $table = null;
     /**
-     *  ID do último registro inserido
-     */
-    public $insertId = null;
-    /**
-     *  Registros afetados pela consulta
-     */
-    public $affectedRows = null;
-    /**
      *  Campo de chave primária.
      */
     public $primaryKey = null;
@@ -381,7 +373,7 @@ class Model extends Object {
      */
     public function delete($id = null, $dependent = true) {
         $db =& self::getConnection($this->environment);
-        $params = array("conditions" => array($this->primaryKey => $id));
+        $params = array("conditions" => array($this->primaryKey => $id, "limit" => 1));
         if($this->exists($id) && $this->deleteAll($params)):
             if($dependent):
                 $this->deleteDependent($id);
