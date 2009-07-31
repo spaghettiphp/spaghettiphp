@@ -1,6 +1,8 @@
 <?php
 /**
- *  Short Description
+ *  Model é o responsável pela camada de dados da aplicação, fazendo a comunicação
+ *  com o banco de dados através de uma camada de abstração. Possui funcionalidades
+ *  CRUD, além de cuidar dos relacionamentos entre outros models.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -8,18 +10,6 @@
  */
 
 class Model extends Object {
-    /**
-     * Associações entre modelos disponíveis
-     */
-    public $associations = array("hasMany", "belongsTo", "hasOne");
-    /**
-     * Chaves disponíveis para cada associação
-     */
-    public $associationKeys = array(
-        "hasMany" => array("foreignKey", "conditions", "order", "limit"),
-        "belongsTo" => array("foreignKey", "conditions"),
-        "hasOne" => array("foreignKey", "conditions")
-    );
     /**
      *  Associações do tipo Belongs To
      */
@@ -33,7 +23,7 @@ class Model extends Object {
      */
     public $hasOne = array();
     /**
-     *  ID do registro
+     *  ID do último registro inserido/alterado
      */
     public $id = null;
     /**
@@ -56,6 +46,18 @@ class Model extends Object {
      *  Configuração de ambiente a ser usada.
      */
     public $environment = null;
+    /**
+     *  Associações entre modelos disponíveis
+     */
+    public $associations = array("hasMany", "belongsTo", "hasOne");
+    /**
+     *  Chaves disponíveis para cada associação
+     */
+    public $associationKeys = array(
+        "hasMany" => array("foreignKey", "conditions", "order", "limit"),
+        "belongsTo" => array("foreignKey", "conditions"),
+        "hasOne" => array("foreignKey", "conditions")
+    );
 
     public function __construct($table = null) {
         if(is_null($this->table)):
@@ -225,7 +227,13 @@ class Model extends Object {
     public function all($params = array()) {
         $db =& self::getConnection($this->environment);
         $params = array_merge(
-            array("fields" => array_keys($this->schema), "conditions" => array(), "order" => null, "limit" => null, "recursion" => $this->recursion),
+            array(
+                "fields" => array_keys($this->schema),
+                "conditions" => array(),
+                "order" => null,
+                "limit" => null,
+                "recursion" => $this->recursion
+            ),
             $params
         );
         $results = $db->read($this->table, $params);
