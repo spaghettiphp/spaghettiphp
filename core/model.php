@@ -281,6 +281,20 @@ class Model extends Object {
         endforeach;
     }
     /**
+     *  Short description.
+     *
+     *  @param array $params
+     *  @return integer
+     */
+    public function count($params = array()) {
+        $db =& self::getConnection($this->environment);
+        $params = array_merge(
+            array("fields" => "*", "conditions" => array()),
+            $params
+        );
+        return $db->count($this->table, $params);
+    }
+    /**
      *  Verifica se um registro existe no banco de dados.
      *
      *  @param integer $id ID do registro a ser verificado
@@ -428,6 +442,15 @@ class Model extends Object {
     public function getInsertId() {
         $db =& self::getConnection($this->environment);
         return $db->getInsertId();
+    }
+	/**
+	 *  Retorna a quantidade de linhas afetadas pela última consulta.
+	 *
+	 *  @return integer Quantidade de linhas afetadas
+	 */
+    public function getAffectedRows() {
+        $db =& self::getConnection($this->environment);
+        return $db->getAffectedRows();
     }
 }
 

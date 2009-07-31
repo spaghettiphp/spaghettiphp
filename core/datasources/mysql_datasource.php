@@ -221,7 +221,7 @@ class MysqlDatasource extends Datasource {
 	public function read($table = null, $params = array()) {
 		$query = $this->renderSql("select", array(
 			"table" => $table,
-			"fields" => (is_array($f = $params["fields"])) ? join(",", $f) : $f,
+			"fields" => is_array($f = $params["fields"]) ? join(",", $f) : $f,
 			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
 			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
 			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
@@ -265,7 +265,23 @@ class MysqlDatasource extends Datasource {
 			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
 			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
 		));
-		return $this->query($query) ? true : false;
+		return $this->query($query);
+	}
+	/**
+	 *  Short description.
+	 *
+	 *	@param string $table
+	 *	@param array $params
+	 *  @return integer
+	 */
+	public function count($table = null, $params) {
+		$query = $this->renderSql("select", array(
+			"table" => $table,
+			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
+			"fields" => "COUNT(" . (is_array($f = $params["fields"]) ? join(",", $f) : $f) . ") AS count"
+		));
+		$results = $this->fetchAll($query);
+		return $results[0]["count"];
 	}
 	/**
 	 *	Cria uma consulta SQL baseada de acordo com alguns parâmetros.
@@ -342,10 +358,10 @@ class MysqlDatasource extends Datasource {
                 else:
                     if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$table][$parts[1]]):
                         $value = $this->value($value);
-                        $sql .= "{$parts[1]} {$parts[2]} '{$value}' AND ";
+                        $sql .= "{$parts[1]} {$parts[2]} {$value} AND ";
                     elseif(isset($this->schema[$table][$field])):
                         $value = $this->value($value, $this->schema[$table][$field]["type"]);
-                        $sql .= "{$field} = '{$value}' AND ";
+                        $sql .= "{$field} = {$value} AND ";
                     endif;
                 endif;
             endforeach;
@@ -362,6 +378,14 @@ class MysqlDatasource extends Datasource {
      */
 	public function getInsertId() {
 		return mysql_insert_id($this->getConnection());
+	}
+	/**
+	 *  Retorna a quantidade de linhas afetadas pela última consulta.
+	 *
+	 *  @return integer Quantidade de linhas afetadas
+	 */
+	public function getAffectedRows() {
+		return mysql_affected_rows($this->getConnection());
 	}
 }
 
