@@ -391,9 +391,9 @@ class Model extends Object {
         return false;
     }
     /**
-     *  Short description.
+     *  Apaga do banco de dados registros dependentes de um registro especificado.
      *
-     *  @param integer $id
+     *  @param integer $id ID do registro principal
      *  @return true
      */
     public function deleteDependent($id = null) {
