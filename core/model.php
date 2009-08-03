@@ -11,31 +11,31 @@
 
 class Model extends Object {
     /**
-     *  Associações do tipo Belongs To
+     *  Associações do tipo belongsTo.
      */
     public $belongsTo = array();
     /**
-     *  Associações do tipo Has Many
+     *  Associações do tipo hasMany.
      */
     public $hasMany = array();
     /**
-     *  Associações do tipo Has One
+     *  Associações do tipo hasOne.
      */
     public $hasOne = array();
     /**
-     *  ID do último registro inserido/alterado
+     *  ID do último registro inserido/alterado.
      */
     public $id = null;
     /**
-     *  Nível de recursão padrão das consultas find
+     *  Nível de recursão padrão de consultas.
      */
     public $recursion = 0;
     /**
-     *  Descrição da tabela do modelo
+     *  Estrutura da tabela do modelo.
      */
     public $schema = array();
     /**
-     *  Nome da tabela usada pelo modelo
+     *  Nome da tabela usada pelo modelo.
      */
     public $table = null;
     /**
@@ -49,25 +49,19 @@ class Model extends Object {
     /**
      *  Associações entre modelos disponíveis
      */
-    public $associations = array("hasMany", "belongsTo", "hasOne");
-    /**
-     *  Chaves disponíveis para cada associação
-     */
-    public $associationKeys = array(
+    public $associations = array(
         "hasMany" => array("foreignKey", "conditions", "order", "limit"),
         "belongsTo" => array("foreignKey", "conditions"),
         "hasOne" => array("foreignKey", "conditions")
     );
 
-    public function __construct($table = null) {
+    public function __construct() {
+        if(is_null($this->environment)):
+            $this->environment = Config::read("environment");
+        endif;
         if(is_null($this->table)):
-            if(!is_null($table)):
-                $this->table = $table;
-            else:
-                $database = Config::read("database");
-                $environment = is_null($this->environment) ? Config::read("environment") : $this->environment;
-                $this->table = $database[$environment]["prefix"] . Inflector::underscore(get_class($this));
-            endif;
+            $database = Config::read("database");
+            $this->table = $database[$this->environment]["prefix"] . Inflector::underscore(get_class($this));
         endif;
         if($this->table && empty($this->schema)):
             $this->describe();
@@ -126,12 +120,29 @@ class Model extends Object {
         return $this->schema = $schema;
     }
     /**
+     *  Carrega um modelo.
+     *
+     *  @param string $model Nome do modelo a ser carregado
+     *  @return boolean Verdadeiro se o modelo foi carregado
+     */
+    public function loadModel($model = null) {
+        if(!isset($this->{$model})):
+            if($class =& ClassRegistry::load($model)):
+                $this->{$model} = $class;
+            else:
+                $this->error("missingModel", array("model" => $model));
+                return false;
+            endif;
+        endif;
+        return true;
+    }
+    /**
      *  Gera as associações do modelo.
      *
      *  @return void
      */
     public function createLinks() {
-        foreach($this->associations as $type):
+        foreach(array_keys($this->associations) as $type):
             $associations =& $this->{$type};
             foreach($associations as $key => $assoc):
                 if(is_numeric($key)):
@@ -144,14 +155,7 @@ class Model extends Object {
                 elseif(!isset($assoc["className"])):
                     $associations[$key]["className"] = $key;
                 endif;
-                $className = $associations[$key]["className"];
-                if(!isset($this->{$className})):
-                    if($class =& ClassRegistry::load($className)):
-                        $this->{$className} = $class;
-                    else:
-                        $this->error("missingModel", array("model" => $className));
-                    endif;
-                endif;
+                $this->loadModel($associations[$key]["className"]);
                 $this->generateAssociation($type);
             endforeach;
         endforeach;
@@ -165,7 +169,7 @@ class Model extends Object {
     public function generateAssociation($type) {
         $associations =& $this->{$type};
         foreach($associations as $k => $assoc):
-            foreach($this->associationKeys[$type] as $key):
+            foreach($this->associations[$type] as $key):
                 if(!isset($assoc[$key])):
                     $data = null;
                     switch($key):
@@ -263,7 +267,7 @@ class Model extends Object {
      *  @return void
      */
     public function findDependent(&$results, $recursion = 0) {
-        foreach($this->associations as $type):
+        foreach(array_keys($this->associations) as $type):
             if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
                 foreach($this->{$type} as $name => $assoc):
                     foreach($results as $key => $result):
