@@ -145,12 +145,9 @@ class View extends Object {
             $ext = $filename[1] ? $filename[1] : "htm";
         endif;
         $filename = App::path("Layout", "{$layout}.{$ext}");
-        $data = array_merge(array(
-            "content_for_layout" => $content,
-            "pageTitle" => $this->pageTitle,
-        ), $this->viewData);
+        $this->contentForLayout = $content;
         if($filename):
-            $out = $this->renderView($filename, $data);
+            $out = $this->renderView($filename, $this->viewData);
             return $out;
         else:
             $this->error("missingLayout", array("layout" => $layout, "extension" => $ext));
