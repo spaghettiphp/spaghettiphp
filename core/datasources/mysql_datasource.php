@@ -268,7 +268,7 @@ class MysqlDatasource extends Datasource {
 		return $this->query($query);
 	}
 	/**
-	 *  Short description.
+	 *  Conta registros no banco de dados.
 	 *
 	 *	@param string $table
 	 *	@param array $params

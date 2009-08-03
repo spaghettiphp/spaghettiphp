@@ -242,6 +242,12 @@ class Model extends Object {
         endif;
         return $results;
     }
+    /**
+     *  Busca o primiero registro no banco de dados.
+     *
+     *  @param array $params Parâmetros a serem usados na busca
+     *  @return array Resultados da busca
+     */
     public function first($params = array()) {
         $params = array_merge(
             array("limit" => 1),
@@ -281,10 +287,10 @@ class Model extends Object {
         endforeach;
     }
     /**
-     *  Short description.
+     *  Conta registros no banco de dados.
      *
-     *  @param array $params
-     *  @return integer
+     *  @param array $params Parâmetros da busca
+     *  @return integer Quantidade de registros encontrados
      */
     public function count($params = array()) {
         $db =& self::getConnection($this->environment);
