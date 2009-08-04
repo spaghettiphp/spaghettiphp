@@ -330,7 +330,23 @@ class MysqlDatasource extends Datasource {
 	 *  @param array $conditions
 	 *  @return string
 	 */
-    public function sqlConditions($table, $conditions) {
+	public function sqlConditions($table, $conditions) {
+		if(is_array($conditions)):
+			$sql = "";
+			foreach($conditions as $key => $value):
+				if(is_numeric($key)):
+					$sql .= $value . " AND ";
+				else:
+					$sql .= "{$key} = {$value}";
+				endif;
+			endforeach;
+			$sql = trim($sql, " AND ");
+		else:
+			$sql = $conditions;
+		endif;
+		return $sql;
+	}
+    public function _sqlConditions($table, $conditions) {
         $sql = "";
         $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
         $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE");
