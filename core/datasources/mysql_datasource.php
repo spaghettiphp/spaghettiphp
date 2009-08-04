@@ -349,20 +349,18 @@ class MysqlDatasource extends Datasource {
 				else:
 					if(in_array($key, $this->logic)):
 						$sql []= "(" . $this->sqlConditions($table, $value, strtoupper($key)) . ")";
+					elseif(is_array($value)):
+						$condition = array();
+						foreach($value as $v):
+							$condition []= $this->sqlConditions($table, array($key => $v));
+						endforeach;
+						$sql []= "(" . join(" OR ", $condition) . ")";
 					else:
-						if(is_array($value)):
-							$t = array();
-							foreach($value as $v):
-								$t []= $this->sqlConditions($table, array($key => $v));
-							endforeach;
-							$sql []= "(" . join(" OR ", $t) . ")";
-						else:
-							$comparison = "=";
-							if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
-								list($regex, $key, $comparison) = $regex;
-							endif;
-							$sql []= "{$key} {$comparison} {$value}";
+						$comparison = "=";
+						if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
+							list($regex, $key, $comparison) = $regex;
 						endif;
+						$sql []= "{$key} {$comparison} {$value}";
 					endif;
 				endif;
 			endforeach;
