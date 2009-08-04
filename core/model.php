@@ -50,7 +50,7 @@ class Model extends Object {
      *  Associações entre modelos disponíveis
      */
     public $associations = array(
-        "hasMany" => array("foreignKey", "conditions", "order", "limit"),
+        "hasMany" => array("foreignKey", "conditions"),
         "belongsTo" => array("foreignKey", "conditions"),
         "hasOne" => array("foreignKey", "conditions")
     );
@@ -139,51 +139,54 @@ class Model extends Object {
     /**
      *  Gera as associações do modelo.
      *
-     *  @return void
+     *  @return true
      */
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
             $associations =& $this->{$type};
-            foreach($associations as $key => $assoc):
+            foreach($associations as $key => $properties):
                 if(is_numeric($key)):
-                    $key = array_unset($associations, $key);
-                    if(is_array($assoc)):
-                        $associations[$key["className"]] = $key;
+                    unset($associations[$key]);
+                    if(is_array($properties)):
+                        $associations[$key = $properties["className"]] = $properties;
                     else:
-                        $associations[$key] = array("className" => $key);
+                        $associations[$key = $properties] = array("className" => $properties);
                     endif;
-                elseif(!isset($assoc["className"])):
+                elseif(!isset($properties["className"])):
                     $associations[$key]["className"] = $key;
                 endif;
                 $this->loadModel($associations[$key]["className"]);
-                $this->generateAssociation($type);
-            endforeach;
-        endforeach;
-    }
-    /**
-     *  Define os parâmetros padrão para as associações.
-     *
-     *  @param string $type Tipo da associação
-     *  @return true
-     */
-    public function generateAssociation($type) {
-        $associations =& $this->{$type};
-        foreach($associations as $k => $assoc):
-            foreach($this->associations[$type] as $key):
-                if(!isset($assoc[$key])):
-                    $data = null;
-                    switch($key):
-                        case "foreignKey":
-                            $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this)) . "_{$this->primaryKey}";
-                            break;
-                        case "conditions":
-                            $data = array();
-                    endswitch;
-                    $associations[$k][$key] = $data;
-                endif;
+                $associations[$key] = $this->generateAssociation($type, $associations[$key]);
             endforeach;
         endforeach;
         return true;
+    }
+    /**
+     *  Define os parâmetros padrão para uma associação.
+     *
+     *  @param string $type Tipo da associação
+     *  @param array $association Propriedades da associação
+     *  @return array Associação com parâmetros definidos
+     */
+    public function generateAssociation($type = null, $association = array()) {
+        foreach($this->associations[$type] as $key):
+            if(!isset($association[$key])):
+                $data = null;
+                switch($key):
+                    case "foreignKey":
+                        if($type == "belongsTo"):
+                            $data = Inflector::underscore($association["className"] . "Id");
+                        else:
+                            $data = Inflector::underscore(get_class($this)) . "_{$this->primaryKey}";
+                        endif;
+                        break;
+                    case "conditions":
+                        $data = array();
+                endswitch;
+                $association[$key] = $data;
+            endif;
+        endforeach;
+        return $association;
     }
     /**
      *  Executa uma consulta diretamente no datasource.
