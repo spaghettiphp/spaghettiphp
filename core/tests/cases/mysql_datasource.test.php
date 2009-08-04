@@ -66,6 +66,11 @@ class TestMysqlDatasource extends UnitTestCase {
         $expected = "(id = 1 OR user_id = 2)";
         $this->assertEqual($passed, $expected);
     }
+    public function testSqlConditionsWithNestedAssociativeArray() {
+        $passed = $this->datasource->sqlConditions(null, array("id" => array("1", "2")));
+        $expected = "(id = 1 OR id = 2)";
+        $this->assertEqual($passed, $expected);
+    }
 }
 
 ?>
