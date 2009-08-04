@@ -32,13 +32,38 @@ class TestMysqlDatasource extends UnitTestCase {
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithMultipleNumericArray() {
-        $passed = $this->datasource->sqlConditions(null, array("id = 1", "id = 2"));
-        $expected = "id = 1 AND id = 2";
+        $passed = $this->datasource->sqlConditions(null, array("id = 1", "user_id = 2"));
+        $expected = "id = 1 AND user_id = 2";
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithSingleAssociativeArray() {
-        $passed = $this->datasource->sqlConditions(null, array("id" => "1"));
+        $passed = $this->datasource->sqlConditions(null, array("id" => 1));
         $expected = "id = 1";
+        $this->assertEqual($passed, $expected);
+    }
+    public function testSqlConditionsWithMultipleAssociativeArray() {
+        $passed = $this->datasource->sqlConditions(null, array("id" => 1, "user_id" => 2));
+        $expected = "id = 1 AND user_id = 2";
+        $this->assertEqual($passed, $expected);
+    }
+    public function testSqlConditionsWithComparisonOperator() {
+        $passed = $this->datasource->sqlConditions(null, array("id >" => 1));
+        $expected = "id > 1";
+        $this->assertEqual($passed, $expected);
+    }
+    public function testSqlConditionsWithNestedNumericArray() {
+        $passed = $this->datasource->sqlConditions(null, array(array("id" => 1, "user_id" => 2)));
+        $expected = "(id = 1 AND user_id = 2)";
+        $this->assertEqual($passed, $expected);
+    }
+    public function testSqlConditionsWithNestedNumericArrayAndPlainArray() {
+        $passed = $this->datasource->sqlConditions(null, array("id" => "1", array("id" => 1, "user_id" => 2)));
+        $expected = "id = 1 AND (id = 1 AND user_id = 2)";
+        $this->assertEqual($passed, $expected);
+    }
+    public function testSqlConditionsWithLogicOperator() {
+        $passed = $this->datasource->sqlConditions(null, array("or" => array("id" => 1, "user_id" => 2)));
+        $expected = "(id = 1 OR user_id = 2)";
         $this->assertEqual($passed, $expected);
     }
 }

@@ -12,6 +12,8 @@ class MysqlDatasource extends Datasource {
     private $connection;
 	private $results;
 	private $transactionStarted = false;
+	private $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE", "REGEXP");
+	private $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
     public $connected = false;
 
     /**
@@ -330,17 +332,29 @@ class MysqlDatasource extends Datasource {
 	 *  @param array $conditions
 	 *  @return string
 	 */
-	public function sqlConditions($table, $conditions) {
+	public function sqlConditions($table, $conditions, $logical = "AND") {
 		if(is_array($conditions)):
-			$sql = "";
+			$sql = array();
 			foreach($conditions as $key => $value):
 				if(is_numeric($key)):
-					$sql .= $value . " AND ";
+					if(is_string($value)):
+						$sql []= $value;
+					else:
+						$sql []= "(" . $this->sqlConditions($table, $value) . ")";
+					endif;
 				else:
-					$sql .= "{$key} = {$value}";
+					if(in_array($key, $this->logic)):
+						$sql []= "(" . $this->sqlConditions($table, $value, strtoupper($key)) . ")";
+					else:
+						if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
+							$sql []= "{$regex[1]} {$regex[2]} {$value}";
+						else:
+							$sql []= "{$key} = {$value}";
+						endif;
+					endif;
 				endif;
 			endforeach;
-			$sql = trim($sql, " AND ");
+			$sql = join(" {$logical} ", $sql);
 		else:
 			$sql = $conditions;
 		endif;
