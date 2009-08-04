@@ -260,7 +260,7 @@ class Model extends Object {
             array("limit" => 1),
             $params
         );
-        $results = $this->all($params)
+        $results = $this->all($params);
         return $results[0];
     }
     /**
