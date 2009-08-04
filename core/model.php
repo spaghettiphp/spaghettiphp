@@ -260,7 +260,8 @@ class Model extends Object {
             array("limit" => 1),
             $params
         );
-        return $this->all($params);
+        $results = $this->all($params)
+        return $results[0];
     }
     /**
      *  Busca registros dependentes.
