@@ -125,7 +125,7 @@ class Model extends Object {
      *  @param string $model Nome do modelo a ser carregado
      *  @return boolean Verdadeiro se o modelo foi carregado
      */
-    public function loadModel($model = null) {
+    public function loadModel($model) {
         if(!isset($this->{$model})):
             if($class =& ClassRegistry::load($model)):
                 $this->{$model} = $class;
@@ -168,7 +168,7 @@ class Model extends Object {
      *  @param array $association Propriedades da associação
      *  @return array Associação com parâmetros definidos
      */
-    public function generateAssociation($type = null, $association = array()) {
+    public function generateAssociation($type, $association) {
         foreach($this->associations[$type] as $key):
             if(!isset($association[$key])):
                 $data = null;
@@ -313,7 +313,7 @@ class Model extends Object {
      *  @param integer $id ID do registro a ser verificado
      *  @return boolean Verdadeiro se o registro existe
      */
-    public function exists($id = null) {
+    public function exists($id) {
         $row = $this->first(array(
             "conditions" => array(
                 $this->primaryKey => $id
@@ -327,7 +327,7 @@ class Model extends Object {
      *  @param array $data Dados a serem inseridos
      *  @return boolean Verdadeiro se o registro foi salvo
      */
-    public function insert($data = array()) {
+    public function insert($data) {
         $db =& self::getConnection($this->environment);
         return $db->create($this->table, $data);
     }
@@ -338,7 +338,7 @@ class Model extends Object {
      *  @param array $data Dados a serem inseridos
      *  @return boolean Verdadeiro se os registros foram atualizado
      */
-    public function update($params = array(), $data = array()) {
+    public function update($params, $data) {
         $db =& self::getConnection($this->environment);
         $params = array_merge(
             array("conditions" => array(), "order" => null, "limit" => null),
@@ -352,7 +352,7 @@ class Model extends Object {
      *  @param array $data Dados a serem salvos
      *  @return boolean Verdadeiro se o registro foi salvo
      */
-    public function save($data = array()) {
+    public function save($data) {
         $this->id = isset($data[$this->primaryKey]) ? $data[$this->primaryKey] : null;
         foreach($data as $field => $value):
             if(!isset($this->schema[$field])):
@@ -406,7 +406,7 @@ class Model extends Object {
      *  @param integer $id ID do registro a ser apagado
      *  @return boolean Verdadeiro caso o registro tenha sido apagado
      */
-    public function delete($id = null, $dependent = true) {
+    public function delete($id, $dependent = true) {
         $db =& self::getConnection($this->environment);
         $params = array("conditions" => array($this->primaryKey => $id, "limit" => 1));
         if($this->exists($id) && $this->deleteAll($params)):
@@ -423,7 +423,7 @@ class Model extends Object {
      *  @param integer $id ID do registro principal
      *  @return true
      */
-    public function deleteDependent($id = null) {
+    public function deleteDependent($id) {
         foreach(array("hasOne", "hasMany") as $type):
             foreach($this->{$type} as $model => $assoc):
                 $this->{$assoc["className"]}->deleteAll(array("conditions" => array(
