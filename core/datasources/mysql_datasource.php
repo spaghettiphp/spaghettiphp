@@ -269,13 +269,13 @@ class MysqlDatasource extends Datasource {
 		));
 		return $this->query($query);
 	}
-	/**
-	 *  Conta registros no banco de dados.
-	 *
-	 *	@param string $table
-	 *	@param array $params
-	 *  @return integer
-	 */
+    /**
+     *  Conta registros no banco de dados.
+     *
+     *  @param string $table Tabela onde estão os registros
+     *  @param array $params Parâmetros da busca
+     *  @return integer Quantidade de registros encontrados
+     */
 	public function count($table = null, $params) {
 		$query = $this->renderSql("select", array(
 			"table" => $table,
@@ -326,11 +326,15 @@ class MysqlDatasource extends Datasource {
         endswitch;
     }
 	/**
-	 *  Short description.
+	 *  Gera as condições para uma consulta SQL.
 	 *
-	 *  @param string $table
+	 *  @param string $table 
 	 *  @param array $conditions
-	 *  @return string
+	 *  @param string $logical
+	 *  @return string Condições formatadas para consulta SQL
+	 *
+	 *  @todo BETWEEN
+	 *  @todo escapar valores
 	 */
 	public function sqlConditions($table, $conditions, $logical = "AND") {
 		if(is_array($conditions)):
@@ -368,47 +372,6 @@ class MysqlDatasource extends Datasource {
 		endif;
 		return $sql;
 	}
-    public function _sqlConditions($table, $conditions) {
-        $sql = "";
-        $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
-        $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE");
-        if(is_array($conditions)):
-            foreach($conditions as $field => $value):
-                if(is_string($value) && is_numeric($field)):
-                    $sql .= "{$value} AND ";
-                elseif(is_array($value)):
-                    if(is_numeric($field)):
-                        $field = "OR";
-                    elseif(in_array($field, $logic)):
-                        $field = strtoupper($field);
-                    elseif(preg_match("/([a-z]*) BETWEEN/", $field, $parts) && $this->schema[$table][$parts[1]]):
-                        $sql .= "{$field} '" . join("' AND '", $value) . "'";
-                        continue;
-                    else:
-                        $values = array();
-                        foreach($value as $item):
-                            $values []= $this->sqlConditions($table, array($field => $item));
-                        endforeach;
-                        $sql .= "(" . join(" OR ", $values) . ") AND ";
-                        continue;
-                    endif;
-                    $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($table, $value));
-                else:
-                    if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$table][$parts[1]]):
-                        $value = $this->value($value);
-                        $sql .= "{$parts[1]} {$parts[2]} {$value} AND ";
-                    elseif(isset($this->schema[$table][$field])):
-                        $value = $this->value($value, $this->schema[$table][$field]["type"]);
-                        $sql .= "{$field} = {$value} AND ";
-                    endif;
-                endif;
-            endforeach;
-            $sql = trim($sql, " AND ");
-        else:
-            $sql = $conditions;
-        endif;
-        return $sql;
-    }
     /**
      *  Retorna o ID do último registro inserido.
      *
