@@ -359,9 +359,9 @@ class Model extends Object {
         if(empty($data)):
             $data = $this->data;
         endif;
-        
-        if(isset($this->schema["modified"]) && $this->schema["modified"]["type"] == "datetime" && !isset($data["modified"])):
-            $data["modified"] = date("Y-m-d H:i:s");
+        $date = date("Y-m-d H:i:s");
+        if(isset($this->schema["modified"]) && !isset($data["modified"]) && in_array($this->schema["modified"]["type"], array("date", "datetime", "time"))):
+            $data["modified"] = $date;
         endif;
         
 		$this->beforeSave();
@@ -369,8 +369,8 @@ class Model extends Object {
             $this->update(array("id" => $data["id"]), $data);
             $this->id = $data["id"];
         else:
-            if(isset($this->schema["created"]) && $this->schema["created"]["type"] == "datetime" && !isset($data["created"])):
-                $data["created"] = date("Y-m-d H:i:s");
+            if(isset($this->schema["created"]) && !isset($data["created"]) && in_array($this->schema["modified"]["type"], array("date", "datetime", "time"))):
+                $data["created"] = $date;
             endif;
             $this->insert($data);
             $this->id = $this->getInsertId();
