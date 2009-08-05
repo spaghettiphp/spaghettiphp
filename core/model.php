@@ -266,28 +266,33 @@ class Model extends Object {
     /**
      *  Busca registros dependentes.
      *
-     *  @param array $results Resultados obtidos em uma consula
+     *  @param array $results Resultados obtidos em uma consulta
      *  @param integer $recursion Nível de recursão
      *  @return void
      */
     public function findDependent($results, $recursion = 0) {
         foreach(array_keys($this->associations) as $type):
-            if($recursion <= 0) continue;
+            if(
+                ($type != "belongsTo" && $recursion <= 0)
+                    or
+                ($type == "belongsTo" && $recursion < 0)
+            ) continue;
             foreach($this->{$type} as $name => $association):
                 foreach($results as $key => $result):
                     $model = $association["className"];
+                    $params = array();
                     if($type == "belongsTo"):
-                        $conditions = array(
+                        $params["conditions"] = array(
                             $this->primaryKey => $result[$association["foreignKey"]]
                         );
+                        $params["recursion"] = $recursion - 1;
                     else:
-                        $conditions = array(
+                        $params["conditions"] = array(
                             $association["foreignKey"] => $result[$this->primaryKey]
                         );
+                        $params["recursion"] = $recursion - 2;
                     endif;
-                    $results[$key][$name] = $this->{$model}->all(array(
-                        "conditions" => $conditions
-                    ));
+                    $results[$key][$name] = $this->{$model}->all($params);
                 endforeach;
             endforeach;
         endforeach;
