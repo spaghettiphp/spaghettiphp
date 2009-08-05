@@ -245,7 +245,7 @@ class Model extends Object {
         );
         $results = $db->read($this->table, $params);
         if($params["recursion"] >= 0):
-            $this->findDependent($results, $params["recursion"]);
+            $results = $this->findDependent($results, $params["recursion"]);
         endif;
         return $results;
     }
@@ -270,7 +270,30 @@ class Model extends Object {
      *  @param integer $recursion Nível de recursão
      *  @return void
      */
-    public function findDependent(&$results, $recursion = 0) {
+    public function findDependent($results, $recursion = 0) {
+        foreach(array_keys($this->associations) as $type):
+            if($recursion <= 0) continue;
+            foreach($this->{$type} as $name => $association):
+                foreach($results as $key => $result):
+                    $model = $association["className"];
+                    if($type == "belongsTo"):
+                        $conditions = array(
+                            $this->primaryKey => $result[$association["foreignKey"]]
+                        );
+                    else:
+                        $conditions = array(
+                            $association["foreignKey"] => $result[$this->primaryKey]
+                        );
+                    endif;
+                    $results[$key][$name] = $this->{$model}->all(array(
+                        "conditions" => $conditions
+                    ));
+                endforeach;
+            endforeach;
+        endforeach;
+        return $results;
+    }
+    public function _findDependent(&$results, $recursion = 0) {
         foreach(array_keys($this->associations) as $type):
             if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
                 foreach($this->{$type} as $name => $assoc):
