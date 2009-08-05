@@ -8,7 +8,7 @@
  */
 
 class MysqlDatasource extends Datasource {
-	private $schema = array();
+	protected $schema = array();
     private $connection;
 	private $results;
 	private $transactionStarted = false;
@@ -313,24 +313,27 @@ class MysqlDatasource extends Datasource {
     public function value($value = "", $column = null) {
         switch($column):
             case "boolean":
-                return $value === true ? 1 : ($value === false ? false : !empty($value));
+                return $value === true ? 1 : ($value === false ? 0 : !empty($value));
             case "integer":
             case "float":
-                if($value === ""):
+                if($value === "" or is_null($value)):
                     return "NULL";
                 elseif(is_numeric($value)):
                     return $value;
                 endif;
             default:
-                return "'" . mysql_real_escape_string($value, $this->connection) . "'";
+				if(is_null($value)):
+					return "NULL";
+				endif;
+				return "'" . mysql_real_escape_string($value, $this->connection) . "'";
         endswitch;
     }
 	/**
 	 *  Gera as condições para uma consulta SQL.
 	 *
-	 *  @param string $table 
-	 *  @param array $conditions
-	 *  @param string $logical
+	 *  @param string $table Nome da tabela a ser usada
+	 *  @param array $conditions Condições da consulta
+	 *  @param string $logical Operador lógico a ser usado
 	 *  @return string Condições formatadas para consulta SQL
 	 */
 	public function sqlConditions($table, $conditions, $logical = "AND") {
@@ -361,7 +364,7 @@ class MysqlDatasource extends Datasource {
 						if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
 							list($regex, $key, $comparison) = $regex;
 						endif;
-						$value = $this->value($value, null);
+						$value = $this->value($value, $this->fieldType($table, $key));
 						$sql []= "{$key} {$comparison} {$value}";
 					endif;
 				endif;
@@ -373,11 +376,11 @@ class MysqlDatasource extends Datasource {
 		return $sql;
 	}
 	/**
-	 *  Short description.
+	 *  Retorna o tipo de um campo da tabela.
 	 *
-	 *	@param string $table
-	 *	@param string $field
-	 *	@return boolean
+	 *	@param string $table Tabela que contém o campo
+	 *	@param string $field Nome do campo
+	 *	@return string Tipo do campo
 	 */
 	public function fieldType($table, $field) {
 		if(isset($this->schema[$table]) && isset($this->schema[$table][$field])):

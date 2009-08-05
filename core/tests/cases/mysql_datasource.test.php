@@ -10,6 +10,13 @@
 App::import("Datasource", "mysql_datasource");
 
 class MysqlDatasourceTest extends MysqlDatasource {
+    protected $schema = array(
+        "table" => array(
+            "id" => array("type" => "integer"),
+            "text" => array("type" => "text"),
+            "active" => array("type" => "boolean")
+        )
+    );
 }
 
 class TestMysqlDatasource extends UnitTestCase {
@@ -78,6 +85,23 @@ class TestMysqlDatasource extends UnitTestCase {
     public function testSqlConditionsWithBetween() {
         $passed = $this->datasource->sqlConditions(null, array("id BETWEEN" => array("1", "2")));
         $expected = "id BETWEEN '1' AND '2'";
+        $this->assertEqual($passed, $expected);
+    }
+    public function testSqlConditionsWithTableSchema() {
+        $passed = $this->datasource->sqlConditions("table", array(
+            "id" => 1,
+            "text" => "Text",
+            "active" => false
+        ));
+        $expected = "id = 1 AND text = 'Text' AND active = 0";
+        $this->assertEqual($passed, $expected);
+    }
+    public function testSqlConditionsWithNullValue() {
+        $passed = $this->datasource->sqlConditions("table", array(
+            "id" => null,
+            "text" => null,
+        ));
+        $expected = "id = NULL AND text = NULL";
         $this->assertEqual($passed, $expected);
     }
 }
