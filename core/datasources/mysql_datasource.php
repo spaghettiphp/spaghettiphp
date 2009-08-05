@@ -1,6 +1,8 @@
 <?php
 /**
- *  Short Description
+ *  MysqlDatasource é a camada de abstração do Spaghetti* para bancos de dados
+ *  MySQL. A classe provê métodos para criação e execução de consultas e retorno
+ *  dos respectivos dados.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
