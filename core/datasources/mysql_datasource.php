@@ -8,10 +8,12 @@
  */
 
 class MysqlDatasource extends Datasource {
-	private $schema = array();
+	protected $schema = array();
     private $connection;
 	private $results;
 	private $transactionStarted = false;
+	private $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE", "REGEXP");
+	private $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
     public $connected = false;
 
     /**
@@ -267,13 +269,13 @@ class MysqlDatasource extends Datasource {
 		));
 		return $this->query($query);
 	}
-	/**
-	 *  Conta registros no banco de dados.
-	 *
-	 *	@param string $table
-	 *	@param array $params
-	 *  @return integer
-	 */
+    /**
+     *  Conta registros no banco de dados.
+     *
+     *  @param string $table Tabela onde estão os registros
+     *  @param array $params Parâmetros da busca
+     *  @return integer Quantidade de registros encontrados
+     */
 	public function count($table = null, $params) {
 		$query = $this->renderSql("select", array(
 			"table" => $table,
@@ -311,66 +313,81 @@ class MysqlDatasource extends Datasource {
     public function value($value = "", $column = null) {
         switch($column):
             case "boolean":
-                return $value === true ? 1 : ($value === false ? false : !empty($value));
+                return $value === true ? 1 : ($value === false ? 0 : !empty($value));
             case "integer":
             case "float":
-                if($value === ""):
+                if($value === "" or is_null($value)):
                     return "NULL";
                 elseif(is_numeric($value)):
                     return $value;
                 endif;
             default:
-                return "'" . mysql_real_escape_string($value, $this->connection) . "'";
+				if(is_null($value)):
+					return "NULL";
+				endif;
+				return "'" . mysql_real_escape_string($value, $this->connection) . "'";
         endswitch;
     }
 	/**
-	 *  Short description.
+	 *  Gera as condições para uma consulta SQL.
 	 *
-	 *  @param string $table
-	 *  @param array $conditions
-	 *  @return string
+	 *  @param string $table Nome da tabela a ser usada
+	 *  @param array $conditions Condições da consulta
+	 *  @param string $logical Operador lógico a ser usado
+	 *  @return string Condições formatadas para consulta SQL
 	 */
-    public function sqlConditions($table, $conditions) {
-        $sql = "";
-        $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
-        $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE");
-        if(is_array($conditions)):
-            foreach($conditions as $field => $value):
-                if(is_string($value) && is_numeric($field)):
-                    $sql .= "{$value} AND ";
-                elseif(is_array($value)):
-                    if(is_numeric($field)):
-                        $field = "OR";
-                    elseif(in_array($field, $logic)):
-                        $field = strtoupper($field);
-                    elseif(preg_match("/([a-z]*) BETWEEN/", $field, $parts) && $this->schema[$table][$parts[1]]):
-                        $sql .= "{$field} '" . join("' AND '", $value) . "'";
-                        continue;
-                    else:
-                        $values = array();
-                        foreach($value as $item):
-                            $values []= $this->sqlConditions($table, array($field => $item));
-                        endforeach;
-                        $sql .= "(" . join(" OR ", $values) . ") AND ";
-                        continue;
-                    endif;
-                    $sql .= preg_replace("/' AND /", "' {$field} ", $this->sqlConditions($table, $value));
-                else:
-                    if(preg_match("/([a-z]*) (" . join("|", $comparison) . ")/", $field, $parts) && $this->schema[$table][$parts[1]]):
-                        $value = $this->value($value);
-                        $sql .= "{$parts[1]} {$parts[2]} {$value} AND ";
-                    elseif(isset($this->schema[$table][$field])):
-                        $value = $this->value($value, $this->schema[$table][$field]["type"]);
-                        $sql .= "{$field} = {$value} AND ";
-                    endif;
-                endif;
-            endforeach;
-            $sql = trim($sql, " AND ");
-        else:
-            $sql = $conditions;
-        endif;
-        return $sql;
-    }
+	public function sqlConditions($table, $conditions, $logical = "AND") {
+		if(is_array($conditions)):
+			$sql = array();
+			foreach($conditions as $key => $value):
+				if(is_numeric($key)):
+					if(is_string($value)):
+						$sql []= $value;
+					else:
+						$sql []= "(" . $this->sqlConditions($table, $value) . ")";
+					endif;
+				else:
+					if(in_array($key, $this->logic)):
+						$sql []= "(" . $this->sqlConditions($table, $value, strtoupper($key)) . ")";
+					elseif(is_array($value)):
+						foreach($value as $k => $v):
+							$value[$k] = $this->value($v, null);
+						endforeach;
+						if(preg_match("/([\w_]+) (BETWEEN)/", $key, $regex)):
+							$condition = $regex[1] . " BETWEEN " . join(" AND ", $value);
+						else:
+							$condition = $key . " IN (" . join(",", $value) . ")";
+						endif;
+						$sql []= $condition;
+					else:
+						$comparison = "=";
+						if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
+							list($regex, $key, $comparison) = $regex;
+						endif;
+						$value = $this->value($value, $this->fieldType($table, $key));
+						$sql []= "{$key} {$comparison} {$value}";
+					endif;
+				endif;
+			endforeach;
+			$sql = join(" {$logical} ", $sql);
+		else:
+			$sql = $conditions;
+		endif;
+		return $sql;
+	}
+	/**
+	 *  Retorna o tipo de um campo da tabela.
+	 *
+	 *	@param string $table Tabela que contém o campo
+	 *	@param string $field Nome do campo
+	 *	@return string Tipo do campo
+	 */
+	public function fieldType($table, $field) {
+		if(isset($this->schema[$table]) && isset($this->schema[$table][$field])):
+			return $this->schema[$table][$field]["type"];
+		endif;
+		return null;
+	}
     /**
      *  Retorna o ID do último registro inserido.
      *
