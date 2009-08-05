@@ -9,11 +9,11 @@
 
 class MysqlDatasource extends Datasource {
 	protected $schema = array();
-    private $connection;
-	private $results;
-	private $transactionStarted = false;
-	private $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE", "REGEXP");
-	private $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
+    protected $connection;
+	protected $results;
+	protected $transactionStarted = false;
+	protected $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE", "REGEXP");
+	protected $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
     public $connected = false;
 
     /**
