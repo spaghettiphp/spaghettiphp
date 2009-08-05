@@ -74,7 +74,7 @@ class TestMysqlDatasource extends UnitTestCase {
     public function testSqlConditionsWithBetween() {
         $passed = $this->datasource->sqlConditions(null, array("id BETWEEN" => array("1", "2")));
         $expected = "id BETWEEN 1 AND 2";
-        #$this->assertEqual($passed, $expected);
+        $this->assertEqual($passed, $expected);
     }
 }
 
