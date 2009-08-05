@@ -411,7 +411,7 @@ class Model extends Object {
      */
     public function delete($id, $dependent = true) {
         $db =& self::getConnection($this->environment);
-        $params = array("conditions" => array($this->primaryKey => $id, "limit" => 1));
+        $params = array("conditions" => array($this->primaryKey => $id), "limit" => 1);
         if($this->exists($id) && $this->deleteAll($params)):
             if($dependent):
                 $this->deleteDependent($id);

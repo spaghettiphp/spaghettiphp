@@ -43,10 +43,6 @@ class Controller extends Object {
      */
     public $output = "";
     /**
-     *  Título da página.
-     */
-    public $pageTitle = "";
-    /**
      *  Parâmetros parseados por Dispatcher.
      */
     public $params = array();
