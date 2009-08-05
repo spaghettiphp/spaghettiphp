@@ -21,7 +21,8 @@ class MysqlDatasourceTest extends MysqlDatasource {
 
 class TestMysqlDatasource extends UnitTestCase {
     public function setUp() {
-        $this->datasource = new MysqlDatasourceTest(array("host" => "localhost", "user" => "root", "password" => "", "database" => "tests"));
+        $config = Config::read("database");
+        $this->datasource = new MysqlDatasourceTest($config["test"]);
         $this->datasource->connect();
     }
     public function tearDown() {
