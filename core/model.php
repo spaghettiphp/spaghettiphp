@@ -275,6 +275,7 @@ class Model extends Object {
             if($recursion < 0 and ($type != "belongsTo" && $recursion <= 0)) continue;
             foreach($this->{$type} as $name => $association):
                 foreach($results as $key => $result):
+                    $name = Inflector::underscore($name);
                     $model = $association["className"];
                     $params = array();
                     if($type == "belongsTo"):
@@ -288,35 +289,12 @@ class Model extends Object {
                         );
                         $params["recursion"] = $recursion - 2;
                     endif;
-                    $results[$key][$name] = $this->{$model}->all($params);
+                    $result = $this->{$model}->all($params);
+                    $results[$key][$name] = $type == "hasMany" ? $result : $result[0];
                 endforeach;
             endforeach;
         endforeach;
         return $results;
-    }
-    public function _findDependent(&$results, $recursion = 0) {
-        foreach(array_keys($this->associations) as $type):
-            if($recursion != 0 || ($type != "hasMany" && $type != "hasOne")):
-                foreach($this->{$type} as $name => $assoc):
-                    foreach($results as $key => $result):
-                        if(isset($this->{$assoc["className"]}->schema[$assoc["foreignKey"]])):
-                            $assocCondition = array($assoc["foreignKey"] => $result[$this->primaryKey]);
-                        else:
-                            $assocCondition = array($this->primaryKey => $result[$assoc["foreignKey"]]);
-                        endif;
-                        #$attrCondition = isset($conditions[Inflector::underscore($assoc["className"])]) ? $conditions[Inflector::underscore($assoc["className"])] : array();
-                        #$condition = array_merge($attrCondition, $assoc["conditions"], $assocCondition);
-                        $condition = $assocCondition;
-                        $assocRecursion = $type != "belongsTo" ? $recursion - 2 : $recursion - 1;
-                        $rows = $this->{$assoc["className"]}->all(array(
-                            "conditions" => $condition,
-                            "recursion" => $assocRecursion
-                        ));
-                        $results[$key][Inflector::underscore($name)] = $type == "hasMany" ? $rows : $rows[0];
-                    endforeach;
-                endforeach;
-            endif;
-        endforeach;
     }
     /**
      *  Conta registros no banco de dados.
