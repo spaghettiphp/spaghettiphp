@@ -334,6 +334,7 @@ class MysqlDatasource extends Datasource {
 	 *  @return string Condições formatadas para consulta SQL
 	 *
 	 *  @todo BETWEEN
+	 *  @todo IN
 	 *  @todo escapar valores
 	 */
 	public function sqlConditions($table, $conditions, $logical = "AND") {
@@ -350,11 +351,8 @@ class MysqlDatasource extends Datasource {
 					if(in_array($key, $this->logic)):
 						$sql []= "(" . $this->sqlConditions($table, $value, strtoupper($key)) . ")";
 					elseif(is_array($value)):
-						$condition = array();
-						foreach($value as $v):
-							$condition []= $this->sqlConditions($table, array($key => $v));
-						endforeach;
-						$sql []= "(" . join(" OR ", $condition) . ")";
+						$condition = $this->sqlConditions($table, $value, ",");
+						$sql []= "{$key} IN ({$condition})";
 					else:
 						$comparison = "=";
 						if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
