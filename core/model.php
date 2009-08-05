@@ -272,11 +272,7 @@ class Model extends Object {
      */
     public function findDependent($results, $recursion = 0) {
         foreach(array_keys($this->associations) as $type):
-            if(
-                ($type != "belongsTo" && $recursion <= 0)
-                    or
-                ($type == "belongsTo" && $recursion < 0)
-            ) continue;
+            if($recursion < 0 and ($type != "belongsTo" && $recursion <= 0)) continue;
             foreach($this->{$type} as $name => $association):
                 foreach($results as $key => $result):
                     $model = $association["className"];
