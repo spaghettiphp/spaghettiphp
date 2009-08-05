@@ -347,10 +347,13 @@ class MysqlDatasource extends Datasource {
 					if(in_array($key, $this->logic)):
 						$sql []= "(" . $this->sqlConditions($table, $value, strtoupper($key)) . ")";
 					elseif(is_array($value)):
+						foreach($value as $k => $v):
+							$value[$k] = $this->value($v, null);
+						endforeach;
 						if(preg_match("/([\w_]+) (BETWEEN)/", $key, $regex)):
-							$condition = $regex[1] . " BETWEEN " . $this->sqlConditions(null, $value);
+							$condition = $regex[1] . " BETWEEN " . join(" AND ", $value);
 						else:
-							$condition = $key . " IN (" . $this->sqlConditions($table, $value, ",") . ")";
+							$condition = $key . " IN (" . join(",", $value) . ")";
 						endif;
 						$sql []= $condition;
 					else:
@@ -358,6 +361,7 @@ class MysqlDatasource extends Datasource {
 						if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
 							list($regex, $key, $comparison) = $regex;
 						endif;
+						$value = $this->value($value, null);
 						$sql []= "{$key} {$comparison} {$value}";
 					endif;
 				endif;
@@ -367,6 +371,19 @@ class MysqlDatasource extends Datasource {
 			$sql = $conditions;
 		endif;
 		return $sql;
+	}
+	/**
+	 *  Short description.
+	 *
+	 *	@param string $table
+	 *	@param string $field
+	 *	@return boolean
+	 */
+	public function fieldType($table, $field) {
+		if(isset($this->schema[$table]) && isset($this->schema[$table][$field])):
+			return $this->schema[$table][$field]["type"];
+		endif;
+		return null;
 	}
     /**
      *  Retorna o ID do último registro inserido.

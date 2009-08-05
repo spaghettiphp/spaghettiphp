@@ -9,9 +9,13 @@
 
 App::import("Datasource", "mysql_datasource");
 
+class MysqlDatasourceTest extends MysqlDatasource {
+}
+
 class TestMysqlDatasource extends UnitTestCase {
     public function setUp() {
-        $this->datasource = new MysqlDatasource();
+        $this->datasource = new MysqlDatasourceTest(array("host" => "localhost", "user" => "root", "password" => "", "database" => "tests"));
+        $this->datasource->connect();
     }
     public function tearDown() {
         $this->datasource = null;
@@ -38,42 +42,42 @@ class TestMysqlDatasource extends UnitTestCase {
     }
     public function testSqlConditionsWithSingleAssociativeArray() {
         $passed = $this->datasource->sqlConditions(null, array("id" => 1));
-        $expected = "id = 1";
+        $expected = "id = '1'";
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithMultipleAssociativeArray() {
         $passed = $this->datasource->sqlConditions(null, array("id" => 1, "user_id" => 2));
-        $expected = "id = 1 AND user_id = 2";
+        $expected = "id = '1' AND user_id = '2'";
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithComparisonOperator() {
         $passed = $this->datasource->sqlConditions(null, array("id >" => 1));
-        $expected = "id > 1";
+        $expected = "id > '1'";
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithNestedNumericArray() {
         $passed = $this->datasource->sqlConditions(null, array(array("id" => 1, "user_id" => 2)));
-        $expected = "(id = 1 AND user_id = 2)";
+        $expected = "(id = '1' AND user_id = '2')";
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithNestedNumericArrayAndPlainArray() {
         $passed = $this->datasource->sqlConditions(null, array("id" => "1", array("id" => 1, "user_id" => 2)));
-        $expected = "id = 1 AND (id = 1 AND user_id = 2)";
+        $expected = "id = '1' AND (id = '1' AND user_id = '2')";
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithLogicOperator() {
         $passed = $this->datasource->sqlConditions(null, array("or" => array("id" => 1, "user_id" => 2)));
-        $expected = "(id = 1 OR user_id = 2)";
+        $expected = "(id = '1' OR user_id = '2')";
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithNestedAssociativeArray() {
         $passed = $this->datasource->sqlConditions(null, array("id" => array("1", "2")));
-        $expected = "id IN (1 , 2)";
+        $expected = "id IN ('1','2')";
         $this->assertEqual($passed, $expected);
     }
     public function testSqlConditionsWithBetween() {
         $passed = $this->datasource->sqlConditions(null, array("id BETWEEN" => array("1", "2")));
-        $expected = "id BETWEEN 1 AND 2";
+        $expected = "id BETWEEN '1' AND '2'";
         $this->assertEqual($passed, $expected);
     }
 }
