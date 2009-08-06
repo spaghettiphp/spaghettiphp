@@ -261,7 +261,7 @@ class Model extends Object {
             $params
         );
         $results = $this->all($params);
-        return $results[0];
+        return empty($results) ? array() : $results[0];
     }
     /**
      *  Busca registros dependentes.
