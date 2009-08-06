@@ -276,6 +276,13 @@ class Controller extends Object {
     public function param($param = null) {
         return $this->params[$param];
     }
+    /**
+     *  Short description.
+     *  
+     */
+    public function paginate($model) {
+        return $model->all();
+    }
 }
 
 ?>

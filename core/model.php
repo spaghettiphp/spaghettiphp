@@ -290,7 +290,10 @@ class Model extends Object {
                         $params["recursion"] = $recursion - 2;
                     endif;
                     $result = $this->{$model}->all($params);
-                    $results[$key][$name] = $type == "hasMany" ? $result : $result[0];
+                    if($type != "hasMany" && !empty($result)):
+                        $result = $result[0];
+                    endif;
+                    $results[$key][$name] = $result;
                 endforeach;
             endforeach;
         endforeach;
