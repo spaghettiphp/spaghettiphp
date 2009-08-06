@@ -54,6 +54,10 @@ class Controller extends Object {
      *  Variáveis a serem enviadas para uma view.
      */
     public $viewData = array();
+    /**
+     *  Short description.
+     */
+    public $paginate = array("perPage" => 20);
     
     public function __construct() {
         if(is_null($this->name) && preg_match("/(.*)Controller/", get_class($this), $name)):
@@ -278,10 +282,21 @@ class Controller extends Object {
     }
     /**
      *  Short description.
-     *  
+     *
+     *  @param object $model
+     *  @param array $params
+     *  @return array
      */
-    public function paginate($model) {
-        return $model->all();
+    public function paginate($model, $params = array()) {
+        $params = array_merge($this->paginate, $params);
+        if(isset($this->params["namedParams"]["page"])):
+            $page = $this->params["namedParams"]["page"];
+        else:
+            $page = 1;
+        endif;
+        $offset = ($page - 1) * $params["perPage"];
+        $params["limit"] = "{$offset},{$params['perPage']}";
+        return $model->all($params);
     }
 }
 
