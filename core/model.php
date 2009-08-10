@@ -47,6 +47,18 @@ class Model extends Object {
      */
     public $environment = null;
     /**
+     *  Short description.
+     */
+    public $conditions = array();
+    /**
+     *  Short description.
+     */
+    public $order = null;
+    /**
+     *  Short description.
+     */
+    public $limit = null;
+    /**
      *  Associações entre modelos disponíveis
      */
     public $associations = array(
@@ -236,9 +248,9 @@ class Model extends Object {
         $params = array_merge(
             array(
                 "fields" => array_keys($this->schema),
-                "conditions" => array(),
-                "order" => null,
-                "limit" => null,
+                "conditions" => $this->conditions,
+                "order" => $this->order,
+                "limit" => $this->limit,
                 "recursion" => $this->recursion
             ),
             $params
@@ -308,7 +320,7 @@ class Model extends Object {
     public function count($params = array()) {
         $db =& self::getConnection($this->environment);
         $params = array_merge(
-            array("fields" => "*", "conditions" => array()),
+            array("fields" => "*", "conditions" => $this->conditions),
             $params
         );
         return $db->count($this->table, $params);
@@ -320,11 +332,15 @@ class Model extends Object {
      *  @return boolean Verdadeiro se o registro existe
      */
     public function exists($id) {
-        $row = $this->first(array(
-            "conditions" => array(
-                $this->primaryKey => $id
+        $conditions = array_merge(
+            $this->conditions,
+            array(
+                "conditions" => array(
+                    $this->primaryKey => $id
+                )
             )
-        ));
+        );
+        $row = $this->first($conditions);
         return !empty($row);
     }
     /**
@@ -448,7 +464,7 @@ class Model extends Object {
     public function deleteAll($params = array()) {
         $db =& self::getConnection($this->environment);
         $params = array_merge(
-            array("conditions" => array(), "order" => null, "limit" => null),
+            array("conditions" => $this->conditions, "order" => $this->order, "limit" => $this->limit),
             $params
         );
         return $db->delete($this->table, $params);
