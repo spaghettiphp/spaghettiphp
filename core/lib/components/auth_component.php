@@ -1,6 +1,6 @@
 <?php
 /**
- *  AuthComponent responsável pela autenticação e controle de acesso na aplicação,
+ *  AuthComponent é o responsável pela autenticação e controle de acesso na aplicação,
  *  podendo controlar com base nos prefixos e nas classes do controller.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -10,76 +10,78 @@
 
 class AuthComponent extends Component {
     /**
-     * Permissões dos controles e ações corrente
-     *
-     * @var array
+     *  Permissões dos controllers e actions corrente.
+     *  
+     *  @var array
      */
     public $permissions = null;
     /**
-     * Mantem o estado do usuário corrente
-     *
-     * @var boolean
+     *  Mantém o estado do usuário corrente.
+     *  
+     *  @var boolean
      */
     public $loggedIn = false;
     /**
-     * Objeto controle
-     *
-     * @var object
+     *  Objeto Controller.
+     * 
+     *  @var object
      */
     public $controller = null;
     /**
-     * Dados repassados pelo controlador (método $_POST)
-     * @var array
+     *  Dados repassados pelo controller (via $_POST).
+     *  
+     *  @var array
      */
     public $data = array();
     /**
-     * Parâmetros do controlador
-     * @var array
+     *  Parâmetros do controller.
+     *  
+     *  @var array
      */
     public $params = array();
     /**
-     * Nome do modelo a ser utilizado pela autenticação
-     *
-     * @var string>
+     *  Nome do modelo a ser utilizado para a autenticação.
+     * 
+     *  @var string
      */
     public $userModel = "Users";
     /**
-     * Condições adicionais para serem usadas na autenticação
-     *
-     * @var array
+     *  Condições adicionais para serem usadas na autenticação.
+     * 
+     *  @var array
      */
     public $userScope = array();
     /**
-     * URL a ser redirecionada e controlar o login
-     *
-     * @var string
+     *  URL a ser redirecionada e controlar o login.
+     * 
+     *  @var string
      */
     public $loginAction = "/users/login";
     /**
-     * URL a ser redirecionada após o login efetuado com sucesso
-     *
-     * @var string
+     *  URL a ser redirecionada após o login efetuado com sucesso.
+     * 
+     *  @var string
      */
     public $loginRedirect = "/";
     /**
-     * URL a ser redirecionado após o logoff
-     *
-     * @var string
+     *  URL a ser redirecionado após o logout
+     * 
+     *  @var string
      */
     public $logoutRedirect = "/";
     /**
-     * Permite especificar campos para usuário e senha não predefinidos
+     *  Permite especificar campos para usuário e senha diferentes do padrão.
      *
-     * @var array
+     *  @var array
      */
     public $fields = array(
         "username" => "username",
         "password" => "password"
     );
     /**
-     * Inicializa o componente
-     *
-     * @param object $controller
+     *  Inicializa o componente.
+     * 
+     *  @param object $controller
      */
      public function initialize(&$controller) {
         $this->controller = $controller;
@@ -98,9 +100,9 @@ class AuthComponent extends Component {
         endif;
     }
     /**
-     * Verifica se o usuário esta autorizado ou não para o controller
-     *
-     * @return boolean Verdadeiro caso esteja autorizado a executar o controller
+     *  Verifica se o usuário esta autorizado ou não para acessar o controller.
+     * 
+     *  @return boolean Verdadeiro caso esteja autorizado a acessar o controller
      */
     public function authorized() {
         $authorized = true;
@@ -124,10 +126,10 @@ class AuthComponent extends Component {
         return $authorized;
     }
     /**
-     * Verifica se o usuário esta autorizado ou não para o controller,
-     * redirecionando para a pagina de login em caso negatvo
-     *
-     * @return boolean Verdadeiro se estiver autorizado a executaro controller
+     *  Verifica se o usuário esta autorizado ou não para o controller,
+     *  redirecionando para a pagina de login em caso negativo.
+     * 
+     *  @return boolean Verdadeiro se estiver autorizado a acessar o controller
      */
     public function check() {
         if(!$this->authorized()):
@@ -137,10 +139,10 @@ class AuthComponent extends Component {
         return true;
     }
     /**
-     * Libera os prefixos/controles a serem visualizados sem autenticação
-     *
-     * @param array $permissions Prefix/Controller a serem liberados
-     * @return void
+     *  Libera prefixos/controllers a serem visualizados sem autenticação.
+     * 
+     *  @param array $permissions Prefixos/controllers a serem liberados
+     *  @return true
      */
     public function allow($permissions = array()) {
         if($permissions == "" || $permissions == "*"):
@@ -153,10 +155,10 @@ class AuthComponent extends Component {
         return true;
     }
     /**
-     * Bloqueia os prefixos/controles a serem visualizados com autenticação
-     *
-     * @param array $permissions Prefix/Controller a serem bloqueados
-     * @return void
+     *  Bloqueia os prefixos/controller a serem visualizados com autenticação.
+     *  
+     *  @param array $permissions Prefixos/controllers a serem bloqueados
+     *  @return true
      */
     public function deny($permissions = array()) {
         if($permissions == "" || $permissions == "*"):
@@ -169,10 +171,10 @@ class AuthComponent extends Component {
         return true;
     }
     /**
-     * Criptografa a senha com o hash MD5
-     *
-     * @param array $data Dados a serem utilizados
-     * @return array Dados com senha criptografada com hash MD5
+     *  Criptografa a senha com o hash MD5.
+     * 
+     *  @param array $data Dados a serem utilizados
+     *  @return array Dados com senha criptografada com hash MD5
      */
     public function hashPasswords($data = array()) {
         if(isset($data[$this->fields["password"]])):
@@ -181,20 +183,20 @@ class AuthComponent extends Component {
         return $data;
     }
     /**
-     * Carrega os dados do usuário
-     *
-     * @param <type> $data
-     * @return object Objeto do controle User
+     *  Carrega os dados do usuário.
+     * 
+     *  @param array $data Dados providos pelo usuário
+     *  @return array Dados do usuário
      */
     public function identify($data = array()) {
         $userModel = ClassRegistry::init($this->userModel);
-        $user = $userModel->find(array_merge($this->userScope, $data));
+        $user = $userModel->first(array_merge($this->userScope, $data));
         return $user;
     }
     /**
-     * Verifica os dados repassados para realizar o login no sistema
-     *
-     * @return boolean Verdadeiro para login efetuado com sucesso, caso contrário retornará falso
+     *  Verifica os dados repassados para realizar o login no sistema.
+     * 
+     *  @return boolean Verdadeiro para login efetuado com sucesso
      */
     public function login() {
         if(!$this->loggedIn):
@@ -216,9 +218,9 @@ class AuthComponent extends Component {
         endif;
     }
     /**
-     * Efetua logoff redirecionando em seguida
-     *
-     * @return void Redireciona apos efetuar logoff
+     *  Efetua logout, redirecionando em seguida.
+     * 
+     *  @return true
      */
     public function logout() {
         setcookie("user_id", "", time() - 3600, "/");
@@ -228,15 +230,15 @@ class AuthComponent extends Component {
         return true;
     }
     /**
-     * Pega o usuário da sessão
-     *
-     * @param string $field Campo a ser retornado
-     * @return array Repassa um array com os dados do usuário ou apenas o campo repassado por $field
+     *  Pega o usuário da sessão.
+     * 
+     *  @param string $field Campo a ser retornado
+     *  @return array Repassa um array com os dados do usuário ou apenas o camporepassado por $field
      */
     public function user($field = null) {
         $user_id = $_COOKIE["user_id"];
         $user = $this->identify(array("id" => $user_id));
-        return $field === null ? $user : $user[$field];
+        return is_null($field) ? $user : $user[$field];
     }
 }
 
