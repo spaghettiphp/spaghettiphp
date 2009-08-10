@@ -245,7 +245,7 @@ class Model extends Object {
         );
         $results = $db->read($this->table, $params);
         if($params["recursion"] >= 0):
-            $results = $this->findDependent($results, $params["recursion"]);
+            $results = $this->dependent($results, $params["recursion"]);
         endif;
         return $results;
     }
@@ -270,7 +270,7 @@ class Model extends Object {
      *  @param integer $recursion Nível de recursão
      *  @return void
      */
-    public function findDependent($results, $recursion = 0) {
+    public function dependent($results, $recursion = 0) {
         foreach(array_keys($this->associations) as $type):
             if($recursion < 0 and ($type != "belongsTo" && $recursion <= 0)) continue;
             foreach($this->{$type} as $name => $association):
@@ -284,8 +284,11 @@ class Model extends Object {
                         );
                         $params["recursion"] = $recursion - 1;
                     else:
-                        $params["conditions"] = array(
-                            $association["foreignKey"] => $result[$this->primaryKey]
+                        $params["conditions"] = array_merge(
+                            $association["conditions"],
+                            array(
+                                $association["foreignKey"] => $result[$this->primaryKey]
+                            )
                         );
                         $params["recursion"] = $recursion - 2;
                     endif;
