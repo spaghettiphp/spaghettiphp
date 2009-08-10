@@ -375,7 +375,11 @@ class Model extends Object {
      *  @return boolean Verdadeiro se o registro foi salvo
      */
     public function save($data) {
-        $this->id = isset($data[$this->primaryKey]) ? $data[$this->primaryKey] : null;
+        if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
+            $this->id = $data[$this->primaryKey];
+        elseif(!is_null($this->id)):
+            $data[$this->primaryKey] = $this->id;
+        endif;
         foreach($data as $field => $value):
             if(!isset($this->schema[$field])):
                 unset($data[$field]);
