@@ -52,7 +52,6 @@ class View extends Object {
             $this->controller = preg_replace("/-/", "_", $controller->param("controller"));
             $this->action = $controller->param("action");
             $this->extension = $controller->param("extension");
-            $this->pageTitle = $controller->pageTitle;
             $this->layout = $controller->layout;
             $this->autoLayout = $controller->autoLayout;
         endif;

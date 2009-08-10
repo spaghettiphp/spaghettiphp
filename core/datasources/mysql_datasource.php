@@ -297,7 +297,7 @@ class MysqlDatasource extends Datasource {
 	public function renderSql($type, $data = array()) {
 		switch($type):
 			case "select":
-				return "SELECT {$data['fields']} FROM {$data['table']} {$data['conditions']} {$data['limit']}";
+				return "SELECT {$data['fields']} FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
 			case "delete":
 				return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
 			case "insert":
