@@ -47,15 +47,15 @@ class Model extends Object {
      */
     public $environment = null;
     /**
-     *  Short description.
+     *  Condições padrão para o modelo.
      */
     public $conditions = array();
     /**
-     *  Short description.
+     *  Ordenação padrão para o modelo.
      */
     public $order = null;
     /**
-     *  Short description.
+     *  Limite padrão para o modelo.
      */
     public $limit = null;
     /**
