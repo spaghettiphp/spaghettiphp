@@ -35,7 +35,7 @@ class Dispatcher extends Object {
         $prefixes = join("|", Mapper::getPrefixes());
         
         $parts = array("here", "prefix", "controller", "action", "id", "extension", "params");
-        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?(.*))?/", $url, $reg);
+        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([^\/]*)\/?)?(?:([^\/]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?(.*))?/", $url, $reg);
         foreach($parts as $k => $key) {
             $this->path[$key] = $reg[$k];
         }
