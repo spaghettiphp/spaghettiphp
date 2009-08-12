@@ -8,35 +8,141 @@
  */
 
 class FormHelper extends HtmlHelper {
+    /**
+     *  Short description.
+     *
+     *  @param string $action
+     *  @param array $options
+     *  @return string
+     */
     public function create($action = null, $options = array()) {
-        $attr = array_merge(array("method" => "post", "action" => Mapper::url($action)), $options);
-        $form = $this->openTag("form", $attr);
+        $attributes = array_merge(
+            array(
+                "method" => "post",
+                "action" => Mapper::url($action)
+            ),
+            $options
+        );
+        $form = $this->openTag("form", $attributes);
         return $this->output($form);
     }
-    public function close($submit = null, $attr = array()) {
+    /**
+     *  Short description.
+     *
+     *  @param string $submit
+     *  @param array $attributes
+     *  @return string
+     */
+    public function close($submit = null, $attributes = array()) {
         $form = $this->closeTag("form");
-        if($submit != null):
-            $form = $this->submit($submit, $attr) . $form;
+        if(!is_null($submit)):
+            $form = $this->submit($submit, $attributes) . $form;
         endif;
         return $this->output($form);
     }
-    public function submit($submit = "", $attr = array()) {
-        return $this->output($this->tag("button", $submit, array_merge(array("type" => "submit"), $attr)));
+    /**
+     *  Short description.
+     *
+     *  @param string $label
+     *  @param array $attributes
+     *  @return string
+     */
+    public function submit($submit = "", $attributes = array()) {
+        $attributes = array_merge(
+            array("type" => "submit"),
+            $attributes
+        );
+        $button = $this->tag("button", $submit, $attributes);
+        return $this->output($button);
     }
-    public function text($name = "", $value = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "text"), $attr), false));
+    /**
+     *  Short description.
+     *
+     *  @param string $name
+     *  @param array $attributes
+     *  @return string
+     */
+    public function text($name = "", $attributes = array()) {
+        $attributes = array_merge(
+            array(
+                "type" => "text",
+                "name" => $name
+            ),
+            $attributes
+        );
+        $input = $this->tag("input", null, $attributes, false);
+        return $this->output($input);
     }
-    public function textarea($name = "", $value = "", $attr = array()) {
-        return $this->output($this->tag("textarea", $value, array_merge(array("name" => $name), $attr)));
+    /**
+     *  Short description.
+     *
+     *  @param string $name
+     *  @param array $attributes
+     *  @return string
+     */
+    public function textarea($name = "", $attributes = array()) {
+        $attributes = array_merge(
+            array(
+                "name" => $name
+            ),
+            $attributes
+        );
+        $input = $this->tag("textarea", array_unset($attributes, "value"), $attributes);
+        return $this->output($input);
     }
-    public function password($name = "", $value = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "password"), $attr), false));
+    /**
+     *  Short description.
+     *
+     *  @param string $name
+     *  @param array $attributes
+     *  @return string
+     */
+    public function password($name = "", $attributes = array()) {
+        $attributes = array_merge(
+            array(
+                "type" => "password",
+                "name" => $name
+            ),
+            $attributes
+        );
+        $input = $this->tag("input", null, $attributes, false);
+        return $this->output($input);
     }
-    public function file($name = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("name" => $name, "type" => "file"), $attr), false));
+    /**
+     *  Short description.
+     *
+     *  @param string $name
+     *  @param array $attributes
+     *  @return string
+     */
+    public function file($name = "", $attributes = array()) {
+        $attributes = array_merge(
+            array(
+                "type" => "file",
+                "name" => $name
+            ),
+            $attributes
+        );
+        $input = $this->tag("input", null, $attributes, false);
+        return $this->output($input);
     }
-    public function hidden($name = "", $value = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "hidden"), $attr), false));
+    /**
+     *  Short description.
+     *
+     *  @param string $name
+     *  @param array $attributes
+     *  @return string
+     */
+    public function hidden($name = "", $attributes = array()) {
+        $attributes = array_merge(
+            array(
+                "type" => "hidden",
+                "name" => $name
+            ),
+            $attributes
+        );
+        $input = $this->tag("input", null, $attributes, false);
+        return $this->output($input);
     }
     public function select($name = "", $values = array(), $selected = "", $attr = array()) {
         $options = "";
@@ -54,18 +160,15 @@ class FormHelper extends HtmlHelper {
             "type" => "text",
             "label" => Inflector::humanize($name)
         ), $options);
-        $type = $options["type"];
-        $label = $options["label"];
-        unset($options["type"]);
-        unset($options["label"]);
+        $type = array_unset($options, "type");
+        $label = array_unset($options, "label");
         if($type == "select"):
             $values = $options["options"];
             unset($options["options"]);
             $input = $this->select($name, $values, $value, $options);
-        elseif($type == "file"):
-            $input = $this->file($name, $options);
         else:
-            $input = $this->{$type}($name, $value, $options);
+            $options["value"] = $value;
+            $input = $this->{$type}($name, $options);
         endif;
         return $label != false ? $this->tag("label", "{$label}\n{$input}") : $input;
     }
