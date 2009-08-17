@@ -46,7 +46,6 @@ class Model extends Object {
      *  Configuração de ambiente a ser usada.
      */
     public $environment = null;
-    public $perPage = 20;
     /**
      *  Condições padrão para o modelo.
      */
@@ -59,6 +58,10 @@ class Model extends Object {
      *  Limite padrão para o modelo.
      */
     public $limit = null;
+    /**
+     *  Padrão para quantidade de registros por página.
+     */
+    public $perPage = 20;
     /**
      *  Associações entre modelos disponíveis
      */
@@ -343,11 +346,7 @@ class Model extends Object {
             ),
             $params
         );
-        if(isset($params["page"])):
-            $page = $params["page"];
-        else:
-            $page = 1;
-        endif;
+        $page = !$params["page"] ? 1 : $params["page"];
         $offset = ($page - 1) * $params["perPage"];
         $params["limit"] = "{$offset},{$params['perPage']}";
         return $this->all($params);
