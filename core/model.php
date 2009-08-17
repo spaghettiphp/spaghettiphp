@@ -48,6 +48,18 @@ class Model extends Object {
     public $environment = null;
     public $perPage = 20;
     /**
+     *  Condições padrão para o modelo.
+     */
+    public $conditions = array();
+    /**
+     *  Ordenação padrão para o modelo.
+     */
+    public $order = null;
+    /**
+     *  Limite padrão para o modelo.
+     */
+    public $limit = null;
+    /**
      *  Associações entre modelos disponíveis
      */
     public $associations = array(
@@ -237,9 +249,9 @@ class Model extends Object {
         $params = array_merge(
             array(
                 "fields" => array_keys($this->schema),
-                "conditions" => array(),
-                "order" => null,
-                "limit" => null,
+                "conditions" => $this->conditions,
+                "order" => $this->order,
+                "limit" => $this->limit,
                 "recursion" => $this->recursion
             ),
             $params
@@ -312,7 +324,7 @@ class Model extends Object {
     public function count($params = array()) {
         $db =& self::getConnection($this->environment);
         $params = array_merge(
-            array("fields" => "*", "conditions" => array()),
+            array("fields" => "*", "conditions" => $this->conditions),
             $params
         );
         return $db->count($this->table, $params);
@@ -347,11 +359,15 @@ class Model extends Object {
      *  @return boolean Verdadeiro se o registro existe
      */
     public function exists($id) {
-        $row = $this->first(array(
-            "conditions" => array(
-                $this->primaryKey => $id
+        $conditions = array_merge(
+            $this->conditions,
+            array(
+                "conditions" => array(
+                    $this->primaryKey => $id
+                )
             )
-        ));
+        );
+        $row = $this->first($conditions);
         return !empty($row);
     }
     /**
@@ -386,7 +402,11 @@ class Model extends Object {
      *  @return boolean Verdadeiro se o registro foi salvo
      */
     public function save($data) {
-        $this->id = isset($data[$this->primaryKey]) ? $data[$this->primaryKey] : null;
+        if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
+            $this->id = $data[$this->primaryKey];
+        elseif(!is_null($this->id)):
+            $data[$this->primaryKey] = $this->id;
+        endif;
         foreach($data as $field => $value):
             if(!isset($this->schema[$field])):
                 unset($data[$field]);
@@ -475,7 +495,7 @@ class Model extends Object {
     public function deleteAll($params = array()) {
         $db =& self::getConnection($this->environment);
         $params = array_merge(
-            array("conditions" => array(), "order" => null, "limit" => null),
+            array("conditions" => $this->conditions, "order" => $this->order, "limit" => $this->limit),
             $params
         );
         return $db->delete($this->table, $params);
