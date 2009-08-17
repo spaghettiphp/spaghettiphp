@@ -280,24 +280,6 @@ class Controller extends Object {
     public function param($param = null) {
         return $this->params[$param];
     }
-    /**
-     *  Short description.
-     *
-     *  @param object $model
-     *  @param array $params
-     *  @return array
-     */
-    public function paginate($model, $params = array()) {
-        $params = array_merge($this->paginate, $params);
-        if(isset($this->params["namedParams"]["page"])):
-            $page = $this->params["namedParams"]["page"];
-        else:
-            $page = 1;
-        endif;
-        $offset = ($page - 1) * $params["perPage"];
-        $params["limit"] = "{$offset},{$params['perPage']}";
-        return $model->all($params);
-    }
 }
 
 ?>

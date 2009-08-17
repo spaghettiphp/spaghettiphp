@@ -46,6 +46,7 @@ class Model extends Object {
      *  Configuração de ambiente a ser usada.
      */
     public $environment = null;
+    public $perPage = 20;
     /**
      *  Associações entre modelos disponíveis
      */
@@ -315,6 +316,29 @@ class Model extends Object {
             $params
         );
         return $db->count($this->table, $params);
+    }
+    /**
+     *  Short description.
+     *
+     *  @param array $params
+     *  @return array
+     */
+    public function paginate($params = array()) {
+        $params = array_merge(
+            array(
+                "perPage" => $this->perPage,
+                "page" => 1
+            ),
+            $params
+        );
+        if(isset($params["page"])):
+            $page = $params["page"];
+        else:
+            $page = 1;
+        endif;
+        $offset = ($page - 1) * $params["perPage"];
+        $params["limit"] = "{$offset},{$params['perPage']}";
+        return $this->all($params);
     }
     /**
      *  Verifica se um registro existe no banco de dados.
