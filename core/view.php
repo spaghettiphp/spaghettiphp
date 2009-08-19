@@ -66,7 +66,11 @@ class View extends Object {
     public function loadHelpers() {
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
-            $this->loadedHelpers[Inflector::underscore($helper)] = ClassRegistry::init($class, "Helper");
+            $this->loadedHelpers[Inflector::underscore($helper)] = ClassRegistry::load($class, "Helper");
+            if(!$this->loadedHelpers[Inflector::underscore($helper)]):
+                $this->error("missingHelper", array("helper" => $helper));
+                return false;
+            endif;
         endforeach;
         return $this->loadedHelpers;
     }
