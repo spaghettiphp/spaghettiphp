@@ -333,10 +333,10 @@ class Model extends Object {
         return $db->count($this->table, $params);
     }
     /**
-     *  Short description.
+     *  Retorna registros paginados.
      *
-     *  @param array $params
-     *  @return array
+     *  @param array $params Parâmetros da busca e paginação
+     *  @return array Resultados da página $params["page"]
      */
     public function paginate($params = array()) {
         $params = array_merge(
