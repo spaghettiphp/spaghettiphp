@@ -8,20 +8,60 @@
  */
 
 class PaginationHelper extends Helper {
-    public function next() {
-        
+    /**
+     *  Short description.
+     */
+    public $model = false;
+
+    /**
+     *  Short description.
+     */
+    public function model($model) {
+        if($this->model = ClassRegistry::load($model)):
+            return true;
+        endif;
+        return false;
     }
-    public function previous() {
+    /**
+     *  Short description.
+     */
+    public function next($text = "&gt;") {
+        $output = "";
+        if($this->hasNext()):
         
+        endif;
+        return $this->output($output);
     }
-    public function first() {
-        
+    /**
+     *  Short description.
+     */
+    public function previous($text = "&lt;") {
+        $output = "";
+        if($this->hasPrevious()):
+            $output = $text;
+        endif;
+        return $this->output($output);
     }
-    public function last() {
-        
+    /**
+     *  Short description.
+     */
+    public function hasNext() {
+        return false;
     }
-    public function numbers() {
-        
+    /**
+     *  Short description.
+     */
+    public function hasPrevious() {
+        return $this->getPage() != 1;
+    }
+    /**
+     *  Short description.
+     */
+    public function getPage() {
+        if($this->model):
+            return $this->model->getPage();
+        endif;
+        return false;
     }
 }
 

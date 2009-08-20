@@ -346,8 +346,8 @@ class Model extends Object {
             ),
             $params
         );
-        $page = !$params["page"] ? 1 : $params["page"];
-        $offset = ($page - 1) * $params["perPage"];
+        $this->page = !$params["page"] ? 1 : $params["page"];
+        $offset = ($this->page - 1) * $params["perPage"];
         $params["limit"] = "{$offset},{$params['perPage']}";
         return $this->all($params);
     }
@@ -516,6 +516,14 @@ class Model extends Object {
     public function getAffectedRows() {
         $db =& self::getConnection($this->environment);
         return $db->getAffectedRows();
+    }
+    
+    /**
+     *  Do NOT mess with this code yet!
+     */
+    protected $page = null;
+    public function getPage() {
+        return $this->page;
     }
 }
 
