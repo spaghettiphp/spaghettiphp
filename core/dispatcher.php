@@ -33,8 +33,8 @@ class Dispatcher extends Object {
         $url = Mapper::getRoute($here);
         $prefixes = join("|", Mapper::getPrefixes());
         
-        $parts = array("here", "prefix", "controller", "action", "id", "extension", "params");
-        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?(.*))?/i", $url, $reg);
+        $parts = array("here", "prefix", "controller", "action", "id", "extension", "params", "queryString");
+        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i", $url, $reg);
         foreach($parts as $k => $key) {
             $this->path[$key] = $reg[$k];
         }
@@ -54,6 +54,10 @@ class Dispatcher extends Object {
         if(!empty($this->path["prefix"])) $this->path["action"] = "{$this->path['prefix']}_{$this->path['action']}";
         if(empty($this->path["id"])) $this->path["id"] = null;
         if(empty($this->path["extension"])) $this->path["extension"] = Config::read("defaultExtension");
+        if(!empty($this->path["queryString"])):
+            parse_str($this->path["queryString"], $queryString);
+            $this->path["namedParams"] = array_merge($this->path["namedParams"], $queryString);
+        endif;
         
         return $this->path;
     }
