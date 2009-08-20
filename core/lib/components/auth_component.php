@@ -189,7 +189,11 @@ class AuthComponent extends Component {
      *  @return array Dados do usuário
      */
     public function identify($data = array()) {
-        $userModel = ClassRegistry::init($this->userModel);
+        $userModel = ClassRegistry::load($this->userModel);
+        if(!$userModel):
+            $this->error("missingModel", array("model" => $this->userModel));
+            return false;
+        endif;
         $user = $userModel->first(array_merge($this->userScope, $data));
         return $user;
     }
