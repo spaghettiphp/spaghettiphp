@@ -7,7 +7,7 @@
  *
  */
 
-class PaginationHelper extends Helper {
+class PaginationHelper extends HtmlHelper {
     /**
      *  Short description.
      */
@@ -25,22 +25,20 @@ class PaginationHelper extends Helper {
     /**
      *  Short description.
      */
-    public function next($text = "&gt;") {
-        $output = "";
+    public function next($text) {
         if($this->hasNext()):
-            $output = $text;
+            return $this->link($text, $this->getUrl(1));
         endif;
-        return $this->output($output);
+        return "";
     }
     /**
      *  Short description.
      */
-    public function previous($text = "&lt;") {
-        $output = "";
+    public function previous($text) {
         if($this->hasPrevious()):
-            $output = $text;
+            return $this->link($text, $this->getUrl(-1));
         endif;
-        return $this->output($output);
+        return "";
     }
     /**
      *  Short description.
@@ -53,6 +51,11 @@ class PaginationHelper extends Helper {
      */
     public function hasPrevious() {
         return $this->model->pagination["page"] != 1;
+    }
+    public function getUrl($direction) {
+        $page = $this->model->pagination["page"] + $direction;
+        $url = preg_replace("%page:\d+/?%", "", Mapper::here());
+        return $url . "/page:{$page}";
     }
 }
 
