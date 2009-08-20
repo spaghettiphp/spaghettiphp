@@ -346,9 +346,13 @@ class Model extends Object {
             ),
             $params
         );
-        $this->page = !$params["page"] ? 1 : $params["page"];
-        $offset = ($this->page - 1) * $params["perPage"];
+        $page = !$params["page"] ? 1 : $params["page"];
+        $offset = ($page - 1) * $params["perPage"];
         $params["limit"] = "{$offset},{$params['perPage']}";
+
+        $this->pagination["page"] = $page;
+        $this->pagination["totalPages"] = ceil($this->count($params) / $params["perPage"]);
+
         return $this->all($params);
     }
     /**
@@ -521,10 +525,10 @@ class Model extends Object {
     /**
      *  Do NOT mess with this code yet!
      */
-    protected $page = null;
-    public function getPage() {
-        return $this->page;
-    }
+    public $pagination = array(
+        "page" => null,
+        "totalPages" => null
+    );
 }
 
 ?>

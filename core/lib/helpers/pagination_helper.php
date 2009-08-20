@@ -28,7 +28,7 @@ class PaginationHelper extends Helper {
     public function next($text = "&gt;") {
         $output = "";
         if($this->hasNext()):
-        
+            $output = $text;
         endif;
         return $this->output($output);
     }
@@ -46,22 +46,13 @@ class PaginationHelper extends Helper {
      *  Short description.
      */
     public function hasNext() {
-        return false;
+        return $this->model->pagination["page"] < $this->model->pagination["totalPages"];
     }
     /**
      *  Short description.
      */
     public function hasPrevious() {
-        return $this->getPage() != 1;
-    }
-    /**
-     *  Short description.
-     */
-    public function getPage() {
-        if($this->model):
-            return $this->model->getPage();
-        endif;
-        return false;
+        return $this->model->pagination["page"] != 1;
     }
 }
 
