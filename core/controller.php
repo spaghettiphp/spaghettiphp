@@ -54,7 +54,9 @@ class Controller extends Object {
      *  Variáveis a serem enviadas para uma view.
      */
     public $viewData = array();
-    
+    /**
+     *  Contrutor da classe.
+     */
     public function __construct() {
         if(is_null($this->name) && preg_match("/(.*)Controller/", get_class($this), $name)):
             if($name[1] && $name[1] != "App"):

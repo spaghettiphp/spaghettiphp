@@ -9,7 +9,17 @@
  */
 
 class ClassRegistry {
+    /**
+     *  Nome das classes a serem utilizados pelo Spaghetti
+     *  @var array
+     */
     public $objects = array();
+    /**
+     *  Retorna uma única instância (Singleton) da classe solicitada.
+     *
+     *  @staticvar object $instance Objeto a ser verificado
+     *  @return object Objeto da classe utilizada
+     */
     public static function &getInstance() {
         static $instance = array();
         if (!$instance):
@@ -17,6 +27,14 @@ class ClassRegistry {
         endif;
         return $instance[0];
     }
+    /**
+     *  Carrega a classe, registrando o objeto, retornando uma instância
+     *  para a mesma.
+     *
+     *  @param string $class Classe a ser inicializada
+     *  @param string $type Tipo da classe
+     *  @return object Instância da classe
+     */
     public static function &load($class, $type = "Model") {
         $self =& ClassRegistry::getInstance();
         if($object =& $self->duplicate($class, $class)):
@@ -31,6 +49,14 @@ class ClassRegistry {
         endif;
         return ${$class};
     }
+    /**
+     *  Inicializa a classe, registrando o objeto, retornando uma instância
+     *  para a mesma.
+     * 
+     *  @param string $class Classe a ser inicializada
+     *  @param string $type Tipo da classe
+     *  @return object Instância da classe
+     */
     public static function &init($class, $type = "Model") {
         $self =& ClassRegistry::getInstance();
         if($model =& $self->duplicate($class, $class)):
