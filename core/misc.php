@@ -35,4 +35,10 @@ function pick() {
     return null;
 }
 
+function array_unset(&$array = array(), $index = "") {
+    $item = $array[$index];
+    unset($array[$index]);
+    return $item;
+}
+
 ?>
