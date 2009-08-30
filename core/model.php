@@ -173,7 +173,7 @@ class Model extends Object {
                     $data = null;
                     switch($key):
                         case "foreignKey":
-                            $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this)) . "Id";
+                            $data = ($type == "belongsTo") ? Inflector::underscore($class . "Id") : Inflector::underscore(get_class($this) . "Id");
                             break;
                         case "conditions":
                             $data = array();
