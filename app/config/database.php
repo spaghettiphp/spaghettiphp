@@ -7,10 +7,10 @@
 
 $database = array(
     "development" => array(
-        "host" => "localhost",
-        "user" => "root",
+        "host" => "",
+        "user" => "",
         "password" => "",
-        "database" => "tests",
+        "database" => "",
         "prefix" => ""
     )
 );
