@@ -26,8 +26,7 @@
         <div>
             <h1>Seu Spaghetti* acabou de sair do forno!</h1>
             <p>
-                Mas essa provavelmente não é a tela que você havia planejado para sua aplicação.<br />
-                A boa notícia é que a parte divertida começa agora! Siga os passos abaixo para começar a se divertir com produtividade.
+                E a parte divertida começa agora! Siga os passos abaixo para começar a se divertir com produtividade!
             </p>
         </div>
     </div>
@@ -101,14 +100,14 @@
             <div class="left">
                 <strong>Spaghetti Web Development Framework</strong>
                 <ul>
-                    <li><a href="http://trac.spaghettiphp.org/">Trac</a></li>
-                    <li><a href="http://spaghettiphp.org/docss">Documenta&ccedil;&atilde;o</a></li>
+                    <li><a href="http://forum.spaghettiphp.org/">Fórum</a></li>
+                    <li><a href="http://spaghettiphp.org/docs">Documenta&ccedil;&atilde;o</a></li>
                     <li><a href="http://spaghettiphp.org/tutorials">Tutoriais</a></li>
                     <li class="last"><a href="http://spaghettiphp.org/screencasts">Screencasts</a></li>
                 </ul>
             </div>
             <div class="right">
-                <?php echo $html->image("spaghetti.gif", "Spaghetti"); ?> vers&atilde;o 0.1.1
+                <?php echo $html->image("spaghetti.gif", "Spaghetti"); ?> vers&atilde;o 0.1.2
             </div>
         </div>
     
