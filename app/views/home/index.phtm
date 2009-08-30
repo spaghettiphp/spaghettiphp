@@ -83,11 +83,11 @@
 				</form>
 				<script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&lang=pt"></script>
             <ul>
+                <li><a href="http://forum.spaghettiphp.org/">Fórum</a></li>
                 <li><a href="http://spaghettiphp.org/docs">Documenta&ccedil;&atilde;o</a></li>
                 <li><a href="http://spaghettiphp.org/tutorials">Tutoriais</a></li>
                 <li><a href="http://spaghettiphp.org/screencasts">Screencasts</a></li>
                 <li><a href="http://spaghettiphp.org/components">Componentes</a></li>
-                <li><a href="http://trac.spaghettiphp.org/">Reposit&oacute;rio de Vers&otilde;es</a></li>
             </ul>
 
             <h2>Estenda sua aplica&ccedil;&atilde;o</h2>
