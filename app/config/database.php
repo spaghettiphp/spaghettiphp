@@ -8,9 +8,9 @@
 $database = array(
     "development" => array(
         "host" => "localhost",
-        "user" => "username",
-        "password" => "root",
-        "database" => "spaghetti",
+        "user" => "root",
+        "password" => "",
+        "database" => "tests",
         "prefix" => ""
     )
 );

@@ -365,36 +365,32 @@ class Model extends Object {
             $data["modified"] = $date;
         endif;
         
-		$this->beforeSave();
-        if(isset($data["id"]) && $this->exists($data["id"])):
-            $this->update(array("id" => $data["id"]), $data);
-            $this->id = $data["id"];
-        else:
-            if(isset($this->schema["created"]) && !isset($data["created"]) && in_array($this->schema["modified"]["type"], array("date", "datetime", "time"))):
-                $data["created"] = $date;
+        $saveData = array();
+        foreach($data as $field => $value):
+            if(isset($this->schema[$field])):
+                $saveData[$field] = $value;
             endif;
-            $this->insert($data);
+        endforeach;
+        
+		$this->beforeSave();
+        if(isset($saveData["id"]) && $this->exists($saveData["id"])):
+            $this->update(array("id" => $saveData["id"]), $saveData);
+            $this->id = $saveData["id"];
+        else:
+            if(isset($this->schema["created"]) && !isset($saveData["created"]) && in_array($this->schema["modified"]["type"], array("date", "datetime", "time"))):
+                $saveData["created"] = $date;
+            endif;
+            $this->insert($saveData);
             $this->id = $this->getInsertId();
         endif;
         $this->afterSave();
         
-        /**
-         * correção para trabalhar com hasOne
-         * inserção e alteração em pleno funcionamento
-         * by Victor Feitoza - obrigado!
-         */
         foreach(array("hasOne", "hasMany") as $type):
             foreach($this->{$type} as $class => $assoc):
                 $assocModel = Inflector::underscore($class);
-                //if(isset($data[$assocModel])):
-                if(is_object($this->{$class})):
-					$this->beforeSave();
-                    //$data[$assocModel][$assoc["foreignKey"]] = $this->id;
-                    $data['id'] = $data[$assocModel.'_id'];
-                    $data[$assoc["foreignKey"]] = $this->id;
-                    //$this->{$class}->save($data[$assocModel]);
+                if(isset($data[$assocModel])):
+                    $data[$assocModel][$assoc["foreignKey"]] = $this->id;
                     $this->{$class}->save($data);
-					$this->afterSave();
                 endif;
             endforeach;
         endforeach;
