@@ -389,8 +389,14 @@ class Model extends Object {
             foreach($this->{$type} as $class => $assoc):
                 $assocModel = Inflector::underscore($class);
                 if(isset($data[$assocModel])):
-                    $data[$assocModel][$assoc["foreignKey"]] = $this->id;
-                    $this->{$class}->save($data);
+                    if($type == "hasOne"):
+                        $data[$assocModel] = array($data[$assocModel]);
+                    endif;
+                    foreach($data[$assocModel] as $assocData):
+                        $assocData[$assoc["foreignKey"]] = $this->id;
+                        $this->{$class}->create();
+                        $this->{$class}->save($assocData);
+                    endforeach;
                 endif;
             endforeach;
         endforeach;
