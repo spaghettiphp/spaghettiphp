@@ -46,7 +46,11 @@ class View extends Object {
      * Variáveis definidas no controller para serem passadas para a view.
      */
     public $viewData = array();
-    
+    /**
+     *  Construtor.
+     * 
+     *  @param object $controller Controle atual
+     */
     public function __construct(&$controller = null) {
         if($controller):
             $this->controller = preg_replace("/-/", "_", $controller->param("controller"));

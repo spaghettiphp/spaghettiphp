@@ -48,6 +48,12 @@ class Mapper extends Object {
             $this->here = self::normalize(substr($_SERVER["REQUEST_URI"], $start));
         endif;
     }
+    /**
+     *  Retorna uma única instância (Singleton) da classe solicitada.
+     *
+     *  @staticvar object $instance Objeto a ser verificado
+     *  @return object Objeto da classe utilizada
+     */
     public static function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):

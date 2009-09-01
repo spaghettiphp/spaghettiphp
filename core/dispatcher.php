@@ -17,7 +17,12 @@ class Dispatcher extends Object {
      *  URL recebida através de Mapper::here.
      */
     public $url = "";
-    
+    /**
+     *  Construtor.
+     * 
+     *  @param boolean $dispatch Instância ou não o novo controller
+     *  @return mixed Instância do novo controller ou falso em caso de erro
+     */
     public function __construct($dispatch = true) {
         $this->parseUrl();
         if($dispatch) return $this->dispatch();

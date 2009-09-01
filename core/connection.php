@@ -17,9 +17,18 @@ class Connection extends Object {
      *  Datasources já instanciados.
      */
     private $datasources = array();
+    /**
+     *  Lendo arquivos de configuração do banco de dados.
+     */
     public function __construct() {
         $this->config = Config::read("database");
     }
+    /**
+     *  Retorna uma única instância (Singleton) da classe solicitada.
+     *
+     *  @staticvar object $instance Objeto a ser verificado
+     *  @return object Objeto da classe utilizada
+     */
     public static function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
