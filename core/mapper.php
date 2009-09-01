@@ -28,11 +28,7 @@ class Mapper extends Object {
      *  Controller padrão da aplicação.
      */
     public $root = null;
-    /**
-     *  Define a URL base e URL atual da aplicação.
-     *
-     *  @return void
-     */
+
     public function __construct() {
         if(is_null($this->base)):
             $this->base = dirname($_SERVER["PHP_SELF"]);
@@ -48,12 +44,6 @@ class Mapper extends Object {
             $this->here = self::normalize(substr($_SERVER["REQUEST_URI"], $start));
         endif;
     }
-    /**
-     *  Retorna uma única instância (Singleton) da classe solicitada.
-     *
-     *  @staticvar object $instance Objeto a ser verificado
-     *  @return object Objeto da classe utilizada
-     */
     public static function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):

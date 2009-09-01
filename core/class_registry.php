@@ -11,15 +11,8 @@
 class ClassRegistry {
     /**
      *  Nome das classes a serem utilizados pelo Spaghetti
-     *  @var array
      */
     public $objects = array();
-    /**
-     *  Retorna uma única instância (Singleton) da classe solicitada.
-     *
-     *  @staticvar object $instance Objeto a ser verificado
-     *  @return object Objeto da classe utilizada
-     */
     public static function &getInstance() {
         static $instance = array();
         if (!$instance):
@@ -69,7 +62,7 @@ class ClassRegistry {
         return ${$class};
     }
     /**
-     *  ClassRegistry::addObject() adiciona uma instância de uma classe no registro.
+     *  Adiciona uma instância de uma classe no registro.
      * 
      *  @param string $key Nome da chave
      *  @param object &$object Referência ao objeto a ser registrado
@@ -85,7 +78,7 @@ class ClassRegistry {
         return false;
     }
     /**
-     *  ClassRegistry::removeObject() remove uma instância de uma classe do registro.
+     *  Remove uma instância de uma classe do registro.
      *  
      *  @param string $key Nome da chave
      *  @return boolean true
@@ -98,7 +91,7 @@ class ClassRegistry {
         return true;
     }
     /**
-     *  ClassRegistry::isKeySet() verifica se uma se uma chave já está registrada.
+     *  Verifica se uma se uma chave já está registrada.
      * 
      *  @param string $key Nome da chave
      *  @return boolean Verdadeiro se a chave está registrada
@@ -111,7 +104,7 @@ class ClassRegistry {
         return false;
     }
     /**
-     *  ClassRegistry::getObject() retorna a instância da respectiva chave solicitada.
+     *  Retorna a instância da respectiva chave solicitada.
      * 
      *  @param string $key Nome da chave
      *  @return mixed Objeto correspondente a chave, falso se a chave não existe
@@ -125,7 +118,7 @@ class ClassRegistry {
         return $return;
     }
     /**
-     *  ClassRegistry::duplicate() retorna uma cópia de uma instância já registrada.
+     *  Retorna uma cópia de uma instância já registrada.
      * 
      *  @param string $key Chave da instância a ser buscada
      *  @param object $class Instância da classe a ser buscada
@@ -144,7 +137,7 @@ class ClassRegistry {
         return $duplicate;
     }
     /**
-     *  ClassRegistry::flush() limpa todos os objetos instanciados do registro.
+     *  Limpa todos os objetos instanciados do registro.
      * 
      *  @return boolean true
      */
