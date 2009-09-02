@@ -71,6 +71,8 @@ class Model extends Object {
         "hasOne" => array("foreignKey", "conditions")
     );
 
+    public $pagination = array();
+
     public function __construct() {
         if(is_null($this->environment)):
             $this->environment = Config::read("environment");
@@ -350,8 +352,14 @@ class Model extends Object {
         $offset = ($page - 1) * $params["perPage"];
         $params["limit"] = "{$offset},{$params['perPage']}";
 
-        $this->pagination["page"] = $page;
-        $this->pagination["totalPages"] = ceil($this->count($params) / $params["perPage"]);
+        $totalRecords = $this->count($params);
+        $this->pagination = array(
+            "totalRecords" => $totalRecords,
+            "totalPages" => ceil($totalRecords / $params["perPage"]),
+            "perPage" => $params["perPage"],
+            "offset" => $offset,
+            "page" => $page
+        );
 
         return $this->all($params);
     }
@@ -521,14 +529,6 @@ class Model extends Object {
         $db =& self::getConnection($this->environment);
         return $db->getAffectedRows();
     }
-    
-    /**
-     *  Do NOT mess with this code yet!
-     */
-    public $pagination = array(
-        "page" => null,
-        "totalPages" => null
-    );
 }
 
 ?>
