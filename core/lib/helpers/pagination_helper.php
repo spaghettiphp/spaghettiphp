@@ -44,18 +44,29 @@ class PaginationHelper extends HtmlHelper {
      *  Short description.
      */
     public function hasNext() {
-        return $this->model->pagination["page"] < $this->model->pagination["totalPages"];
+        if($this->model):
+            return $this->model->pagination["page"] < $this->model->pagination["totalPages"];
+        endif;
+        return false;
     }
     /**
      *  Short description.
      */
     public function hasPrevious() {
-        return $this->model->pagination["page"] != 1;
+        if($this->model):
+            return $this->model->pagination["page"] != 1;
+        endif;
+        return false;
     }
     public function getUrl($direction) {
         $page = $this->model->pagination["page"] + $direction;
-        $url = preg_replace("%page:\d+/?%", "", Mapper::here());
-        return $url . "/page:{$page}";
+        $here = Mapper::here();
+        if(preg_match("/page:\d?/", $here)):
+            $url = preg_replace("%page:\d+?%", "page:{$page}", $here);
+        else:
+            $url = "{$here}/page:{$page}";
+        endif;
+        return $url;
     }
 }
 
