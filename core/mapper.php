@@ -28,11 +28,7 @@ class Mapper extends Object {
      *  Controller padrão da aplicação.
      */
     public $root = null;
-    /**
-     *  Define a URL base e URL atual da aplicação.
-     *
-     *  @return void
-     */
+
     public function __construct() {
         if(is_null($this->base)):
             $this->base = dirname($_SERVER["PHP_SELF"]);
