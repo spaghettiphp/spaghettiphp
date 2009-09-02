@@ -39,10 +39,10 @@ class Dispatcher extends Object {
             $this->path[$key] = $reg[$k];
         }
         
-        $this->path["namedParams"] = $this->path["params"] = array();
+        $this->path["named"] = $this->path["params"] = array();
         foreach(split("/", $reg[6]) as $param):
             if(preg_match("/([^:]*):([^:]*)/", $param, $reg)):
-                $this->path["namedParams"][$reg[1]] = urldecode($reg[2]);
+                $this->path["named"][$reg[1]] = urldecode($reg[2]);
             elseif($param != ""):
                 $this->path["params"] []= urldecode($param);
             endif;
@@ -56,7 +56,7 @@ class Dispatcher extends Object {
         if(empty($this->path["extension"])) $this->path["extension"] = Config::read("defaultExtension");
         if(!empty($this->path["queryString"])):
             parse_str($this->path["queryString"], $queryString);
-            $this->path["namedParams"] = array_merge($this->path["namedParams"], $queryString);
+            $this->path["named"] = array_merge($this->path["named"], $queryString);
         endif;
         
         return $this->path;

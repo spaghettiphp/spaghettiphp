@@ -45,7 +45,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -59,7 +59,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -73,7 +73,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -87,7 +87,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -101,7 +101,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -115,7 +115,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -129,7 +129,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array("params"),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -143,7 +143,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "html",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -157,7 +157,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "html",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -171,7 +171,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "html",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -185,7 +185,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "html",
             "params" => array("params"),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -199,7 +199,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "html",
             "params" => array("params", "anotherParam"),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -213,7 +213,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -227,7 +227,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -241,7 +241,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -255,7 +255,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
@@ -269,11 +269,11 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array("param" => "value")
+            "named" => array("param" => "value")
         );
         $this->assertEqual($expected, $results);
     }
-    public function testParseWithManyNamedParams() {
+    public function testParseWithManynamed() {
         $results = $this->dispatcher->parseUrl("/controller/action/1/param:value/anotherParam:anotherValue");
         $expected = array(
             "here" => "/controller/action/1/param:value/anotherParam:anotherValue",
@@ -283,7 +283,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array("param" => "value", "anotherParam" => "anotherValue")
+            "named" => array("param" => "value", "anotherParam" => "anotherValue")
         );
         $this->assertEqual($expected, $results);
     }
@@ -297,7 +297,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array("param"),
-            "namedParams" => array("param" => "value")
+            "named" => array("param" => "value")
         );
         $this->assertEqual($expected, $results);
     }
@@ -311,7 +311,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array("param"),
-            "namedParams" => array("param" => "value")
+            "named" => array("param" => "value")
         );
         $this->assertEqual($expected, $results);
     }
@@ -325,11 +325,11 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array("param with space"),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
-    public function testParseWithSpacedNamedParams() {
+    public function testParseWithSpacednamed() {
         $results = $this->dispatcher->parseUrl("/controller/action/1/name:param+with+space");
         $expected = array(
             "here" => "/controller/action/1/name:param+with+space",
@@ -339,7 +339,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "htm",
             "params" => array(),
-            "namedParams" => array("name" => "param with space")
+            "named" => array("name" => "param with space")
         );
         $this->assertEqual($expected, $results);
     }
@@ -353,7 +353,7 @@ class TestDispatcher extends UnitTestCase {
     //        "id" => "",
     //        "extension" => "htm",
     //        "params" => array(),
-    //        "namedParams" => array("param" => "value")
+    //        "named" => array("param" => "value")
     //    );
     //    $this->assertEqual($expected, $results);
     //}
@@ -367,11 +367,11 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "xml",
             "params" => array("param"),
-            "namedParams" => array()
+            "named" => array()
         );
         $this->assertEqual($expected, $results);
     }
-    public function parseUrlWithExtensionAfterNamedParams() {
+    public function parseUrlWithExtensionAfternamed() {
         $results = $this->dispatcher->parseUrl("/controller/action/1/name:param.xml");
         $expected = array(
             "here" => "/controller/action/1/param.htm",
@@ -381,7 +381,7 @@ class TestDispatcher extends UnitTestCase {
             "id" => "1",
             "extension" => "xml",
             "params" => array(),
-            "namedParams" => array("name" => "param")
+            "named" => array("name" => "param")
         );
         $this->assertEqual($expected, $results);
     }

@@ -274,11 +274,29 @@ class Controller extends Object {
     /**
      *  Retorna o valor de um parâmetro da URL
      *
-     *  @param string $param Nome do valor a ser retornado
+     *  @param string $key Chave do valor a ser retornado
      *  @return string Valor do parâmetro
      */
-    public function param($param = null) {
-        return $this->params[$param];
+    public function param($key = null) {
+        if(isset($this->params["named"][$key])):
+            return $this->params["named"][$key];
+        elseif(in_array($key, array_keys($this->params))):
+            return $this->params[$key];
+        endif;
+        return null;
+    }
+    /**
+     *  Retorna a o número de página atual.
+     *
+     *  @param string $param Parâmetro contento o número de página
+     *  @return integer Número de página atual
+     */
+    public function page($param = "page") {
+        $page = $this->param($param);
+        if(is_null($page) || empty($page)):
+            $page = 1;
+        endif;
+        return $page;
     }
 }
 
