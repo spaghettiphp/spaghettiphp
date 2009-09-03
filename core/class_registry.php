@@ -10,7 +10,7 @@
 
 class ClassRegistry {
     /**
-     *  Short description.
+     *  Nome das classes a serem utilizados pelo Spaghetti
      */
     public $objects = array();
 
@@ -22,11 +22,12 @@ class ClassRegistry {
         return $instance[0];
     }
     /**
-     *  Short description.
+     *  Carrega a classe, registrando o objeto, retornando uma instância
+     *  para a mesma.
      *
-     *  @param string $class
-     *  @param string $type
-     *  @return object
+     *  @param string $class Classe a ser inicializada
+     *  @param string $type Tipo da classe
+     *  @return object Instância da classe
      */
     public static function &load($class, $type = "Model") {
         $self =& ClassRegistry::getInstance();
@@ -45,7 +46,7 @@ class ClassRegistry {
         endif;
     }
     /**
-     *  Short description.
+     *  Adiciona uma instância de uma classe no registro.
      * 
      *  @param string $key
      *  @param object &$object
@@ -60,7 +61,7 @@ class ClassRegistry {
         return false;
     }
     /**
-     *  Short description.
+     *  Remove uma instância de uma classe do registro.
      *  
      *  @param string $key
      *  @return boolean true
@@ -73,7 +74,7 @@ class ClassRegistry {
         return true;
     }
     /**
-     *  Short description.
+     *  Verifica se uma se uma chave já está registrada.
      * 
      *  @param string $key
      *  @return boolean
@@ -86,7 +87,7 @@ class ClassRegistry {
         return false;
     }
     /**
-     *  Short description.
+     *  Retorna a instância da respectiva chave solicitada.
      * 
      *  @param string $key
      *  @return mixed
@@ -100,7 +101,7 @@ class ClassRegistry {
         return $return;
     }
     /**
-     *  Short description.
+     *  Retorna uma cópia de uma instância já registrada.
      * 
      *  @param string $key
      *  @param object $class
@@ -119,7 +120,7 @@ class ClassRegistry {
         return $duplicate;
     }
     /**
-     *  Short description.
+     *  Limpa todos os objetos instanciados do registro.
      * 
      *  @return boolean true
      */

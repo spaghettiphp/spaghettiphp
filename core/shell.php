@@ -1,17 +1,27 @@
 <?php
 /**
- *  Short Description
+ *  Gerencia os dados para utilização em console.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
-
 class Shell extends Object {
+    /**
+     *  Expõe o texto do erro e paraliza a execução posteriormente.
+     * 
+     *  @param string $text Texto a ser exibido
+     */
     public function error($text = null) {
         $this->log($text, "error");
         $this->stop();
     }
+    /**
+     *  Grava as mensagens com o método que a chamou.
+     * 
+     *  @param string $message Mensagem a ser gravada
+     *  @param string $type Tipo da execução
+     */
     public function log($message = null, $type = "created") {
         printf("%15s  %s\n", $type, $message);
     }

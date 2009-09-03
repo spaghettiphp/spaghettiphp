@@ -17,7 +17,7 @@ class Dispatcher extends Object {
      *  URL recebida através de Mapper::here.
      */
     public $url = "";
-    
+
     /**
      *  Chama o controller e a action solicitadas pela URL.
      * 

@@ -194,7 +194,7 @@ class AuthComponent extends Component {
             $this->error("missingModel", array("model" => $this->userModel));
             return false;
         endif;
-        $user = $userModel->first(array_merge($this->userScope, $data));
+        $user = $userModel->first(array("conditions" => array_merge($this->userScope, $data)));
         return $user;
     }
     /**
