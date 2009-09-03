@@ -1,6 +1,6 @@
 <?php
 /**
- *  Mapper é o responsável por cuidar de URLs e roteamento dentro do Spaghetti.
+ *  Mapper é o responsável por cuidar de URLs e roteamento dentro do Spaghetti*.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -35,7 +35,7 @@ class Mapper extends Object {
     public function __construct() {
         if(is_null($this->base)):
             $this->base = dirname($_SERVER["PHP_SELF"]);
-            while(in_array(basename($this->base), array("app", "core", "tests", "webroot"))):
+            while(in_array(basename($this->base), array("app", "webroot"))):
                 $this->base = dirname($this->base);
             endwhile;
             if($this->base == DS || $this->base == "."):
@@ -205,9 +205,9 @@ class Mapper extends Object {
      *  @return array URL interpretada
      */
     public function parse($url = null) {
-        $here = Mapper::normalize(is_null($url) ? Mapper::here() : $url);
-        $url = Mapper::getRoute($here);
-        $prefixes = join("|", Mapper::getPrefixes());
+        $here = self::normalize(is_null($url) ? Mapper::here() : $url);
+        $url = self::getRoute($here);
+        $prefixes = join("|", self::getPrefixes());
         
         $path = array();
         $parts = array("here", "prefix", "controller", "action", "id", "extension", "params", "queryString");
@@ -226,7 +226,7 @@ class Mapper extends Object {
         endforeach;
 
         $path["here"] = $here;
-        if(empty($path["controller"])) $path["controller"] = Mapper::getRoot();
+        if(empty($path["controller"])) $path["controller"] = self::getRoot();
         if(empty($path["action"])) $path["action"] = "index";
         if(!empty($path["prefix"])) $path["action"] = "{$path['prefix']}_{$path['action']}";
         if(empty($path["id"])) $path["id"] = null;
