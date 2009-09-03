@@ -182,6 +182,20 @@ class HtmlHelper extends Helper {
         endif;
         return $file;
     }
+    /*
+     * Transforma um array em uma lista não ordenada.
+     * 
+     * @param array $array Array com os valores que virarão lista
+     * @param string $class Classe CSS que será adicionada à lista
+     * @return string
+     */
+    public function arrayToList($array = array(), $class=null){
+        $class = $class ? ' class="' . $class .'"' : '';
+        $html = "<ul{$class}><li>";
+        $html .= implode("</li><li>", $array);
+        $html .= "</li></ul>";
+        return $this->output($hmtl);
+    }
 }
 
 ?>
