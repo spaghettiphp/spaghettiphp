@@ -217,6 +217,55 @@ class Mapper extends Object {
         $self = self::getInstance();
         return $self->root;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     *  Faz a interpretação da URL, identificando as partes da URL.
+     * 
+     *  @param string $url URL a ser interpretada
+     *  @return array URL interpretada
+     */
+    public function parse($url = null) {
+        $here = Mapper::normalize(is_null($url) ? Mapper::here() : $url);
+        $url = Mapper::getRoute($here);
+        $prefixes = join("|", Mapper::getPrefixes());
+        
+        $path = array();
+        $parts = array("here", "prefix", "controller", "action", "id", "extension", "params", "queryString");
+        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i", $url, $reg);
+        foreach($parts as $k => $key) {
+            $path[$key] = $reg[$k];
+        }
+        
+        $path["namedParams"] = $path["params"] = array();
+        foreach(split("/", $reg[6]) as $param):
+            if(preg_match("/([^:]*):([^:]*)/", $param, $reg)):
+                $path["namedParams"][$reg[1]] = urldecode($reg[2]);
+            elseif($param != ""):
+                $path["params"] []= urldecode($param);
+            endif;
+        endforeach;
+
+        $path["here"] = $here;
+        if(empty($path["controller"])) $path["controller"] = Mapper::getRoot();
+        if(empty($path["action"])) $path["action"] = "index";
+        if(!empty($path["prefix"])) $path["action"] = "{$path['prefix']}_{$path['action']}";
+        if(empty($path["id"])) $path["id"] = null;
+        if(empty($path["extension"])) $path["extension"] = Config::read("defaultExtension");
+        if(!empty($path["queryString"])):
+            parse_str($path["queryString"], $queryString);
+            $path["namedParams"] = array_merge($path["namedParams"], $queryString);
+        endif;
+        
+        return $path;
+    }
 }
 
 ?>

@@ -56,6 +56,7 @@ define("APP", ROOT . DS . "app");
  */
 require_once CORE . DS . "bootstrap.php";
 
-new Dispatcher();
+$dispatcher = new Dispatcher;
+$dispatcher->dispatch();
 
 ?>
