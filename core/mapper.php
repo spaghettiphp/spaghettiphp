@@ -204,7 +204,7 @@ class Mapper extends Object {
      *  @param string $url URL a ser interpretada
      *  @return array URL interpretada
      */
-    public function parse($url = null) {
+    public static function parse($url = null) {
         $here = self::normalize(is_null($url) ? Mapper::here() : $url);
         $url = self::getRoute($here);
         $prefixes = join("|", self::getPrefixes());
@@ -216,10 +216,10 @@ class Mapper extends Object {
             $path[$key] = $reg[$k];
         }
         
-        $path["namedParams"] = $path["params"] = array();
+        $path["named"] = $path["params"] = array();
         foreach(split("/", $reg[6]) as $param):
             if(preg_match("/([^:]*):([^:]*)/", $param, $reg)):
-                $path["namedParams"][$reg[1]] = urldecode($reg[2]);
+                $path["named"][$reg[1]] = urldecode($reg[2]);
             elseif($param != ""):
                 $path["params"] []= urldecode($param);
             endif;
@@ -233,7 +233,7 @@ class Mapper extends Object {
         if(empty($path["extension"])) $path["extension"] = Config::read("defaultExtension");
         if(!empty($path["queryString"])):
             parse_str($path["queryString"], $queryString);
-            $path["namedParams"] = array_merge($path["namedParams"], $queryString);
+            $path["named"] = array_merge($path["named"], $queryString);
         endif;
         
         return $path;
@@ -246,14 +246,28 @@ class Mapper extends Object {
      *  @return string URL gerada para a aplicação
      */
     public static function url($path = null, $full = false) {
-        if(preg_match("/^[a-z]+:/", $path)):
-            return $path;
-        elseif(substr($path, 0, 1) == "/"):
-            $url = self::base() . $path;
+        if(is_array($path)):
+            $here = Mapper::parse();
+            $default = array_merge(
+                array(
+                    "prefix" => $here["prefix"],
+                    "controller" => $here["controller"],
+                    "action" => $here["action"],
+                    "id" => $here["id"]
+                ),
+                $here["named"]
+            );
+            $url = join("/", $default);
         else:
-            $url = self::base() . self::here() . "/" . $path;
+            if(preg_match("/^[a-z]+:/", $path)):
+                return $path;
+            elseif(substr($path, 0, 1) == "/"):
+                $url = self::base() . $path;
+            else:
+                $url = self::base() . self::here() . "/" . $path;
+            endif;
+            $url = self::normalize($url);
         endif;
-        $url = self::normalize($url);
         return $full ? BASE_URL . $url : $url;
     }
 }
