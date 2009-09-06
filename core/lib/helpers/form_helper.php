@@ -23,8 +23,11 @@ class FormHelper extends HtmlHelper {
             ),
             $options
         );
-        $form = $this->openTag("form", $attributes);
-        return $this->output($form);
+        if($attributes["method"] == "file"):
+            $attributes["method"] = "post";
+            $attributes["enctype"] = "multipart/form-data";
+        endif;
+        return $this->output($this->openTag("form", $attributes));
     }
     /**
      *  Short description.
