@@ -67,24 +67,6 @@ class FormHelper extends HtmlHelper {
         return $this->output($button);
     }
     /**
-     *  Cria uma caixa de texto multi-linhas.
-     *
-     *  @param string $name Nome da caixa de texto
-     *  @param string $value Conteudo da caixa de texto
-     *  @param array $attr Atributos da tag
-     *  @return string Caixa de texto do formulário
-     */
-    public function textarea($name = "", $attributes = array()) {
-        $attributes = array_merge(
-            array(
-                "name" => $name
-            ),
-            $attributes
-        );
-        $input = $this->tag("textarea", array_unset($attributes, "value"), $attributes);
-        return $this->output($input);
-    }
-    /**
      *  Cria uma caixa de seleção.
      * 
      *  @param string $name Nome da caixa de seleção
@@ -129,7 +111,7 @@ class FormHelper extends HtmlHelper {
         if($options["type"] == "select"):
             $input = $this->select($name, $options["options"], $options["value"], $options);
         elseif($options["type"] == "textarea"):
-            $input = $this->textarea($name, $options);
+            $input = $this->tag("textarea", array_unset($attributes, "value"), $attributes);
         else:
             $input = $this->tag("input", null, $options, false);
         endif;
