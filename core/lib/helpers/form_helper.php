@@ -112,7 +112,6 @@ class FormHelper extends HtmlHelper {
      *  @param array $attr Atributos da tag
      *  @return string Campo de entrada do formulário
      */
-    #public function input($name = "", $value = "", $options = array()) {
     public function input($name, $options = array()) {
         $options = array_merge(array(
             "type" => "text",
@@ -127,8 +126,10 @@ class FormHelper extends HtmlHelper {
         $label = array_unset($options, "label");
         $div = array_unset($options, "div");
         
-        if($options["type"] == "textarea" || $options["type"] == "select"):
-            $input = "#TODO#";
+        if($options["type"] == "select"):
+            $input = $this->select($name, $options["options"], $options["value"], $options);
+        elseif($options["type"] == "textarea"):
+            $input = $this->textarea($name, $options);
         else:
             $input = $this->tag("input", null, $options, false);
         endif;
