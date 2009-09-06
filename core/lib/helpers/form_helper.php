@@ -50,12 +50,20 @@ class FormHelper extends HtmlHelper {
      *  @param array $attributes Atributos e opções da tag
      *  @return string Botão de envio do formulário
      */
-    public function submit($submit = "", $attributes = array()) {
+    public function submit($text, $attributes = array()) {
         $attributes = array_merge(
-            array("type" => "submit"),
+            array(
+                "type" => "submit",
+                "tag" => "button"
+            ),
             $attributes
         );
-        $button = $this->tag("button", $submit, $attributes);
+        if(array_unset($attributes, "tag") == "input"):
+            $attributes["value"] = $text;
+            $button = $this->tag("input", null, $attributes, false);
+        else:
+            $button = $this->tag("button", $text, $attributes);
+        endif;
         return $this->output($button);
     }
     /**
