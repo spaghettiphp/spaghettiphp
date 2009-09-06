@@ -142,6 +142,17 @@ class HtmlHelper extends Helper {
         return $this->output($this->tag("script", null, $attr));
     }
     /**
+     *  Short description.
+     *
+     *  @return string
+     */
+    public function div($content, $attributes = array()) {
+        if(!is_array($attributes)):
+            $attributes = array("class" => $attributes);
+        endif;
+        return $this->output($this->tag("div", $content, $attributes));
+    }
+    /**
      *  Cria uma URL interna para utilização no HTML.
      * 
      *  @param string $path Caminho relativo a URL

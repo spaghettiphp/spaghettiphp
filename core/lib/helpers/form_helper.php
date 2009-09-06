@@ -67,25 +67,6 @@ class FormHelper extends HtmlHelper {
         return $this->output($button);
     }
     /**
-     *  Cria uma caixa de texto.
-     *
-     *  @param string $name Nome da caixa de texto
-     *  @param string $value Conteudo da caixa de texto
-     *  @param array $attr Atributos da tag
-     *  @return string Caixa de texto do formulário
-     */
-    public function text($name = "", $attributes = array()) {
-        $attributes = array_merge(
-            array(
-                "type" => "text",
-                "name" => $name
-            ),
-            $attributes
-        );
-        $input = $this->tag("input", null, $attributes, false);
-        return $this->output($input);
-    }
-    /**
      *  Cria uma caixa de texto multi-linhas.
      *
      *  @param string $name Nome da caixa de texto
@@ -101,62 +82,6 @@ class FormHelper extends HtmlHelper {
             $attributes
         );
         $input = $this->tag("textarea", array_unset($attributes, "value"), $attributes);
-        return $this->output($input);
-    }
-    /**
-     *  Cria uma caixa de texto para senhas.
-     * 
-     *  @param string $name Nome da caixa de texto
-     *  @param string $value Conteudo da caixa de texto
-     *  @param array $attr Atributos da tag
-     *  @return string Caixa de texto do formulário
-     */
-    public function password($name = "", $attributes = array()) {
-        $attributes = array_merge(
-            array(
-                "type" => "password",
-                "name" => $name
-            ),
-            $attributes
-        );
-        $input = $this->tag("input", null, $attributes, false);
-        return $this->output($input);
-    }
-    /**
-     *  Cria uma caixa de texto para enviar arquivos.
-     * 
-     *  @param string $name Nome da caixa de envio de arquivo
-     *  @param string $value Conteudo da caixa de envio de arquivo
-     *  @return string Caixa de envio de arquivo do formulário
-     */
-    public function file($name = "", $attributes = array()) {
-        $attributes = array_merge(
-            array(
-                "type" => "file",
-                "name" => $name
-            ),
-            $attributes
-        );
-        $input = $this->tag("input", null, $attributes, false);
-        return $this->output($input);
-    }
-    /**
-     *  Cria um campo oculto.
-     * 
-     *  @param string $name Nome do campo oculto
-     *  @param string $value Conteudo do campo oculto
-     *  @param array $attr Atributos da tag
-     *  @return string Campo oculto do formulário
-     */
-    public function hidden($name = "", $attributes = array()) {
-        $attributes = array_merge(
-            array(
-                "type" => "hidden",
-                "name" => $name
-            ),
-            $attributes
-        );
-        $input = $this->tag("input", null, $attributes, false);
         return $this->output($input);
     }
     /**
@@ -187,22 +112,39 @@ class FormHelper extends HtmlHelper {
      *  @param array $attr Atributos da tag
      *  @return string Campo de entrada do formulário
      */
-    public function input($name = "", $value = "", $options = array()) {
+    #public function input($name = "", $value = "", $options = array()) {
+    public function input($name, $options = array()) {
         $options = array_merge(array(
             "type" => "text",
-            "label" => Inflector::humanize($name)
+            "id" => md5(rand()),
+            "label" => Inflector::humanize($name),
+            "div" => true
         ), $options);
-        $type = array_unset($options, "type");
-        $label = array_unset($options, "label");
-        if($type == "select"):
-            $values = $options["options"];
-            unset($options["options"]);
-            $input = $this->select($name, $values, $value, $options);
-        else:
-            $options["value"] = $value;
-            $input = $this->{$type}($name, $options);
+        if($name == "password"):
+            $options["type"] = "password";
         endif;
-        return $label != false ? $this->tag("label", "{$label}\n{$input}") : $input;
+        
+        $label = array_unset($options, "label");
+        $div = array_unset($options, "div");
+        
+        if($options["type"] == "textarea" || $options["type"] == "select"):
+            $input = "#TODO#";
+        else:
+            $input = $this->tag("input", null, $options, false);
+        endif;
+        
+        if($label):
+            $input = $this->tag("label", $label, array("for" => $options["id"])) . $input;
+        endif;
+        
+        if($div):
+            if($div === true):
+                $div = "input {$options['type']}";
+            endif;
+            $input = $this->div($input, $div);
+        endif;
+
+        return $this->output($input);
     }
     /**
      *  Cria um conjunto de caixa de seleção para a data.
