@@ -75,16 +75,26 @@ class FormHelper extends HtmlHelper {
      *  @param array $attr Atributos da tag
      *  @return string Caixa de seleção do formulário
      */
-    public function select($name = "", $values = array(), $selected = "", $attr = array()) {
-        $options = "";
-        foreach($values as $key => $value):
-            $optionAttr = array("value" => $key);
-            if($key == $selected):
-                $optionAttr["selected"] = "selected";
-            endif;
-            $options .= $this->tag("option", $value, $optionAttr);
-        endforeach;
-        return $this->tag("select", $options, array_merge(array("name" => $name), $attr));
+    #public function select($name = "", $values = array(), $selected = "", $attr = array()) {
+    public function select($name, $options = array()) {
+        $options = array_merge(array(
+            "name" => $name,
+            "options" => array(),
+            "value" => null
+        ), $options);
+        if(isset($options["options"])):
+            $selectOptions = array_unset($options, "options");
+            $content = "";
+            foreach($selectOptions as $key => $value):
+                $optionAttr = array("value" => $value);
+                if($key === $options["value"]):
+                    $optionAttr["selected"] = true;
+                    unset($options["value"]);
+                endif;
+                $content .= $this->tag("option", $value, $optionAttr);
+            endforeach;
+        endif;
+        return $this->output($this->tag("select", $content, $options));
     }
     /**
      *  Cria caixa de entrada formatada e com label.
@@ -109,7 +119,8 @@ class FormHelper extends HtmlHelper {
         $div = array_unset($options, "div");
         
         if($options["type"] == "select"):
-            $input = $this->select($name, $options["options"], $options["value"], $options);
+            unset($options["type"]);
+            $input = $this->select($name, $options);
         elseif($options["type"] == "textarea"):
             $input = $this->tag("textarea", array_unset($attributes, "value"), $attributes);
         else:
