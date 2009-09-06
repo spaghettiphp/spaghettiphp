@@ -70,12 +70,9 @@ class FormHelper extends HtmlHelper {
      *  Cria uma caixa de seleção.
      * 
      *  @param string $name Nome da caixa de seleção
-     *  @param string $value Conteudo da caixa de seleção
-     *  @param string $selected Opção selecionada por padrão
-     *  @param array $attr Atributos da tag
+     *  @param array $options Atributos da tag
      *  @return string Caixa de seleção do formulário
      */
-    #public function select($name = "", $values = array(), $selected = "", $attr = array()) {
     public function select($name, $options = array()) {
         $options = array_merge(array(
             "name" => $name,
@@ -100,8 +97,7 @@ class FormHelper extends HtmlHelper {
      *  Cria caixa de entrada formatada e com label.
      * 
      *  @param string $name Nome do campo de entrada
-     *  @param string $value Conteudo do campo de entrada
-     *  @param array $attr Atributos da tag
+     *  @param array $options Atributos da tag
      *  @return string Campo de entrada do formulário
      */
     public function input($name, $options = array()) {
@@ -111,33 +107,28 @@ class FormHelper extends HtmlHelper {
             "label" => Inflector::humanize($name),
             "div" => true
         ), $options);
-        if($name == "password"):
-            $options["type"] = "password";
-        endif;
-        
         $label = array_unset($options, "label");
         $div = array_unset($options, "div");
-        
         if($options["type"] == "select"):
             unset($options["type"]);
             $input = $this->select($name, $options);
         elseif($options["type"] == "textarea"):
             $input = $this->tag("textarea", array_unset($attributes, "value"), $attributes);
         else:
+            if($name == "password"):
+                $options["type"] = "password";
+            endif;
             $input = $this->tag("input", null, $options, false);
         endif;
-        
         if($label):
             $input = $this->tag("label", $label, array("for" => $options["id"])) . $input;
         endif;
-        
         if($div):
             if($div === true):
                 $div = "input {$options['type']}";
             endif;
             $input = $this->div($input, $div);
         endif;
-
         return $this->output($input);
     }
     /**
