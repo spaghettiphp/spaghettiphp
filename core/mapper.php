@@ -1,6 +1,6 @@
 <?php
 /**
- *  Mapper é o responsável por cuidar de URLs e roteamento dentro do Spaghetti.
+ *  Mapper é o responsável por cuidar de URLs e roteamento dentro do Spaghetti*.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -28,15 +28,14 @@ class Mapper extends Object {
      *  Controller padrão da aplicação.
      */
     public $root = null;
+
     /**
      *  Define a URL base e URL atual da aplicação.
-     *
-     *  @return void
      */
     public function __construct() {
         if(is_null($this->base)):
             $this->base = dirname($_SERVER["PHP_SELF"]);
-            while(in_array(basename($this->base), array("app", "core", "tests", "webroot"))):
+            while(in_array(basename($this->base), array("app", "webroot"))):
                 $this->base = dirname($this->base);
             endwhile;
             if($this->base == DS || $this->base == "."):
@@ -54,6 +53,24 @@ class Mapper extends Object {
             $instance[0] = new Mapper();
         endif;
         return $instance[0];
+    }
+    /**
+     *  Getter para Mapper::here
+     *
+     *  @return string Valor de Mapper:here
+     */
+    public static function here() {
+        $self = self::getInstance();
+        return $self->here;
+    }
+    /**
+     *  Getter para Mapper::base
+     *
+     *  @return string Valor de Mapper::base
+     */
+    public static function base() {
+        $self = self::getInstance();
+        return $self->base;
     }
     /**
      *  Normaliza uma URL, removendo barras duplicadas ou no final de strings e
@@ -77,22 +94,59 @@ class Mapper extends Object {
         return $url;
     }
     /**
-     *  Gera uma URL, levando em consideração o local atual da aplicação.
+     *  Define o controller padrão da aplicação
      *
-     *  @param string $path Caminho relativo ou URL absoluta
-     *  @param bool $full URL completa (true) ou apenas o caminho
-     *  @return string URL gerada para a aplicação
+     *  @param string $controller Controller a ser definido como padrão
+     *  @return true
      */
-    public static function url($path = null, $full = false) {
-        if(preg_match("/^[a-z]+:/", $path)):
-            return $path;
-        elseif(substr($path, 0, 1) == "/"):
-            $url = self::base() . $path;
-        else:
-            $url = self::base() . self::here() . "/" . $path;
-        endif;
-        $url = self::normalize($url);
-        return $full ? BASE_URL . $url : $url;
+    public static function root($controller = "") {
+        $self = self::getInstance();
+        $self->root = $controller;
+        return true;
+    }
+    /**
+     *  Getter para Mapper::root
+     *
+     *  @return string Controller padrão da aplicação
+     */
+    public static function getRoot() {
+        $self = self::getInstance();
+        return $self->root;
+    }
+    /**
+     *  Short Description
+     *
+     *  @param string $prefix description
+     *  @return true
+     */
+    public static function prefix($prefix = "") {
+        $self = self::getInstance();
+        if(is_array($prefix)) $prefixes = $prefix;
+        else $prefixes = func_get_args();
+        foreach($prefixes as $prefix):
+            $self->prefixes []= $prefix;
+        endforeach;
+        return true;
+    }
+    /**
+     *  Remove um prefixo da lista
+     *
+     *  @param string $prefix Prefixo a ser removido
+     *  @return true
+     */
+    public static function unsetPrefix($prefix = "") {
+        $self = self::getInstance();
+        unset($self->prefixes[$prefix]);
+        return true;
+    }
+    /**
+     *  Retorna uma lista com todos os prefixos definidos pela aplicação.
+     *
+     *  @return array Lista de prefixos
+     */
+    public static function getPrefixes() {
+        $self = self::getInstance();
+        return $self->prefixes;
     }
     /**
      *  Short Description
@@ -145,77 +199,76 @@ class Mapper extends Object {
         return self::normalize($url);
     }
     /**
-     *  Define o controller padrão da aplicação
-     *
-     *  @param string $controller Controller a ser definido como padrão
-     *  @return true
+     *  Faz a interpretação da URL, identificando as partes da URL.
+     * 
+     *  @param string $url URL a ser interpretada
+     *  @return array URL interpretada
      */
-    public static function root($controller = "") {
-        $self = self::getInstance();
-        $self->root = $controller;
-        return true;
-    }
-    /**
-     *  Short Description
-     *
-     *  @param string $prefix description
-     *  @return true
-     */
-    public static function prefix($prefix = "") {
-        $self = self::getInstance();
-        if(is_array($prefix)) $prefixes = $prefix;
-        else $prefixes = func_get_args();
-        foreach($prefixes as $prefix):
-            $self->prefixes []= $prefix;
+    public static function parse($url = null) {
+        $here = self::normalize(is_null($url) ? Mapper::here() : $url);
+        $url = self::getRoute($here);
+        $prefixes = join("|", self::getPrefixes());
+        
+        $path = array();
+        $parts = array("here", "prefix", "controller", "action", "id", "extension", "params", "queryString");
+        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i", $url, $reg);
+        foreach($parts as $k => $key) {
+            $path[$key] = $reg[$k];
+        }
+        
+        $path["named"] = $path["params"] = array();
+        foreach(split("/", $reg[6]) as $param):
+            if(preg_match("/([^:]*):([^:]*)/", $param, $reg)):
+                $path["named"][$reg[1]] = urldecode($reg[2]);
+            elseif($param != ""):
+                $path["params"] []= urldecode($param);
+            endif;
         endforeach;
-        return true;
+
+        $path["here"] = $here;
+        if(empty($path["controller"])) $path["controller"] = self::getRoot();
+        if(empty($path["action"])) $path["action"] = "index";
+        if(!empty($path["prefix"])) $path["action"] = "{$path['prefix']}_{$path['action']}";
+        if(empty($path["id"])) $path["id"] = null;
+        if(empty($path["extension"])) $path["extension"] = Config::read("defaultExtension");
+        if(!empty($path["queryString"])):
+            parse_str($path["queryString"], $queryString);
+            $path["named"] = array_merge($path["named"], $queryString);
+        endif;
+        
+        return $path;
     }
     /**
-     *  Remove um prefixo da lista
+     *  Gera uma URL, levando em consideração o local atual da aplicação.
      *
-     *  @param string $prefix Prefixo a ser removido
-     *  @return true
+     *  @param string $path Caminho relativo ou URL absoluta
+     *  @param bool $full URL completa (true) ou apenas o caminho
+     *  @return string URL gerada para a aplicação
      */
-    public static function unsetPrefix($prefix = "") {
-        $self = self::getInstance();
-        unset($self->prefixes[$prefix]);
-        return true;
-    }
-    /**
-     *  Retorna uma lista com todos os prefixos definidos pela aplicação.
-     *
-     *  @return array Lista de prefixos
-     */
-    public static function getPrefixes() {
-        $self = self::getInstance();
-        return $self->prefixes;
-    }
-    /**
-     *  Getter para Mapper::here
-     *
-     *  @return string Valor de Mapper:here
-     */
-    public static function here() {
-        $self = self::getInstance();
-        return $self->here;
-    }
-    /**
-     *  Getter para Mapper::base
-     *
-     *  @return string Valor de Mapper::base
-     */
-    public static function base() {
-        $self = self::getInstance();
-        return $self->base;
-    }
-    /**
-     *  Getter para Mapper::root
-     *
-     *  @return string Controller padrão da aplicação
-     */
-    public static function getRoot() {
-        $self = self::getInstance();
-        return $self->root;
+    public static function url($path = null, $full = false) {
+        if(is_array($path)):
+            $here = Mapper::parse();
+            $default = array_merge(
+                array(
+                    "prefix" => $here["prefix"],
+                    "controller" => $here["controller"],
+                    "action" => $here["action"],
+                    "id" => $here["id"]
+                ),
+                $here["named"]
+            );
+            $url = join("/", $default);
+        else:
+            if(preg_match("/^[a-z]+:/", $path)):
+                return $path;
+            elseif(substr($path, 0, 1) == "/"):
+                $url = self::base() . $path;
+            else:
+                $url = self::base() . self::here() . "/" . $path;
+            endif;
+            $url = self::normalize($url);
+        endif;
+        return $full ? BASE_URL . $url : $url;
     }
 }
 

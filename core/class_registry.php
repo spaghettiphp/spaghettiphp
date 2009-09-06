@@ -1,7 +1,7 @@
 <?php
 /**
  *  ClassRegistry faz o registro e gerenciamento de instâncias das classes utilizadas
- *  pelo Spaghetti, evitando a criação de várias instâncias de uma mesma classe.
+ *  pelo Spaghetti*, evitando a criação de várias instâncias de uma mesma classe.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -9,7 +9,11 @@
  */
 
 class ClassRegistry {
+    /**
+     *  Nome das classes a serem utilizados pelo Spaghetti
+     */
     public $objects = array();
+
     public static function &getInstance() {
         static $instance = array();
         if (!$instance):
@@ -17,6 +21,14 @@ class ClassRegistry {
         endif;
         return $instance[0];
     }
+    /**
+     *  Carrega a classe, registrando o objeto, retornando uma instância
+     *  para a mesma.
+     *
+     *  @param string $class Classe a ser inicializada
+     *  @param string $type Tipo da classe
+     *  @return object Instância da classe
+     */
     public static function &load($class, $type = "Model") {
         $self =& ClassRegistry::getInstance();
         if($object =& $self->duplicate($class, $class)):
@@ -28,27 +40,17 @@ class ClassRegistry {
         endif;
         if(class_exists($class)):
             ${$class} = new $class;
-        endif;
-        return ${$class};
-    }
-    public static function &init($class, $type = "Model") {
-        $self =& ClassRegistry::getInstance();
-        if($model =& $self->duplicate($class, $class)):
-            return $model;
-        elseif(class_exists($class) || App::import($type, Inflector::underscore($class))):
-            ${$class} = new $class;
+            return ${$class};
         else:
-            $this->error("missing{$type}", array(strtolower($type) => $class));
+            return false;
         endif;
-        return ${$class};
     }
     /**
-     *  ClassRegistry::addObject() adiciona uma instância de uma classe no registro.
+     *  Adiciona uma instância de uma classe no registro.
      * 
-     *  @param string $key Nome da chave
-     *  @param object &$object Referência ao objeto a ser registrado
-     *  @return boolean Verdadeiro se a instância foi adicionada, falso se a chave
-     *  já existir
+     *  @param string $key
+     *  @param object &$object
+     *  @return boolean
      */
     public static function addObject($key, &$object) {
         $self =& ClassRegistry::getInstance();
@@ -59,9 +61,9 @@ class ClassRegistry {
         return false;
     }
     /**
-     *  ClassRegistry::removeObject() remove uma instância de uma classe do registro.
+     *  Remove uma instância de uma classe do registro.
      *  
-     *  @param string $key Nome da chave
+     *  @param string $key
      *  @return boolean true
      */
     public static function removeObject($key) {
@@ -72,10 +74,10 @@ class ClassRegistry {
         return true;
     }
     /**
-     *  ClassRegistry::isKeySet() verifica se uma se uma chave já está registrada.
+     *  Verifica se uma se uma chave já está registrada.
      * 
-     *  @param string $key Nome da chave
-     *  @return boolean Verdadeiro se a chave está registrada
+     *  @param string $key
+     *  @return boolean
      */
     public static function isKeySet($key) {
         $self =& ClassRegistry::getInstance();
@@ -85,10 +87,10 @@ class ClassRegistry {
         return false;
     }
     /**
-     *  ClassRegistry::getObject() retorna a instância da respectiva chave solicitada.
+     *  Retorna a instância da respectiva chave solicitada.
      * 
-     *  @param string $key Nome da chave
-     *  @return mixed Objeto correspondente a chave, falso se a chave não existe
+     *  @param string $key
+     *  @return mixed
      */
     public static function &getObject($key) {
         $self =& ClassRegistry::getInstance();
@@ -99,11 +101,11 @@ class ClassRegistry {
         return $return;
     }
     /**
-     *  ClassRegistry::duplicate() retorna uma cópia de uma instância já registrada.
+     *  Retorna uma cópia de uma instância já registrada.
      * 
-     *  @param string $key Chave da instância a ser buscada
-     *  @param object $class Instância da classe a ser buscada
-     *  @return mixed Instância da classe, falso se não estiver definida no registro
+     *  @param string $key
+     *  @param object $class
+     *  @return mixed
      */
     public static function &duplicate($key, $class) {
         $self =& ClassRegistry::getInstance();
@@ -118,7 +120,7 @@ class ClassRegistry {
         return $duplicate;
     }
     /**
-     *  ClassRegistry::flush() limpa todos os objetos instanciados do registro.
+     *  Limpa todos os objetos instanciados do registro.
      * 
      *  @return boolean true
      */

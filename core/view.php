@@ -46,7 +46,7 @@ class View extends Object {
      * Variáveis definidas no controller para serem passadas para a view.
      */
     public $viewData = array();
-    
+
     public function __construct(&$controller = null) {
         if($controller):
             $this->controller = preg_replace("/-/", "_", $controller->param("controller"));
@@ -66,7 +66,11 @@ class View extends Object {
     public function loadHelpers() {
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
-            $this->loadedHelpers[Inflector::underscore($helper)] = ClassRegistry::init($class, "Helper");
+            $this->loadedHelpers[Inflector::underscore($helper)] = ClassRegistry::load($class, "Helper");
+            if(!$this->loadedHelpers[Inflector::underscore($helper)]):
+                $this->error("missingHelper", array("helper" => $helper));
+                return false;
+            endif;
         endforeach;
         return $this->loadedHelpers;
     }

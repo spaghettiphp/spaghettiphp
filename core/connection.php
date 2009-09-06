@@ -17,6 +17,9 @@ class Connection extends Object {
      *  Datasources já instanciados.
      */
     private $datasources = array();
+    /**
+     *  Lendo arquivos de configuração do banco de dados.
+     */
     public function __construct() {
         $this->config = Config::read("database");
     }

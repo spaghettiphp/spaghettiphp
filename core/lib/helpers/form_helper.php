@@ -1,6 +1,6 @@
 <?php
 /**
- *  Short Description
+ *  Geração automática do formulário em HTML de acordo com os dados passados.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -9,11 +9,11 @@
 
 class FormHelper extends HtmlHelper {
     /**
-     *  Short description.
-     *
-     *  @param string $action
-     *  @param array $options
-     *  @return string
+     *  Retorna um elemento HTML do formulário formatado.
+     * 
+     *  @param string $action Ação atual do modelo
+     *  @param array $options Atributos e opções da tag HTML
+     *  @return string Tag FORM aberto e formatado
      */
     public function create($action = null, $options = array()) {
         $attributes = array_merge(
@@ -30,11 +30,11 @@ class FormHelper extends HtmlHelper {
         return $this->output($this->openTag("form", $attributes));
     }
     /**
-     *  Short description.
+     *  Fecha um elemento HTML do formulário de acordo com os atributos repassados.
      *
-     *  @param string $submit
-     *  @param array $attributes
-     *  @return string
+     *  @param boolean $submit Botão e envio do formulário
+     *  @param array $attributes Atributos e opções da tag HTML
+     *  @return string Tag FORM fechada
      */
     public function close($submit = null, $attributes = array()) {
         $form = $this->closeTag("form");
@@ -44,11 +44,11 @@ class FormHelper extends HtmlHelper {
         return $this->output($form);
     }
     /**
-     *  Short description.
+     *  Cria um botão de envio dos dados do formulário.
      *
-     *  @param string $label
-     *  @param array $attributes
-     *  @return string
+     *  @param string $submit Nome do botão de envio
+     *  @param array $attributes Atributos e opções da tag
+     *  @return string Botão de envio do formulário
      */
     public function submit($submit = "", $attributes = array()) {
         $attributes = array_merge(
@@ -59,11 +59,12 @@ class FormHelper extends HtmlHelper {
         return $this->output($button);
     }
     /**
-     *  Short description.
+     *  Cria uma caixa de texto.
      *
-     *  @param string $name
-     *  @param array $attributes
-     *  @return string
+     *  @param string $name Nome da caixa de texto
+     *  @param string $value Conteudo da caixa de texto
+     *  @param array $attr Atributos da tag
+     *  @return string Caixa de texto do formulário
      */
     public function text($name = "", $attributes = array()) {
         $attributes = array_merge(
@@ -77,11 +78,12 @@ class FormHelper extends HtmlHelper {
         return $this->output($input);
     }
     /**
-     *  Short description.
+     *  Cria uma caixa de texto multi-linhas.
      *
-     *  @param string $name
-     *  @param array $attributes
-     *  @return string
+     *  @param string $name Nome da caixa de texto
+     *  @param string $value Conteudo da caixa de texto
+     *  @param array $attr Atributos da tag
+     *  @return string Caixa de texto do formulário
      */
     public function textarea($name = "", $attributes = array()) {
         $attributes = array_merge(
@@ -94,11 +96,12 @@ class FormHelper extends HtmlHelper {
         return $this->output($input);
     }
     /**
-     *  Short description.
-     *
-     *  @param string $name
-     *  @param array $attributes
-     *  @return string
+     *  Cria uma caixa de texto para senhas.
+     * 
+     *  @param string $name Nome da caixa de texto
+     *  @param string $value Conteudo da caixa de texto
+     *  @param array $attr Atributos da tag
+     *  @return string Caixa de texto do formulário
      */
     public function password($name = "", $attributes = array()) {
         $attributes = array_merge(
@@ -112,11 +115,11 @@ class FormHelper extends HtmlHelper {
         return $this->output($input);
     }
     /**
-     *  Short description.
-     *
-     *  @param string $name
-     *  @param array $attributes
-     *  @return string
+     *  Cria uma caixa de texto para enviar arquivos.
+     * 
+     *  @param string $name Nome da caixa de envio de arquivo
+     *  @param string $value Conteudo da caixa de envio de arquivo
+     *  @return string Caixa de envio de arquivo do formulário
      */
     public function file($name = "", $attributes = array()) {
         $attributes = array_merge(
@@ -130,11 +133,12 @@ class FormHelper extends HtmlHelper {
         return $this->output($input);
     }
     /**
-     *  Short description.
-     *
-     *  @param string $name
-     *  @param array $attributes
-     *  @return string
+     *  Cria um campo oculto.
+     * 
+     *  @param string $name Nome do campo oculto
+     *  @param string $value Conteudo do campo oculto
+     *  @param array $attr Atributos da tag
+     *  @return string Campo oculto do formulário
      */
     public function hidden($name = "", $attributes = array()) {
         $attributes = array_merge(
@@ -147,6 +151,15 @@ class FormHelper extends HtmlHelper {
         $input = $this->tag("input", null, $attributes, false);
         return $this->output($input);
     }
+    /**
+     *  Cria uma caixa de seleção.
+     * 
+     *  @param string $name Nome da caixa de seleção
+     *  @param string $value Conteudo da caixa de seleção
+     *  @param string $selected Opção selecionada por padrão
+     *  @param array $attr Atributos da tag
+     *  @return string Caixa de seleção do formulário
+     */
     public function select($name = "", $values = array(), $selected = "", $attr = array()) {
         $options = "";
         foreach($values as $key => $value):
@@ -158,6 +171,14 @@ class FormHelper extends HtmlHelper {
         endforeach;
         return $this->tag("select", $options, array_merge(array("name" => $name), $attr));
     }
+    /**
+     *  Cria caixa de entrada formatada e com label.
+     * 
+     *  @param string $name Nome do campo de entrada
+     *  @param string $value Conteudo do campo de entrada
+     *  @param array $attr Atributos da tag
+     *  @return string Campo de entrada do formulário
+     */
     public function input($name = "", $value = "", $options = array()) {
         $options = array_merge(array(
             "type" => "text",
@@ -175,6 +196,17 @@ class FormHelper extends HtmlHelper {
         endif;
         return $label != false ? $this->tag("label", "{$label}\n{$input}") : $input;
     }
+    /**
+     *  Cria um conjunto de caixa de seleção para a data.
+     * 
+     *  @param string $name Nome do conjunto de caixas de seleção
+     *  @param int $start_year Ano inicial da seleção
+     *  @param int $end_year Ano final da seleção
+     *  @param int $current_month Mês corrente
+     *  @param int $current_day Dia corrente
+     *  @param int $current_year Ano corrente
+     *  @return string Retorna um conjunto de caixa de seleção
+     */
     public function dateselect($name = "date", $start_year = 1980, $end_year = null, $current_month = null, $current_day = null, $current_year = null) {
         //if default values are not passed, default values should be the current date
         $year_now = (int) date("Y");
