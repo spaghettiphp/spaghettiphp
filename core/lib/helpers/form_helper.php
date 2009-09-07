@@ -142,7 +142,7 @@ class FormHelper extends HtmlHelper {
             unset($options["type"]);
             $input = $this->select($name, $options);
         elseif($options["type"] == "textarea"):
-            $input = $this->tag("textarea", array_unset($options, "value"), $options`);
+            $input = $this->tag("textarea", array_unset($options, "value"), $options);
         elseif($options["type"] == "radio"):
             $label = false;
             $input = $this->radio($name, $options);
