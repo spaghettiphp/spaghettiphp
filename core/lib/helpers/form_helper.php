@@ -79,19 +79,45 @@ class FormHelper extends HtmlHelper {
             "options" => array(),
             "value" => null
         ), $options);
-        if(isset($options["options"])):
-            $selectOptions = array_unset($options, "options");
-            $content = "";
-            foreach($selectOptions as $key => $value):
-                $optionAttr = array("value" => $value);
-                if($key === $options["value"]):
-                    $optionAttr["selected"] = true;
-                    unset($options["value"]);
-                endif;
-                $content .= $this->tag("option", $value, $optionAttr);
-            endforeach;
-        endif;
+        $selectOptions = array_unset($options, "options");
+        $content = "";
+        foreach($selectOptions as $key => $value):
+            $optionAttr = array("value" => $value);
+            if($key === $options["value"]):
+                $optionAttr["selected"] = true;
+                unset($options["value"]);
+            endif;
+            $content .= $this->tag("option", $value, $optionAttr);
+        endforeach;
         return $this->output($this->tag("select", $content, $options));
+    }
+    /**
+     *  Short description.
+     *
+     *  @return string
+     */
+    public function radio($name, $options = array()) {
+        $options = array_merge(array(
+            "options" => array(),
+            "value" => null
+        ), $options);
+        $content = "";
+        $radioOptions = array_unset($options, "options");
+        foreach($radioOptions as $key => $value):
+            $radioAttr = array(
+                "type" => "radio",
+                "value" => $key,
+                "id" => Inflector::camelize("{$name}_{$key}"),
+                "name" => $name,
+            );
+            if($key === $options["value"]):
+                $radioAttr["checked"] = true;
+                unset($options["value"]);
+            endif;
+            $content .= $this->tag("input", null, $radioAttr, false);
+            $content .= $this->tag("label", $value, array("for" => $radioAttr["id"]));
+        endforeach;
+        return $this->output($content);
     }
     /**
      *  Cria caixa de entrada formatada e com label.
@@ -103,7 +129,7 @@ class FormHelper extends HtmlHelper {
     public function input($name, $options = array()) {
         $options = array_merge(array(
             "type" => "text",
-            "id" => md5(rand()),
+            "id" => Inflector::camelize("form_{$name}"),
             "label" => Inflector::humanize($name),
             "div" => true
         ), $options);
@@ -114,6 +140,9 @@ class FormHelper extends HtmlHelper {
             $input = $this->select($name, $options);
         elseif($options["type"] == "textarea"):
             $input = $this->tag("textarea", array_unset($attributes, "value"), $attributes);
+        elseif($options["type"] == "radio"):
+            $label = false;
+            $input = $this->radio($name, $options);
         else:
             if($name == "password"):
                 $options["type"] = "password";
