@@ -92,9 +92,11 @@ class FormHelper extends HtmlHelper {
         return $this->output($this->tag("select", $content, $options));
     }
     /**
-     *  Short description.
+     *  Cria um input radio.
      *
-     *  @return string
+     *  @param string $name Nome do input
+     *  @param array $options Atributos da tag
+     *  @return string Input do formulário
      */
     public function radio($name, $options = array()) {
         $options = array_merge(array(
