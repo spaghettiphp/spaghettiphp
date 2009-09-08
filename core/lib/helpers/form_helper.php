@@ -16,21 +16,30 @@ class FormHelper extends HtmlHelper {
      *  @return string Tag FORM aberto e formatado
      */
     public function create($action = null, $options = array()) {
-        $attr = array_merge(array("method" => "post", "action" => Mapper::url($action)), $options);
-        $form = $this->openTag("form", $attr);
-        return $this->output($form);
+        $attributes = array_merge(
+            array(
+                "method" => "post",
+                "action" => Mapper::url($action)
+            ),
+            $options
+        );
+        if($attributes["method"] == "file"):
+            $attributes["method"] = "post";
+            $attributes["enctype"] = "multipart/form-data";
+        endif;
+        return $this->output($this->openTag("form", $attributes));
     }
     /**
      *  Fecha um elemento HTML do formulário de acordo com os atributos repassados.
      *
      *  @param boolean $submit Botão e envio do formulário
-     *  @param array $attr Atributos e opções da tag HTML
+     *  @param array $attributes Atributos e opções da tag HTML
      *  @return string Tag FORM fechada
      */
-    public function close($submit = null, $attr = array()) {
+    public function close($submit = null, $attributes = array()) {
         $form = $this->closeTag("form");
-        if($submit != null):
-            $form = $this->submit($submit, $attr) . $form;
+        if(!is_null($submit)):
+            $form = $this->submit($submit, $attributes) . $form;
         endif;
         return $this->output($form);
     }
@@ -38,113 +47,121 @@ class FormHelper extends HtmlHelper {
      *  Cria um botão de envio dos dados do formulário.
      *
      *  @param string $submit Nome do botão de envio
-     *  @param array $attr Atributos e opções da tag
+     *  @param array $attributes Atributos e opções da tag
      *  @return string Botão de envio do formulário
      */
-    public function submit($submit = "", $attr = array()) {
-        return $this->output($this->tag("button", $submit, array_merge(array("type" => "submit"), $attr)));
-    }
-    /**
-     *  Cria uma caixa de texto.
-     *
-     *  @param string $name Nome da caixa de texto
-     *  @param string $value Conteudo da caixa de texto
-     *  @param array $attr Atributos da tag
-     *  @return string Caixa de texto do formulário
-     */
-    public function text($name = "", $value = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "text"), $attr), false));
-    }
-    /**
-     *  Cria uma caixa de texto multi-linhas.
-     *
-     *  @param string $name Nome da caixa de texto
-     *  @param string $value Conteudo da caixa de texto
-     *  @param array $attr Atributos da tag
-     *  @return string Caixa de texto do formulário
-     */
-    public function textarea($name = "", $value = "", $attr = array()) {
-        return $this->output($this->tag("textarea", $value, array_merge(array("name" => $name), $attr)));
-    }
-    /**
-     *  Cria uma caixa de texto para senhas.
-     * 
-     *  @param string $name Nome da caixa de texto
-     *  @param string $value Conteudo da caixa de texto
-     *  @param array $attr Atributos da tag
-     *  @return string Caixa de texto do formulário
-     */
-    public function password($name = "", $value = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "password"), $attr), false));
-    }
-    /**
-     *  Cria uma caixa de texto para enviar arquivos.
-     * 
-     *  @param string $name Nome da caixa de envio de arquivo
-     *  @param string $value Conteudo da caixa de envio de arquivo
-     *  @return string Caixa de envio de arquivo do formulário
-     */
-    public function file($name = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("name" => $name, "type" => "file"), $attr), false));
-    }
-    /**
-     *  Cria um campo oculto.
-     * 
-     *  @param string $name Nome do campo oculto
-     *  @param string $value Conteudo do campo oculto
-     *  @param array $attr Atributos da tag
-     *  @return string Campo oculto do formulário
-     */
-    public function hidden($name = "", $value = "", $attr = array()) {
-        return $this->output($this->openTag("input", array_merge(array("name" => $name, "value" => $value, "type" => "hidden"), $attr), false));
+    public function submit($text, $attributes = array()) {
+        $attributes = array_merge(
+            array(
+                "type" => "submit",
+                "tag" => "button"
+            ),
+            $attributes
+        );
+        if(array_unset($attributes, "tag") == "input"):
+            $attributes["value"] = $text;
+            $button = $this->tag("input", null, $attributes, false);
+        else:
+            $button = $this->tag("button", $text, $attributes);
+        endif;
+        return $this->output($button);
     }
     /**
      *  Cria uma caixa de seleção.
      * 
      *  @param string $name Nome da caixa de seleção
-     *  @param string $value Conteudo da caixa de seleção
-     *  @param string $selected Opção selecionada por padrão
-     *  @param array $attr Atributos da tag
+     *  @param array $options Atributos da tag
      *  @return string Caixa de seleção do formulário
      */
-    public function select($name = "", $values = array(), $selected = "", $attr = array()) {
-        $options = "";
-        foreach($values as $key => $value):
-            $optionAttr = array("value" => $key);
-            if($key == $selected):
-                $optionAttr["selected"] = "selected";
+    public function select($name, $options = array()) {
+        $options = array_merge(array(
+            "name" => $name,
+            "options" => array(),
+            "value" => null
+        ), $options);
+        $selectOptions = array_unset($options, "options");
+        $content = "";
+        foreach($selectOptions as $key => $value):
+            $optionAttr = array("value" => $value);
+            if($key === $options["value"]):
+                $optionAttr["selected"] = true;
+                unset($options["value"]);
             endif;
-            $options .= $this->tag("option", $value, $optionAttr);
+            $content .= $this->tag("option", $value, $optionAttr);
         endforeach;
-        return $this->tag("select", $options, array_merge(array("name" => $name), $attr));
+        return $this->output($this->tag("select", $content, $options));
+    }
+    /**
+     *  Cria um input radio.
+     *
+     *  @param string $name Nome do input
+     *  @param array $options Atributos da tag
+     *  @return string Input do formulário
+     */
+    public function radio($name, $options = array()) {
+        $options = array_merge(array(
+            "options" => array(),
+            "value" => null
+        ), $options);
+        $content = "";
+        $radioOptions = array_unset($options, "options");
+        foreach($radioOptions as $key => $value):
+            $radioAttr = array(
+                "type" => "radio",
+                "value" => $key,
+                "id" => Inflector::camelize("{$name}_{$key}"),
+                "name" => $name,
+            );
+            if($key === $options["value"]):
+                $radioAttr["checked"] = true;
+                unset($options["value"]);
+            endif;
+            $content .= $this->tag("input", null, $radioAttr, false);
+            $content .= $this->tag("label", $value, array("for" => $radioAttr["id"]));
+        endforeach;
+        return $this->output($content);
     }
     /**
      *  Cria caixa de entrada formatada e com label.
      * 
      *  @param string $name Nome do campo de entrada
-     *  @param string $value Conteudo do campo de entrada
-     *  @param array $attr Atributos da tag
+     *  @param array $options Atributos da tag
      *  @return string Campo de entrada do formulário
      */
-    public function input($name = "", $value = "", $options = array()) {
+    public function input($name, $options = array()) {
         $options = array_merge(array(
+            "name" => $name,
             "type" => "text",
-            "label" => Inflector::humanize($name)
+            "id" => Inflector::camelize("form_{$name}"),
+            "label" => Inflector::humanize($name),
+            "div" => true
         ), $options);
-        $type = $options["type"];
-        $label = $options["label"];
-        unset($options["type"]);
-        unset($options["label"]);
-        if($type == "select"):
-            $values = $options["options"];
-            unset($options["options"]);
-            $input = $this->select($name, $values, $value, $options);
-        elseif($type == "file"):
-            $input = $this->file($name, $options);
+        $label = array_unset($options, "label");
+        $div = array_unset($options, "div");
+        if($options["type"] == "select"):
+            unset($options["type"]);
+            $input = $this->select($name, $options);
+        elseif($options["type"] == "textarea"):
+            $input = $this->tag("textarea", array_unset($options, "value"), $options);
+        elseif($options["type"] == "radio"):
+            $label = false;
+            $input = $this->radio($name, $options);
         else:
-            $input = $this->{$type}($name, $value, $options);
+            if($name == "password"):
+                $options["type"] = "password";
+            endif;
+            $input = $this->tag("input", null, $options, false);
         endif;
-        return $label != false ? $this->tag("label", "{$label}\n{$input}") : $input;
+        if($label):
+            $input = $this->tag("label", $label, array("for" => $options["id"])) . $input;
+        endif;
+        if($div):
+            if($div === true):
+                $div = "input {$options['type']}";
+            endif;
+            $input = $this->div($input, $div);
+        endif;
+        return $this->output($input);
     }
     /**
      *  Cria um conjunto de caixa de seleção para a data.
