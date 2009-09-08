@@ -147,7 +147,9 @@ class FormHelper extends HtmlHelper {
             $label = false;
             $input = $this->radio($name, $options);
         else:
-            if($name == "password"):
+            if($options["type"] == "hidden"):
+                $div = $label = false;
+            elseif($name == "password"):
                 $options["type"] = "password";
             endif;
             $input = $this->tag("input", null, $options, false);
