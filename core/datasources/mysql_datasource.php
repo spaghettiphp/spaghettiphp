@@ -11,6 +11,7 @@
 
 class MysqlDatasource extends Datasource {
 	protected $schema = array();
+	protected $sources = array();
     protected $connection;
 	protected $results;
 	protected $transactionStarted = false;
@@ -143,6 +144,20 @@ class MysqlDatasource extends Datasource {
             return "{$type}($limit)";
         endif;
     }
+	/**
+	 *  Short description.
+	 *
+	 *  @return array
+	 */
+	public function listSources() {
+		if(empty($this->sources)):
+			$sources = $this->query("SHOW TABLES FROM {$this->config['database']}");
+			while($source = mysql_fetch_array($sources)):
+				$this->sources []= $source[0];
+			endwhile;
+		endif;
+		return $this->sources;
+	}
     /**
      *  Descreve uma tabela do banco de dados.
      *
