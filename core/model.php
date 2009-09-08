@@ -75,9 +75,7 @@ class Model extends Object {
             $database = Config::read("database");
             $this->table = $database[$this->environment]["prefix"] . Inflector::underscore(get_class($this));
         endif;
-        if($this->table && empty($this->schema)):
-            $this->describe();
-        endif;
+        $this->setSource($this->table);
         ClassRegistry::addObject(get_class($this), $this);
         $this->createLinks();
     }
@@ -112,6 +110,27 @@ class Model extends Object {
             $instance[0] = Connection::getDatasource($environment);
         endif;
         return $instance[0];
+    }
+    /**
+     *  Short description.
+     *
+     *  @param string $table
+     *  @return boolean
+     */
+    public function setSource($table) {
+        $db =& self::getConnection($this->environment);
+        if($table):
+            $this->table = $table;
+            $sources = $db->listSources();
+            if(!in_array($this->table, $sources)):
+                $this->error("missingTable", array("model" => get_class($this), "table" => $this->table));
+                return false;
+            endif;
+            if(empty($this->schema)):
+                $this->describe();
+            endif;
+        endif;
+        return true;
     }
     /**
      *  Descreve a tabela do banco de dados.

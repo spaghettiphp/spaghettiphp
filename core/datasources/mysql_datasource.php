@@ -145,9 +145,9 @@ class MysqlDatasource extends Datasource {
         endif;
     }
 	/**
-	 *  Short description.
+	 *  Lista as tabelas existentes no banco de dados.
 	 *
-	 *  @return array
+	 *  @return array Lista de tabelas no banco de dados
 	 */
 	public function listSources() {
 		if(empty($this->sources)):
