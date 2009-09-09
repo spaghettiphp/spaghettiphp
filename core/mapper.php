@@ -205,7 +205,7 @@ class Mapper extends Object {
      *  @return array URL interpretada
      */
     public static function parse($url = null) {
-        $here = self::normalize(is_null($url) ? Mapper::here() : $url);
+        $here = self::normalize(is_null($url) ? self::here() : $url);
         $url = self::getRoute($here);
         $prefixes = join("|", self::getPrefixes());
         
