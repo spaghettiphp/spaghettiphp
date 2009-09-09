@@ -58,15 +58,13 @@ class PaginationHelper extends HtmlHelper {
         endif;
         return false;
     }
+    /**
+     *  Short description.
+     */
     public function getUrl($direction) {
-        $page = $this->model->pagination["page"] + $direction;
-        $here = Mapper::here();
-        if(preg_match("/page:\d?/", $here)):
-            $url = preg_replace("%page:\d+?%", "page:{$page}", $here);
-        else:
-            $url = "{$here}/page:{$page}";
-        endif;
-        return $url;
+        return Mapper::url(array(
+            "page" => $this->model->pagination["page"] + $direction
+        ));
     }
 }
 
