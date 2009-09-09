@@ -87,7 +87,7 @@ class Mapper extends Object {
         while(strpos($url, "//") !== false):
             $url = str_replace("//", "/", $url);
         endwhile;
-        $url = preg_replace("/\/$/", "", $url);
+        $url = rtrim($url, "/");
         if(empty($url)):
             $url = "/";
         endif;
@@ -205,7 +205,7 @@ class Mapper extends Object {
      *  @return array URL interpretada
      */
     public static function parse($url = null) {
-        $here = self::normalize(is_null($url) ? Mapper::here() : $url);
+        $here = self::normalize(is_null($url) ? self::here() : $url);
         $url = self::getRoute($here);
         $prefixes = join("|", self::getPrefixes());
         
@@ -247,17 +247,24 @@ class Mapper extends Object {
      */
     public static function url($path = null, $full = false) {
         if(is_array($path)):
-            $here = Mapper::parse();
-            $default = array_merge(
-                array(
-                    "prefix" => $here["prefix"],
-                    "controller" => $here["controller"],
-                    "action" => $here["action"],
-                    "id" => $here["id"]
-                ),
-                $here["named"]
-            );
-            $url = join("/", $default);
+            $here = self::parse();
+            $params = $here["named"];
+            $path = array_merge(array(
+                "prefix" => $here["prefix"],
+                "controller" => $here["controller"],
+                "action" => $here["action"],
+                "id" => $here["id"]
+            ), $path, $params);
+            $nonParams = array("prefix", "controller", "action", "id");
+            $url = "";
+            foreach($path as $key => $value):
+                if(!in_array($key, $nonParams)):
+                    $url .= "/" . self::param($key, $value);
+                elseif(!is_null($value)):
+                    $url .= "/" . $value;
+                endif;
+            endforeach;
+            $url = self::normalize($url);
         else:
             if(preg_match("/^[a-z]+:/", $path)):
                 return $path;
@@ -269,6 +276,9 @@ class Mapper extends Object {
             $url = self::normalize($url);
         endif;
         return $full ? BASE_URL . $url : $url;
+    }
+    public function param($key, $value) {
+        return "{$key}:{$value}";
     }
 }
 
