@@ -248,16 +248,21 @@ class Mapper extends Object {
     public static function url($path = null, $full = false) {
         if(is_array($path)):
             $here = Mapper::parse();
-            $default = array_merge(
-                array(
-                    "prefix" => $here["prefix"],
-                    "controller" => $here["controller"],
-                    "action" => $here["action"],
-                    "id" => $here["id"]
-                ),
-                $here["named"]
+            $default = array(
+                "prefix" => $here["prefix"],
+                "controller" => $here["controller"],
+                "action" => $here["action"],
+                "id" => $here["id"]
             );
-            $url = join("/", $default);
+            $nonParams = array("prefix", "controller", "action", "id");
+            $params = $here["named"];
+            foreach($path as $key => $value):
+                if(!in_array($key, $nonParams)):
+                    $params[$key] = array_unset($path, $key);
+                endif;
+            endforeach;
+            $merged = array_merge($default, $path, Mapper::params($params));
+            $url = self::normalize(join("/", $merged));
         else:
             if(preg_match("/^[a-z]+:/", $path)):
                 return $path;
@@ -269,6 +274,13 @@ class Mapper extends Object {
             $url = self::normalize($url);
         endif;
         return $full ? BASE_URL . $url : $url;
+    }
+    public function params($params) {
+        $string = array();
+        foreach($params as $key => $value):
+            $string []= "{$key}:{$value}";
+        endforeach;
+        return $string;
     }
 }
 
