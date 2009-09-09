@@ -87,7 +87,7 @@ class Mapper extends Object {
         while(strpos($url, "//") !== false):
             $url = str_replace("//", "/", $url);
         endwhile;
-        $url = preg_replace("/\/$/", "", $url);
+        $url = rtrim($url, "/");
         if(empty($url)):
             $url = "/";
         endif;
@@ -247,23 +247,24 @@ class Mapper extends Object {
      */
     public static function url($path = null, $full = false) {
         if(is_array($path)):
-            $here = Mapper::parse();
-            $default = array(
+            $here = self::parse();
+            $params = $here["named"];
+            $path = array_merge(array(
                 "prefix" => $here["prefix"],
                 "controller" => $here["controller"],
                 "action" => $here["action"],
                 "id" => $here["id"]
-            );
+            ), $path, $params);
             $nonParams = array("prefix", "controller", "action", "id");
-            $params = array_merge($here["named"], $path);
-            $parsed = array();
+            $url = "";
             foreach($path as $key => $value):
                 if(!in_array($key, $nonParams)):
-                    $parsed []= self::param($key, $value);
+                    $url .= "/" . self::param($key, $value);
+                elseif(!is_null($value)):
+                    $url .= "/" . $value;
                 endif;
             endforeach;
-            $merged = array_merge($default, $path, $parsed);
-            $url = self::normalize(join("/", $merged));
+            $url = self::normalize($url);
         else:
             if(preg_match("/^[a-z]+:/", $path)):
                 return $path;
