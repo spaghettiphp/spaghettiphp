@@ -254,7 +254,7 @@ class Mapper extends Object {
                 "controller" => $here["controller"],
                 "action" => $here["action"],
                 "id" => $here["id"]
-            ), $path, $params);
+            ), $params, $path);
             $nonParams = array("prefix", "controller", "action", "id");
             $url = "";
             foreach($path as $key => $value):
