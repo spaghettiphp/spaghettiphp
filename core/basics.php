@@ -12,12 +12,29 @@
  *  provendo funcionalidade básica para o framework.
  */
 abstract class Object {
+    /**
+     *  Loga os eventos processados pelo framework.
+     * 
+     *  @param string $message Mensagem do log
+     *  @return string Retorna a mensagem a ser trabalhada
+     */
     protected function log($message = "") {
         return $message;
     }
+    /**
+     *  Reporta ao usuário o erro encontrado.
+     * 
+     *  @param string $type Tipo do erro ocorrido
+     *  @param string $details Detalhes do erro ocorrido
+     */
     protected function error($type = "", $details = array()) {
         new Error($type, $details);
     }
+    /**
+     *  Paraliza a execução do script atual.
+     * 
+     *  @param string $status
+     */
     protected function stop($status = null) {
         exit($status);
     }
@@ -73,7 +90,10 @@ class App extends Object {
             "Component" => array(APP . DS . "components", LIB . DS . "components"),
             "Helper" => array(APP . DS . "helpers", LIB . DS . "helpers"),
 
-            "Script" => array(ROOT . DS . "script")
+            "Script" => array(ROOT . DS . "script"),
+            "Command" => array(ROOT. DS . "script" . DS . "commands"),
+            "Task" => array(ROOT. DS . "script" . DS . "tasks"),
+            "Template" => array(ROOT. DS . "script" . DS . "templates"),
         );
  
         foreach($paths[$type] as $path):
@@ -92,9 +112,17 @@ class App extends Object {
  */
 class Config extends Object {
     /**
-     *  Definições de configurações.
+     *  Definições de configurações
+     * 
+     *  @var array
      */
     private $config = array();
+    /**
+     *  Retorna uma única instância (Singleton) da classe solicitada.
+     *
+     *  @staticvar object $instance Objeto a ser verificado
+     *  @return object Objeto da classe utilizada
+     */
     public static function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
