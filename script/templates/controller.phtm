@@ -1,7 +1,0 @@
-class <?php echo $name ?> extends <?php echo $baseController ?> {
-<?php foreach($methods as $method): ?>
-    public function <?php echo $method ?>() {
-        
-    }
-<?php endforeach ?>
-}
