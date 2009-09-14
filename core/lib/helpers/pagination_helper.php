@@ -30,7 +30,8 @@ class PaginationHelper extends HtmlHelper {
      */
     public function next($text) {
         if($this->hasNext()):
-            return $this->link($text, $this->url(1));
+            $page = $this->model->pagination["page"] + 1;
+            return $this->link($text, $this->url($page));
         endif;
         return "";
     }
@@ -42,10 +43,27 @@ class PaginationHelper extends HtmlHelper {
      */
     public function previous($text) {
         if($this->hasPrevious()):
-            return $this->link($text, $this->url(-1));
+            $page = $this->model->pagination["page"] - 1;
+            return $this->link($text, $this->url($page));
         endif;
         return "";
     }
+    
+    public function first($text) {
+        if($this->hasPrevious()):
+            $page = 1;
+            return $this->link($text, $this->url($page));
+        endif;
+        return "";
+    }
+    public function last($text) {
+        if($this->hasNext()):
+            $page = $this->model->pagination["totalPages"];
+            return $this->link($text, $this->url($page));
+        endif;
+        return "";
+    }
+    
     /**
      *  Short description.
      *
@@ -74,9 +92,9 @@ class PaginationHelper extends HtmlHelper {
      *  @param integer $direction
      *  @return string
      */
-    public function url($direction) {
+    public function url($page) {
         return Mapper::url(array(
-            "page" => $this->model->pagination["page"] + $direction
+            "page" => $page
         ));
     }
 }
