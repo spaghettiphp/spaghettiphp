@@ -28,10 +28,10 @@ class PaginationHelper extends HtmlHelper {
      *  @param string $text
      *  @return string
      */
-    public function next($text) {
+    public function next($text, $attr = array()) {
         if($this->hasNext()):
             $page = $this->model->pagination["page"] + 1;
-            return $this->link($text, $this->url($page));
+            return $this->link($text, $this->url($page), $attr);
         endif;
         return "";
     }
@@ -41,25 +41,25 @@ class PaginationHelper extends HtmlHelper {
      *  @param string $text
      *  @return string
      */
-    public function previous($text) {
+    public function previous($text, $attr = array()) {
         if($this->hasPrevious()):
             $page = $this->model->pagination["page"] - 1;
-            return $this->link($text, $this->url($page));
+            return $this->link($text, $this->url($page), $attr);
         endif;
         return "";
     }
     
-    public function first($text) {
+    public function first($text, $attr = array()) {
         if($this->hasPrevious()):
             $page = 1;
-            return $this->link($text, $this->url($page));
+            return $this->link($text, $this->url($page), $attr);
         endif;
         return "";
     }
-    public function last($text) {
+    public function last($text, $attr = array()) {
         if($this->hasNext()):
             $page = $this->model->pagination["totalPages"];
-            return $this->link($text, $this->url($page));
+            return $this->link($text, $this->url($page), $attr);
         endif;
         return "";
     }
