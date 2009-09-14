@@ -1,0 +1,5 @@
+#! /usr/bin/php
+<?php
+require_once "libs/bootstrap.php";
+require_once "libs/about/about.php";
+?>

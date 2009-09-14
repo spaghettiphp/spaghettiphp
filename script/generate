@@ -1,19 +1,8 @@
 #! /usr/bin/php
-
 <?php
-/**
- *  Short Description
- *
- *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
- *
- */
+require_once "libs/bootstrap.php";
+require_once "libs/generate/generate.php";
 
-$path = dirname(dirname(__FILE__));
-require_once $path . DIRECTORY_SEPARATOR . "spaghetti.php";
-
-App::import("Core", array("shell", "command", "task", "file", "folder"));
-
-new ShellDispatcher();
-
+$arguments = ShellParser::parse($_SERVER["argv"]);
+Generate::initFromArguments($arguments);
 ?>
