@@ -11,25 +11,25 @@
 
 class Controller extends Object {
     /**
-     *  Renderizar layout automaticamente.
-    */
+     *  Define se o layout será renderizado automaticamente.
+     */
     public $autoLayout = true;
     /**
-     *  Renderizar view automaticamente.
-    */
+     *  Define se a view será renderizada automaticamente.
+     */
     public $autoRender = true;
     /**
      *  Componentes a serem carregados no controller.
-    */
+     */
     public $components = array();
+    /**
+     *  Helpers a serem carregados pela view.
+     */
+    public $helpers = array("Html", "Form", "Pagination");
     /**
      *  Valores enviados através de $_POST.
      */
     public $data = array();
-    /**
-     *  Helpers a serem carregados por uma view.
-     */
-    public $helpers = array("Html", "Form");
     /**
      *  Layout a ser renderizado.
      */
@@ -39,11 +39,11 @@ class Controller extends Object {
      */
     public $name = null;
     /**
-     *  Conteúdo de saída gerado por uma view.
+     *  Conteúdo de saída gerado pela view.
      */
     public $output = "";
     /**
-     *  Parâmetros parseados por Dispatcher.
+     *  Parâmetros interpretados por Mapper.
      */
     public $params = array();
     /**
@@ -51,13 +51,9 @@ class Controller extends Object {
      */
     public $uses = null;
     /**
-     *  Variáveis a serem enviadas para uma view.
+     *  Variáveis a serem enviadas para a view.
      */
     public $viewData = array();
-    /**
-     *  Short description.
-     */
-    public $paginate = array("perPage" => 20);
 
     public function __construct() {
         if(is_null($this->name) && preg_match("/(.*)Controller/", get_class($this), $name)):
@@ -78,7 +74,7 @@ class Controller extends Object {
     /**
      *  Carrega todos os componentes associados ao controller.
      *
-     *  @return boolean
+     *  @return boolean Verdadeiro se todos os componentes foram carregados
      */
     public function loadComponents() {
         foreach($this->components as $component):
@@ -109,7 +105,7 @@ class Controller extends Object {
     /**
      *  Carrega todos os models associados ao controller.
      *
-     *  @return boolean
+     *  @return boolean Verdadeiro caso todos os models foram carregados
      */
     public function loadModels() {
         foreach($this->uses as $model):
@@ -157,11 +153,11 @@ class Controller extends Object {
         return call_user_func_array(array(&$this, $action), $args);
     }
     /**
-     *  Renderiza action atual, utilizando o layout informado.
+     *  Renderiza uma view.
      *
      *  @param string $action Nome da action a ser renderizada
-     *  @param string $layout Nome do layout
-     *  @return string Conteúdo gerado pela view
+     *  @param string $layout Nome do layout a ser renderizado
+     *  @return string Resultado da renderização
      */
     public function render($action = null, $layout = null) {
         $this->beforeRender();
@@ -171,7 +167,7 @@ class Controller extends Object {
         return $this->output;
     }
     /**
-     *  Limpa o conteúdo de saída do controller
+     *  Limpa o conteúdo de saída do controller.
      *
      *  @return true
      */
@@ -239,21 +235,19 @@ class Controller extends Object {
     /**
      *  Define uma variável a ser passada para uma view.
      * 
-     *  @param string $var Nome da variável
+     *  @param string $var Nome da variável a ser definida
      *  @param mixed $value Valor da variável
      *  @return mixed Valor da variável
      */
-    public function set($var = null, $value = null) {
+    public function set($var, $value = null) {
         if(is_array($var)):
             foreach($var as $key => $value):
                 $this->set($key, $value);
             endforeach;
-            return true;
-        elseif(!is_null($var)):
-            $this->viewData[$var] = $value;
-            return $this->viewData[$var];
+        elseif(!is_null($value)):
+            return $this->viewData[$var] = $value;
         endif;
-        return false;
+        return true;
     }
     /**
      *  Recupera uma variável de Controller::viewData.
@@ -270,7 +264,7 @@ class Controller extends Object {
         return false;
     }
     /**
-     *  Retorna o valor de um parâmetro da URL
+     *  Retorna o valor de um parâmetro da URL.
      *
      *  @param string $key Chave do valor a ser retornado
      *  @return string Valor do parâmetro
