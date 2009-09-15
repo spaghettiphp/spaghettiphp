@@ -12,17 +12,19 @@
 class View extends Object {
     public $autoLayout;
     public $data = array();
-    public $helpers = array();
+    public $helpers = array("Html");
     public $loadedHelpers = array();
     public $layout;
     public $pageTitle;
     public $params = array();
-    public function __construct(&$controller) {
-        $this->autoLayout = $controller->autoLayout;
-        $this->helpers = $controller->helpers;
-        $this->params = $controller->params;
-        $this->layout = $controller->layout;
-        $this->data = $controller->viewData;
+    public function __construct(&$controller = null) {
+        if($controller):
+            $this->autoLayout = $controller->autoLayout;
+            $this->helpers = $controller->helpers;
+            $this->params = $controller->params;
+            $this->layout = $controller->layout;
+            $this->data = $controller->viewData;
+        endif;
         $this->loadHelpers();
     }
     protected function loadHelpers() {
@@ -45,32 +47,31 @@ class View extends Object {
         $output = ob_get_clean();
         return $output;
     }
-
-
-
-
-    public function render() {
-        if($action === null):
-            $action = "{$this->params['controller']}/{$this->params['action']}";
-            $ext = $this->params['extension'];
+    public function render($action = null, $layout = null) {
+        if(is_null($action)):
+            $controller = $this->params["controller"];
+            $action = $this->params["action"];
+            $ext = $this->params["extension"];
+            $layout = $this->layout;
         else:
-            $filename = preg_split("/\./", $action);
+            $filename = explode(".", $action);
+            $controller = null;
             $action = $filename[0];
-            $ext = $filename[1] ? $filename[1] : "htm";
+            $ext = $filename[1] ? $filename[1] : $this->params["extension"];
         endif;
-        $filename = App::path("View", "{$action}.{$ext}");
-        if($filename):
-            $out = $this->renderView($filename, $this->data);
-            if($this->autoLayout && $this->layout):
-                $layout = $layout === null ? "{$this->layout}.{$ext}" : $layout;
-                $out = $this->renderLayout($out, $layout);
+        $file = App::path("View", "{$controller}/{$action}.{$ext}");
+        if($file):
+            $output = $this->renderView($file, $this->data);
+            if($this->autoLayout && $layout):
+                $output = $this->renderLayout($output, "$layout.$ext", $ext);
             endif;
-            return $out;
+            return $output;
         else:
-            $this->error("missingView", array("controller" => $this->params['controller'], "view" => $action, "extension" => $ext));
+            $this->error("missingView", array("controller" => $controller, "view" => $action, "extension" => $ext));
             return false;
         endif;
     }
+
     public function renderLayout() {
         if($layout === null):
             $layout = $this->layout;
