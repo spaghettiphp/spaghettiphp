@@ -132,7 +132,7 @@ class FormHelper extends HtmlHelper {
         $options = array_merge(array(
             "name" => $name,
             "type" => "text",
-            "id" => Inflector::camelize("form_{$name}"),
+            "id" => Inflector::camelize("form_" . Inflector::slug($name)),
             "label" => Inflector::humanize($name),
             "div" => true
         ), $options);
