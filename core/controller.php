@@ -166,8 +166,6 @@ class Controller extends Object {
     public function render($action = null, $layout = null) {
         $this->beforeRender();
         $view = new View($this);
-        $view->set($this->viewData);
-        $view->helpers = $this->helpers;
         $this->output .= $view->render($action, $layout);
         $this->autoRender = false;
         return $this->output;

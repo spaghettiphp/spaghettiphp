@@ -7,7 +7,7 @@
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
-
+$start = microtime(true);
 /**
  *  O Spaghetti suporta apenas a versão 5 do PHP. Um erro é gerado caso a versão
  *  seja anterior a 5.0.
@@ -58,5 +58,7 @@ require_once CORE . DS . "bootstrap.php";
 
 $dispatcher = new Dispatcher;
 $dispatcher->dispatch();
+
+pr(microtime(true) - $start);
 
 ?>
