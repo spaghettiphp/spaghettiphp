@@ -63,7 +63,7 @@ class View extends Object {
         if($file):
             $output = $this->renderView($file, $this->data);
             if($this->autoLayout && $layout):
-                $output = $this->renderLayout($output, "$layout.$ext", $ext);
+                $output = $this->renderLayout($output, $layout, $ext);
             endif;
             return $output;
         else:
@@ -71,29 +71,22 @@ class View extends Object {
             return false;
         endif;
     }
-
-    public function renderLayout() {
-        if($layout === null):
-            $layout = $this->layout;
-            $ext = $this->params['extension'];
-        else:
-            $filename = preg_split("/\./", $layout);
-            $layout = $filename[0];
-            $ext = $filename[1] ? $filename[1] : "htm";
+    public function renderLayout($content, $layout, $ext = null) {
+        if(is_null($ext)):
+            $ext = $this->params["extension"];
         endif;
-        $filename = App::path("Layout", "{$layout}.{$ext}");
+        $file = App::path("Layout", "{$layout}.{$ext}");
         $this->contentForLayout = $content;
-        if($filename):
-            $out = $this->renderView($filename, $this->data);
-            return $out;
+        if($file):
+            return $this->renderView($file, $this->data);
         else:
             $this->error("missingLayout", array("layout" => $layout, "extension" => $ext));
             return false;
         endif;        
     }
-    public function element() {
-        $ext = $this->params['extension'] ? $this->params['extension'] : "htm";
+    public function element($element, $params = array()) {
         $element = dirname($element) . DS . "_" . basename($element);
+        $ext = $this->params["extension"] ? $this->params["extension"] : Config::read("defaultExtension");
         return $this->renderView(App::path("View", "{$element}.{$ext}"), $params);
     }
 }
