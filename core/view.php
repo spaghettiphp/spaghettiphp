@@ -8,26 +8,114 @@
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
-    
+
 class View extends Object {
+    public $autoLayout;
+    public $data = array();
+    public $helpers = array();
+    public $loadedHelpers = array();
+    public $layout;
+    public $pageTitle;
+    public $params = array();
+    public function __construct(&$controller) {
+        $this->autoLayout = $controller->autoLayout;
+        $this->helpers = $controller->helpers;
+        $this->params = $controller->params;
+        $this->layout = $controller->layout;
+        $this->data = $controller->viewData;
+        $this->loadHelpers();
+    }
+    protected function loadHelpers() {
+        foreach($this->helpers as $helper):
+            $class = "{$helper}Helper";
+            $helper = Inflector::underscore($helper);
+            $this->loadedHelpers[$helper] = ClassRegistry::load($class, "Helper");
+            if(!$this->loadedHelpers[$helper]):
+                $this->error("missingHelper", array("helper" => $class));
+                return false;
+            endif;
+        endforeach;
+        return $this->loadedHelpers;
+    }
+    protected function renderView($filename, $data = array()) {
+        extract($data, EXTR_OVERWRITE);
+        extract($this->loadedHelpers, EXTR_PREFIX_SAME, "helper");
+        ob_start();
+        include $filename;
+        $output = ob_get_clean();
+        return $output;
+    }
+
+
+
+
+    public function render() {
+        if($action === null):
+            $action = "{$this->params['controller']}/{$this->params['action']}";
+            $ext = $this->params['extension'];
+        else:
+            $filename = preg_split("/\./", $action);
+            $action = $filename[0];
+            $ext = $filename[1] ? $filename[1] : "htm";
+        endif;
+        $filename = App::path("View", "{$action}.{$ext}");
+        if($filename):
+            $out = $this->renderView($filename, $this->data);
+            if($this->autoLayout && $this->layout):
+                $layout = $layout === null ? "{$this->layout}.{$ext}" : $layout;
+                $out = $this->renderLayout($out, $layout);
+            endif;
+            return $out;
+        else:
+            $this->error("missingView", array("controller" => $this->params['controller'], "view" => $action, "extension" => $ext));
+            return false;
+        endif;
+    }
+    public function renderLayout() {
+        if($layout === null):
+            $layout = $this->layout;
+            $ext = $this->params['extension'];
+        else:
+            $filename = preg_split("/\./", $layout);
+            $layout = $filename[0];
+            $ext = $filename[1] ? $filename[1] : "htm";
+        endif;
+        $filename = App::path("Layout", "{$layout}.{$ext}");
+        $this->contentForLayout = $content;
+        if($filename):
+            $out = $this->renderView($filename, $this->data);
+            return $out;
+        else:
+            $this->error("missingLayout", array("layout" => $layout, "extension" => $ext));
+            return false;
+        endif;        
+    }
+    public function element() {
+        $ext = $this->params['extension'] ? $this->params['extension'] : "htm";
+        $element = dirname($element) . DS . "_" . basename($element);
+        return $this->renderView(App::path("View", "{$element}.{$ext}"), $params);
+    }
+}
+
+class OldView extends Object {
     /**
-     *  Helpers utilizados pela view, definidos no controller
+     *  Helpers utilizados pela view, definidos no controller.
      */
     public $helpers = array();
     /**
-     *  Array que armazena os helpers carregados
+     *  Array que armazena os helpers carregados.
      */
     public $loadedHelpers = array();
     /**
-     *  Nome do layout
+     *  Nome do layout.
      */
     public $layout;
     /**
-     *  Título da página HTML
+     *  Título da página HTML.
      */
     public $pageTitle;
     /**
-     *  Renderização automática do layout
+     *  Renderização automática do layout.
      */
     public $autoLayout = true;
     /**
