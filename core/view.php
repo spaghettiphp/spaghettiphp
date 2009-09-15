@@ -128,8 +128,8 @@ class View extends Object {
             $ext = $this->params["extension"];
         endif;
         $file = App::path("Layout", "{$layout}.{$ext}");
-        $this->contentForLayout = $content;
         if($file):
+            $this->contentForLayout = $content;
             return $this->renderView($file, $this->data);
         else:
             $this->error("missingLayout", array(
