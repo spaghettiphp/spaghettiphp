@@ -162,9 +162,8 @@ class Controller extends Object {
     public function render($action = null, $layout = null) {
         $this->beforeRender();
         $view = new View($this);
-        $this->output .= $view->render($action, $layout);
         $this->autoRender = false;
-        return $this->output;
+        return $this->output .= $view->render($action, $layout);
     }
     /**
      *  Limpa o conteúdo de saída do controller.
