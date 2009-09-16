@@ -100,12 +100,13 @@ class HtmlHelper extends Helper {
         return $this->output($this->tag("img", null, $attr, true));
     }
     /**
-     *  Cria o elemento folha de estilho para ser usado no HTML.
+     *  Cria elementos de folha de estilho para serem usados no HTML.
      * 
-     *  @param string $href Nome da folha de estilo a ser inserido no HTML
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string URL da folha de estilo a ser utilizada
+     *  @param string $href Caminho da folha de estilo a ser inserida no HTML
+     *  @param array $attr Atributos da tag
+     *  @param boolean $inline Verdadeiro para imprimir a folha de estilo inline
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string Elemento de folha de estilo a ser utilizado
      */
     public function stylesheet($href = "", $attr = array(), $inline = true, $full = false) {
         if(is_array($href)):
@@ -129,23 +130,32 @@ class HtmlHelper extends Helper {
         return $this->output($this->tag("link", null, $attr, true));
     }
     /**
-     *  Cria o elemento script para ser usado no HTML.
+     *  Cria um elemento de script para ser usado no HTML.
      * 
-     *  @param string $src Nome do script a ser inseido no HTML
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string URL do script a ser utilizado
+     *  @param string $src Caminho do script a ser inseido no HTML
+     *  @param array $attr Atributos da tag
+     *  @param boolean $inline Verdadeiro para imprimir o script inline
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string Elemento de script a ser utilizado
      */
-    public function script($src = "", $attr = array(), $full = false) {
-        $tags = "";
+    public function script($src = "", $attr = array(), $inline = true, $full = false) {
         if(is_array($src)):
+            $tags = "";
             foreach($src as $tag):
-                $tags .= HtmlHelper::script($tag, $attr, $full) . PHP_EOL;
+                $tags .= $this->script($tag, $attr, $full) . PHP_EOL;
             endforeach;
             return $tags;
         endif;
-        $attrs = array("src" => $this->url("/scripts", $src, $full), "type" => "text/javascript");
-        $attr = array_merge($attrs, $attr);
+        if(!$this->external($src)):
+            $src = "/scripts/" . $this->extension($href, "js");
+        endif;
+        $attr = array_merge(
+            array(
+                "src" => $src,
+                "type" => "text/javascript"
+            ),
+            $attr
+        );
         return $this->output($this->tag("script", null, $attr));
     }
     /**
