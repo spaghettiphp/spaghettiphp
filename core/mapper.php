@@ -242,7 +242,7 @@ class Mapper extends Object {
      *  Gera uma URL, levando em consideração o local atual da aplicação.
      *
      *  @param string $path Caminho relativo ou URL absoluta
-     *  @param bool $full URL completa (true) ou apenas o caminho
+     *  @param bool $full Verdadeiro para gerar uma URL completa
      *  @return string URL gerada para a aplicação
      */
     public static function url($path = null, $full = false) {

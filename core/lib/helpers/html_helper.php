@@ -69,38 +69,33 @@ class HtmlHelper extends Helper {
         return join(" ", $attributes);
     }
     /**
-     *  Cria links par serem utilizados na aplicação.
+     *  Cria um link para ser utilizado na aplicação.
      * 
      *  @param string $text Conteúdo para o link
-     *  @param string $url URL relativa a instalação
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string Link em HTML gerado para a aplicação
+     *  @param string $url URL relativa à raiz da aplicação
+     *  @param array $attr Atributos da tag
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string Link HTML
      */
-    public function link($text = "", $url = "", $attr = array(), $full = false) {
-        if(!is_array($attr)):
-            $attr = array();
+    public function link($text, $url = null, $attr = array(), $full = false) {
+        if(is_null($url)):
+            $url = $text;
         endif;
-        $href = array("href" => Mapper::url($url, $full));
-        $attr = array_merge($href, $attr);
+        $attr["href"] = Mapper::url($url, $full);
         return $this->output($this->tag("a", $text, $attr));
     }
     /**
-     *  Cria o elemento imagem para ser usado no HTML.
+     *  Cria um elemento de imagem para ser na aplicação.
      * 
-     *  @param string $src Nome da imagem a ser inserido no HTML
-     *  @param string $alt Texto alternativo da imagem
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string ML da imagem a ser inserida
+     *  @param string $src Caminho da imagem
+     *  @param array $attr Atributos da tag
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string HTML da imagem a ser inserida
      */
-    public function image($src = "", $alt = "", $attr = array(), $full = false) {
-        if(!is_array($attr)):
-            $attr = array();
-        endif;
-        $src_alt = array("src" => $this->internalUrl("/images", $src, $full), "alt" => $alt);
-        $attr = array_merge($src_alt, $attr);
-        return $this->output($this->tag("img", null, $attr, false));
+    public function image($src, $attr = array(), $full = false) {
+        $src = $this->internalUrl("/images", $src, $full);
+        $attr["src"] = $src;
+        return $this->output($this->tag("img", null, $attr, true));
     }
     /**
      *  Cria o elemento folha de estilho para ser usado no HTML.
