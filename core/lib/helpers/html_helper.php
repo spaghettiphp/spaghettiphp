@@ -158,6 +158,25 @@ class HtmlHelper extends Helper {
         );
         return $this->output($this->tag("script", null, $attr));
     }
+    /*
+     *  Cria uma lista a partir de um array.
+     *  
+     *  @param array $list Array com conjunto de elementos da lista
+     *  @return string
+     */
+    public function nestedList($list, $attr = array(), $type = "ul") {
+        $content = "";
+        foreach($list as $k => $li):
+            if(is_array($li)):
+                $li = $this->nestedList($li, array(), $type);
+                if(!is_numeric($k)):
+                    $li = $k . $li;
+                endif;
+            endif;
+            $content .= $this->tag("li", $li) . PHP_EOL;
+        endforeach;
+        return $this->tag($type, $content, $attr);
+    }
     /**
      *  Cria uma tag DIV.
      *
@@ -170,6 +189,22 @@ class HtmlHelper extends Helper {
             $attr = array("class" => $attr);
         endif;
         return $this->output($this->tag("div", $content, $attr));
+    }
+    /**
+     *  Short description.
+     *
+     *  @param string $charset
+     *  @return string
+     */
+    public function charset($charset = null) {
+        if(is_null($charset)):
+            $charset = Config::read("appEncoding");
+        endif;
+        $attr = array(
+            "http-equiv" => "Content-type",
+            "content" => "text/html; charset={$charset}"
+        );
+        return $this->output($this->tag("meta", null, $attr));
     }
     /**
      *  Verifica se uma URL é externa.
@@ -194,25 +229,6 @@ class HtmlHelper extends Helper {
             endif;
         endif;
         return $file;
-    }
-    /*
-     *  Cria uma lista a partir de um array.
-     *  
-     *  @param array $list Array com conjunto de elementos da lista
-     *  @return string
-     */
-    public function nestedList($list, $attr = array(), $type = "ul") {
-        $content = "";
-        foreach($list as $k => $li):
-            if(is_array($li)):
-                $li = $this->nestedList($li, array(), $type);
-                if(!is_numeric($k)):
-                    $li = $k . $li;
-                endif;
-            endif;
-            $content .= $this->tag("li", $li) . PHP_EOL;
-        endforeach;
-        return $this->tag($type, $content, $attr);
     }
 }
 

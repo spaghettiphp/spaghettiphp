@@ -23,4 +23,9 @@ Config::write("environment", "development");
  */
 Config::write("debugMode", 1);
 
+/**
+ *  Short description.
+ */
+Config::write("appEncoding", "utf-8");
+
 ?>
