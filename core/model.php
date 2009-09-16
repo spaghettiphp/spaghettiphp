@@ -43,6 +43,10 @@ class Model extends Object {
      */
     public $primaryKey = null;
     /**
+     *  Campo a ser usado como título em consultas toList.
+     */
+    public $displayField = null;
+    /**
      *  Configuração de ambiente a ser usada.
      */
     public $environment = null;
@@ -118,10 +122,10 @@ class Model extends Object {
         return $instance[0];
     }
     /**
-     *  Short description.
+     *  Define a tabela a ser usada pelo modelo.
      *
-     *  @param string $table
-     *  @return boolean
+     *  @param string $table Nome da tabela a ser usada
+     *  @return boolean Verdadeiro caso a tabela exista
      */
     public function setSource($table) {
         $db =& self::getConnection($this->environment);
@@ -287,7 +291,7 @@ class Model extends Object {
         return $results;
     }
     /**
-     *  Busca o primiero registro no banco de dados.
+     *  Busca o primeiro registro no banco de dados.
      *
      *  @param array $params Parâmetros a serem usados na busca
      *  @return array Resultados da busca
@@ -305,7 +309,7 @@ class Model extends Object {
      *
      *  @param array $results Resultados obtidos em uma consulta
      *  @param integer $recursion Nível de recursão
-     *  @return void
+     *  @return array Resultados da busca
      */
     public function dependent($results, $recursion = 0) {
         foreach(array_keys($this->associations) as $type):
@@ -381,6 +385,27 @@ class Model extends Object {
         );
 
         return $this->all($params);
+    }
+    /**
+     *  Busca registros no banco de dados em formato de array chave => valor.
+     *
+     *  @param array $params Parâmetros da busca
+     *  @return array Resultados da busca
+     */
+    public function toList($params = array()) {
+        $params = array_merge(
+            array(
+                "key" => $this->primaryKey,
+                "displayField" => $this->displayField
+            ),
+            $params
+        );
+        $all = $this->all($params);
+        $results = array();
+        foreach($all as $result):
+            $results[$params["key"]] = $result["displayField"];
+        endforeach;
+        return $results;
     }
     /**
      *  Verifica se um registro existe no banco de dados.
