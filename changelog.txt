@@ -1,47 +1,57 @@
 version 0.2b (2009-10-15)
-	* Supporting parameters coming from query strings
-	* Moved /app/config/database.php to /app/config/database.sample.php
-	* Moved global $content_for_layout to View::contentForLayout
-	* Model supports Model::id to set record id in Model::save()
-	* Added pagination support
-	* Added Model::count() for counting rows in the database
-	* Added working Model::beforeSave() and Model::afterSave() callbacks
-	* Moved Model::find() to Model::first()
-	* Moved Model::findAll() to Model::all()
-	* Added Model::begin(), Model::commit() and Model::rollback() to database transactions
-	* Removed Model::__set(), Model::__get() and Model::data
-	* Moved MySQL-related methods to MysqlDatasource
-	* Added Connection and Datasource
-	* Added Model::primaryKey
-	* Spaghetti* informs that it won't work without PHP5
-	* /index.php informs that Spaghetti* won't work without mod_rewrite
-	* ClassRegistry::load() returns false instead of throwing missing* error
-	* Moved ClassRegistry::init() to ClassRegistry::load()
-	* Changed view's file extensions to more "standard" formats: .htm.php
-	* Added Mapper::root() and removed default routing to prefixes
-	* Fixed bug with external bugs in HtmlHelper
-	* Added ImageComponent and UploadComponent
-	* Protected or private methods in Controller return missingAction when requested as actions
-	* Refactored and moved Dispatcher::parseUrl() to Mapper::parse()
-	* Added Mapper::normalize() to remove slashes from urls
-	* Many classes, like Object, are abstract classes
-	* Fixed lots of strict errors and notices
+    * Added Model::toList()
+    * Moved Dispatcher::parseUrl() to Mapper::parse()
+    * FormHelper::input() now prints a better markup
+    * Added option to select button or input type=submit in FormHelper::close()
+    * Added radio buttons to FormHelper::input()
+    * Removed some input methods from FormHelper
+    * Removed $value param from FormHelper::input()
+    * Supporting parameters coming from query strings
+    * Moved /app/config/database.php to /app/config/database.sample.php
+    * Moved global $content_for_layout to View::contentForLayout
+    * Model supports Model::id to set record id in Model::save()
+    * Added pagination support
+    * Added Model::count() for counting rows in the database
+    * Added working Model::beforeSave() and Model::afterSave() callbacks
+    * Moved Model::find() to Model::first()
+    * Moved Model::findAll() to Model::all()
+    * Added Model::begin(), Model::commit() and Model::rollback() to database transactions
+    * Removed Model::__set(), Model::__get() and Model::data
+    * Moved MySQL-related methods to MysqlDatasource
+    * Added Connection and Datasource
+    * Added Model::primaryKey
+    * Spaghetti* informs that it won't work without PHP5
+    * /index.php informs that Spaghetti* won't work without mod_rewrite
+    * ClassRegistry::load() returns false instead of throwing missing* error
+    * Moved ClassRegistry::init() to ClassRegistry::load()
+    * Changed view's file extensions to more "standard" formats: .htm.php
+    * Added Mapper::root() and removed default routing to prefixes
+    * Fixed bug with external bugs in HtmlHelper
+    * Added ImageComponent and UploadComponent
+    * Protected or private methods in Controller return missingAction when requested as actions
+    * Refactored and moved Dispatcher::parseUrl() to Mapper::parse()
+    * Added Mapper::normalize() to remove slashes from urls
+    * Many classes, like Object, are abstract classes
+    * Fixed lots of strict errors and notices
 
 version 0.1.2 (2009-08-30)
-	* Fixed Model::save() with relational data
-	* Fixed broken relationships with undefined foreignKeys
-	* Fixed minor bug in View::element
-	* Fixing links in the welcome page
+    * Fixed Model::save() with relational data
+    * Fixed broken relationships with undefined foreignKeys
+    * Fixed minor bug in View::element
+    * Fixing links in the welcome page
 
 version 0.1.1 (2009-08-17)
-	* View::element() can use elements in subfolders
-	* Model::save() supports DATE and TIME fieldtypes in created and modified
-	* Find queries can specify desired fields
-	* Added upcoming Model::all() and Model::first()
-	* Fixed null values in Model::insert() and Model::update()
-	* Added missingHelper error
-	* Fixed className in Model relationships
-	* Model::save() saves dependent rows in hasMany and hasOne relationships
-	* Mapper::getRoute() only rewrites the first matching route
-	* Dispatcher::parseUrl() treats id as null when not present
-	* Fixed missing $url throwing notice in Dispatcher::__construct()
+    * View::element() can use elements in subfolders
+    * Model::save() supports DATE and TIME fieldtypes in created and modified
+    * Find queries can specify desired fields
+    * Added upcoming Model::all() and Model::first()
+    * Fixed null values in Model::insert() and Model::update()
+    * Added missingHelper error
+    * Fixed className in Model relationships
+    * Model::save() saves dependent rows in hasMany and hasOne relationships
+    * Mapper::getRoute() only rewrites the first matching route
+    * Dispatcher::parseUrl() treats id as null when not present
+    * Fixed missing $url throwing notice in Dispatcher::__construct()
+    
+version 0.1 (2009-01-01)
+    * First public version of Spaghetti* =D
