@@ -93,7 +93,7 @@ class HtmlHelper extends Helper {
      *  @return string HTML da imagem a ser inserida
      */
     public function image($src, $attr = array(), $full = false) {
-        $src = $this->internalUrl("/images", $src, $full);
+        $src = $this->url("/images", $src, $full);
         $attr["src"] = $src;
         return $this->output($this->tag("img", null, $attr, true));
     }
@@ -113,7 +113,7 @@ class HtmlHelper extends Helper {
             endforeach;
             return $tags;
         endif;
-        $attrs = array("href" => $this->internalUrl("/styles", $href, $full), "rel" => "stylesheet", "type" => "text/css");
+        $attrs = array("href" => $this->url("/styles", $href, $full), "rel" => "stylesheet", "type" => "text/css");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("link", null, $attr, false));
     }
@@ -133,7 +133,7 @@ class HtmlHelper extends Helper {
             endforeach;
             return $tags;
         endif;
-        $attrs = array("src" => $this->internalUrl("/scripts", $src, $full), "type" => "text/javascript");
+        $attrs = array("src" => $this->url("/scripts", $src, $full), "type" => "text/javascript");
         $attr = array_merge($attrs, $attr);
         return $this->output($this->tag("script", null, $attr));
     }
@@ -151,14 +151,14 @@ class HtmlHelper extends Helper {
         return $this->output($this->tag("div", $content, $attr));
     }
     /**
-     *  Cria uma URL interna para utilização no HTML.
+     *  Cria uma URL interna para utilização do helper.
      * 
-     *  @param string $path Caminho relativo a URL
-     *  @param string $url URL a ser inserido
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string URL interna a ser utilizada
+     *  @param string $path Caminho a ser preposto à URL
+     *  @param string $url URL a ser inserida
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string URL interna com path preposto ou URL externa
      */
-    public function internalUrl($path = "", $url = "", $full = false) {
+    public function url($path, $url, $full = false) {
         if(preg_match("/^[a-z]+:/", $url)):
             return $url;
         else:
