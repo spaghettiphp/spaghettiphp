@@ -93,7 +93,9 @@ class HtmlHelper extends Helper {
      *  @return string HTML da imagem a ser inserida
      */
     public function image($src, $attr = array(), $full = false) {
-        $src = $this->url("/images", $src, $full);
+        if(!$this->external($src)):
+            $src = Mapper::url("/images/" . $src, $full);
+        endif;
         $attr["src"] = $src;
         return $this->output($this->tag("img", null, $attr, true));
     }
@@ -105,17 +107,26 @@ class HtmlHelper extends Helper {
      *  @param boolean $full URL completa (true) ou apenas o caminho
      *  @return string URL da folha de estilo a ser utilizada
      */
-    public function stylesheet($href = "", $attr = array(), $full = false) {
-        $tags = "";
+    public function stylesheet($href = "", $attr = array(), $inline = true, $full = false) {
         if(is_array($href)):
+            $tags = "";
             foreach($href as $tag):
-                $tags .= HtmlHelper::stylesheet($tag, $attr, $full) . PHP_EOL;
+                $tags .= $this->stylesheet($tag, $attr, $full) . PHP_EOL;
             endforeach;
             return $tags;
         endif;
-        $attrs = array("href" => $this->url("/styles", $href, $full), "rel" => "stylesheet", "type" => "text/css");
-        $attr = array_merge($attrs, $attr);
-        return $this->output($this->tag("link", null, $attr, false));
+        if(!$this->external($href)):
+            $href = "/styles/" . $this->extension($href, "css");
+        endif;
+        $attr = array_merge(
+            array(
+                "href" => Mapper::url($href, $full),
+                "rel" => "stylesheet",
+                "type" => "text/css"
+            ),
+            $attr
+        );
+        return $this->output($this->tag("link", null, $attr, true));
     }
     /**
      *  Cria o elemento script para ser usado no HTML.
@@ -150,20 +161,16 @@ class HtmlHelper extends Helper {
         endif;
         return $this->output($this->tag("div", $content, $attr));
     }
-    /**
-     *  Cria uma URL interna para utilização do helper.
-     * 
-     *  @param string $path Caminho a ser preposto à URL
-     *  @param string $url URL a ser inserida
-     *  @param boolean $full Verdadeiro para gerar uma URL completa
-     *  @return string URL interna com path preposto ou URL externa
-     */
-    public function url($path, $url, $full = false) {
-        if(preg_match("/^[a-z]+:/", $url)):
-            return $url;
-        else:
-            return Mapper::url("{$path}/{$url}", $full);
+    public function external($url) {
+        return preg_match("/^[a-z]+:/", $url);
+    }
+    public function extension($file, $extension) {
+        if(strpos($file, "?") === false):
+            if(strpos($file, "." . $extension) === false):
+                $file .= "." . $extension;
+            endif;
         endif;
+        return $file;
     }
 }
 
