@@ -171,9 +171,22 @@ class HtmlHelper extends Helper {
         endif;
         return $this->output($this->tag("div", $content, $attr));
     }
+    /**
+     *  Verifica se uma URL é externa.
+     *
+     *  @param string $url URL a ser verificada
+     *  @return boolean Verdadeiro se a URL for externa
+     */
     public function external($url) {
         return preg_match("/^[a-z]+:/", $url);
     }
+    /**
+     *  Adiciona uma extensão a um arquivo caso ela não exista.
+     *
+     *  @param string $file Nome do arquivo
+     *  @param string $extension Extensão a ser adicionada
+     *  @return string Novo nome do arquivo
+     */
     public function extension($file, $extension) {
         if(strpos($file, "?") === false):
             if(strpos($file, "." . $extension) === false):
