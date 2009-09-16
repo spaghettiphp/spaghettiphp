@@ -403,7 +403,7 @@ class Model extends Object {
         $all = $this->all($params);
         $results = array();
         foreach($all as $result):
-            $results[$all[$params["key"]]] = $all[$result["displayField"]];
+            $results[$result[$params["key"]]] = $result[$params["displayField"]];
         endforeach;
         return $results;
     }
