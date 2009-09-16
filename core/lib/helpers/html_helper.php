@@ -9,62 +9,63 @@
 
 class HtmlHelper extends Helper {
     /**
-     *  Cria as tags (únicas) HTML fechando-as se necessário.
+     *  Cria HTML para tags de abertura.
      *
      *  @param string $tag Tag a ser criada
-     *  @param string $attr Atributos e opções da tag HTML
-     *  @param boolean $close Fecha as tags (true)
+     *  @param string $attr Atributos da tag
+     *  @param boolean $empty Verdadeiro para criar uma tag vazia
      *  @return string Tag HTML
      */
-    public function openTag($tag = "", $attr = "", $close = true) {
+    public function openTag($tag, $attr = array(), $empty = false) {
         $html = "<{$tag}";
-        if(($attr = $this->attr($attr)) != ""):
+        $attr = $this->attr($attr);
+        if(!empty($attr)):
             $html .= " $attr";
         endif;
-        $html .= ($close ? "" : " /") . ">";
+        $html .= ($empty ? " /" : "") . ">";
         return $html;
     }
     /**
-     *  Fecha as tags HMTL.
+     *  Cria HTML para tag de fechamento.
      * 
-     *  @param string $tag Tag a ser fechado
-     *  @return string Tag HMTL fechado
+     *  @param string $tag Tag a ser fechada
+     *  @return string Tag HMTL fechada
      */
-    public function closeTag($tag = "") {
+    public function closeTag($tag) {
         return "</{$tag}>";
     }
     /**
-     *  Cria as tags (pares) HTML com o seu conteudo, fechando-o caso necessário.
+     *  Cria HTML para tags de abertura e fechamento contendo algum conteúdo.
      * 
-     *  @param string $tag Tag HTML para inserção
-     *  @param string $content Conteúdo entre as tags inseridos
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $close Verdadero para fechar a tag em questão
-     *  @return string Tag HTML com o seu conteudo
+     *  @param string $tag Tag a ser criada
+     *  @param string $content Conteúdo entre as tags inseridas
+     *  @param array $attr Atributos da tag
+     *  @param boolean $close Verdadeiro para criar uma tag vazia
+     *  @return string Tag HTML com o seu conteúdo
      */
-    public function tag($tag = "", $content = "", $attr = array(), $close = true) {
-        $html = $this->openTag($tag, $attr, $close);
-        if($close):
+    public function tag($tag, $content = "", $attr = array(), $empty = false) {
+        $html = $this->openTag($tag, $attr, $empty);
+        if(!$empty):
             $html .= "{$content}" . $this->closeTag($tag);
         endif;
         return $html;
     }
     /**
-     *  Prepara os atributos para utilização nas tags.
+     *  Prepara atributos para utilização em tags HTML.
      * 
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @return string Atributos para pre-enchimento da tag
+     *  @param array $attr Atributos a serem preparados
+     *  @return string Atributos para preenchimento da tag
      */
-    public function attr($attr = array()) {
+    public function attr($attr) {
         $attributes = array();
-        if(is_array($attr)):
-            foreach($attr as $name => $value):
-                if($value === true):
-                    $value = $name;
-                endif;
-                $attributes []= "$name=\"$value\"";
-            endforeach;
-        endif;
+        foreach($attr as $name => $value):
+            if($value === true):
+                $value = $name;
+            elseif($value === false):
+                continue;
+            endif;
+            $attributes []= $name . '="' . $value . '"';
+        endforeach;
         return join(" ", $attributes);
     }
     /**
