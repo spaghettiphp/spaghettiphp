@@ -147,7 +147,7 @@ class HtmlHelper extends Helper {
             return $tags;
         endif;
         if(!$this->external($src)):
-            $src = "/scripts/" . $this->extension($href, "js");
+            $src = "/scripts/" . $this->extension($src, "js");
         endif;
         $attr = array_merge(
             array(
