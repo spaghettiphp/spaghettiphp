@@ -40,7 +40,7 @@ class HtmlHelper extends Helper {
      *  @param string $tag Tag a ser criada
      *  @param string $content Conteúdo entre as tags inseridas
      *  @param array $attr Atributos da tag
-     *  @param boolean $close Verdadeiro para criar uma tag vazia
+     *  @param boolean $empty Verdadeiro para criar uma tag vazia
      *  @return string Tag HTML com o seu conteúdo
      */
     public function tag($tag, $content = "", $attr = array(), $empty = false) {
@@ -183,18 +183,23 @@ class HtmlHelper extends Helper {
         return $file;
     }
     /*
-     * Transforma um array em uma lista não ordenada.
-     * 
-     * @param array $array Array com os valores que virarão lista
-     * @param string $class Classe CSS que será adicionada à lista
-     * @return string
+     *  Cria uma lista a partir de um array.
+     *  
+     *  @param array $list Array com conjunto de elementos da lista
+     *  @return string
      */
-    public function arrayToList($array = array(), $class=null){
-        $class = $class ? ' class="' . $class .'"' : '';
-        $html = "<ul{$class}><li>";
-        $html .= implode("</li><li>", $array);
-        $html .= "</li></ul>";
-        return $this->output($hmtl);
+    public function nestedList($list, $attr = array(), $type = "ul") {
+        $content = "";
+        foreach($list as $k => $li):
+            if(is_array($li)):
+                $li = $this->nestedList($li, array(), $type);
+                if(!is_numeric($k)):
+                    $li = $k . $li;
+                endif;
+            endif;
+            $content .= $this->tag("li", $li) . PHP_EOL;
+        endforeach;
+        return $this->tag($type, $content, $attr);
     }
 }
 
