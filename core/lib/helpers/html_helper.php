@@ -191,10 +191,10 @@ class HtmlHelper extends Helper {
         return $this->output($this->tag("div", $content, $attr));
     }
     /**
-     *  Short description.
+     *  Adiciona uma meta tag para definir o charset da página.
      *
-     *  @param string $charset
-     *  @return string
+     *  @param string $charset Charset a ser utilizado
+     *  @return string Tag META
      */
     public function charset($charset = null) {
         if(is_null($charset)):
