@@ -1,6 +1,8 @@
 <?php
 /**
- *  Short description.
+ *  Validation é a classe responsável pela validação de dados dentro do Spaghetti*,
+ *  provendo métodos para vários tipos de validação, e também com a possibilidade
+ *  de criação de alguns métodos personalizados.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -9,21 +11,22 @@
 
 class Validation extends Object {
     /**
-     *  Short description.
+     *  Valida um valor alfanumérico (letras e números).
      *
-     *  @param string $value
-     *  @return boolean
+     *  @param string $value Valor a ser validado
+     *  @return boolean Verdadeiro caso o valor seja válido
      */
     public static function alphanumeric($value) {
         return preg_match("/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu", $value);
     }
     /**
-     *  Short description.
+     *  Valida um número ou comprimento de uma string que esteja entre dois outros
+     *  valores especificados.
      *
-     *  @param string $value
-     *  @param integer $min
-     *  @param integer $max
-     *  @return boolean
+     *  @param string $value Valor a ser validado
+     *  @param integer $min Valor mínimo
+     *  @param integer $max Valor máximo
+     *  @return boolean Verdadeiro caso o valor seja válido
      */
     public static function between($value, $min, $max) {
         if(!is_numeric($value)):
