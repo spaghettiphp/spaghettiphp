@@ -8,8 +8,8 @@
  */
 
 class Validation extends Object {
-    public static function alphaNumeric() {
-        
+    public static function alphanumeric($value) {
+        return preg_match("/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu", $value);
     }
     public static function between() {
         
@@ -59,8 +59,8 @@ class Validation extends Object {
     public static function inList() {
         
     }
-    public static function numeric() {
-        
+    public static function numeric($value) {
+        return is_numeric($value);
     }
     public static function notEmpty() {
         
