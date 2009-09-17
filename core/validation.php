@@ -29,8 +29,13 @@ class Validation extends Object {
     public static function date() {
         
     }
-    public static function decimal() {
-        
+    public static function decimal($value, $places = null) {
+        if(is_null($places)):
+            $regex = "/^[+-]?[\d]+\.[\d]+([eE][+-]?[\d]+)?$/";
+        else:
+            $regex = "/^[+-]?[\d]+\.[\d]{" . $places . "}$/";
+        endif;
+        return preg_match($regex, $value);
     }
     public static function email() {
         
