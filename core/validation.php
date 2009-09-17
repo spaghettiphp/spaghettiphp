@@ -49,11 +49,13 @@ class Validation extends Object {
     public static function ip() {
         
     }
-    public static function minLength() {
-        
+    public static function minLength($value, $length) {
+        $valueLength = strlen($value);
+        return $valueLength >= $length;
     }
-    public static function maxLength() {
-        
+    public static function maxLength($value, $length) {
+        $valueLength = strlen($value);
+        return $valueLength <= $length;
     }
     public static function money() {
         

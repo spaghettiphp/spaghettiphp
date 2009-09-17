@@ -48,6 +48,30 @@ class TestValidation extends UnitTestCase {
         $value = "42.";
         $this->assertFalse(Validation::decimal($value));
     }
+    public function testValidMaxLength() {
+        $value = "42424";
+        $this->assertTrue(Validation::maxLength($value, 5));
+    }
+    public function testValidMaxLengthWithLessCharacters() {
+        $value = "42";
+        $this->assertTrue(Validation::maxLength($value, 5));
+    }
+    public function testInvalidMaxLength() {
+        $value = "424242";
+        $this->assertFalse(Validation::maxLength($value, 5));
+    }
+    public function testValidMinLength() {
+        $value = "42";
+        $this->assertTrue(Validation::minLength($value, 2));
+    }
+    public function testValidMinLengthWithMoreCharacters() {
+        $value = "4242";
+        $this->assertTrue(Validation::minLength($value, 2));
+    }
+    public function testInvalidMinLength() {
+        $value = "4";
+        $this->assertFalse(Validation::minLength($value, 2));
+    }
 }
 
 ?>
