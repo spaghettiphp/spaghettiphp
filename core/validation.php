@@ -8,9 +8,23 @@
  */
 
 class Validation extends Object {
+    /**
+     *  Short description.
+     *
+     *  @param string $value
+     *  @return boolean
+     */
     public static function alphanumeric($value) {
         return preg_match("/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu", $value);
     }
+    /**
+     *  Short description.
+     *
+     *  @param string $value
+     *  @param integer $min
+     *  @param integer $max
+     *  @return boolean
+     */
     public static function between($value, $min, $max) {
         if(!is_numeric($value)):
             $value = strlen($value);
@@ -20,6 +34,12 @@ class Validation extends Object {
     public static function blank() {
         
     }
+    /**
+     *  Short description.
+     *
+     *  @param string $value
+     *  @return boolean
+     */
     public static function boolean($value) {
         $boolean = array(0, 1, '0', '1', true, false);
         return in_array($value, $boolean, true);
@@ -33,6 +53,13 @@ class Validation extends Object {
     public static function date() {
         
     }
+    /**
+     *  Short description.
+     *
+     *  @param string $value
+     *  @param integer $places
+     *  @return boolean
+     */
     public static function decimal($value, $places = null) {
         if(is_null($places)):
             $regex = "/^[+-]?[\d]+\.[\d]+([eE][+-]?[\d]+)?$/";
@@ -53,10 +80,24 @@ class Validation extends Object {
     public static function ip() {
         
     }
+    /**
+     *  Short description.
+     *
+     *  @param string $value
+     *  @param integer $length
+     *  @return boolean
+     */
     public static function minLength($value, $length) {
         $valueLength = strlen($value);
         return $valueLength >= $length;
     }
+    /**
+     *  Short description.
+     *
+     *  @param string $value
+     *  @param integer $length
+     *  @return boolean
+     */
     public static function maxLength($value, $length) {
         $valueLength = strlen($value);
         return $valueLength <= $length;
@@ -70,6 +111,12 @@ class Validation extends Object {
     public static function inList() {
         
     }
+    /**
+     *  Short description.
+     *
+     *  @param string $value
+     *  @return boolean
+     */
     public static function numeric($value) {
         return is_numeric($value);
     }
