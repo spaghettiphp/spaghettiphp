@@ -72,6 +72,22 @@ class TestValidation extends UnitTestCase {
         $value = "4";
         $this->assertFalse(Validation::minLength($value, 2));
     }
+    public function testValidBetweenWithString() {
+        $value = "Spaghetti";
+        $this->assertTrue(Validation::between($value, 3, 10));
+    }
+    public function testValidBetweenWithNumber() {
+        $value = 5;
+        $this->assertTrue(Validation::between($value, 3, 10));
+    }
+    public function testInvalidBetweenWithString() {
+        $value = "Spaghetti* Framework";
+        $this->assertFalse(Validation::between($value, 3, 10));
+    }
+    public function testInvalidBetweenWithNumber() {
+        $value = 1;
+        $this->assertFalse(Validation::between($value, 3, 10));
+    }
 }
 
 ?>

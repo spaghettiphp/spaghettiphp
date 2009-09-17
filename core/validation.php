@@ -11,8 +11,11 @@ class Validation extends Object {
     public static function alphanumeric($value) {
         return preg_match("/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu", $value);
     }
-    public static function between() {
-        
+    public static function between($value, $min, $max) {
+        if(!is_numeric($value)):
+            $value = strlen($value);
+        endif;
+        return $value >= $min && $value <= $max;
     }
     public static function blank() {
         
