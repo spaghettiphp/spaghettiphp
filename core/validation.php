@@ -20,8 +20,9 @@ class Validation extends Object {
     public static function blank() {
         
     }
-    public static function boolean() {
-        
+    public static function boolean($value) {
+        $boolean = array(0, 1, '0', '1', true, false);
+        return in_array($value, $boolean, true);
     }
     public static function creditCard() {
         

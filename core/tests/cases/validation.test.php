@@ -88,6 +88,22 @@ class TestValidation extends UnitTestCase {
         $value = 1;
         $this->assertFalse(Validation::between($value, 3, 10));
     }
+    public function testValidBooleanWithNumber() {
+        $value = 0;
+        $this->assertTrue(Validation::boolean($value));
+    }
+    public function testValidBooleanWithString() {
+        $value = '1';
+        $this->assertTrue(Validation::boolean($value));
+    }
+    public function testValidBooleanWithBooleanTrue() {
+        $value = true;
+        $this->assertTrue(Validation::boolean($value));
+    }
+    public function testValidBooleanWithBooleanFalse() {
+        $value = false;
+        $this->assertTrue(Validation::boolean($value));
+    }
 }
 
 ?>
