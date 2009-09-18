@@ -120,24 +120,24 @@ class HtmlHelper extends Helper {
      */
     public function stylesheet($href = "", $attr = array(), $inline = true, $full = false) {
         if(is_array($href)):
-            $tags = "";
+            $output = "";
             foreach($href as $tag):
-                $tags .= $this->stylesheet($tag, $attr, $inline, $full) . PHP_EOL;
+                $output .= $this->stylesheet($tag, $attr, true, $full) . PHP_EOL;
             endforeach;
-            return $tags;
+        else:
+            if(!$this->external($href)):
+                $href = "/styles/" . $this->extension($href, "css");
+            endif;
+            $attr = array_merge(
+                array(
+                    "href" => Mapper::url($href, $full),
+                    "rel" => "stylesheet",
+                    "type" => "text/css"
+                ),
+                $attr
+            );
+            $output = $this->output($this->tag("link", null, $attr, true));
         endif;
-        if(!$this->external($href)):
-            $href = "/styles/" . $this->extension($href, "css");
-        endif;
-        $attr = array_merge(
-            array(
-                "href" => Mapper::url($href, $full),
-                "rel" => "stylesheet",
-                "type" => "text/css"
-            ),
-            $attr
-        );
-        $output = $this->output($this->tag("link", null, $attr, true));
         if($inline):
             return $output;
         else:
@@ -156,27 +156,27 @@ class HtmlHelper extends Helper {
      */
     public function script($src = "", $attr = array(), $inline = true, $full = false) {
         if(is_array($src)):
-            $tags = "";
+            $output = "";
             foreach($src as $tag):
-                $tags .= $this->script($tag, $attr, $inline, $full) . PHP_EOL;
+                $output .= $this->script($tag, $attr, true, $full) . PHP_EOL;
             endforeach;
-            return $tags;
+        else:
+            if(!$this->external($src)):
+                $src = "/scripts/" . $this->extension($src, "js");
+            endif;
+            $attr = array_merge(
+                array(
+                    "src" => $src,
+                    "type" => "text/javascript"
+                ),
+                $attr
+            );
+            $output = $this->output($this->tag("script", null, $attr));
         endif;
-        if(!$this->external($src)):
-            $src = "/scripts/" . $this->extension($src, "js");
-        endif;
-        $attr = array_merge(
-            array(
-                "src" => $src,
-                "type" => "text/javascript"
-            ),
-            $attr
-        );
-        $output = $this->output($this->tag("script", null, $attr));
         if($inline):
             return $output;
         else:
-            $this->scriptsForLayout .= $output;
+            $this->view->scriptsForLayout .= $output;
             return true;
         endif;
     }
