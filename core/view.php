@@ -59,7 +59,7 @@ class View extends Object {
             $helper = Inflector::underscore($helper);
             if(App::path("Helper", Inflector::underscore($class))):
                 App::import("Helper", Inflector::underscore($class));
-                $this->loadedHelpers[$helper] = new $class;
+                $this->loadedHelpers[$helper] = new $class($this);
             else:
                 $this->error("missingHelper", array("helper" => $class));
                 return false;

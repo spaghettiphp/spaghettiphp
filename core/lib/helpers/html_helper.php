@@ -9,6 +9,16 @@
 
 class HtmlHelper extends Helper {
     /**
+     *  Mantém uma referência à view que chamou o helper.
+     */
+    protected $view;
+    
+    public function __construct(&$view) {
+        $this->view =& $view;
+        $this->view->stylesForLayout = "";
+        $this->view->scriptsForLayout = "";
+    }
+    /**
      *  Cria HTML para tags de abertura.
      *
      *  @param string $tag Tag a ser criada
@@ -112,7 +122,7 @@ class HtmlHelper extends Helper {
         if(is_array($href)):
             $tags = "";
             foreach($href as $tag):
-                $tags .= $this->stylesheet($tag, $attr, $full) . PHP_EOL;
+                $tags .= $this->stylesheet($tag, $attr, $inline, $full) . PHP_EOL;
             endforeach;
             return $tags;
         endif;
@@ -127,7 +137,13 @@ class HtmlHelper extends Helper {
             ),
             $attr
         );
-        return $this->output($this->tag("link", null, $attr, true));
+        $output = $this->output($this->tag("link", null, $attr, true));
+        if($inline):
+            return $output;
+        else:
+            $this->view->stylesForLayout .= $output;
+            return true;
+        endif;
     }
     /**
      *  Cria um elemento de script para ser usado no HTML.
@@ -142,7 +158,7 @@ class HtmlHelper extends Helper {
         if(is_array($src)):
             $tags = "";
             foreach($src as $tag):
-                $tags .= $this->script($tag, $attr, $full) . PHP_EOL;
+                $tags .= $this->script($tag, $attr, $inline, $full) . PHP_EOL;
             endforeach;
             return $tags;
         endif;
@@ -156,7 +172,13 @@ class HtmlHelper extends Helper {
             ),
             $attr
         );
-        return $this->output($this->tag("script", null, $attr));
+        $output = $this->output($this->tag("script", null, $attr));
+        if($inline):
+            return $output;
+        else:
+            $this->scriptsForLayout .= $output;
+            return true;
+        endif;
     }
     /*
      *  Cria uma lista a partir de um array.
