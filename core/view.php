@@ -57,8 +57,10 @@ class View extends Object {
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
             $helper = Inflector::underscore($helper);
-            $this->loadedHelpers[$helper] = ClassRegistry::load($class, "Helper");
-            if(!$this->loadedHelpers[$helper]):
+            if(App::path("Helper", Inflector::underscore($class))):
+                App::import("Helper", Inflector::underscore($class));
+                $this->loadedHelpers[$helper] = new $class;
+            else:
                 $this->error("missingHelper", array("helper" => $class));
                 return false;
             endif;
