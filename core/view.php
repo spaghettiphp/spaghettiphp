@@ -53,7 +53,7 @@ class View extends Object {
      *
      *  @return array Instâncias dos helpers
      */
-    protected function loadHelpers() {
+    public function loadHelpers() {
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
             $helper = Inflector::underscore($helper);
@@ -74,7 +74,7 @@ class View extends Object {
      *  @param array $data Dados a serem extraídos durante a renderização
      *  @return string Resultado da renderização
      */
-    protected function renderView($filename, $data = array()) {
+    public function renderView($filename, $data = array()) {
         extract($data, EXTR_OVERWRITE);
         extract($this->loadedHelpers, EXTR_PREFIX_SAME, "helper");
         ob_start();
@@ -130,8 +130,8 @@ class View extends Object {
             $ext = $this->params["extension"];
         endif;
         $file = App::path("Layout", "{$layout}.{$ext}");
-        $this->contentForLayout = $content;
         if($file):
+            $this->contentForLayout = $content;
             return $this->renderView($file, $this->data);
         else:
             $this->error("missingLayout", array(

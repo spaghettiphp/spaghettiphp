@@ -82,7 +82,7 @@ class FormHelper extends HtmlHelper {
         $selectOptions = array_unset($options, "options");
         $content = "";
         foreach($selectOptions as $key => $value):
-            $optionAttr = array("value" => $value);
+            $optionAttr = array("value" => $key);
             if($key === $options["value"]):
                 $optionAttr["selected"] = true;
                 unset($options["value"]);
@@ -132,15 +132,16 @@ class FormHelper extends HtmlHelper {
         $options = array_merge(array(
             "name" => $name,
             "type" => "text",
-            "id" => Inflector::camelize("form_{$name}"),
+            "id" => Inflector::camelize("form_" . Inflector::slug($name)),
             "label" => Inflector::humanize($name),
             "div" => true
         ), $options);
         $label = array_unset($options, "label");
         $div = array_unset($options, "div");
         if($options["type"] == "select"):
-            unset($options["type"]);
-            $input = $this->select($name, $options);
+            $selectOptions = $options;
+            unset($selectOptions["type"]);
+            $input = $this->select($name, $selectOptions);
         elseif($options["type"] == "textarea"):
             $input = $this->tag("textarea", array_unset($options, "value"), $options);
         elseif($options["type"] == "radio"):
