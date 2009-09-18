@@ -57,8 +57,9 @@ class View extends Object {
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
             $helper = Inflector::underscore($helper);
-            if(App::path("Helper", Inflector::underscore($class))):
-                App::import("Helper", Inflector::underscore($class));
+            $file = "{$helper}_helper";
+            if(App::path("Helper", $file)):
+                App::import("Helper", $file);
                 $this->loadedHelpers[$helper] = new $class($this);
             else:
                 $this->error("missingHelper", array("helper" => $class));
@@ -76,7 +77,7 @@ class View extends Object {
      */
     public function renderView($filename, $data = array()) {
         extract($data, EXTR_OVERWRITE);
-        extract($this->loadedHelpers, EXTR_PREFIX_SAME, "helper");
+        extract($this->loadedHelpers, EXTR_PREFIX_SAME, "helper_");
         ob_start();
         include $filename;
         $output = ob_get_clean();
