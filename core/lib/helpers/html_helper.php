@@ -126,11 +126,11 @@ class HtmlHelper extends Helper {
             endforeach;
         else:
             if(!$this->external($href)):
-                $href = "/styles/" . $this->extension($href, "css");
+                $href = Mapper::url("/styles/" . $this->extension($href, "css"), $full);
             endif;
             $attr = array_merge(
                 array(
-                    "href" => Mapper::url($href, $full),
+                    "href" => $href,
                     "rel" => "stylesheet",
                     "type" => "text/css"
                 ),
@@ -162,7 +162,7 @@ class HtmlHelper extends Helper {
             endforeach;
         else:
             if(!$this->external($src)):
-                $src = "/scripts/" . $this->extension($src, "js");
+                $src = Mapper::url("/scripts/" . $this->extension($src, "js"), $full);
             endif;
             $attr = array_merge(
                 array(
