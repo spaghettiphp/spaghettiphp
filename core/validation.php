@@ -108,8 +108,31 @@ class Validation extends Object {
     public static function money() {
         
     }
-    public static function multiple() {
-        
+    /**
+     *  Short description.
+     *
+     *  @param array $values Valores a serem validados
+     *  @param array $list
+     *  @param integer $min
+     *  @param integer $max
+     *  @return boolean Verdadeiro caso os valores sejam válidos
+     */
+    public static function multiple($values, $list, $min = null, $max = null) {
+        $values = array_filter($values);
+        if(empty($values)):
+            return false;
+        elseif(!is_null($min) && count($values) < $min):
+            return false;
+        elseif(!is_null($max) && count($values) > $max):
+            return false;
+        else:
+            foreach(array_keys($values) as $value):
+                if(!in_array($value, $list)):
+                    return false;
+                endif;
+            endforeach;
+        endif;
+        return true;
     }
     /**
      *  Valida se um valor pertence a uma lista pré-definida.

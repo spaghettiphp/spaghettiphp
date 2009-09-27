@@ -130,6 +130,41 @@ class TestValidation extends UnitTestCase {
         $list = array("Spaghetti", "Framework");
         $this->assertFalse(Validation::inList($value, $list));
     }
+    public function testValidMultipleWithSingleOption() {
+        $values = array("Spaghetti" => 1);
+        $list = array("Spaghetti", "Framework");
+        $this->assertTrue(Validation::multiple($values, $list));
+    }
+    public function testValidMultipleWithMultipleOptions() {
+        $values = array("Spaghetti" => 1, "Framework" => 1);
+        $list = array("Spaghetti", "Framework");
+        $this->assertTrue(Validation::multiple($values, $list));
+    }
+    public function testValidMultipleWithMinAndMax() {
+        $values = array("Spaghetti" => 1, "Framework" => 1);
+        $list = array("Spaghetti", "Framework");
+        $this->assertTrue(Validation::multiple($values, $list, 1, 2));
+    }
+    public function testInvalidMultiple() {
+        $values = array("PHP" => 1);
+        $list = array("Spaghetti", "Framework");
+        $this->assertFalse(Validation::multiple($values, $list));
+    }
+    public function testInvalidMultipleWithZeroedValue() {
+        $values = array("Spaghetti" => 0);
+        $list = array("Spaghetti", "Framework");
+        $this->assertFalse(Validation::multiple($values, $list));
+    }
+    public function testInvalidMultipleWithMin() {
+        $values = array("Spaghetti" => 1);
+        $list = array("Spaghetti", "Framework");
+        $this->assertFalse(Validation::multiple($values, $list, 2));
+    }
+    public function testInvalidMultipleWithMax() {
+        $values = array("Spaghetti" => 1, "Framework" => 1);
+        $list = array("Spaghetti", "Framework");
+        $this->assertFalse(Validation::multiple($values, $list, null, 1));
+    }
 }
 
 ?>
