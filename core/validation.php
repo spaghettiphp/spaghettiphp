@@ -111,8 +111,15 @@ class Validation extends Object {
     public static function multiple() {
         
     }
-    public static function inList() {
-        
+    /**
+     *  Valida se um valor pertence a uma lista pré-definida.
+     *
+     *  @param string $value Valor a ser validado
+     *  @param array $list Lista contendo valores válidos
+     *  @return boolean Verdadeiro caso o valor seja válido
+     */
+    public static function inList($value, $list) {
+        return in_array($value, $list);
     }
     /**
      *  Valida um valor numérico.

@@ -120,6 +120,16 @@ class TestValidation extends UnitTestCase {
         $value = "   ";
         $this->assertFalse(Validation::notEmpty($value));
     }
+    public function testValidInList() {
+        $value = "Spaghetti";
+        $list = array("Spaghetti", "Framework");
+        $this->assertTrue(Validation::inList($value, $list));
+    }
+    public function testInvalidInList() {
+        $value = "PHP";
+        $list = array("Spaghetti", "Framework");
+        $this->assertFalse(Validation::inList($value, $list));
+    }
 }
 
 ?>
