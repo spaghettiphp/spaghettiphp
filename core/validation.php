@@ -38,10 +38,10 @@ class Validation extends Object {
         
     }
     /**
-     *  Short description.
+     *  Valida um valor booleano (true, false, 0 ou 1).
      *
-     *  @param string $value
-     *  @return boolean
+     *  @param string $value Valor a ser validado
+     *  @return boolean Verdadeiro caso o valor seja válido
      */
     public static function boolean($value) {
         $boolean = array(0, 1, '0', '1', true, false);
@@ -57,11 +57,11 @@ class Validation extends Object {
         
     }
     /**
-     *  Short description.
+     *  Valida um número decimal.
      *
-     *  @param string $value
-     *  @param integer $places
-     *  @return boolean
+     *  @param string $value Valor a ser validado
+     *  @param integer $places Número de casas decimais
+     *  @return boolean Verdadeiro caso o valor seja válido
      */
     public static function decimal($value, $places = null) {
         if(is_null($places)):
@@ -84,22 +84,22 @@ class Validation extends Object {
         
     }
     /**
-     *  Short description.
+     *  Valida se um valor tem um tamanho mínimo.
      *
-     *  @param string $value
-     *  @param integer $length
-     *  @return boolean
+     *  @param string $value Valor a ser validado
+     *  @param integer $length Tamanho mínimo do valor
+     *  @return boolean Verdadeiro caso o valor seja válido
      */
     public static function minLength($value, $length) {
         $valueLength = strlen($value);
         return $valueLength >= $length;
     }
     /**
-     *  Short description.
+     *  Valida se um valor tem um tamanho máximo.
      *
-     *  @param string $value
-     *  @param integer $length
-     *  @return boolean
+     *  @param string $value Valor a ser validado
+     *  @param integer $length Tamanho máximo do valor
+     *  @return boolean Verdadeiro caso o valor seja válido
      */
     public static function maxLength($value, $length) {
         $valueLength = strlen($value);
@@ -115,10 +115,10 @@ class Validation extends Object {
         
     }
     /**
-     *  Short description.
+     *  Valida um valor numérico.
      *
-     *  @param string $value
-     *  @return boolean
+     *  @param string $value Valor a ser validado
+     *  @return boolean Verdadeiro caso o valor seja válido
      */
     public static function numeric($value) {
         return is_numeric($value);
