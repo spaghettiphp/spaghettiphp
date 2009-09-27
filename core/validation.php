@@ -123,8 +123,14 @@ class Validation extends Object {
     public static function numeric($value) {
         return is_numeric($value);
     }
-    public static function notEmpty() {
-        
+    /**
+     *  Valida um valor não-vazio.
+     *
+     *  @param string $value Valor a ser validado
+     *  @return boolean Verdadeiro caso o valor seja válido
+     */
+    public static function notEmpty($value) {
+        return preg_match("/[^\s]+/m", $value);
     }
     public static function range() {
         

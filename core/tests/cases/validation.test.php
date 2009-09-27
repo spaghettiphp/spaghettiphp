@@ -104,6 +104,22 @@ class TestValidation extends UnitTestCase {
         $value = false;
         $this->assertTrue(Validation::boolean($value));
     }
+    public function testValidNotEmpty() {
+        $value = "Spaghetti";
+        $this->assertTrue(Validation::notEmpty($value));
+    }
+    public function testValidNotEmptyWithZero() {
+        $value = "0";
+        $this->assertTrue(Validation::notEmpty($value));
+    }
+    public function testInvalidNotEmptyWithEmptyString() {
+        $value = "";
+        $this->assertFalse(Validation::notEmpty($value));
+    }
+    public function testInvalidNotEmptyWithSpaces() {
+        $value = "   ";
+        $this->assertFalse(Validation::notEmpty($value));
+    }
 }
 
 ?>
