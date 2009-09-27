@@ -57,11 +57,16 @@ class View extends Object {
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
             $helper = Inflector::underscore($helper);
-            $this->loadedHelpers[$helper] = ClassRegistry::load($class, "Helper");
-            if(!$this->loadedHelpers[$helper]):
-                $this->error("missingHelper", array("helper" => $class));
-                return false;
+            $file = "{$helper}_helper";
+            if(!class_exists($class)):
+                if(App::path("Helper", $file)):
+                    App::import("Helper", $file);
+                else:
+                    $this->error("missingHelper", array("helper" => $class));
+                    return false;
+                endif;
             endif;
+            $this->loadedHelpers[$helper] = new $class($this);
         endforeach;
         return $this->loadedHelpers;
     }
@@ -74,7 +79,7 @@ class View extends Object {
      */
     public function renderView($filename, $data = array()) {
         extract($data, EXTR_OVERWRITE);
-        extract($this->loadedHelpers, EXTR_PREFIX_SAME, "helper");
+        extract($this->loadedHelpers, EXTR_PREFIX_SAME, "helper_");
         ob_start();
         include $filename;
         $output = ob_get_clean();

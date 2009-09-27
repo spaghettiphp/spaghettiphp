@@ -9,163 +9,248 @@
 
 class HtmlHelper extends Helper {
     /**
-     *  Cria as tags (únicas) HTML fechando-as se necessário.
+     *  Mantém uma referência à view que chamou o helper.
+     */
+    protected $view;
+    
+    public function __construct(&$view) {
+        $this->view =& $view;
+        $this->view->stylesForLayout = "";
+        $this->view->scriptsForLayout = "";
+    }
+    /**
+     *  Cria HTML para tags de abertura.
      *
      *  @param string $tag Tag a ser criada
-     *  @param string $attr Atributos e opções da tag HTML
-     *  @param boolean $close Fecha as tags (true)
+     *  @param string $attr Atributos da tag
+     *  @param boolean $empty Verdadeiro para criar uma tag vazia
      *  @return string Tag HTML
      */
-    public function openTag($tag = "", $attr = "", $close = true) {
+    public function openTag($tag, $attr = array(), $empty = false) {
         $html = "<{$tag}";
-        if(($attr = $this->attr($attr)) != ""):
+        $attr = $this->attr($attr);
+        if(!empty($attr)):
             $html .= " $attr";
         endif;
-        $html .= ($close ? "" : " /") . ">";
+        $html .= ($empty ? " /" : "") . ">";
         return $html;
     }
     /**
-     *  Fecha as tags HMTL.
+     *  Cria HTML para tag de fechamento.
      * 
-     *  @param string $tag Tag a ser fechado
-     *  @return string Tag HMTL fechado
+     *  @param string $tag Tag a ser fechada
+     *  @return string Tag HMTL fechada
      */
-    public function closeTag($tag = "") {
+    public function closeTag($tag) {
         return "</{$tag}>";
     }
     /**
-     *  Cria as tags (pares) HTML com o seu conteudo, fechando-o caso necessário.
+     *  Cria HTML para tags de abertura e fechamento contendo algum conteúdo.
      * 
-     *  @param string $tag Tag HTML para inserção
-     *  @param string $content Conteúdo entre as tags inseridos
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $close Verdadero para fechar a tag em questão
-     *  @return string Tag HTML com o seu conteudo
+     *  @param string $tag Tag a ser criada
+     *  @param string $content Conteúdo entre as tags inseridas
+     *  @param array $attr Atributos da tag
+     *  @param boolean $empty Verdadeiro para criar uma tag vazia
+     *  @return string Tag HTML com o seu conteúdo
      */
-    public function tag($tag = "", $content = "", $attr = array(), $close = true) {
-        $html = $this->openTag($tag, $attr, $close);
-        if($close):
+    public function tag($tag, $content = "", $attr = array(), $empty = false) {
+        $html = $this->openTag($tag, $attr, $empty);
+        if(!$empty):
             $html .= "{$content}" . $this->closeTag($tag);
         endif;
         return $html;
     }
     /**
-     *  Prepara os atributos para utilização nas tags.
+     *  Prepara atributos para utilização em tags HTML.
      * 
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @return string Atributos para pre-enchimento da tag
+     *  @param array $attr Atributos a serem preparados
+     *  @return string Atributos para preenchimento da tag
      */
-    public function attr($attr = array()) {
+    public function attr($attr) {
         $attributes = array();
-        if(is_array($attr)):
-            foreach($attr as $name => $value):
-                if($value === true):
-                    $value = $name;
-                endif;
-                $attributes []= "$name=\"$value\"";
-            endforeach;
-        endif;
+        foreach($attr as $name => $value):
+            if($value === true):
+                $value = $name;
+            elseif($value === false):
+                continue;
+            endif;
+            $attributes []= $name . '="' . $value . '"';
+        endforeach;
         return join(" ", $attributes);
     }
     /**
-     *  Cria links par serem utilizados na aplicação.
+     *  Cria um link para ser utilizado na aplicação.
      * 
      *  @param string $text Conteúdo para o link
-     *  @param string $url URL relativa a instalação
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string Link em HTML gerado para a aplicação
+     *  @param string $url URL relativa à raiz da aplicação
+     *  @param array $attr Atributos da tag
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string Link HTML
      */
-    public function link($text = "", $url = "", $attr = array(), $full = false) {
-        if(!is_array($attr)):
-            $attr = array();
+    public function link($text, $url = null, $attr = array(), $full = false) {
+        if(is_null($url)):
+            $url = $text;
         endif;
-        $href = array("href" => Mapper::url($url, $full));
-        $attr = array_merge($href, $attr);
+        $attr["href"] = Mapper::url($url, $full);
         return $this->output($this->tag("a", $text, $attr));
     }
     /**
-     *  Cria o elemento imagem para ser usado no HTML.
+     *  Cria um elemento de imagem para ser na aplicação.
      * 
-     *  @param string $src Nome da imagem a ser inserido no HTML
-     *  @param string $alt Texto alternativo da imagem
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string ML da imagem a ser inserida
+     *  @param string $src Caminho da imagem
+     *  @param array $attr Atributos da tag
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string HTML da imagem a ser inserida
      */
-    public function image($src = "", $alt = "", $attr = array(), $full = false) {
-        if(!is_array($attr)):
-            $attr = array();
+    public function image($src, $attr = array(), $full = false) {
+        if(!$this->external($src)):
+            $src = Mapper::url("/images/" . $src, $full);
         endif;
-        $src_alt = array("src" => $this->internalUrl("/images", $src, $full), "alt" => $alt);
-        $attr = array_merge($src_alt, $attr);
-        return $this->output($this->tag("img", null, $attr, false));
+        $attr["src"] = $src;
+        return $this->output($this->tag("img", null, $attr, true));
     }
     /**
-     *  Cria o elemento folha de estilho para ser usado no HTML.
+     *  Cria elementos de folha de estilho para serem usados no HTML.
      * 
-     *  @param string $href Nome da folha de estilo a ser inserido no HTML
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string URL da folha de estilo a ser utilizada
+     *  @param string $href Caminho da folha de estilo a ser inserida no HTML
+     *  @param array $attr Atributos da tag
+     *  @param boolean $inline Verdadeiro para imprimir a folha de estilo inline
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string Elemento de folha de estilo a ser utilizado
      */
-    public function stylesheet($href = "", $attr = array(), $full = false) {
-        $tags = "";
+    public function stylesheet($href = "", $attr = array(), $inline = true, $full = false) {
         if(is_array($href)):
+            $output = "";
             foreach($href as $tag):
-                $tags .= HtmlHelper::stylesheet($tag, $attr, $full) . PHP_EOL;
+                $output .= $this->stylesheet($tag, $attr, true, $full) . PHP_EOL;
             endforeach;
-            return $tags;
+        else:
+            if(!$this->external($href)):
+                $href = Mapper::url("/styles/" . $this->extension($href, "css"), $full);
+            endif;
+            $attr = array_merge(
+                array(
+                    "href" => $href,
+                    "rel" => "stylesheet",
+                    "type" => "text/css"
+                ),
+                $attr
+            );
+            $output = $this->output($this->tag("link", null, $attr, true));
         endif;
-        $attrs = array("href" => $this->internalUrl("/styles", $href, $full), "rel" => "stylesheet", "type" => "text/css");
-        $attr = array_merge($attrs, $attr);
-        return $this->output($this->tag("link", null, $attr, false));
+        if($inline):
+            return $output;
+        else:
+            $this->view->stylesForLayout .= $output;
+            return true;
+        endif;
     }
     /**
-     *  Cria o elemento script para ser usado no HTML.
+     *  Cria um elemento de script para ser usado no HTML.
      * 
-     *  @param string $src Nome do script a ser inseido no HTML
-     *  @param array $attr Atributos e opções da tag HTML
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string URL do script a ser utilizado
+     *  @param string $src Caminho do script a ser inseido no HTML
+     *  @param array $attr Atributos da tag
+     *  @param boolean $inline Verdadeiro para imprimir o script inline
+     *  @param boolean $full Verdadeiro para gerar uma URL completa
+     *  @return string Elemento de script a ser utilizado
      */
-    public function script($src = "", $attr = array(), $full = false) {
-        $tags = "";
+    public function script($src = "", $attr = array(), $inline = true, $full = false) {
         if(is_array($src)):
+            $output = "";
             foreach($src as $tag):
-                $tags .= HtmlHelper::script($tag, $attr, $full) . PHP_EOL;
+                $output .= $this->script($tag, $attr, true, $full) . PHP_EOL;
             endforeach;
-            return $tags;
+        else:
+            if(!$this->external($src)):
+                $src = Mapper::url("/scripts/" . $this->extension($src, "js"), $full);
+            endif;
+            $attr = array_merge(
+                array(
+                    "src" => $src,
+                    "type" => "text/javascript"
+                ),
+                $attr
+            );
+            $output = $this->output($this->tag("script", null, $attr));
         endif;
-        $attrs = array("src" => $this->internalUrl("/scripts", $src, $full), "type" => "text/javascript");
-        $attr = array_merge($attrs, $attr);
-        return $this->output($this->tag("script", null, $attr));
+        if($inline):
+            return $output;
+        else:
+            $this->view->scriptsForLayout .= $output;
+            return true;
+        endif;
     }
-    /**
-     *  Short description.
-     *
+    /*
+     *  Cria uma lista a partir de um array.
+     *  
+     *  @param array $list Array com conjunto de elementos da lista
      *  @return string
      */
-    public function div($content, $attributes = array()) {
-        if(!is_array($attributes)):
-            $attributes = array("class" => $attributes);
-        endif;
-        return $this->output($this->tag("div", $content, $attributes));
+    public function nestedList($list, $attr = array(), $type = "ul") {
+        $content = "";
+        foreach($list as $k => $li):
+            if(is_array($li)):
+                $li = $this->nestedList($li, array(), $type);
+                if(!is_numeric($k)):
+                    $li = $k . $li;
+                endif;
+            endif;
+            $content .= $this->tag("li", $li) . PHP_EOL;
+        endforeach;
+        return $this->tag($type, $content, $attr);
     }
     /**
-     *  Cria uma URL interna para utilização no HTML.
-     * 
-     *  @param string $path Caminho relativo a URL
-     *  @param string $url URL a ser inserido
-     *  @param boolean $full URL completa (true) ou apenas o caminho
-     *  @return string URL interna a ser utilizada
+     *  Cria uma tag DIV.
+     *
+     *  @param string $content Conteúdo da tag
+     *  @param array $attr Atributos da tag
+     *  @return string Tag DIV
      */
-    public function internalUrl($path = "", $url = "", $full = false) {
-        if(preg_match("/^[a-z]+:/", $url)):
-            return $url;
-        else:
-            return Mapper::url("{$path}/{$url}", $full);
+    public function div($content, $attr = array()) {
+        if(!is_array($attr)):
+            $attr = array("class" => $attr);
         endif;
+        return $this->output($this->tag("div", $content, $attr));
+    }
+    /**
+     *  Adiciona uma meta tag para definir o charset da página.
+     *
+     *  @param string $charset Charset a ser utilizado
+     *  @return string Tag META
+     */
+    public function charset($charset = null) {
+        if(is_null($charset)):
+            $charset = Config::read("appEncoding");
+        endif;
+        $attr = array(
+            "http-equiv" => "Content-type",
+            "content" => "text/html; charset={$charset}"
+        );
+        return $this->output($this->tag("meta", null, $attr));
+    }
+    /**
+     *  Verifica se uma URL é externa.
+     *
+     *  @param string $url URL a ser verificada
+     *  @return boolean Verdadeiro se a URL for externa
+     */
+    public function external($url) {
+        return preg_match("/^[a-z]+:/", $url);
+    }
+    /**
+     *  Adiciona uma extensão a um arquivo caso ela não exista.
+     *
+     *  @param string $file Nome do arquivo
+     *  @param string $extension Extensão a ser adicionada
+     *  @return string Novo nome do arquivo
+     */
+    public function extension($file, $extension) {
+        if(strpos($file, "?") === false):
+            if(strpos($file, "." . $extension) === false):
+                $file .= "." . $extension;
+            endif;
+        endif;
+        return $file;
     }
 }
 
