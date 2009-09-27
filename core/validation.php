@@ -109,12 +109,12 @@ class Validation extends Object {
         
     }
     /**
-     *  Short description.
+     *  Valida um valor de múltipla escolha.
      *
      *  @param array $values Valores a serem validados
-     *  @param array $list
-     *  @param integer $min
-     *  @param integer $max
+     *  @param array $list Lista contendo valores válidos
+     *  @param integer $min Mínimo de ocorrências de escolhas
+     *  @param integer $max Máximo de ocorrências de escolhas
      *  @return boolean Verdadeiro caso os valores sejam válidos
      */
     public static function multiple($values, $list, $min = null, $max = null) {
