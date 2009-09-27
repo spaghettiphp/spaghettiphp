@@ -50,8 +50,18 @@ class Validation extends Object {
     public static function creditCard() {
         
     }
-    public static function comparison() {
-        
+    /**
+     *  Valida valores através de comparação.
+     *
+     *  @param string $value1 Primeiro valor a ser comparado
+     *  @param string $operator Operador usado para comparar os valores
+     *  @param string $value2 Segundo valor a ser comparado
+     *  @return boolean Resultado da comparação
+     */
+    public static function comparison($value1, $operator, $value2) {
+        switch($operator):
+            
+        endswitch;
     }
     public static function date() {
         
