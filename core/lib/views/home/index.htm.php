@@ -84,7 +84,7 @@
 			</ul>
 		</div>
 		<div class="right">
-			<?php echo $html->image("spaghetti.gif", "Spaghetti"); ?> vers&atilde;o 0.1
+			<?php echo $html->image("spaghetti.gif"); ?> vers&atilde;o 0.1
 		</div>
 	</div>
 
