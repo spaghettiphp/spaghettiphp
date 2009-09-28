@@ -217,7 +217,7 @@ class Mapper extends Object {
         }
         
         $path["named"] = $path["params"] = array();
-        foreach(split("/", $reg[6]) as $param):
+        foreach(explode("/", $reg[6]) as $param):
             if(preg_match("/([^:]*):([^:]*)/", $param, $reg)):
                 $path["named"][$reg[1]] = urldecode($reg[2]);
             elseif($param != ""):
