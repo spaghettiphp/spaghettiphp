@@ -264,7 +264,7 @@ class Mapper extends Object {
                     $url .= "/" . $value;
                 endif;
             endforeach;
-            $url = self::normalize($url);
+            $url = self::normalize(self::base() . $url);
         else:
             if(preg_match("/^[a-z]+:/", $path)):
                 return $path;

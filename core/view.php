@@ -58,13 +58,15 @@ class View extends Object {
             $class = "{$helper}Helper";
             $helper = Inflector::underscore($helper);
             $file = "{$helper}_helper";
-            if(App::path("Helper", $file)):
-                App::import("Helper", $file);
-                $this->loadedHelpers[$helper] = new $class($this);
-            else:
-                $this->error("missingHelper", array("helper" => $class));
-                return false;
+            if(!class_exists($class)):
+                if(App::path("Helper", $file)):
+                    App::import("Helper", $file);
+                else:
+                    $this->error("missingHelper", array("helper" => $class));
+                    return false;
+                endif;
             endif;
+            $this->loadedHelpers[$helper] = new $class($this);
         endforeach;
         return $this->loadedHelpers;
     }
