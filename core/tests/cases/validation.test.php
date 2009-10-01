@@ -165,6 +165,18 @@ class TestValidation extends UnitTestCase {
         $list = array("Spaghetti", "Framework");
         $this->assertFalse(Validation::multiple($values, $list, null, 1));
     }
+    public function testValidBlank() {
+        $value = "";
+        $this->assertTrue(Validation::blank($value));
+    }
+    public function testValidBlankWithWhitespaces() {
+        $value = "    ";
+        $this->assertTrue(Validation::blank($value));
+    }
+    public function testInvalidBlank() {
+        $value = "Spaghetti";
+        $this->assertFalse(Validation::blank($value));
+    }
 }
 
 ?>

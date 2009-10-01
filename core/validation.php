@@ -34,8 +34,14 @@ class Validation extends Object {
         endif;
         return $value >= $min && $value <= $max;
     }
-    public static function blank() {
-        
+    /**
+      *  Short description.
+      *
+      *  @param string $value
+      *  @return boolean
+      */
+    public static function blank($value) {
+        return !preg_match("/[^\s]/", $value);
     }
     /**
      *  Valida um valor booleano (true, false, 0 ou 1).
