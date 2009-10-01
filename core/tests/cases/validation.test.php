@@ -290,6 +290,22 @@ class TestValidation extends UnitTestCase {
         $value = "6:00pm";
         $this->assertTrue(Validation::time($value));
     }
+    public function testValidEmail() {
+        $value = "spaghettiphp@spaghettiphp.org";
+        $this->assertTrue(Validation::email($value));
+    }
+    public function testValidEmailWithHostCheck() {
+        $value = "spaghettiphp@spaghettiphp.org";
+        $this->assertTrue(Validation::email($value, true));
+    }
+    public function testInvalidEmail() {
+        $value = "spaghettiphp.spaghettiphp.org";
+        $this->assertFalse(Validation::email($value));
+    }
+    public function testInvalidEmailWithHostCheck() {
+        $value = "spaghettiphp@thisisreallynotavalidhostforsure.org";
+        $this->assertFalse(Validation::email($value, true));
+    }
 }
 
 ?>

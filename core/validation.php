@@ -109,8 +109,21 @@ class Validation extends Object {
         endif;
         return preg_match($regex, $value);
     }
-    public static function email() {
-        
+    /**
+      *  Valida um endereço de e-mail.
+      *
+      *  @param string $value Valor a ser validado
+      *  @param boolean $checkHost Verdadeiro para chegar o host
+      *  @return boolean Verdadeiro caso o valor seja válido
+      */
+    public static function email($value, $checkHost = false) {
+        $match = preg_match("/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@" . self::$patterns["hostname"] . "$/i", $value);
+        if($match && $checkHost):
+            preg_match("/@(" . self::$patterns["hostname"] . ")$/i", $value, $reg);
+            $host = gethostbynamel($reg[1]);
+            return is_array($host);
+        endif;
+        return $match;
     }
     /**
       *  Valida se um valor é igual a outro valor pré-definido.
