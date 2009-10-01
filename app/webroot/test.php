@@ -7,7 +7,11 @@
  *
  */
 
-ini_set("error_reporting", E_ALL);
+if(version_compare(PHP_VERSION, "5.3") >= 0):
+    ini_set("error_reporting", E_ALL & ~E_DEPRECATED);
+else:
+    ini_set("error_reporting", E_ALL);
+endif;
 define("DS", DIRECTORY_SEPARATOR);
 define("ROOT", dirname(dirname(dirname(__FILE__))));
 define("BASE_URL", "http://" . $_SERVER["HTTP_HOST"]);
