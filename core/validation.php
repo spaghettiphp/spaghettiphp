@@ -57,8 +57,14 @@ class Validation extends Object {
         $boolean = array(0, 1, '0', '1', true, false);
         return in_array($value, $boolean, true);
     }
-    public static function creditCard() {
-        
+    /**
+      *  Valida um número de cartão de crédito.
+      *
+      *  @param string $value Valor a ser validado
+      *  @return boolean Verdadeiro caso o valor seja válido
+      */
+    public static function creditCard($value) {
+        return preg_match("/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/", $value);
     }
     /**
      *  Valida valores através de comparação.
