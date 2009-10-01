@@ -35,10 +35,10 @@ class Validation extends Object {
         return $value >= $min && $value <= $max;
     }
     /**
-      *  Short description.
+      *  Valida se um valor é vazio.
       *
-      *  @param string $value
-      *  @return boolean
+      *  @param string $value Valor a ser validado
+      *  @return boolean Verdadeiro caso o valor seja válido
       */
     public static function blank($value) {
         return !preg_match("/[^\s]/", $value);
@@ -66,8 +66,26 @@ class Validation extends Object {
      */
     public static function comparison($value1, $operator, $value2) {
         switch($operator):
-            
+            case ">":
+            case "greater":
+                return $value1 > $value2;
+            case "<":
+            case "less":
+                return $value1 < $value2;
+            case ">=":
+            case "greaterorequal":
+                return $value1 >= $value2;
+            case "<=":
+            case "lessorequal":
+                return $value1 <= $value2;
+            case "==":
+            case "equal":
+                return $value1 == $value2;
+            case "!=":
+            case "notequal":
+                return $value1 != $value2;
         endswitch;
+        return false;
     }
     public static function date() {
         

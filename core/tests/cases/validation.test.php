@@ -177,6 +177,21 @@ class TestValidation extends UnitTestCase {
         $value = "Spaghetti";
         $this->assertFalse(Validation::blank($value));
     }
+    public function testValidComparisonWithSymbol() {
+        $value1 = 42;
+        $value2 = 3.14;
+        $this->assertTrue(Validation::comparison($value1, ">", $value2));
+    }
+    public function testValidComparisonWithText() {
+        $value1 = 3.14;
+        $value2 = 42;
+        $this->assertTrue(Validation::comparison($value1, "less", $value2));
+    }
+    public function testInvalidComparison() {
+        $value1 = 3.14;
+        $value2 = 42;
+        $this->assertFalse(Validation::comparison($value1, "equal", $value2));
+    }
 }
 
 ?>
