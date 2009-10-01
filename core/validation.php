@@ -109,11 +109,11 @@ class Validation extends Object {
         
     }
     /**
-      *  Short description.
+      *  Valida se um valor é igual a outro valor pré-definido.
       *
-      *  @param string $value
-      *  @param string $compare
-      *  @return boolean
+      *  @param string $value Valor a ser validado
+      *  @param string $compare Valor a ser comparado
+      *  @return boolean Verdadeiro caso o valor seja válido
       */
     public static function equal($value, $compare) {
         return $value === $compare;
@@ -203,8 +203,30 @@ class Validation extends Object {
     public static function notEmpty($value) {
         return preg_match("/[^\s]+/m", $value);
     }
-    public static function range() {
-        
+    /**
+      *  Valida se um valor está dentro de uma faixa especificada.
+      *
+      *  @param integer $value Valor a ser validado
+      *  @param integer $lower Menor valor da faixa
+      *  @param integer $upper Maior valor da faixa
+      *  @return boolean Verdadeiro caso o valor seja válido
+      */
+    public static function range($value, $lower = null, $upper = null) {
+        if(is_numeric($value)):
+            if(!is_null($lower) || !is_null($upper)):
+                $checkLower = $checkUpper = true;
+                if(!is_null($lower)):
+                    $checkLower = $value > $lower;
+                endif;
+                if(!is_null($upper)):
+                    $checkUpper = $value < $upper;
+                endif;
+            else:
+                return is_finite($value);
+            endif;
+            return $checkLower && $checkUpper;
+        endif;
+        return false;
     }
     public static function time() {
         

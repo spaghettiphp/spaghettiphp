@@ -206,6 +206,38 @@ class TestValidation extends UnitTestCase {
         $compare = "42";
         $this->assertFalse(Validation::equal($value, $compare));
     }
+    public function testValidRangeWithFiniteNumerical() {
+        $value = 42;
+        $this->assertTrue(Validation::range($value));
+    }
+    public function testValidRangeWithFiniteNumericalAsString() {
+        $value = "42";
+        $this->assertTrue(Validation::range($value));
+    }
+    public function testValidRangeWithLower() {
+        $value = 42;
+        $lower = 0;
+        $this->assertTrue(Validation::range($value, $lower));
+    }
+    public function testValidRangeWithUpper() {
+        $value = 42;
+        $upper = 84;
+        $this->assertTrue(Validation::range($value, null, $upper));
+    }
+    public function testInvalidRangeWithLower() {
+        $value = 0;
+        $lower = 42;
+        $this->assertFalse(Validation::range($value, $lower));
+    }
+    public function testInvalidRangeWithUpper() {
+        $value = 42;
+        $upper = 0;
+        $this->assertFalse(Validation::range($value, null, $upper));
+    }
+    public function testInvalidRangeWithNonNumericValue() {
+        $value = "Non numeric";
+        $this->assertFalse(Validation::range($value));
+    }
 }
 
 ?>
