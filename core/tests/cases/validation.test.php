@@ -192,6 +192,20 @@ class TestValidation extends UnitTestCase {
         $value2 = 42;
         $this->assertFalse(Validation::comparison($value1, "equal", $value2));
     }
+    public function testValidEqual() {
+        $value = "Spaghetti";
+        $this->assertTrue(Validation::equal($value, $value));
+    }
+    public function testInvalidEqual() {
+        $value = "Spaghetti";
+        $compare = "Framework";
+        $this->assertFalse(Validation::equal($value, $compare));
+    }
+    public function testInvalidEqualWithIdenticalComparison() {
+        $value = 42;
+        $compare = "42";
+        $this->assertFalse(Validation::equal($value, $compare));
+    }
 }
 
 ?>

@@ -108,8 +108,15 @@ class Validation extends Object {
     public static function email() {
         
     }
-    public static function equal() {
-        
+    /**
+      *  Short description.
+      *
+      *  @param string $value
+      *  @param string $compare
+      *  @return boolean
+      */
+    public static function equal($value, $compare) {
+        return $value === $compare;
     }
     public static function file() {
         // extension?
