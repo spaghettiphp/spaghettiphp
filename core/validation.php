@@ -98,6 +98,16 @@ class Validation extends Object {
         return false;
     }
     /**
+      *  Valida um valor de acordo com uma expressão regular personalizada.
+      *
+      *  @param string $value Valor a ser validado
+      *  @param string $regex Expressão regular a ser usada
+      *  @return boolean Verdadeiro caso o valor seja válido
+      */
+    public function regex($value, $regex) {
+        return preg_match($value, $regex);
+    }
+    /**
       *  Valida uma data no formato d/m/y.
       *
       *  @param string $value Valor a ser validado
