@@ -142,9 +142,6 @@ class Validation extends Object {
     public static function equal($value, $compare) {
         return $value === $compare;
     }
-    public static function file() {
-        // extension?
-    }
     /**
       *  Valida se o valor é um IP válido.
       *
@@ -175,9 +172,6 @@ class Validation extends Object {
     public static function maxLength($value, $length) {
         $valueLength = strlen($value);
         return $valueLength <= $length;
-    }
-    public static function money() {
-        
     }
     /**
      *  Valida um valor de múltipla escolha.
