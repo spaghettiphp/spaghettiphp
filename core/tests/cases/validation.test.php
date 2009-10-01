@@ -306,6 +306,15 @@ class TestValidation extends UnitTestCase {
         $value = "spaghettiphp@thisisreallynotavalidhostforsure.org";
         $this->assertFalse(Validation::email($value, true));
     }
+    public function testValidDate() {
+        $value = "01/01/2009";
+        $this->assertTrue(Validation::date($value));
+        
+    }
+    public function testInvalidDate() {
+        $value = "2009-01-01";
+        $this->assertFalse(Validation::date($value));
+    }
 }
 
 ?>

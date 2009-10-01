@@ -91,8 +91,15 @@ class Validation extends Object {
         endswitch;
         return false;
     }
-    public static function date() {
-        
+    /**
+      *  Valida uma data no formato d/m/y.
+      *
+      *  @param string $value Valor a ser validado
+      *  @return boolean Verdadeiro caso o valor seja válido
+      */
+    public static function date($value) {
+        $regex = "%^(?:(?:31(\\/|-|\\.|\\x20)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.|\\x20)(?:0?[1,3-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.|\\x20)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.|\\x20)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$%";
+        return preg_match($regex, $value);
     }
     /**
      *  Valida um número decimal.
