@@ -121,8 +121,14 @@ class Validation extends Object {
     public static function file() {
         // extension?
     }
-    public static function ip() {
-        
+    /**
+      *  Valida se o valor é um IP válido.
+      *
+      *  @param string $value Valor a ser validado
+      *  @return boolean Verdadeiro caso o valor seja válido.
+      */
+    public static function ip($value) {
+        return preg_match("/^(?:(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])$/", $value);
     }
     /**
      *  Valida se um valor tem um tamanho mínimo.

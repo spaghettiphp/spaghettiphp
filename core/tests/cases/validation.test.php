@@ -238,6 +238,18 @@ class TestValidation extends UnitTestCase {
         $value = "Non numeric";
         $this->assertFalse(Validation::range($value));
     }
+    public function testValidIp() {
+        $value = "127.0.0.1";
+        $this->assertTrue(Validation::ip($value));
+    }
+    public function testInvalidIp() {
+        $value = "123.456.789.0";
+        $this->assertFalse(Validation::ip($value));
+    }
+    public function testInvalidIpAsMalformed() {
+        $value = "123456789";
+        $this->assertFalse(Validation::ip($value));
+    }
 }
 
 ?>
