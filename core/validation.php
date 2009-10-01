@@ -238,8 +238,16 @@ class Validation extends Object {
         endif;
         return false;
     }
-    public static function time() {
-        
+    /**
+      *  Valida se o valor passado é um horário.
+      *
+      *  @param string $value Valor a ser validado
+      *  @return boolean Verdadeiro caso o valor seja válido
+      */
+    public static function time($value) {
+        $regex = "/^([01]\d|2[0-3])(:[0-5]\d){1,2}$"
+               . "|^(0?[1-9]|1[0-2])(:[0-5]\d){1,2}\s?[AaPp]m$/";
+        return preg_match($regex, $value);
     }
     /**
       *  Valida uma URL válida.

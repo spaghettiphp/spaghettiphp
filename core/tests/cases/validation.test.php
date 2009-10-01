@@ -278,6 +278,18 @@ class TestValidation extends UnitTestCase {
         $value = "spaghettiphp.org/download#download";
         $this->assertTrue(Validation::url($value));
     }
+    public function testValidTimeWith24Hours() {
+        $value = "18:00";
+        $this->assertTrue(Validation::time($value));
+    }
+    public function testValidTimeWith12Hours() {
+        $value = "06:00pm";
+        $this->assertTrue(Validation::time($value));
+    }
+    public function testValidTimeWith12Hours2() {
+        $value = "6:00pm";
+        $this->assertTrue(Validation::time($value));
+    }
 }
 
 ?>
