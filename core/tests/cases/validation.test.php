@@ -250,6 +250,34 @@ class TestValidation extends UnitTestCase {
         $value = "123456789";
         $this->assertFalse(Validation::ip($value));
     }
+    public function testValidUrlWithIp() {
+        $value = "http://127.0.0.1";
+        $this->assertTrue(Validation::url($value));
+    }
+    public function testValidUrlWithHostname() {
+        $value = "http://spaghettiphp.org";
+        $this->assertTrue(Validation::url($value));
+    }
+    public function testValidUrlWithHostnameAndPort() {
+        $value = "http://spaghettiphp.org:8080";
+        $this->assertTrue(Validation::url($value));
+    }
+    public function testValidUrlWithPath() {
+        $value = "http://spaghettiphp.org/download/download/";
+        $this->assertTrue(Validation::url($value));
+    }
+    public function testValidUrlWithQueryString() {
+        $value = "http://spaghettiphp.org/download?redirect=true";
+        $this->assertTrue(Validation::url($value));
+    }
+    public function testValidUrlWithHash() {
+        $value = "http://spaghettiphp.org/download#download";
+        $this->assertTrue(Validation::url($value));
+    }
+    public function testValidUrlWithoutPrefix() {
+        $value = "spaghettiphp.org/download#download";
+        $this->assertTrue(Validation::url($value));
+    }
 }
 
 ?>

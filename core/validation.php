@@ -10,6 +10,10 @@
  */
 
 class Validation extends Object {
+    public static $patterns = array(
+        "ip" => "(?:(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])",
+        "hostname" => "(?:[a-z0-9][-a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel)"
+    );
     /**
      *  Valida um valor alfanumérico (letras e números).
      *
@@ -128,7 +132,7 @@ class Validation extends Object {
       *  @return boolean Verdadeiro caso o valor seja válido.
       */
     public static function ip($value) {
-        return preg_match("/^(?:(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])$/", $value);
+        return preg_match("/^" . self::$patterns["ip"] . "$/", $value);
     }
     /**
      *  Valida se um valor tem um tamanho mínimo.
@@ -237,8 +241,22 @@ class Validation extends Object {
     public static function time() {
         
     }
-    public static function url() {
-        
+    /**
+      *  Valida uma URL válida.
+      *
+      *  @param string $value Valor a ser validado
+      *  @param boolean $strict Limitar a URL a protocolos válidos
+      *  @return boolean Verdadeiro caso o valor seja válido
+      */
+    public static function url($value, $strict = false) {
+        $chars = '([' . preg_quote('!"$&\'()*+,-.@_:;=') . '\/0-9a-z]|(\%[0-9a-f]{2}))';
+        $regex = "(?:(?:https?|ftps?|file|news|gopher)://)?"
+               . "(?:" . self::$patterns["ip"] . "|" . self::$patterns["hostname"] . ")"
+               . "(?::[1-9][0-9]{0,3})?"
+               . "(?:/?|/{$chars}*)?"
+               . "(?:\?{$chars}*)?"
+               . "(?:#{$chars}*)?";
+        return preg_match("%^{$regex}$%i", $value);
     }
 }
 
