@@ -506,22 +506,26 @@ class Model extends Object {
       */
     public function validate($data) {
         $this->errors = array();
-
-        foreach($data as $field => $value):
-
-            if(isset($this->validates[$field])):
-
-                if(is_array($this->validates[$field])):
-                    
-                else:
-                    $function = $this->validates[$field];
-                    if(!Validation::$function($value)):
-                        $this->errors []= $function;
+        
+        foreach($this->validates as $field => $rules):
+            if(!is_array($rules)):
+                $rules = array($rules);
+            endif;
+            
+            foreach($rules as $rule):
+                if(!is_array($rule)):
+                    $rule = array("rule" => $rule);
+                endif;
+                
+                if(isset($data[$field])):
+                    $rule = $rule["rule"];
+                    if(!Validation::$rule($data[$field])):
+                        $this->errors []= $rule;
                     endif;
                 endif;
-
-            endif;
-
+                
+            endforeach;
+            
         endforeach;
 
         return empty($this->errors);
