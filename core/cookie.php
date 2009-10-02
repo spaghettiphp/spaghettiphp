@@ -54,35 +54,48 @@ class Cookie extends Object {
     public static function delete($name) {
         
     }
+    public static function destroy() {
+        
+    }
     /**
-      *  Short description.
+      *  Lê o valor de um cookie.
       *
-      *  @param string $name
-      *  @return string
+      *  @param string $name Nome do cookie a ser lido
+      *  @return string Valor do cookie
       */
     public static function read($name) {
         $self = self::getInstance();
-        return $self->decrypt($_COOKIE[$self->name][$name]);
+        return self::decrypt($_COOKIE[$self->name][$name]);
     }
     /**
-      *  Short description.
+      *  Salva um cookie.
       *
-      *  @param string $name
-      *  @param string $value
-      *  @return boolean
+      *  @param string $name Nome do cookie a ser salvo
+      *  @param string $value Valor do cookie
+      *  @return boolean Verdadeiro se o cookie foi salvo
       */
     public static function write($name, $value) {
         $self = self::getInstance();
-        setcookie("{$self->name}[{$name}]", $self->encrypt($value));
+        return setcookie("{$self->name}[{$name}]", self::encrypt($value));
     }
-    
-    
-    private function encrypt($value) {
+    /**
+      *  Encripta o valor de um cookie.
+      *
+      *  @param string $value Valor a ser encriptado
+      *  @return string Valor encriptado
+      */
+    public static function encrypt($value) {
         $self = self::getInstance();
         $encripted = base64_encode(Security::cipher($value, $self->key));
         return "U3BhZ2hldHRp.{$encripted}";
     }
-    private function decrypt($value) {
+    /**
+      *  Decripta o valor de um cookie.
+      *
+      *  @param string $value Valor encriptado
+      *  @return string Valor decriptado
+      */
+    public static function decrypt($value) {
         $self = self::getInstance();
         $prefix = strpos($value, "U3BhZ2hldHRp.");
         if($prefix !== false):
