@@ -36,6 +36,33 @@ class Security extends Object {
         endfor;
         return $output;
     }
+    /**
+      *  Cria um hash de uma string usando o método especificado.
+      *
+      *  @param string $text Texto a ser hasheado
+      *  @param string $hash Método de hashing
+      *  @param mixed $salt Salt a ser usado
+      *  @return string Hash do valor
+      */
+    public function hash($text, $hash = null, $salt = false) {
+        if($salt):
+            if(is_string($salt)):
+                $text = $salt . $text;
+            else:
+                $text = Config::read("securitySalt") . $text;
+            endif;
+        endif;
+        switch($hash):
+            case "md5":
+                return md5($text);
+            case "sha256":
+                return bin2hex(mhash(MHASH_SHA256, $text));
+            case "sha1":
+            default:
+                return sha1($text);
+        endswitch;
+        return false;
+    }
 }
 
 ?>
