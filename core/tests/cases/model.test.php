@@ -70,6 +70,30 @@ class TestModel extends UnitTestCase {
         $result = $this->User->validate($data);
         $this->assertFalse($result);
     }
+    public function testValidateWithOneRuleParam() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => array("minLength", 5)
+            )
+        );
+        $data = array(
+            "username" => "spg"
+        );
+        $result = $this->User->validate($data);
+        $this->assertFalse($result);
+    }
+    public function testValidateWithMultipleRuleParams() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => array("between", 5, 15)
+            )
+        );
+        $data = array(
+            "username" => "spaghettiphp"
+        );
+        $result = $this->User->validate($data);
+        $this->assertTrue($result);
+    }
 }
 
 ?>

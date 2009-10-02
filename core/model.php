@@ -508,39 +508,42 @@ class Model extends Object {
         $this->errors = array();
         
         $defaults = array(
-            "required" => false
+            "required" => false,
+            "allowEmpty" => false
         );
-        
         foreach($this->validates as $field => $rules):
             if(!is_array($rules) || (is_array($rules) && isset($rules["rule"]))):
                 $rules = array($rules);
             endif;
-            
             foreach($rules as $rule):
                 if(!is_array($rule)):
                     $rule = array("rule" => $rule);
                 endif;
                 $rule = array_merge($defaults, $rule);
-                
-
-
                 $required = !isset($data[$field]) && $rule["required"];
                 if($required):
                     $this->errors []= "required";
                 elseif(isset($data[$field])):
                     $rule = $rule["rule"];
-                    if(!Validation::$rule($data[$field])):
+                    if(!$this->callFunction($rule, $data[$field])):
                         $this->errors []= $rule;
                     endif;
                 endif;
-
-                
             endforeach;
-            
-            
         endforeach;
         return empty($this->errors);
     }
+    
+    public function callFunction($rule, $value) {
+        if(is_array($rule)):
+            $function = $rule[0];
+            $rule[0] = $value;
+            return call_user_func_array(array("Validation", $function), $rule);
+        else:
+            return Validation::$rule($value);
+        endif;
+    }
+    
     /**
      *  Callback executado antes de salvar um registro.
      *
