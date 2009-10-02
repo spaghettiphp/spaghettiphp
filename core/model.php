@@ -508,7 +508,8 @@ class Model extends Object {
         $this->errors = array();
         $defaults = array(
             "required" => false,
-            "allowEmpty" => false
+            "allowEmpty" => false,
+            "message" => null
         );
         foreach($this->validates as $field => $rules):
             if(!is_array($rules) || (is_array($rules) && isset($rules["rule"]))):
@@ -521,11 +522,12 @@ class Model extends Object {
                 $rule = array_merge($defaults, $rule);
                 $required = !isset($data[$field]) && $rule["required"];
                 if($required):
-                    $this->errors []= "required";
+                    $this->errors[$field] = "required";
                 elseif(isset($data[$field])):
-                    $rule = $rule["rule"];
-                    if(!$this->callValidationMethod($rule, $data[$field])):
-                        $this->errors []= $rule;
+                    if(!$this->callValidationMethod($rule["rule"], $data[$field])):
+                        $message = is_null($rule["message"]) ? $rule["rule"] : $rule["message"];
+                        $this->errors[$field] = $message;
+                        break;
                     endif;
                 endif;
             endforeach;

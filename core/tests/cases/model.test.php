@@ -47,7 +47,44 @@ class TestModel extends UnitTestCase {
         );
         $this->User->validate($data);
         $result = $this->User->errors;
-        $this->assertEqual($result, array("alphanumeric"));
+        $expected = array(
+            "username" => "alphanumeric"
+        );
+        $this->assertEqual($result, $expected);
+    }
+    public function testErrorsOfValidateWithMultipleRules() {
+        $this->User->validates = array(
+            "username" => array(
+                array("rule" => "alphanumeric"),
+                array("rule" => "numeric")
+            )
+        );
+        $data = array(
+            "username" => "Spaghetti* Framework"
+        );
+        $this->User->validate($data);
+        $result = $this->User->errors;
+        $expected = array(
+            "username" => "alphanumeric"
+        );
+        $this->assertEqual($result, $expected);
+    }
+    public function testErrorsOfValidateWithMessage() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => "alphanumeric",
+                "message" => "the field must be alphanumeric"
+            )
+        );
+        $data = array(
+            "username" => "Spaghetti* Framework"
+        );
+        $this->User->validate($data);
+        $result = $this->User->errors;
+        $expected = array(
+            "username" => "the field must be alphanumeric"
+        );
+        $this->assertEqual($result, $expected);
     }
     public function testValidateWithMultipleRules() {
         $this->User->validates = array(
@@ -72,6 +109,21 @@ class TestModel extends UnitTestCase {
         $data = array();
         $result = $this->User->validate($data);
         $this->assertFalse($result);
+    }
+    public function testErrorsOfValidateWithRequired() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => "alphanumeric",
+                "required" => true
+            )
+        );
+        $data = array();
+        $this->User->validate($data);
+        $result = array("username" => "required");
+        $expected = array(
+            "username" => "required"
+        );
+        $this->assertEqual($result, $expected);
     }
     public function testValidateWithOneRuleParam() {
         $this->User->validates = array(
@@ -120,6 +172,7 @@ class TestModel extends UnitTestCase {
         );
         $result = $this->User->validate($data);
         $this->assertFalse($result);
-    }}
+    }
+}
 
 ?>
