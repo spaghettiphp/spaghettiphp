@@ -68,7 +68,7 @@ class Cookie extends Object {
       *  @return string
       */
     public static function read($name) {
-        
+        return self::decrypt($_COOKIE[$name]);
     }
     /**
       *  Short description.
@@ -78,7 +78,7 @@ class Cookie extends Object {
       *  @return boolean
       */
     public static function write($name, $value) {
-        
+        setcookie($name, self::encrypt($value));
     }
     public static function encrypt($value) {
         $self = self::getInstance();
