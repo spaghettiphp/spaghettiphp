@@ -506,7 +506,6 @@ class Model extends Object {
       */
     public function validate($data) {
         $this->errors = array();
-        
         $defaults = array(
             "required" => false,
             "allowEmpty" => false
@@ -525,7 +524,7 @@ class Model extends Object {
                     $this->errors []= "required";
                 elseif(isset($data[$field])):
                     $rule = $rule["rule"];
-                    if(!$this->callFunction($rule, $data[$field])):
+                    if(!$this->callValidation($rule, $data[$field])):
                         $this->errors []= $rule;
                     endif;
                 endif;
@@ -533,17 +532,22 @@ class Model extends Object {
         endforeach;
         return empty($this->errors);
     }
-    
-    public function callFunction($rule, $value) {
-        if(is_array($rule)):
-            $function = $rule[0];
-            $rule[0] = $value;
-            return call_user_func_array(array("Validation", $function), $rule);
+    /**
+      *  Chama um método de validação.
+      *
+      *  @param mixed $params Nome do método a ser chamado e parâmetros
+      *  @param string $value Valor a ser validado
+      *  @return boolean Resultado do método de validação
+      */
+    public function callValidation($params, $value) {
+        if(is_array($params)):
+            $method = $params[0];
+            $params[0] = $value;
+            return call_user_func_array(array("Validation", $method), $params);
         else:
-            return Validation::$rule($value);
+            return Validation::$params($value);
         endif;
     }
-    
     /**
      *  Callback executado antes de salvar um registro.
      *
