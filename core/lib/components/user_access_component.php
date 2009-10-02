@@ -13,9 +13,9 @@ class UserAccessComponent extends Component{
       *  Configurações de acesso aos dados dos usuários.
       */
     public $configs = array(
-        "username" => "username",        //    Campo que contém o username
-        "password" => "password",        //    Campo que contém a senha codificada com MD5
-        "level" => "level"            //    Campo que contém o nível do usuário
+        "username" => "username",
+        "password" => "password",
+        "level" => "level"
     );
     /**
       *  Model padrão para ser usado no UA.
