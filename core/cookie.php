@@ -46,16 +46,13 @@ class Cookie extends Object {
         return self::$instance;
     }
     /**
-      *  Short description.
+      *  Apaga um cookie.
       *
-      *  @param string $name
-      *  @return boolean
+      *  @param string $name Nome do cookie a ser apagado
+      *  @return boolean Verdadeiro caso o cookie tenha sido apagado
       */
     public static function delete($name) {
-        
-    }
-    public static function destroy() {
-        
+        return setcookie("{$self->name}[{$name}]", "", time() - 42000);
     }
     /**
       *  Lê o valor de um cookie.
