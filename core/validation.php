@@ -10,6 +10,9 @@
  */
 
 class Validation extends Object {
+    /**
+     *  Padrões comuns usados em vários lugares.
+     */
     public static $patterns = array(
         "ip" => "(?:(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])",
         "hostname" => "(?:[a-z0-9][-a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel)"
