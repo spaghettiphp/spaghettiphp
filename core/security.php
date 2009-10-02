@@ -12,10 +12,10 @@ class Security extends Object {
     /**
       *  Encripta/decripta um valor usando a chave especificada.
       *
-      *  @copyright Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
       *  @param string $text Valor a ser encriptado/decriptado
       *  @param string $key Chage a ser usada para encriptar/decriptar o valor
       *  @return string Valor encriptado/decriptado
+      *  @copyright Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
       */
     public static function cipher($text, $key) {
         if(empty($key)):
