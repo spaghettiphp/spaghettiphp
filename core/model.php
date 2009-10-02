@@ -71,6 +71,10 @@ class Model extends Object {
       */
     public $validates = array();
     /**
+      *  Erros gerados pela última validação.
+      */
+    public $errors = array();
+    /**
      *  Associações entre modelos disponíveis
      */
     public $associations = array(
@@ -501,14 +505,26 @@ class Model extends Object {
       *  @return boolean Verdadeiro caso todos os dados sejam válidos
       */
     public function validate($data) {
-        $validates = true;
+        $this->errors = array();
+
         foreach($data as $field => $value):
+
             if(isset($this->validates[$field])):
-                $function = $this->validates[$field];
-                $validates = $validates && Validation::$function($value);
+
+                if(is_array($this->validates[$field])):
+                    
+                else:
+                    $function = $this->validates[$field];
+                    if(!Validation::$function($value)):
+                        $this->errors []= $function;
+                    endif;
+                endif;
+
             endif;
+
         endforeach;
-        return $validates;
+
+        return empty($this->errors);
     }
     /**
      *  Callback executado antes de salvar um registro.
