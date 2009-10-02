@@ -25,15 +25,17 @@ class Cookie extends Object {
       */
     public $path;
     /**
-      *  Short description.
+      *  Chave a ser usada na encriptação/decriptação do cookie.
       */
-    private $values;
+    public $key;
+    /**
+      *  Namespace do cookie.
+      */
+    public $name = "SpaghettiCookie";
     /**
       *  Instância da classe.
       */
     public static $instance;
-    public $key;
-    public $name = "Spaghetti";
     
     public function __construct() {
         $this->key = Config::read("securitySalt");
@@ -99,9 +101,9 @@ class Cookie extends Object {
       *  @param string $value Valor do cookie
       *  @return boolean Verdadeiro se o cookie foi salvo
       */
-    public static function write($name, $value) {
+    public static function write($name, $value, $expires = null) {
         $self = self::getInstance();
-        return setcookie("{$self->name}[{$name}]", self::encrypt($value));
+        return setcookie("{$self->name}[{$name}]", self::encrypt($value), $self->expire($expires));
     }
     /**
       *  Encripta o valor de um cookie.
@@ -128,6 +130,17 @@ class Cookie extends Object {
             return Security::cipher($encrypted, $self->key);
         endif;
         return false;
+    }
+    public function expire($expires) {
+        if(is_null($expires)):
+            $expires = $this->expires;
+        endif;
+        $now = time();
+        if(is_numeric($expires)):
+            return $this->expires = $now + $expires;
+        else:
+            return $this->expires = strtotime($expires, $now);
+        endif;
     }
 }
 
