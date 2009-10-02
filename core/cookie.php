@@ -82,6 +82,7 @@ class Cookie extends Object {
       *  @return boolean Verdadeiro caso o cookie tenha sido apagado
       */
     public static function delete($name) {
+        $self = self::getInstance();
         return setcookie("{$self->name}[{$name}]", "", time() - 42000);
     }
     /**
