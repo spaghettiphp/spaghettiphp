@@ -67,6 +67,14 @@ class Model extends Object {
      */
     public $perPage = 20;
     /**
+      *  Regras de validação.
+      */
+    public $validates = array();
+    /**
+      *  Erros gerados pela última validação.
+      */
+    public $errors = array();
+    /**
      *  Associações entre modelos disponíveis
      */
     public $associations = array(
@@ -489,6 +497,63 @@ class Model extends Object {
         endif;
         $this->afterSave($created);
         return $save;
+    }
+    /**
+      *  Valida os dados a serem salvos pelo modelo.
+      *
+      *  @param array $data Dados a serem validados
+      *  @return boolean Verdadeiro caso todos os dados sejam válidos
+      */
+    public function validate($data) {
+        $this->errors = array();
+        $defaults = array(
+            "required" => false,
+            "allowEmpty" => false,
+            "message" => null
+        );
+        foreach($this->validates as $field => $rules):
+            if(!is_array($rules) || (is_array($rules) && isset($rules["rule"]))):
+                $rules = array($rules);
+            endif;
+            foreach($rules as $rule):
+                if(!is_array($rule)):
+                    $rule = array("rule" => $rule);
+                endif;
+                $rule = array_merge($defaults, $rule);
+                $required = !isset($data[$field]) && $rule["required"];
+                if($required):
+                    $this->errors[$field] = "required";
+                elseif(isset($data[$field])):
+                    if(!$this->callValidationMethod($rule["rule"], $data[$field])):
+                        $message = is_null($rule["message"]) ? $rule["rule"] : $rule["message"];
+                        $this->errors[$field] = $message;
+                        break;
+                    endif;
+                endif;
+            endforeach;
+        endforeach;
+        return empty($this->errors);
+    }
+    /**
+      *  Chama um método de validação.
+      *
+      *  @param mixed $params Nome do método a ser chamado e parâmetros
+      *  @param string $value Valor a ser validado
+      *  @return boolean Resultado do método de validação
+      */
+    public function callValidationMethod($params, $value) {
+        $method = is_array($params) ? $params[0] : $params;
+        $class = method_exists($this, $method) ? $this : "Validation";
+        if(is_array($params)):
+            $params[0] = $value;
+            return call_user_func_array(array($class, $method), $params);
+        else:
+            if($class == "Validation"):
+                return Validation::$params($value);
+            else:
+                return $this->$params($value);
+            endif;
+        endif;
     }
     /**
      *  Callback executado antes de salvar um registro.

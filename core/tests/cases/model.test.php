@@ -7,12 +7,171 @@
  *
  */
 
+class User extends AppModel {
+    public $table = false;
+    public function customRule($value, $param = true) {
+        return $param;
+    }
+}
+
 class TestModel extends UnitTestCase {
     public function setUp() {
-        
+        $this->User = new User;
     }
     public function tearDown() {
-        
+        $this->User = null;
+    }
+    public function testValidateWithNoRules() {
+        $data = array(
+            "username" => "spaghettiphp"
+        );
+        $result = $this->User->validate($data);
+        $this->assertTrue($result);
+    }
+    public function testValidateWithSimpleRule() {
+        $this->User->validates = array(
+            "username" => "alphanumeric"
+        );
+        $data = array(
+            "username" => "spaghettiphp"
+        );
+        $result = $this->User->validate($data);
+        $this->assertTrue($result);
+    }
+    public function testErrorsOfValidateWithSimpleRule() {
+        $this->User->validates = array(
+            "username" => "alphanumeric"
+        );
+        $data = array(
+            "username" => "Spaghetti* Framework"
+        );
+        $this->User->validate($data);
+        $result = $this->User->errors;
+        $expected = array(
+            "username" => "alphanumeric"
+        );
+        $this->assertEqual($result, $expected);
+    }
+    public function testErrorsOfValidateWithMultipleRules() {
+        $this->User->validates = array(
+            "username" => array(
+                array("rule" => "alphanumeric"),
+                array("rule" => "numeric")
+            )
+        );
+        $data = array(
+            "username" => "Spaghetti* Framework"
+        );
+        $this->User->validate($data);
+        $result = $this->User->errors;
+        $expected = array(
+            "username" => "alphanumeric"
+        );
+        $this->assertEqual($result, $expected);
+    }
+    public function testErrorsOfValidateWithMessage() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => "alphanumeric",
+                "message" => "the field must be alphanumeric"
+            )
+        );
+        $data = array(
+            "username" => "Spaghetti* Framework"
+        );
+        $this->User->validate($data);
+        $result = $this->User->errors;
+        $expected = array(
+            "username" => "the field must be alphanumeric"
+        );
+        $this->assertEqual($result, $expected);
+    }
+    public function testValidateWithMultipleRules() {
+        $this->User->validates = array(
+            "username" => array(
+                array("rule" => "alphanumeric"),
+                array("rule" => "notEmpty")
+            )
+        );
+        $data = array(
+            "username" => ""
+        );
+        $result = $this->User->validate($data);
+        $this->assertFalse($result);
+    }
+    public function testValidateWithRequired() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => "alphanumeric",
+                "required" => true
+            )
+        );
+        $data = array();
+        $result = $this->User->validate($data);
+        $this->assertFalse($result);
+    }
+    public function testErrorsOfValidateWithRequired() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => "alphanumeric",
+                "required" => true
+            )
+        );
+        $data = array();
+        $this->User->validate($data);
+        $result = array("username" => "required");
+        $expected = array(
+            "username" => "required"
+        );
+        $this->assertEqual($result, $expected);
+    }
+    public function testValidateWithOneRuleParam() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => array("minLength", 5)
+            )
+        );
+        $data = array(
+            "username" => "spg"
+        );
+        $result = $this->User->validate($data);
+        $this->assertFalse($result);
+    }
+    public function testValidateWithMultipleRuleParams() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => array("between", 5, 15)
+            )
+        );
+        $data = array(
+            "username" => "spaghettiphp"
+        );
+        $result = $this->User->validate($data);
+        $this->assertTrue($result);
+    }
+    public function testValidateWithCustomMethod() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => "customRule"
+            )
+        );
+        $data = array(
+            "username" => "spaghettiphp"
+        );
+        $result = $this->User->validate($data);
+        $this->assertTrue($result);
+    }
+    public function testValidateWithCustomMethodAndParams() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => array("customRule", false)
+            )
+        );
+        $data = array(
+            "username" => "spaghettiphp"
+        );
+        $result = $this->User->validate($data);
+        $this->assertFalse($result);
     }
 }
 
