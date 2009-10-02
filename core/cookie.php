@@ -62,7 +62,7 @@ class Cookie extends Object {
       */
     public static function read($name) {
         $self = self::getInstance();
-        return $self->decrypt($_COOKIE[$name]);
+        return $self->decrypt($_COOKIE[$self->name][$name]);
     }
     /**
       *  Short description.
