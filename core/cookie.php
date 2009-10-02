@@ -9,7 +9,7 @@
 
 class Cookie extends Object {
     /**
-      *  Short description.
+      *  Armazena a data de expiração do cookie.
       */
     public $expires;
     /**
@@ -21,9 +21,9 @@ class Cookie extends Object {
       */
     public $secure;
     /**
-      *  Short description.
+      *  Caminho para o qual o cookie está disponível.
       */
-    public $path;
+    public $path = "/";
     /**
       *  Chave a ser usada na encriptação/decriptação do cookie.
       */
@@ -83,7 +83,8 @@ class Cookie extends Object {
       */
     public static function delete($name) {
         $self = self::getInstance();
-        return setcookie("{$self->name}[{$name}]", "", time() - 42000);
+        $path = Mapper::base() . $self->path;
+        return setcookie("{$self->name}[{$name}]", "", time() - 42000, $path);
     }
     /**
       *  Lê o valor de um cookie.
@@ -104,7 +105,9 @@ class Cookie extends Object {
       */
     public static function write($name, $value, $expires = null) {
         $self = self::getInstance();
-        return setcookie("{$self->name}[{$name}]", self::encrypt($value), $self->expire($expires));
+        $expires = $self->expire($expires);
+        $path = Mapper::base() . $self->path;
+        return setcookie("{$self->name}[{$name}]", self::encrypt($value), $expires, $path);
     }
     /**
       *  Encripta o valor de um cookie.
