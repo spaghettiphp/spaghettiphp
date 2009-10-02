@@ -50,7 +50,7 @@ class UserAccessComponent extends Component{
     /**
       *  O level atualmente sendo modificado.
       */
-    public $now_level = null;
+    public $nowLevel = null;
     /**
       *  A duração dos cookies, em segundos.
       */
@@ -172,7 +172,7 @@ class UserAccessComponent extends Component{
       *  @return object $this
       */
     public function allow($url) {
-        $this->permissions[$this->now_level][$url] = true;
+        $this->permissions[$this->nowLevel][$url] = true;
         return $this;
     }
     /**
@@ -182,7 +182,7 @@ class UserAccessComponent extends Component{
       *  @return object $this
       */
     public function deny($url) {
-        $this->permissions[$this->now_level][$url] = false;
+        $this->permissions[$this->nowLevel][$url] = false;
         return $this;
     }
     /**
@@ -230,7 +230,7 @@ class UserAccessComponent extends Component{
       *  @return object $this
       */
     public function userLevel($level) {
-        $this->now_level = $level;
+        $this->nowLevel = $level;
         return $this;
     }
     /**
@@ -257,7 +257,7 @@ class UserAccessComponent extends Component{
       *  @return object $this
       */
     public function loginRedirect($url) {
-        $this->loginRedirect[$this->now_level] = $url;
+        $this->loginRedirect[$this->nowLevel] = $url;
         return $this;
     }
     /**
