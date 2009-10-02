@@ -82,7 +82,8 @@ class Cookie extends Object {
     }
     public static function encrypt($value) {
         $self = self::getInstance();
-        return base64_encode(Security::cipher($value, $self->key));
+        $encripted = base64_encode(Security::cipher($value, $self->key));
+        return "U3BhZ2hldHRp.{$encripted}";
     }
     public static function decrypt($value) {
         
