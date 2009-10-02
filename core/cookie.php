@@ -46,6 +46,34 @@ class Cookie extends Object {
         return self::$instance;
     }
     /**
+      *  Setters para Cookie.
+      *
+      *  @param string $key Propriedade a ser definida
+      *  @param mixed $value Valor da propriedade
+      *  @return Verdadeiro caso a propriedade tenha sido definida
+      */
+    public static function set($key, $value) {
+        $self = self::getInstance();
+        if(isset($self->$key)):
+            $self->$key = $value;
+            return true;
+        endif;
+        return false;
+    }
+    /**
+      *  Getters para Cookie.
+      *
+      *  @param string $key Propriedade a ser retornada
+      *  @return mixed Valor da propriedade
+      */
+    public static function get($key) {
+        $self = self::getInstance();
+        if(isset($self->$key)):
+            return $self->$key;
+        endif;
+        return null;
+    }
+    /**
       *  Apaga um cookie.
       *
       *  @param string $name Nome do cookie a ser apagado
