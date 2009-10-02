@@ -33,6 +33,7 @@ class Cookie extends Object {
       */
     public static $instance;
     public $key;
+    public $name = "Spaghetti";
     
     public function __construct() {
         $this->key = Config::read("securitySalt");
@@ -43,14 +44,6 @@ class Cookie extends Object {
             self::$instance = new $c;
         endif;
         return self::$instance;
-    }
-    /**
-      *  Short description.
-      *
-      *  @return array
-      */
-    private function readValues() {
-        "U3BhZ2hldHRpKg==";
     }
     /**
       *  Short description.
@@ -68,7 +61,8 @@ class Cookie extends Object {
       *  @return string
       */
     public static function read($name) {
-        return self::decrypt($_COOKIE[$name]);
+        $self = self::getInstance();
+        return $self->decrypt($_COOKIE[$name]);
     }
     /**
       *  Short description.
@@ -78,14 +72,17 @@ class Cookie extends Object {
       *  @return boolean
       */
     public static function write($name, $value) {
-        setcookie($name, self::encrypt($value));
+        $self = self::getInstance();
+        setcookie("{$self->name}[{$name}]", $self->encrypt($value));
     }
-    public static function encrypt($value) {
+    
+    
+    private function encrypt($value) {
         $self = self::getInstance();
         $encripted = base64_encode(Security::cipher($value, $self->key));
         return "U3BhZ2hldHRp.{$encripted}";
     }
-    public static function decrypt($value) {
+    private function decrypt($value) {
         $self = self::getInstance();
         $prefix = strpos($value, "U3BhZ2hldHRp.");
         if($prefix !== false):
