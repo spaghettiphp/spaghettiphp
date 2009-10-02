@@ -524,7 +524,7 @@ class Model extends Object {
                     $this->errors []= "required";
                 elseif(isset($data[$field])):
                     $rule = $rule["rule"];
-                    if(!$this->callValidation($rule, $data[$field])):
+                    if(!$this->callValidationMethod($rule, $data[$field])):
                         $this->errors []= $rule;
                     endif;
                 endif;
@@ -539,13 +539,18 @@ class Model extends Object {
       *  @param string $value Valor a ser validado
       *  @return boolean Resultado do método de validação
       */
-    public function callValidation($params, $value) {
+    public function callValidationMethod($params, $value) {
+        $method = is_array($params) ? $params[0] : $params;
+        $class = method_exists($this, $method) ? $this : "Validation";
         if(is_array($params)):
-            $method = $params[0];
             $params[0] = $value;
-            return call_user_func_array(array("Validation", $method), $params);
+            return call_user_func_array(array($class, $method), $params);
         else:
-            return Validation::$params($value);
+            if($class == "Validation"):
+                return Validation::$params($value);
+            else:
+                return $this->$params($value);
+            endif;
         endif;
     }
     /**

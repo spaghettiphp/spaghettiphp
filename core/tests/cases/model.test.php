@@ -9,6 +9,9 @@
 
 class User extends AppModel {
     public $table = false;
+    public function customRule($value, $param = true) {
+        return $param;
+    }
 }
 
 class TestModel extends UnitTestCase {
@@ -94,6 +97,29 @@ class TestModel extends UnitTestCase {
         $result = $this->User->validate($data);
         $this->assertTrue($result);
     }
-}
+    public function testValidateWithCustomMethod() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => "customRule"
+            )
+        );
+        $data = array(
+            "username" => "spaghettiphp"
+        );
+        $result = $this->User->validate($data);
+        $this->assertTrue($result);
+    }
+    public function testValidateWithCustomMethodAndParams() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => array("customRule", false)
+            )
+        );
+        $data = array(
+            "username" => "spaghettiphp"
+        );
+        $result = $this->User->validate($data);
+        $this->assertFalse($result);
+    }}
 
 ?>
