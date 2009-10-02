@@ -86,7 +86,13 @@ class Cookie extends Object {
         return "U3BhZ2hldHRp.{$encripted}";
     }
     public static function decrypt($value) {
-        
+        $self = self::getInstance();
+        $prefix = strpos($value, "U3BhZ2hldHRp.");
+        if($prefix !== false):
+            $encrypted = base64_decode(substr($value, $prefix + 13));
+            return Security::cipher($encrypted, $self->key);
+        endif;
+        return false;
     }
 }
 
