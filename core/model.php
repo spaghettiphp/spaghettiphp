@@ -507,8 +507,12 @@ class Model extends Object {
     public function validate($data) {
         $this->errors = array();
         
+        $defaults = array(
+            "required" => false
+        );
+        
         foreach($this->validates as $field => $rules):
-            if(!is_array($rules)):
+            if(!is_array($rules) || (is_array($rules) && isset($rules["rule"]))):
                 $rules = array($rules);
             endif;
             
@@ -516,18 +520,25 @@ class Model extends Object {
                 if(!is_array($rule)):
                     $rule = array("rule" => $rule);
                 endif;
+                $rule = array_merge($defaults, $rule);
                 
-                if(isset($data[$field])):
+
+
+                $required = !isset($data[$field]) && $rule["required"];
+                if($required):
+                    $this->errors []= "required";
+                elseif(isset($data[$field])):
                     $rule = $rule["rule"];
                     if(!Validation::$rule($data[$field])):
                         $this->errors []= $rule;
                     endif;
                 endif;
+
                 
             endforeach;
             
+            
         endforeach;
-
         return empty($this->errors);
     }
     /**

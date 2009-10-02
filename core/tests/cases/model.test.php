@@ -59,6 +59,17 @@ class TestModel extends UnitTestCase {
         $result = $this->User->validate($data);
         $this->assertFalse($result);
     }
+    public function testValidateWithRequired() {
+        $this->User->validates = array(
+            "username" => array(
+                "rule" => "alphanumeric",
+                "required" => true
+            )
+        );
+        $data = array();
+        $result = $this->User->validate($data);
+        $this->assertFalse($result);
+    }
 }
 
 ?>
