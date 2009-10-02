@@ -1,4 +1,6 @@
 version 0.2b (2009-10-15)
+    * Added array support for Mapper::url()
+    * Added data validation support for Model
     * Added Model::toList()
     * Moved Dispatcher::parseUrl() to Mapper::parse()
     * FormHelper::input() now prints a better markup
