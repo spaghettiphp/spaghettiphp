@@ -67,6 +67,10 @@ class Model extends Object {
      */
     public $perPage = 20;
     /**
+      *  Regras de validação.
+      */
+    public $validates = array();
+    /**
      *  Associações entre modelos disponíveis
      */
     public $associations = array(
@@ -489,6 +493,22 @@ class Model extends Object {
         endif;
         $this->afterSave($created);
         return $save;
+    }
+    /**
+      *  Valida os dados a serem salvos pelo modelo.
+      *
+      *  @param array $data Dados a serem validados
+      *  @return boolean Verdadeiro caso todos os dados sejam válidos
+      */
+    public function validate($data) {
+        $validates = true;
+        foreach($data as $field => $value):
+            if(isset($this->validates[$field])):
+                $function = $this->validates[$field];
+                $validates = $validates && Validation::$function($value);
+            endif;
+        endforeach;
+        return $validates;
     }
     /**
      *  Callback executado antes de salvar um registro.
