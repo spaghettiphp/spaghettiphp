@@ -16,13 +16,14 @@ class AuthComponent extends Component {
      *  Lista de permissões.
      */
     public $permissions = array();
+    public $authorized = true;
 
     public function initialize(&$controller) {
         $this->controller = $controller;
     }
     public function authorized() {
         $here = Mapper::here();
-        $authorized = true;
+        $authorized = $this->authorized;
         foreach($this->permissions as $url => $permission):
             if(Mapper::match($url, $here)):
                 $authorized = $permission;
@@ -31,10 +32,18 @@ class AuthComponent extends Component {
         return $authorized;
     }
     public function allow($url = null) {
-        
+        if(is_null($url)):
+            $this->authorized = true;
+        else:
+            
+        endif;
     }
     public function deny($url = null) {
-        
+        if(is_null($url)):
+            $this->authorized = false;
+        else:
+            
+        endif;
     }
     public function login() {
         
