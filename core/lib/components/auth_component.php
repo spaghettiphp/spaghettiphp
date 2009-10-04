@@ -123,6 +123,14 @@ class AuthComponent extends Component {
             return $this->user[$field];
         endif;
     }
+    public function check() {
+        if(!$this->authorized()):
+            Cookie::write("action", Mapper::here());
+            $this->controller->redirect($this->loginAction);
+            return false;
+        endif;
+        return true;
+    }
     public function login() {
         
     }
