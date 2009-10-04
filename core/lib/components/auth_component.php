@@ -8,7 +8,30 @@
  */
 
 class AuthComponent extends Component {
-    
+    /**
+     *  Instância do controller usando o componente.
+     */
+    public $controller;
+    /**
+     *  Lista de permissões.
+     */
+    public $permissions = array();
+
+    public function initialize(&$controller) {
+        $this->controller = $controller;
+    }
+    public function allow($action) {
+        
+    }
+    public function deny($url) {
+        
+    }
+    public function login() {
+        
+    }
+    public function logout() {
+        
+    }
 }
 
 ?>
