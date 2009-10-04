@@ -1,6 +1,7 @@
 <?php
 /**
- *  Short description.
+ *  Cookie cuida da criação e leitura de cookies para o Spaghetti*, levando em conta
+ *  aspectos de segurança, encriptando todos os cookies criados.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -23,7 +24,7 @@ class Cookie extends Object {
     /**
       *  Define um cookie seguro.
       */
-    public $secure = "false";
+    public $secure = false;
     /**
       *  Chave a ser usada na encriptação/decriptação do cookie.
       */
@@ -135,6 +136,12 @@ class Cookie extends Object {
         endif;
         return false;
     }
+    /**
+     *  Define o tempo de duração de um cookie.
+     *
+     *  @param mixed $expires Tempo de duração do cookie
+     *  @return mixed Data de expiração do cookie
+     */
     public function expire($expires) {
         if(is_null($expires)):
             $expires = $this->expires;
