@@ -20,6 +20,13 @@ class AuthComponent extends Component {
      *  Autorização para URLs não especificadas explicitamente.
      */
     public $authorized = true;
+    
+    public $userModel = "Users";
+    public $userScope = array();
+    public $fields = array(
+        "username" => "username",
+        "password" => "password"
+    );
     public $loggedIn;
 
     public function initialize(&$controller) {
@@ -80,12 +87,30 @@ class AuthComponent extends Component {
             $user = Cookie::read("user_id");
             $password = Cookie::read("password");
             if(!is_null($user) && !is_null($password)):
-                $this->loggedIn = "maybe";
+                $user = $this->identify($user, $password);
+                $this->loggedIn = !empty($user);
             else:
                 $this->loggedIn = false;
             endif;
         endif;
         return $this->loggedIn;
+    }
+    public function identify($id, $password) {
+        $userModel = ClassRegistry::load($this->userModel);
+        if(!$userModel):
+            $this->error("missingModel", array("model" => $this->userModel));
+            return false;
+        endif;
+        $params = array(
+            "conditions" => array_merge(
+                $this->userScope,
+                array(
+                    $userModel->primaryKey => $id,
+                    $this->fields["password"] => $password
+                )
+            )
+        );
+        return $userModel->first($params);
     }
     public function login() {
         
