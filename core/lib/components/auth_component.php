@@ -28,6 +28,7 @@ class AuthComponent extends Component {
         "password" => "password"
     );
     public $loggedIn;
+    public $user = array();
 
     public function initialize(&$controller) {
         $this->controller = $controller;
@@ -110,7 +111,17 @@ class AuthComponent extends Component {
                 )
             )
         );
-        return $userModel->first($params);
+        return $this->user = $userModel->first($params);
+    }
+    public function user($field = null) {
+        if(empty($this->user)):
+            return null;
+        endif;
+        if(is_null($field)):
+            return $this->user;
+        else:
+            return $this->user[$field];
+        endif;
     }
     public function login() {
         
