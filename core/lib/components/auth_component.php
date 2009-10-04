@@ -31,14 +31,18 @@ class AuthComponent extends Component {
      *  @return boolean Verdadeiro caso o usuário esteja autorizado a acessar a URL
      */
     public function authorized() {
-        $here = Mapper::here();
-        $authorized = $this->authorized;
-        foreach($this->permissions as $url => $permission):
-            if(Mapper::match($url, $here)):
-                $authorized = $permission;
-            endif;
-        endforeach;
-        return $authorized;
+        if($this->loggedIn()):
+            return true;
+        else:
+            $here = Mapper::here();
+            $authorized = $this->authorized;
+            foreach($this->permissions as $url => $permission):
+                if(Mapper::match($url, $here)):
+                    $authorized = $permission;
+                endif;
+            endforeach;
+            return $authorized;
+        endif;
     }
     /**
      *  Libera URLs a serem visualizadas sem autenticação.
