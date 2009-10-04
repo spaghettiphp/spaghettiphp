@@ -35,14 +35,14 @@ class AuthComponent extends Component {
         if(is_null($url)):
             $this->authorized = true;
         else:
-            
+            $this->permissions[$url] = true;
         endif;
     }
     public function deny($url = null) {
         if(is_null($url)):
             $this->authorized = false;
         else:
-            
+            $this->permissions[$url] = false;
         endif;
     }
     public function login() {
