@@ -20,10 +20,20 @@ class AuthComponent extends Component {
     public function initialize(&$controller) {
         $this->controller = $controller;
     }
-    public function allow($action) {
+    public function authorized() {
+        $here = Mapper::here();
+        $authorized = true;
+        foreach($this->permissions as $url => $permission):
+            if(Mapper::match($url, $here)):
+                $authorized = $permission;
+            endif;
+        endforeach;
+        return $authorized;
+    }
+    public function allow($url = null) {
         
     }
-    public function deny($url) {
+    public function deny($url = null) {
         
     }
     public function login() {
