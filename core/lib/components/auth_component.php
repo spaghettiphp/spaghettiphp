@@ -28,6 +28,10 @@ class AuthComponent extends Component {
         "password" => "password"
     );
     public $loggedIn;
+    public $loginAction = "/users/login";
+    public $logoutAction = "/users/logout";
+    public $loginRedirect = "/";
+    public $logoutRedirect = "/";
     public $user = array();
 
     public function initialize(&$controller) {
@@ -135,7 +139,10 @@ class AuthComponent extends Component {
         
     }
     public function logout() {
-        
+        Cookie::delete("user_id");
+        Cookie::delete("password");
+        $this->controller->redirect($this->logoutRedirect);
+        return true;
     }
 }
 
