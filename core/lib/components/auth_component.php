@@ -1,7 +1,7 @@
 <?php
 /**
- *  Short description.
- *
+ *  AuthComponent é o responsável pela autenticação e controle de acesso na aplicação.
+ * 
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
@@ -36,6 +36,13 @@ class AuthComponent extends Component {
 
     public function initialize(&$controller) {
         $this->controller = $controller;
+    }
+    public function shutdown() {
+        if(Mapper::match($this->loginAction)):
+            $this->login();
+        elseif(Mapper::match($this->logoutAction)):
+            $this->logout();
+        endif;
     }
     /**
      *  Verifica se o usuário esta autorizado ou não para acessar a URL atual.
@@ -136,7 +143,25 @@ class AuthComponent extends Component {
         return true;
     }
     public function login() {
-        
+        if(!$this->loggedIn()):
+            if(!empty($this->data)):
+                if(user_exists()):
+                    Cookie::write("user_id", $user["id"]);
+                    Cookie::write("password", $user["password"]);
+                    $redirect = Cookie::read("action");
+                    if(is_null($redirect)):
+                        $redirect = $this->loginRedirect;
+                    else:
+                        Cookie::delete("action");
+                    endif;
+                    $this->controller->redirect($redirect);
+                else:
+                    $this->controller->set("authError", "wrongData");
+                endif;
+            endif;
+        else:
+            $this->controller->redirect($this->loginRedirect);
+        endif;
     }
     public function logout() {
         Cookie::delete("user_id");
