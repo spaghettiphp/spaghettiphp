@@ -20,6 +20,7 @@ class AuthComponent extends Component {
      *  Autorização para URLs não especificadas explicitamente.
      */
     public $authorized = true;
+    public $loggedIn;
 
     public function initialize(&$controller) {
         $this->controller = $controller;
@@ -64,6 +65,23 @@ class AuthComponent extends Component {
         else:
             $this->permissions[$url] = false;
         endif;
+    }
+    /**
+     *  Short description.
+     *
+     *  @return boolean
+     */
+    public function loggedIn() {
+        if(is_null($this->loggedIn)):
+            $user = Cookie::read("user_id");
+            $password = Cookie::read("password");
+            if(!is_null($user) && !is_null($password)):
+                $this->loggedIn = "maybe";
+            else:
+                $this->loggedIn = false;
+            endif;
+        endif;
+        return $this->loggedIn;
     }
     public function login() {
         
