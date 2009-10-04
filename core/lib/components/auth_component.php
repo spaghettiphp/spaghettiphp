@@ -9,18 +9,26 @@
 
 class AuthComponent extends Component {
     /**
-     *  Instância do controller usando o componente.
+     *  Instância do controller.
      */
     public $controller;
     /**
      *  Lista de permissões.
      */
     public $permissions = array();
+    /**
+     *  Autorização para URLs não especificadas explicitamente.
+     */
     public $authorized = true;
 
     public function initialize(&$controller) {
         $this->controller = $controller;
     }
+    /**
+     *  Verifica se o usuário esta autorizado ou não para acessar a URL atual.
+     *
+     *  @return boolean Verdadeiro caso o usuário esteja autorizado a acessar a URL
+     */
     public function authorized() {
         $here = Mapper::here();
         $authorized = $this->authorized;
@@ -31,6 +39,12 @@ class AuthComponent extends Component {
         endforeach;
         return $authorized;
     }
+    /**
+     *  Libera URLs a serem visualizadas sem autenticação.
+     *
+     *  @param string $url URL a ser liberada
+     *  @return void
+     */
     public function allow($url = null) {
         if(is_null($url)):
             $this->authorized = true;
@@ -38,6 +52,12 @@ class AuthComponent extends Component {
             $this->permissions[$url] = true;
         endif;
     }
+    /**
+     *  Bloqueia os URLS para serem visualizadas apenas com autenticação.
+     *
+     *  @param string $url URL a ser bloqueada
+     *  @return void
+     */
     public function deny($url = null) {
         if(is_null($url)):
             $this->authorized = false;
