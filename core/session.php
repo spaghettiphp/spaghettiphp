@@ -8,11 +8,14 @@
  */
 
 class Session extends Object {
-    public function read() {
-        
+    public static function start() {
+        return session_start();
     }
-    public function write() {
-        
+    public static function read($name) {
+        return $_SESSION[$name];
+    }
+    public static function write($name, $value) {
+        $_SESSION[$name] = $value;
     }
 }
 
