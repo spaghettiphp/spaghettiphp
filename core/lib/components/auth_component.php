@@ -76,7 +76,7 @@ class AuthComponent extends Component {
       *  @param object $controller Objeto Controller
       *  @return void
       */
-    public function initialize(&$controller) {
+    public function startup(&$controller) {
         $this->permissions[$this->loginAction] = true;
         $this->check();
     }
@@ -89,8 +89,6 @@ class AuthComponent extends Component {
     public function shutdown(&$controller) {
         if(Mapper::match($this->loginAction)):
             $this->login();
-        elseif(Mapper::match($this->logoutAction)):
-            $this->logout();
         endif;
     }
     /**
