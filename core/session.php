@@ -11,6 +11,9 @@ class Session extends Object {
     public static function start() {
         return session_start();
     }
+    public static function started() {
+        return isset($_SESSION);
+    }
     public static function read($name) {
         return $_SESSION[$name];
     }
