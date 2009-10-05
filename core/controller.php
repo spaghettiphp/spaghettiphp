@@ -54,6 +54,7 @@ class Controller extends Object {
      *  Variáveis a serem enviadas para a view.
      */
     public $viewData = array();
+    public $methods = array();
 
     public function __construct() {
         if(is_null($this->name) && preg_match("/(.*)Controller/", get_class($this), $name)):
@@ -67,9 +68,15 @@ class Controller extends Object {
             $this->uses = array($this->name);
         endif;
         
+        $this->methods = $this->getMethods();
         $this->data = $_POST;
         $this->loadComponents();
         $this->loadModels();
+    }
+    public function getMethods() {
+        $child = get_class_methods($this);
+        $parent = get_class_methods("Controller");
+        return array_diff($child, $parent);
     }
     /**
      *  Carrega todos os componentes associados ao controller.

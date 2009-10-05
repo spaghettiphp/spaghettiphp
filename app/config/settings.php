@@ -28,4 +28,9 @@ Config::write("debugMode", 1);
  */
 Config::write("appEncoding", "utf-8");
 
+/**
+ *  Short description.
+ */
+Config::write("securitySalt", "12345678910111213141516");
+
 ?>

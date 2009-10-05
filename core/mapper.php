@@ -181,6 +181,20 @@ class Mapper extends Object {
         return true;
     }
     /**
+     *  Short description.
+     *
+     *  @param string $first
+     *  @param string $second
+     *  @return boolean
+     */
+    public static function match($check, $url = null) {
+        if(is_null($url)):
+            $url = self::here();
+        endif;
+        $check = "%^" . str_replace(array(":any", ":fragment", ":num"), array("(.+)", "([^\/]+)", "([0-9]+)"), $check) . "/?$%";
+        return preg_match($check, $url);
+    }
+    /**
      *  Short Description
      *
      *  @param string $url description
@@ -189,10 +203,9 @@ class Mapper extends Object {
     public static function getRoute($url) {
         $self = self::getInstance();
         foreach($self->routes as $map => $route):
-            $map = "/^" . str_replace(array("/", ":any", ":fragment", ":num"), array("\/", "(.+)", "([^\/]+)", "([0-9]+)"), $map) . "\/?$/";
-            $newUrl = preg_replace($map, $route, $url);
-            if($newUrl != $url):
-                $url = $newUrl;
+            if(self::match($map, $url)):
+                $map = "%^" . str_replace(array(":any", ":fragment", ":num"), array("(.+)", "([^\/]+)", "([0-9]+)"), $map) . "/?$%";
+                $url = preg_replace($map, $route, $url);
                 break;
             endif;
         endforeach;

@@ -38,7 +38,7 @@ class Dispatcher extends Object {
         $controller->componentEvent("initialize");
         $controller->beforeFilter();
         $controller->componentEvent("startup");
-        if(can_call_method($controller, $action)):
+        if(in_array($action, $controller->methods) && can_call_method($controller, $action)):
             $params = $path["params"];
             if(!is_null($path["id"])) $params = array_merge(array($path["id"]), $params);
             call_user_func_array(array(&$controller, $action), $params);
