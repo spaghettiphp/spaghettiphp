@@ -24,6 +24,7 @@ class AuthComponent extends Component {
     public $userModel = "Users";
     public $userScope = array();
     public $fields = array(
+        "id" => "id",
         "username" => "username",
         "password" => "password"
     );
@@ -37,7 +38,7 @@ class AuthComponent extends Component {
     public function initialize(&$controller) {
         $this->controller = $controller;
     }
-    public function shutdown() {
+    public function shutdown(&$controller) {
         if(Mapper::match($this->loginAction)):
             $this->login();
         elseif(Mapper::match($this->logoutAction)):
@@ -99,7 +100,10 @@ class AuthComponent extends Component {
             $user = Cookie::read("user_id");
             $password = Cookie::read("password");
             if(!is_null($user) && !is_null($password)):
-                $user = $this->identify($user, $password);
+                $user = $this->identify(array(
+                    $this->fields["id"] => $user,
+                    $this->fields["password"] => $password
+                ));
                 $this->loggedIn = !empty($user);
             else:
                 $this->loggedIn = false;
@@ -107,7 +111,7 @@ class AuthComponent extends Component {
         endif;
         return $this->loggedIn;
     }
-    public function identify($id, $password) {
+    public function identify($conditions) {
         $userModel = ClassRegistry::load($this->userModel);
         if(!$userModel):
             $this->error("missingModel", array("model" => $this->userModel));
@@ -116,10 +120,7 @@ class AuthComponent extends Component {
         $params = array(
             "conditions" => array_merge(
                 $this->userScope,
-                array(
-                    $userModel->primaryKey => $id,
-                    $this->fields["password"] => $password
-                )
+                $conditions
             )
         );
         return $this->user = $userModel->first($params);
@@ -144,10 +145,15 @@ class AuthComponent extends Component {
     }
     public function login() {
         if(!$this->loggedIn()):
-            if(!empty($this->data)):
-                if(user_exists()):
-                    Cookie::write("user_id", $user["id"]);
-                    Cookie::write("password", $user["password"]);
+            if(!empty($this->controller->data)):
+                $password = md5($this->controller->data[$this->fields["password"]]);
+                $user = $this->identify(array(
+                    $this->fields["username"] => $this->controller->data[$this->fields["username"]],
+                    $this->fields["password"] => $password
+                ));
+                if(!empty($user)):
+                    Cookie::write("user_id", $user[$this->fields["id"]]);
+                    Cookie::write("password", $password);
                     $redirect = Cookie::read("action");
                     if(is_null($redirect)):
                         $redirect = $this->loginRedirect;
