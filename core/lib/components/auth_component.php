@@ -71,6 +71,16 @@ class AuthComponent extends Component {
         $this->controller = $controller;
     }
     /**
+      *  Faz as operações necessárias após a inicialização do controller.
+      *
+      *  @param object $controller Objeto Controller
+      *  @return void
+      */
+    public function initialize(&$controller) {
+        $this->permissions[$this->loginAction] = true;
+        $this->check();
+    }
+    /**
       *  Finaliza o component.
       *
       *  @param object $controller Objeto Controller
