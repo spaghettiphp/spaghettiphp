@@ -68,6 +68,22 @@ class AuthComponent extends Component {
       *  Define se o salt será usado como prefixo das senhas.
       */
     public $useSalt = true;
+    /**
+      *  Data de expiração do cookie.
+      */
+    public $expires;
+    /**
+      *  Caminho para o qual o cookie está disponível.
+      */
+    public $path = "/";
+    /**
+      *  Domínio para ao qual o cookie está disponível.
+      */
+    public $domain = "";
+    /**
+      *  Define um cookie seguro.
+      */
+    public $secure = false;
 
     /**
       *  Inicializa o component.
@@ -222,8 +238,11 @@ class AuthComponent extends Component {
                     $this->fields["password"] => $password
                 ));
                 if(!empty($user)):
-                    Cookie::write("user_id", $user[$this->fields["id"]]);
-                    Cookie::write("password", $password);
+                    Cookie::set("domain", $this->domain);
+                    Cookie::set("path", $this->path);
+                    Cookie::set("secure", $this->secure);
+                    Cookie::write("user_id", $user[$this->fields["id"]], $this->expires);
+                    Cookie::write("password", $password, $this->expires);
                     $redirect = Cookie::read("action");
                     if(is_null($redirect)):
                         $redirect = $this->loginRedirect;
