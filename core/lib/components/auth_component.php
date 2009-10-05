@@ -25,6 +25,10 @@ class AuthComponent extends Component {
         "password" => "password"
     );
     /**
+      *  Método de hash a ser usado para senhas.
+      */
+    public $hash = "sha1";
+    /**
       *  Estado de autenticação do usuário corrente.
       */
     public $loggedIn;
@@ -60,6 +64,10 @@ class AuthComponent extends Component {
       *  Condições adicionais para serem usadas na autenticação.
       */
     public $userScope = array();
+    /**
+      *  Define se o salt será usado como prefixo das senhas.
+      */
+    public $useSalt = true;
 
     /**
       *  Inicializa o component.
@@ -192,6 +200,15 @@ class AuthComponent extends Component {
         return $this->user = $userModel->first($params);
     }
     /**
+      *  Cria o hash de uma senha.
+      *
+      *  @param string $password Senha para ter o hash gerado
+      *  @return string Hash da senha
+      */
+    public function hash($password) {
+        return Security::hash($password, $this->hash, $this->useSalt);
+    }
+    /**
       *  Efetua o login do usuário.
       *
       *  @return void
@@ -199,7 +216,7 @@ class AuthComponent extends Component {
     public function login() {
         if(!$this->loggedIn()):
             if(!empty($this->controller->data)):
-                $password = md5($this->controller->data[$this->fields["password"]]);
+                $password = $this->hash($this->controller->data[$this->fields["password"]]);
                 $user = $this->identify(array(
                     $this->fields["username"] => $this->controller->data[$this->fields["username"]],
                     $this->fields["password"] => $password
