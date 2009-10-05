@@ -20,6 +20,9 @@ class Session extends Object {
     public static function write($name, $value) {
         $_SESSION[$name] = $value;
     }
+    public static function delete($name) {
+        return unset($_SESSION[$name]);
+    }
 }
 
 ?>
