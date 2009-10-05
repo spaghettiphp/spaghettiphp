@@ -9,35 +9,73 @@
 
 class AuthComponent extends Component {
     /**
+     *  Autorização para URLs não especificadas explicitamente.
+     */
+    public $authorized = true;
+    /**
      *  Instância do controller.
      */
     public $controller;
     /**
-     *  Lista de permissões.
-     */
-    public $permissions = array();
-    /**
-     *  Autorização para URLs não especificadas explicitamente.
-     */
-    public $authorized = true;
-    
-    public $userModel = "Users";
-    public $userScope = array();
+      *  Nomes dos campos do modelo a serem usados na autenticação.
+      */
     public $fields = array(
         "id" => "id",
         "username" => "username",
         "password" => "password"
     );
+    /**
+      *  Estado de autenticação do usuário corrente.
+      */
     public $loggedIn;
+    /**
+      *  Action que fará login.
+      */
     public $loginAction = "/users/login";
-    public $logoutAction = "/users/logout";
+    /**
+      *  URL para redirecionamento após o login.
+      */
     public $loginRedirect = "/";
+    /**
+      *  Action que fará logout.
+      */
+    public $logoutAction = "/users/logout";
+    /**
+      *  URL para redirecionamento após o logout.
+      */
     public $logoutRedirect = "/";
+    /**
+     *  Lista de permissões.
+     */
+    public $permissions = array();
+    /**
+      *  Usuário atual.
+      */
     public $user = array();
+    /**
+      *  Nome do modelo a ser utilizado para a autenticação.
+      */
+    public $userModel = "Users";
+    /**
+      *  Condições adicionais para serem usadas na autenticação.
+      */
+    public $userScope = array();
 
+    /**
+      *  Inicializa o component.
+      *
+      *  @param object $controller Objeto Controller
+      *  @return void
+      */
     public function initialize(&$controller) {
         $this->controller = $controller;
     }
+    /**
+      *  Finaliza o component.
+      *
+      *  @param object $controller Objeto Controller
+      *  @return void
+      */
     public function shutdown(&$controller) {
         if(Mapper::match($this->loginAction)):
             $this->login();
@@ -46,9 +84,23 @@ class AuthComponent extends Component {
         endif;
     }
     /**
+      *  Verifica se o usuário está autorizado a acessar a URL atual, tomando as
+      *  ações necessárias no caso contrário.
+      *
+      *  @return boolean Verdadeiro caso o usuário esteja autorizado
+      */
+    public function check() {
+        if(!$this->authorized()):
+            Cookie::write("action", Mapper::here());
+            $this->controller->redirect($this->loginAction);
+            return false;
+        endif;
+        return true;
+    }
+    /**
      *  Verifica se o usuário esta autorizado ou não para acessar a URL atual.
      *
-     *  @return boolean Verdadeiro caso o usuário esteja autorizado a acessar a URL
+     *  @return boolean Verdadeiro caso o usuário esteja autorizado
      */
     public function authorized() {
         if($this->loggedIn()):
@@ -91,9 +143,9 @@ class AuthComponent extends Component {
         endif;
     }
     /**
-     *  Short description.
+     *  Verifica se o usuário está autenticado.
      *
-     *  @return boolean
+     *  @return boolean Verdadeiro caso o usuário esteja autenticado
      */
     public function loggedIn() {
         if(is_null($this->loggedIn)):
@@ -111,6 +163,12 @@ class AuthComponent extends Component {
         endif;
         return $this->loggedIn;
     }
+    /**
+      *  Identifica o usuário no banco de dados.
+      *
+      *  @param array $conditions Condições da busca
+      *  @return array Dados do usuário
+      */
     public function identify($conditions) {
         $userModel = ClassRegistry::load($this->userModel);
         if(!$userModel):
@@ -125,24 +183,11 @@ class AuthComponent extends Component {
         );
         return $this->user = $userModel->first($params);
     }
-    public function user($field = null) {
-        if(empty($this->user)):
-            return null;
-        endif;
-        if(is_null($field)):
-            return $this->user;
-        else:
-            return $this->user[$field];
-        endif;
-    }
-    public function check() {
-        if(!$this->authorized()):
-            Cookie::write("action", Mapper::here());
-            $this->controller->redirect($this->loginAction);
-            return false;
-        endif;
-        return true;
-    }
+    /**
+      *  Efetua o login do usuário.
+      *
+      *  @return void
+      */
     public function login() {
         if(!$this->loggedIn()):
             if(!empty($this->controller->data)):
@@ -169,11 +214,31 @@ class AuthComponent extends Component {
             $this->controller->redirect($this->loginRedirect);
         endif;
     }
+    /**
+      *  Efetua o logout do usuário.
+      *
+      *  @return void
+      */
     public function logout() {
         Cookie::delete("user_id");
         Cookie::delete("password");
         $this->controller->redirect($this->logoutRedirect);
-        return true;
+    }
+    /**
+      *  Retorna informações do usuário.
+      *
+      *  @param string $field Campo a ser retornado
+      *  @return mixed Campo escolhido ou todas as informações do usuário
+      */
+    public function user($field = null) {
+        if(empty($this->user)):
+            return null;
+        endif;
+        if(is_null($field)):
+            return $this->user;
+        else:
+            return $this->user[$field];
+        endif;
     }
 }
 
