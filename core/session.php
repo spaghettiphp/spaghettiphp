@@ -21,7 +21,8 @@ class Session extends Object {
         $_SESSION[$name] = $value;
     }
     public static function delete($name) {
-        return unset($_SESSION[$name]);
+        unset($_SESSION[$name]);
+        return true;
     }
 }
 

@@ -37,14 +37,16 @@
 		</li>
 		<li>
 			<strong>Crie uma <em>view</em> para sua <em>action</em></strong>
-			<p>Para criar uma <em>view</em> em sua <em>action</em>, crie um arquivo na pasta <em class="mono">/app/views/nome_do_controller/nome_da_action.phtm</em>. Se voc&ecirc; quiser criar uma <em>view</em> para a <em>action shop</em> do <em>controller Products</em>, por exemplo, o arquivo da <em>view</em> ficar&aacute; <em class="mono">/app/views/products/shop.phtm</em>.</p>
+			<p>Para criar uma <em>view</em> em sua <em>action</em>, crie um arquivo na pasta <em class="mono">/app/views/nome_do_controller/nome_da_action.htm.php</em>. Se voc&ecirc; quiser criar uma <em>view</em> para a <em>action shop</em> do <em>controller Products</em>, por exemplo, o arquivo da <em>view</em> ficar&aacute; <em class="mono">/app/views/products/shop.htm.php</em>.</p>
 		</li>
 		<li>
 			<strong>Crie um <em>layout</em> para sua aplica&ccedil;&atilde;o</strong>
-			<p>O <em>layout</em> padr&atilde;o &eacute; o arquivo <em class="mono">/app/layouts/default.phtm</em>. Consulte a documenta&ccedil;&atilde;o para informa&ccedil;&otilde;es sobre a cria&ccedil;&atilde;o de m&uacute;ltiplos <em>layouts</em>.</p>
+			<p>O <em>layout</em> padr&atilde;o &eacute; o arquivo <em class="mono">/app/layouts/default.htm.php</em>. Consulte a documenta&ccedil;&atilde;o para informa&ccedil;&otilde;es sobre a cria&ccedil;&atilde;o de m&uacute;ltiplos <em>layouts</em>.</p>
 		</li>
 		</ol>
-		
+		<h2>Versão Beta</h2>
+		<p>Você está rodando uma <em>versão beta</em> do Spaghetti*. É possível que durante seu uso, você encontre bugs que precisem ser corrigidos. Se você encontrá-los, <?php echo $html->link("abra um ticket", "http://dev.spaghettiphp.org/") ?> para que possamos consertá-lo, e tornar o Spaghetti* ainda melhor.</p>
+		<p>Essa versão beta não possui uma documentação completa, portanto está disponível apenas através do <a href="http://github.com/spaghettiphp/spaghettiphp-docs">GitHub</a>, onde você também pode ajudar a melhorá-la. Fique atento às modificações!</p>
 	</div>
 	
 	<div id="sidebar">
@@ -60,11 +62,13 @@
 			</form>
 			<script type="text/javascript" src="http://www.google.com/coop/cse/brand?form=cse-search-box&lang=pt"></script>
 		<ul>
+			<li><a href="http://forum.spaghettiphp.org/">F&oacute;rum</a></li>
 			<li><a href="http://spaghettiphp.org/docs">Documenta&ccedil;&atilde;o</a></li>
+			<li><a href="http://dev.spaghettiphp.org/">Bugs</a></li>
 			<li><a href="http://spaghettiphp.org/tutorials">Tutoriais</a></li>
 			<li><a href="http://spaghettiphp.org/screencasts">Screencasts</a></li>
 			<li><a href="http://spaghettiphp.org/components">Componentes</a></li>
-			<li><a href="http://trac.spaghettiphp.org/">Reposit&oacute;rio de Vers&otilde;es</a></li>
+			<li><a href="http://github.com/spaghettiphp/spaghettiphp">Reposit&oacute;rio Oficial</a></li>
 		</ul>
 
 		<h2>Estenda sua aplica&ccedil;&atilde;o</h2>
@@ -75,16 +79,17 @@
 
 	<div id="footer">
 		<div class="left">
-			<strong>Spaghetti Web Development Framework</strong>
+			<strong>Spaghetti* Framework 0.2b</strong>
 			<ul>
-				<li><a href="http://trac.spaghettiphp.org/">Trac</a></li>
-				<li><a href="http://spaghettiphp.org/docss">Documenta&ccedil;&atilde;o</a></li>
+				<li><a href="http://forum.spaghettiphp.org/">F&oacute;rum</a></li>
+				<li><a href="http://spaghettiphp.org/docs">Documenta&ccedil;&atilde;o</a></li>
+				<li><a href="http://dev.spaghettiphp.org/">Bugs</a></li>
 				<li><a href="http://spaghettiphp.org/tutorials">Tutoriais</a></li>
 				<li class="last"><a href="http://spaghettiphp.org/screencasts">Screencasts</a></li>
 			</ul>
 		</div>
 		<div class="right">
-			<?php echo $html->image("spaghetti.gif"); ?> vers&atilde;o 0.1
+			<?php echo $html->image("spaghetti.gif"); ?> vers&atilde;o 0.2b
 		</div>
 	</div>
 
