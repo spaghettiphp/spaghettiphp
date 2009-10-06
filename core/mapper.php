@@ -290,7 +290,7 @@ class Mapper extends Object {
         endif;
         return $full ? BASE_URL . $url : $url;
     }
-    public function param($key, $value) {
+    public static function param($key, $value) {
         return "{$key}:{$value}";
     }
 }
