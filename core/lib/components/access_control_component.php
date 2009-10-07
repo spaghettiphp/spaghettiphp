@@ -10,7 +10,7 @@
 
 App::import("Component", "auth_component");
 
-class UserAccessComponent extends AuthComponent {
+class AccessControlComponent extends AuthComponent {
     
 }
 
