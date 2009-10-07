@@ -8,10 +8,12 @@
  *
  */
 
-App::import("Component", "auth_component");
-
-class AccessControlComponent extends AuthComponent {
-    
+class AccessControlComponent extends Component {
+    public function initialize(&$controller) {
+        if(!isset($controller->AuthComponent)):
+            trigger_error("Controller::AuthComponent not found", E_USER_ERROR);
+        endif;
+    }
 }
 
 ?>
