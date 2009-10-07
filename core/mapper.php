@@ -183,8 +183,8 @@ class Mapper extends Object {
     /**
      *  Short description.
      *
-     *  @param string $first
-     *  @param string $second
+     *  @param string $check
+     *  @param string $url
      *  @return boolean
      */
     public static function match($check, $url = null) {
