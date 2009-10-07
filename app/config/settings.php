@@ -31,6 +31,6 @@ Config::write("appEncoding", "utf-8");
 /**
  *  Short description.
  */
-Config::write("securitySalt", "12345678910111213141516");
+Config::write("securitySalt", "pokipoki");
 
 ?>

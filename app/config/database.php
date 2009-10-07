@@ -9,10 +9,10 @@
 Config::write("database", array(
     "development" => array(
         "driver" => "mysql",
-        "host" => "",
-        "user" => "",
+        "host" => "localhost",
+        "user" => "root",
         "password" => "",
-        "database" => "",
+        "database" => "test",
         "prefix" => ""
     ),
     "production" => array(
