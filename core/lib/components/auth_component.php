@@ -13,6 +13,10 @@ class AuthComponent extends Component {
      */
     public $authorized = true;
     /**
+      *  Define se AuthComponent::check() será chamado automaticamente.
+      */
+    public $autoCheck = true;
+    /**
      *  Instância do controller.
      */
     public $controller;
@@ -102,7 +106,9 @@ class AuthComponent extends Component {
       */
     public function startup(&$controller) {
         $this->permissions[$this->loginAction] = true;
-        $this->check();
+        if($this->autoCheck):
+            $this->check();
+        endif;
     }
     /**
       *  Finaliza o component.
