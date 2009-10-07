@@ -257,7 +257,7 @@ class AuthComponent extends Component {
                     endif;
                     $this->controller->redirect($redirect);
                 else:
-                    $this->controller->set("authError", "wrongData");
+                    $this->error("wrongData")
                 endif;
             endif;
         else:
@@ -289,6 +289,15 @@ class AuthComponent extends Component {
         else:
             return $this->user[$field];
         endif;
+    }
+    /**
+      *  Define um erro ocorrido durante a autenticação.
+      *
+      *  @param string $error Nome do erro
+      *  @return void
+      */
+    public function error($error) {
+        $this->controller->set("authError", $error);
     }
 }
 
