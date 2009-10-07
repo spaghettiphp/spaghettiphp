@@ -7,6 +7,8 @@
  *
  */
 
+App::import("Helper", "html_helper");
+
 class PaginationHelper extends HtmlHelper {
     /**
      *  Short description.
@@ -31,7 +33,7 @@ class PaginationHelper extends HtmlHelper {
     public function next($text, $attr = array()) {
         if($this->hasNext()):
             $page = $this->model->pagination["page"] + 1;
-            return $this->link($text, $this->url($page), $attr);
+            return $this->link($text, array("page" => $page), $attr);
         endif;
         return "";
     }
@@ -44,7 +46,7 @@ class PaginationHelper extends HtmlHelper {
     public function previous($text, $attr = array()) {
         if($this->hasPrevious()):
             $page = $this->model->pagination["page"] - 1;
-            return $this->link($text, $this->url($page), $attr);
+            return $this->link($text, array("page" => $page), $attr);
         endif;
         return "";
     }
@@ -52,18 +54,17 @@ class PaginationHelper extends HtmlHelper {
     public function first($text, $attr = array()) {
         if($this->hasPrevious()):
             $page = 1;
-            return $this->link($text, $this->url($page), $attr);
+            return $this->link($text, array("page" => $page), $attr);
         endif;
         return "";
     }
     public function last($text, $attr = array()) {
         if($this->hasNext()):
             $page = $this->model->pagination["totalPages"];
-            return $this->link($text, $this->url($page), $attr);
+            return $this->link($text, array("page" => $page), $attr);
         endif;
         return "";
     }
-    
     /**
      *  Short description.
      *
@@ -85,17 +86,6 @@ class PaginationHelper extends HtmlHelper {
             return $this->model->pagination["page"] != 1;
         endif;
         return null;
-    }
-    /**
-     *  Short description.
-     *
-     *  @param integer $direction
-     *  @return string
-     */
-    public function url($page) {
-        return Mapper::url(array(
-            "page" => $page
-        ));
     }
 }
 

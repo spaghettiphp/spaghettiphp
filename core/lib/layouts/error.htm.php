@@ -99,7 +99,7 @@
     </div>
     
     <div id="footer">
-        <small>Spaghetti* Framework 0.1</small>
+        <small>Spaghetti* Framework 0.2b</small>
     </div>
     
 </body>

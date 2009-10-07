@@ -629,11 +629,11 @@ class Model extends Object {
         $db =& self::getConnection($this->environment);
         return $db->getInsertId();
     }
-	/**
-	 *  Retorna a quantidade de linhas afetadas pela última consulta.
-	 *
-	 *  @return integer Quantidade de linhas afetadas
-	 */
+    /**
+     *  Retorna a quantidade de linhas afetadas pela última consulta.
+     *
+     *  @return integer Quantidade de linhas afetadas
+     */
     public function getAffectedRows() {
         $db =& self::getConnection($this->environment);
         return $db->getAffectedRows();

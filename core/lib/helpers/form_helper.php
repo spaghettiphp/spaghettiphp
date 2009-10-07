@@ -7,6 +7,8 @@
  *
  */
 
+App::import("Helper", "html_helper");
+
 class FormHelper extends HtmlHelper {
     /**
      *  Retorna um elemento HTML do formulário formatado.

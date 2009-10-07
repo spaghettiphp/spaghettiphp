@@ -1,8 +1,7 @@
 <?php
 /**
- *  AuthComponent é o responsável pela autenticação e controle de acesso na aplicação,
- *  podendo controlar com base nos prefixos e nas classes do controller.
- *
+ *  AuthComponent é o responsável pela autenticação e controle de acesso na aplicação.
+ * 
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
@@ -10,211 +9,255 @@
 
 class AuthComponent extends Component {
     /**
-     *  Permissões dos controllers e actions corrente.
-     *  
-     *  @var array
+     *  Autorização para URLs não especificadas explicitamente.
      */
-    public $permissions = null;
+    public $authorized = true;
     /**
-     *  Mantém o estado do usuário corrente.
-     *  
-     *  @var boolean
-     */
-    public $loggedIn = false;
+      *  Define se AuthComponent::check() será chamado automaticamente.
+      */
+    public $autoCheck = true;
     /**
-     *  Objeto Controller.
-     * 
-     *  @var object
+     *  Instância do controller.
      */
-    public $controller = null;
+    public $controller;
     /**
-     *  Dados repassados pelo controller (via $_POST).
-     *  
-     *  @var array
-     */
-    public $data = array();
-    /**
-     *  Parâmetros do controller.
-     *  
-     *  @var array
-     */
-    public $params = array();
-    /**
-     *  Nome do modelo a ser utilizado para a autenticação.
-     * 
-     *  @var string
-     */
-    public $userModel = "Users";
-    /**
-     *  Condições adicionais para serem usadas na autenticação.
-     * 
-     *  @var array
-     */
-    public $userScope = array();
-    /**
-     *  URL a ser redirecionada e controlar o login.
-     * 
-     *  @var string
-     */
-    public $loginAction = "/users/login";
-    /**
-     *  URL a ser redirecionada após o login efetuado com sucesso.
-     * 
-     *  @var string
-     */
-    public $loginRedirect = "/";
-    /**
-     *  URL a ser redirecionado após o logout
-     * 
-     *  @var string
-     */
-    public $logoutRedirect = "/";
-    /**
-     *  Permite especificar campos para usuário e senha diferentes do padrão.
-     *
-     *  @var array
-     */
+      *  Nomes dos campos do modelo a serem usados na autenticação.
+      */
     public $fields = array(
+        "id" => "id",
         "username" => "username",
         "password" => "password"
     );
     /**
-     *  Inicializa o componente.
-     * 
-     *  @param object $controller
+      *  Método de hash a ser usado para senhas.
+      */
+    public $hash = "sha1";
+    /**
+      *  Estado de autenticação do usuário corrente.
+      */
+    public $loggedIn;
+    /**
+      *  Action que fará login.
+      */
+    public $loginAction = "/users/login";
+    /**
+      *  URL para redirecionamento após o login.
+      */
+    public $loginRedirect = "/";
+    /**
+      *  Action que fará logout.
+      */
+    public $logoutAction = "/users/logout";
+    /**
+      *  URL para redirecionamento após o logout.
+      */
+    public $logoutRedirect = "/";
+    /**
+     *  Lista de permissões.
      */
-     public function initialize(&$controller) {
+    public $permissions = array();
+    /**
+      *  Usuário atual.
+      */
+    public $user = array();
+    /**
+      *  Nome do modelo a ser utilizado para a autenticação.
+      */
+    public $userModel = "Users";
+    /**
+      *  Condições adicionais para serem usadas na autenticação.
+      */
+    public $userScope = array();
+    /**
+      *  Define se o salt será usado como prefixo das senhas.
+      */
+    public $useSalt = true;
+    /**
+      *  Data de expiração do cookie.
+      */
+    public $expires;
+    /**
+      *  Caminho para o qual o cookie está disponível.
+      */
+    public $path = "/";
+    /**
+      *  Domínio para ao qual o cookie está disponível.
+      */
+    public $domain = "";
+    /**
+      *  Define um cookie seguro.
+      */
+    public $secure = false;
+
+    /**
+      *  Inicializa o component.
+      *
+      *  @param object $controller Objeto Controller
+      *  @return void
+      */
+    public function initialize(&$controller) {
         $this->controller = $controller;
-        $this->params = array(
-            "prefix" => $controller->params["prefix"],
-            "controller" => $controller->params["controller"],
-            "action" => $controller->params["action"]
-        );
-        $this->data = $controller->data;
-        if($this->permissions === null):
-            $this->permissions = array(
-                "prefix" => array(),
-                "controller" => array("users" => true),
-                "action" => array()
-            );
+    }
+    /**
+      *  Faz as operações necessárias após a inicialização do controller.
+      *
+      *  @param object $controller Objeto Controller
+      *  @return void
+      */
+    public function startup(&$controller) {
+        $this->permissions[$this->loginAction] = true;
+        if($this->autoCheck):
+            $this->check();
         endif;
     }
     /**
-     *  Verifica se o usuário esta autorizado ou não para acessar o controller.
-     * 
-     *  @return boolean Verdadeiro caso esteja autorizado a acessar o controller
-     */
-    public function authorized() {
-        $authorized = true;
-        if(isset($_COOKIE["user_id"]) && isset($_COOKIE["user_password"])):
-            $data = array("id" => $_COOKIE["user_id"], "password" => $_COOKIE["user_password"]);
-            $identify = $this->identify($data);
-            if(!empty($identify)):
-                $this->loggedIn = true;
-                return true;
-            endif;
+      *  Finaliza o component.
+      *
+      *  @param object $controller Objeto Controller
+      *  @return void
+      */
+    public function shutdown(&$controller) {
+        if(Mapper::match($this->loginAction)):
+            $this->login();
         endif;
-        foreach($this->params as $param => $value):
-            if(isset($this->permissions[$param][$value])):
-                if($this->permissions[$param][$value] === false):
-                    $authorized = false;
-                elseif($this->permissions[$param][$value] === true):
-                    $authorized = true;
-                endif;
-            endif;
-        endforeach;
-        return $authorized;
     }
     /**
-     *  Verifica se o usuário esta autorizado ou não para o controller,
-     *  redirecionando para a pagina de login em caso negativo.
-     * 
-     *  @return boolean Verdadeiro se estiver autorizado a acessar o controller
-     */
+      *  Verifica se o usuário está autorizado a acessar a URL atual, tomando as
+      *  ações necessárias no caso contrário.
+      *
+      *  @return boolean Verdadeiro caso o usuário esteja autorizado
+      */
     public function check() {
         if(!$this->authorized()):
+            Cookie::write("action", Mapper::here());
             $this->controller->redirect($this->loginAction);
             return false;
         endif;
         return true;
     }
     /**
-     *  Libera prefixos/controllers a serem visualizados sem autenticação.
-     * 
-     *  @param array $permissions Prefixos/controllers a serem liberados
-     *  @return true
+     *  Verifica se o usuário esta autorizado ou não para acessar a URL atual.
+     *
+     *  @return boolean Verdadeiro caso o usuário esteja autorizado
      */
-    public function allow($permissions = array()) {
-        if($permissions == "" || $permissions == "*"):
-            $this->permissions["prefix"][""] = true;
+    public function authorized() {
+        if($this->loggedIn()):
+            return true;
         else:
-            foreach($permissions as $resource => $permission):
-                $this->permissions[$resource][$permission] = true;
+            $here = Mapper::here();
+            $authorized = $this->authorized;
+            foreach($this->permissions as $url => $permission):
+                if(Mapper::match($url, $here)):
+                    $authorized = $permission;
+                endif;
             endforeach;
+            return $authorized;
         endif;
-        return true;
     }
     /**
-     *  Bloqueia os prefixos/controller a serem visualizados com autenticação.
-     *  
-     *  @param array $permissions Prefixos/controllers a serem bloqueados
-     *  @return true
+     *  Libera URLs a serem visualizadas sem autenticação.
+     *
+     *  @param string $url URL a ser liberada
+     *  @return void
      */
-    public function deny($permissions = array()) {
-        if($permissions == "" || $permissions == "*"):
-            $this->permissions["prefix"][""] = false;
+    public function allow($url = null) {
+        if(is_null($url)):
+            $this->authorized = true;
         else:
-            foreach($permissions as $resource => $permission):
-                $this->permissions[$resource][$permission] = false;
-            endforeach;
+            $this->permissions[$url] = true;
         endif;
-        return true;
     }
     /**
-     *  Criptografa a senha com o hash MD5.
-     * 
-     *  @param array $data Dados a serem utilizados
-     *  @return array Dados com senha criptografada com hash MD5
+     *  Bloqueia os URLS para serem visualizadas apenas com autenticação.
+     *
+     *  @param string $url URL a ser bloqueada
+     *  @return void
      */
-    public function hashPasswords($data = array()) {
-        if(isset($data[$this->fields["password"]])):
-            $data[$this->fields["password"]] = md5($data[$this->fields["password"]]);
+    public function deny($url = null) {
+        if(is_null($url)):
+            $this->authorized = false;
+        else:
+            $this->permissions[$url] = false;
         endif;
-        return $data;
     }
     /**
-     *  Carrega os dados do usuário.
-     * 
-     *  @param array $data Dados providos pelo usuário
-     *  @return array Dados do usuário
+     *  Verifica se o usuário está autenticado.
+     *
+     *  @return boolean Verdadeiro caso o usuário esteja autenticado
      */
-    public function identify($data = array()) {
+    public function loggedIn() {
+        if(is_null($this->loggedIn)):
+            $user = Cookie::read("user_id");
+            $password = Cookie::read("password");
+            if(!is_null($user) && !is_null($password)):
+                $user = $this->identify(array(
+                    $this->fields["id"] => $user,
+                    $this->fields["password"] => $password
+                ));
+                $this->loggedIn = !empty($user);
+            else:
+                $this->loggedIn = false;
+            endif;
+        endif;
+        return $this->loggedIn;
+    }
+    /**
+      *  Identifica o usuário no banco de dados.
+      *
+      *  @param array $conditions Condições da busca
+      *  @return array Dados do usuário
+      */
+    public function identify($conditions) {
         $userModel = ClassRegistry::load($this->userModel);
         if(!$userModel):
             $this->error("missingModel", array("model" => $this->userModel));
             return false;
         endif;
-        $user = $userModel->first(array("conditions" => array_merge($this->userScope, $data)));
-        return $user;
+        $params = array(
+            "conditions" => array_merge(
+                $this->userScope,
+                $conditions
+            )
+        );
+        return $this->user = $userModel->first($params);
     }
     /**
-     *  Verifica os dados repassados para realizar o login no sistema.
-     * 
-     *  @return boolean Verdadeiro para login efetuado com sucesso
-     */
+      *  Cria o hash de uma senha.
+      *
+      *  @param string $password Senha para ter o hash gerado
+      *  @return string Hash da senha
+      */
+    public function hash($password) {
+        return Security::hash($password, $this->hash, $this->useSalt);
+    }
+    /**
+      *  Efetua o login do usuário.
+      *
+      *  @return void
+      */
     public function login() {
-        if(!$this->loggedIn):
-            if(!empty($this->data)):
-                $user = $this->identify($this->hashPasswords($this->data));
-                if(empty($user)):
-                    $this->controller->set("authError", "wrongData");
-                    return false;
+        if(!$this->loggedIn()):
+            if(!empty($this->controller->data)):
+                $password = $this->hash($this->controller->data[$this->fields["password"]]);
+                $user = $this->identify(array(
+                    $this->fields["username"] => $this->controller->data[$this->fields["username"]],
+                    $this->fields["password"] => $password
+                ));
+                if(!empty($user)):
+                    Cookie::set("domain", $this->domain);
+                    Cookie::set("path", $this->path);
+                    Cookie::set("secure", $this->secure);
+                    Cookie::write("user_id", $user[$this->fields["id"]], $this->expires);
+                    Cookie::write("password", $password, $this->expires);
+                    $redirect = Cookie::read("action");
+                    if(is_null($redirect)):
+                        $redirect = $this->loginRedirect;
+                    else:
+                        Cookie::delete("action");
+                    endif;
+                    $this->controller->redirect($redirect);
                 else:
-                    setcookie("user_id", $user["id"], null, "/");
-                    setcookie("user_password", $user[$this->fields["password"]], null, "/");
-                    $this->loggedIn = true;
-                    $this->controller->redirect($this->loginRedirect);
-                    return true;
+                    $this->controller->set("authError", "wrongData");
                 endif;
             endif;
         else:
@@ -222,27 +265,30 @@ class AuthComponent extends Component {
         endif;
     }
     /**
-     *  Efetua logout, redirecionando em seguida.
-     * 
-     *  @return true
-     */
+      *  Efetua o logout do usuário.
+      *
+      *  @return void
+      */
     public function logout() {
-        setcookie("user_id", "", time() - 3600, "/");
-        setcookie("user_password", "", time() - 3600, "/");
-        $this->loggedIn = false;
+        Cookie::delete("user_id");
+        Cookie::delete("password");
         $this->controller->redirect($this->logoutRedirect);
-        return true;
     }
     /**
-     *  Pega o usuário da sessão.
-     * 
-     *  @param string $field Campo a ser retornado
-     *  @return array Repassa um array com os dados do usuário ou apenas o camporepassado por $field
-     */
+      *  Retorna informações do usuário.
+      *
+      *  @param string $field Campo a ser retornado
+      *  @return mixed Campo escolhido ou todas as informações do usuário
+      */
     public function user($field = null) {
-        $user_id = $_COOKIE["user_id"];
-        $user = $this->identify(array("id" => $user_id));
-        return is_null($field) ? $user : $user[$field];
+        if(empty($this->user)):
+            return null;
+        endif;
+        if(is_null($field)):
+            return $this->user;
+        else:
+            return $this->user[$field];
+        endif;
     }
 }
 

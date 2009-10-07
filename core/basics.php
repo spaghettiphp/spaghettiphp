@@ -62,7 +62,7 @@ class App extends Object {
             return $include;
         else:
             if($file_path = self::path($type, $file, $ext)):
-                return require $file_path;
+                return require_once $file_path;
             else:
                 trigger_error("File {$file}.{$ext} doesn't exists in {$type}", E_USER_WARNING);
             endif;

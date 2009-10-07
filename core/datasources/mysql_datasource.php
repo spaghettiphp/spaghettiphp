@@ -10,13 +10,13 @@
  */
 
 class MysqlDatasource extends Datasource {
-	protected $schema = array();
-	protected $sources = array();
+    protected $schema = array();
+    protected $sources = array();
     protected $connection;
-	protected $results;
-	protected $transactionStarted = false;
-	protected $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE", "REGEXP");
-	protected $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
+    protected $results;
+    protected $transactionStarted = false;
+    protected $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE", "REGEXP");
+    protected $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
     public $connected = false;
 
     /**
@@ -37,22 +37,22 @@ class MysqlDatasource extends Datasource {
      *  @return boolean Verdadeiro caso a conexão tenha sido desfeita
      */
     public function disconnect() {
-		if(mysql_close($this->connection)):
-			$this->connected = false;
-			$this->connection = null;
-		endif;
-		return !$this->connected;
+        if(mysql_close($this->connection)):
+            $this->connected = false;
+            $this->connection = null;
+        endif;
+        return !$this->connected;
     }
-	/**
-	 *  Retorna a conexão com o banco de dados, ou conecta caso a conexão ainda
-	 *  não tenha sido estabelecida.
-	 *
-	 *  @return resource Conexão com o banco de dados
-	 */
+    /**
+     *  Retorna a conexão com o banco de dados, ou conecta caso a conexão ainda
+     *  não tenha sido estabelecida.
+     *
+     *  @return resource Conexão com o banco de dados
+     */
     public function &getConnection() {
-		if(!$this->connected):
-			$this->connect();
-		endif;
+        if(!$this->connected):
+            $this->connect();
+        endif;
         return $this->connection;
     }
     /**
@@ -144,20 +144,20 @@ class MysqlDatasource extends Datasource {
             return "{$type}($limit)";
         endif;
     }
-	/**
-	 *  Lista as tabelas existentes no banco de dados.
-	 *
-	 *  @return array Lista de tabelas no banco de dados
-	 */
-	public function listSources() {
-		if(empty($this->sources)):
-			$sources = $this->query("SHOW TABLES FROM {$this->config['database']}");
-			while($source = mysql_fetch_array($sources)):
-				$this->sources []= $source[0];
-			endwhile;
-		endif;
-		return $this->sources;
-	}
+    /**
+     *  Lista as tabelas existentes no banco de dados.
+     *
+     *  @return array Lista de tabelas no banco de dados
+     */
+    public function listSources() {
+        if(empty($this->sources)):
+            $sources = $this->query("SHOW TABLES FROM {$this->config['database']}");
+            while($source = mysql_fetch_array($sources)):
+                $this->sources []= $source[0];
+            endwhile;
+        endif;
+        return $this->sources;
+    }
     /**
      *  Descreve uma tabela do banco de dados.
      *
@@ -208,14 +208,14 @@ class MysqlDatasource extends Datasource {
         $this->transactionStarted = !$this->query("ROLLBACK");
         return !$this->transactionStarted;
     }
-	/**
-	 *  Insere um registro na tabela do banco de dados.
-	 *
-	 *  @param string $table Tabela a receber os dados
-	 *  @param array $data Dados a serem inseridos
-	 *  @return boolean Verdadeiro se os dados foram inseridos
-	 */
-	public function create($table = null, $data = array()) {
+    /**
+     *  Insere um registro na tabela do banco de dados.
+     *
+     *  @param string $table Tabela a receber os dados
+     *  @param array $data Dados a serem inseridos
+     *  @return boolean Verdadeiro se os dados foram inseridos
+     */
+    public function create($table = null, $data = array()) {
         $insertFields = $insertValues = array();
         $schema = $this->describe($table);
         foreach($data as $field => $value):
@@ -223,69 +223,69 @@ class MysqlDatasource extends Datasource {
             $insertFields []= $field;
             $insertValues []= $this->value($value, $column);
         endforeach;
-		$query = $this->renderSql("insert", array(
+        $query = $this->renderSql("insert", array(
             "table" => $table,
             "fields" => join(",", $insertFields),
             "values" => join(",", $insertValues)
         ));
-		return $this->query($query);
-	}
-	/**
-	 *  Busca registros em uma tabela do banco de dados.
-	 *
-	 *  @param string $table Tabela a ser consultada
-	 *  @param array $params Parâmetros da consulta
-	 *  @return array Resultados da busca
-	 */
-	public function read($table = null, $params = array()) {
-		$query = $this->renderSql("select", array(
-			"table" => $table,
-			"fields" => is_array($f = $params["fields"]) ? join(",", $f) : $f,
-			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
-			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
-			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
-		));
+        return $this->query($query);
+    }
+    /**
+     *  Busca registros em uma tabela do banco de dados.
+     *
+     *  @param string $table Tabela a ser consultada
+     *  @param array $params Parâmetros da consulta
+     *  @return array Resultados da busca
+     */
+    public function read($table = null, $params = array()) {
+        $query = $this->renderSql("select", array(
+            "table" => $table,
+            "fields" => is_array($f = $params["fields"]) ? join(",", $f) : $f,
+            "conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
+            "order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
+            "limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
+        ));
         return $this->fetchAll($query);
-	}
-	/**
-	 *  Atualiza registros em uma tabela do banco de dados.
-	 *
-	 *  @param string $table Tabela a receber os dados
-	 *  @param array $params Parâmetros da consulta
-	 *  @return boolean Verdadeiro se os dados foram atualizados
-	 */
-	public function update($table = null, $params = array()) {
+    }
+    /**
+     *  Atualiza registros em uma tabela do banco de dados.
+     *
+     *  @param string $table Tabela a receber os dados
+     *  @param array $params Parâmetros da consulta
+     *  @return boolean Verdadeiro se os dados foram atualizados
+     */
+    public function update($table = null, $params = array()) {
         $updateValues = array();
         $schema = $this->describe($table);
         foreach($params["data"] as $field => $value):
             $column = isset($schema[$field]) ? $schema[$field]["type"] : null;
             $updateValues []= $field . "=" . $this->value($value, $column);
         endforeach;
-		$query = $this->renderSql("update", array(
-			"table" => $table,
-			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
-			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
-			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}",
-			"values" => join(",", $updateValues)
-		));
-		return $this->query($query);
-	}
-	/**
-	 *  Remove registros da tabela do banco de dados.
-	 *
-	 *  @param string $table Tabela onde estão os registros
-	 *  @param array $params Parâmetros da consulta
-	 *  @return boolean Verdadeiro se os dados foram excluídos
-	 */
-	public function delete($table = null, $params = array()) {
-		$query = $this->renderSql("delete", array(
-			"table" => $table,
-			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
-			"order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
-			"limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
-		));
-		return $this->query($query);
-	}
+        $query = $this->renderSql("update", array(
+            "table" => $table,
+            "conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
+            "order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
+            "limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}",
+            "values" => join(",", $updateValues)
+        ));
+        return $this->query($query);
+    }
+    /**
+     *  Remove registros da tabela do banco de dados.
+     *
+     *  @param string $table Tabela onde estão os registros
+     *  @param array $params Parâmetros da consulta
+     *  @return boolean Verdadeiro se os dados foram excluídos
+     */
+    public function delete($table = null, $params = array()) {
+        $query = $this->renderSql("delete", array(
+            "table" => $table,
+            "conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
+            "order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
+            "limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
+        ));
+        return $this->query($query);
+    }
     /**
      *  Conta registros no banco de dados.
      *
@@ -293,34 +293,34 @@ class MysqlDatasource extends Datasource {
      *  @param array $params Parâmetros da busca
      *  @return integer Quantidade de registros encontrados
      */
-	public function count($table = null, $params) {
-		$query = $this->renderSql("select", array(
-			"table" => $table,
-			"conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
-			"fields" => "COUNT(" . (is_array($f = $params["fields"]) ? join(",", $f) : $f) . ") AS count"
-		));
-		$results = $this->fetchAll($query);
-		return $results[0]["count"];
-	}
-	/**
-	 *	Cria uma consulta SQL baseada de acordo com alguns parâmetros.
-	 *
-	 *	@param string $type Tipo da consulta
-	 *	@param array $data Parâmetros da consulta
-	 *	@return string Consulta SQL
-	 */
-	public function renderSql($type, $data = array()) {
-		switch($type):
-			case "select":
-				return "SELECT {$data['fields']} FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
-			case "delete":
-				return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
-			case "insert":
-				return "INSERT INTO {$data['table']}({$data['fields']}) VALUES({$data['values']})";
-			case "update":
-				return "UPDATE {$data['table']} SET {$data['values']} {$data['conditions']} {$data['order']} {$data['limit']}";
-		endswitch;
-	}
+    public function count($table = null, $params) {
+        $query = $this->renderSql("select", array(
+            "table" => $table,
+            "conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
+            "fields" => "COUNT(" . (is_array($f = $params["fields"]) ? join(",", $f) : $f) . ") AS count"
+        ));
+        $results = $this->fetchAll($query);
+        return $results[0]["count"];
+    }
+    /**
+     *    Cria uma consulta SQL baseada de acordo com alguns parâmetros.
+     *
+     *    @param string $type Tipo da consulta
+     *    @param array $data Parâmetros da consulta
+     *    @return string Consulta SQL
+     */
+    public function renderSql($type, $data = array()) {
+        switch($type):
+            case "select":
+                return "SELECT {$data['fields']} FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
+            case "delete":
+                return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
+            case "insert":
+                return "INSERT INTO {$data['table']}({$data['fields']}) VALUES({$data['values']})";
+            case "update":
+                return "UPDATE {$data['table']} SET {$data['values']} {$data['conditions']} {$data['order']} {$data['limit']}";
+        endswitch;
+    }
     /**
      *  Escapa um valor para uso em consultas SQL.
      *
@@ -339,88 +339,88 @@ class MysqlDatasource extends Datasource {
                     return $value;
                 endif;
             default:
-				if(is_null($value)):
-					return "NULL";
-				endif;
-				return "'" . mysql_real_escape_string($value, $this->connection) . "'";
+                if(is_null($value)):
+                    return "NULL";
+                endif;
+                return "'" . mysql_real_escape_string($value, $this->connection) . "'";
         endswitch;
     }
-	/**
-	 *  Gera as condições para uma consulta SQL.
-	 *
-	 *  @param string $table Nome da tabela a ser usada
-	 *  @param array $conditions Condições da consulta
-	 *  @param string $logical Operador lógico a ser usado
-	 *  @return string Condições formatadas para consulta SQL
-	 */
-	public function sqlConditions($table, $conditions, $logical = "AND") {
-		if(is_array($conditions)):
-			$sql = array();
-			foreach($conditions as $key => $value):
-				if(is_numeric($key)):
-					if(is_string($value)):
-						$sql []= $value;
-					else:
-						$sql []= "(" . $this->sqlConditions($table, $value) . ")";
-					endif;
-				else:
-					if(in_array($key, $this->logic)):
-						$sql []= "(" . $this->sqlConditions($table, $value, strtoupper($key)) . ")";
-					elseif(is_array($value)):
-						foreach($value as $k => $v):
-							$value[$k] = $this->value($v, null);
-						endforeach;
-						if(preg_match("/([\w_]+) (BETWEEN)/", $key, $regex)):
-							$condition = $regex[1] . " BETWEEN " . join(" AND ", $value);
-						else:
-							$condition = $key . " IN (" . join(",", $value) . ")";
-						endif;
-						$sql []= $condition;
-					else:
-						$comparison = "=";
-						if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
-							list($regex, $key, $comparison) = $regex;
-						endif;
-						$value = $this->value($value, $this->fieldType($table, $key));
-						$sql []= "{$key} {$comparison} {$value}";
-					endif;
-				endif;
-			endforeach;
-			$sql = join(" {$logical} ", $sql);
-		else:
-			$sql = $conditions;
-		endif;
-		return $sql;
-	}
-	/**
-	 *  Retorna o tipo de um campo da tabela.
-	 *
-	 *	@param string $table Tabela que contém o campo
-	 *	@param string $field Nome do campo
-	 *	@return string Tipo do campo
-	 */
-	public function fieldType($table, $field) {
-		if(isset($this->schema[$table]) && isset($this->schema[$table][$field])):
-			return $this->schema[$table][$field]["type"];
-		endif;
-		return null;
-	}
+    /**
+     *  Gera as condições para uma consulta SQL.
+     *
+     *  @param string $table Nome da tabela a ser usada
+     *  @param array $conditions Condições da consulta
+     *  @param string $logical Operador lógico a ser usado
+     *  @return string Condições formatadas para consulta SQL
+     */
+    public function sqlConditions($table, $conditions, $logical = "AND") {
+        if(is_array($conditions)):
+            $sql = array();
+            foreach($conditions as $key => $value):
+                if(is_numeric($key)):
+                    if(is_string($value)):
+                        $sql []= $value;
+                    else:
+                        $sql []= "(" . $this->sqlConditions($table, $value) . ")";
+                    endif;
+                else:
+                    if(in_array($key, $this->logic)):
+                        $sql []= "(" . $this->sqlConditions($table, $value, strtoupper($key)) . ")";
+                    elseif(is_array($value)):
+                        foreach($value as $k => $v):
+                            $value[$k] = $this->value($v, null);
+                        endforeach;
+                        if(preg_match("/([\w_]+) (BETWEEN)/", $key, $regex)):
+                            $condition = $regex[1] . " BETWEEN " . join(" AND ", $value);
+                        else:
+                            $condition = $key . " IN (" . join(",", $value) . ")";
+                        endif;
+                        $sql []= $condition;
+                    else:
+                        $comparison = "=";
+                        if(preg_match("/([\w_]+) (" . join("|", $this->comparison) . ")/", $key, $regex)):
+                            list($regex, $key, $comparison) = $regex;
+                        endif;
+                        $value = $this->value($value, $this->fieldType($table, $key));
+                        $sql []= "{$key} {$comparison} {$value}";
+                    endif;
+                endif;
+            endforeach;
+            $sql = join(" {$logical} ", $sql);
+        else:
+            $sql = $conditions;
+        endif;
+        return $sql;
+    }
+    /**
+     *  Retorna o tipo de um campo da tabela.
+     *
+     *    @param string $table Tabela que contém o campo
+     *    @param string $field Nome do campo
+     *    @return string Tipo do campo
+     */
+    public function fieldType($table, $field) {
+        if(isset($this->schema[$table]) && isset($this->schema[$table][$field])):
+            return $this->schema[$table][$field]["type"];
+        endif;
+        return null;
+    }
     /**
      *  Retorna o ID do último registro inserido.
      *
      *  @return integer ID do último registro inserido
      */
-	public function getInsertId() {
-		return mysql_insert_id($this->getConnection());
-	}
-	/**
-	 *  Retorna a quantidade de linhas afetadas pela última consulta.
-	 *
-	 *  @return integer Quantidade de linhas afetadas
-	 */
-	public function getAffectedRows() {
-		return mysql_affected_rows($this->getConnection());
-	}
+    public function getInsertId() {
+        return mysql_insert_id($this->getConnection());
+    }
+    /**
+     *  Retorna a quantidade de linhas afetadas pela última consulta.
+     *
+     *  @return integer Quantidade de linhas afetadas
+     */
+    public function getAffectedRows() {
+        return mysql_affected_rows($this->getConnection());
+    }
 }
 
 ?>

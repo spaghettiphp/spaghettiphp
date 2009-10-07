@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link rel="shortcut icon" href="http://trac.spaghettiphp.org/chrome/site/spaghettifavicon.png" type="image/png" />
+	<link rel="shortcut icon" href="http://spaghettiphp.org/images/favicon.png" type="image/png" />
     <title>Spaghetti* Framework &mdash; Seja bem vindo!</title>
     
     <?php echo $html->stylesheet("spaghetti.css"); ?>
