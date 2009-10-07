@@ -7,6 +7,8 @@
  *
  */
 
+App::import("Helper", "html_helper");
+
 class PaginationHelper extends HtmlHelper {
     /**
      *  Short description.
