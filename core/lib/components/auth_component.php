@@ -257,7 +257,7 @@ class AuthComponent extends Component {
                     endif;
                     $this->controller->redirect($redirect);
                 else:
-                    $this->error("loginFailed")
+                    $this->error("loginFailed");
                 endif;
             endif;
         else:

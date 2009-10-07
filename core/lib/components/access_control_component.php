@@ -30,6 +30,7 @@ class AccessControlComponent extends Component {
         endif;
         $this->controller = $controller;
         $this->auth = $controller->AuthComponent;
+        $this->auth->deny();
     }
     /**
       *  Short description.
@@ -51,7 +52,13 @@ class AccessControlComponent extends Component {
       *  Short description.
       */
     public function check() {
-        
+        if(!$this->authorized()):
+            Cookie::write("action", Mapper::here());
+            $this->auth->error("notAuthorized");
+            $this->controller->redirect($this->loginAction);
+            return false;
+        endif;
+        return true;
     }
 }
 
