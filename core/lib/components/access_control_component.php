@@ -29,6 +29,7 @@ class AccessControlComponent extends Component {
       *  Nome do modelo a ser utilizado para relacionar grupos e usuários.
       */
     public $userRoleModel = "UsersRoles";
+    public $permissions = array();
     
     /**
       *  Inicializa o componente.
@@ -56,10 +57,18 @@ class AccessControlComponent extends Component {
         endif;
     }
     /**
-      *  Short description.
+      *  Permite acesso a um grupo de usuários.
+      *
+      *  @param string $group Grupo a receber a permissão
+      *  @param array $permissions Permissões a serem dadas ao grupo
+      *  @return void
       */
     public function allow($group, $permissions) {
-        
+        if(!isset($permissions[$group])):
+            $permissions[$group] = $permissions;
+        else:
+            $permissions[$group] = array_merge($permissions[$group], $permissions);
+        endif;
     }
     /**
       *  Short description.
