@@ -92,9 +92,9 @@ class AccessControlComponent extends Component {
     public function allowUser($user, $permissions) {
         $this->checkUserPermissions = true;
         if(!isset($this->permissions[$user])):
-            $this->permissions[$user] = $permissions;
+            $this->userPermissions[$user] = $permissions;
         else:
-            $this->permissions[$user] = array_merge($this->permissions[$user], $permissions);
+            $this->userPermissions[$user] = array_merge($this->userPermissions[$user], $permissions);
         endif;
     }
     /**
