@@ -73,6 +73,11 @@ class Controller extends Object {
         $this->loadComponents();
         $this->loadModels();
     }
+    /**
+     *  Retorna o método atual.
+     *
+     *  @return array Método utilizado
+     */
     public function getMethods() {
         $child = get_class_methods($this);
         $parent = get_class_methods("Controller");
