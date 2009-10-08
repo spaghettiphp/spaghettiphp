@@ -74,7 +74,7 @@ class AccessControlComponent extends Component {
                 endif;
             endforeach;
             if($authorized) return true;
-            elseif(Mapper::here() == "/home")
+            elseif(Mapper::here() != "/home")
                 return true;
             else
                 return false;
@@ -89,7 +89,7 @@ class AccessControlComponent extends Component {
         if(!$this->authorized()):
             Cookie::write("action", Mapper::here());
             $this->auth->error("notAuthorized");
-            $this->controller->redirect($this->loginAction);
+            $this->controller->redirect($this->auth->loginAction);
             return false;
         endif;
         return true;
