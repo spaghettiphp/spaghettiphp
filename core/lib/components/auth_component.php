@@ -141,18 +141,22 @@ class AuthComponent extends Component {
      *  @return boolean Verdadeiro caso o usuário esteja autorizado
      */
     public function authorized() {
-        if($this->loggedIn()):
-            return true;
-        else:
-            $here = Mapper::here();
-            $authorized = $this->authorized;
-            foreach($this->permissions as $url => $permission):
-                if(Mapper::match($url, $here)):
-                    $authorized = $permission;
-                endif;
-            endforeach;
-            return $authorized;
-        endif;
+        return $this->loggedIn() || $this->isPublic();
+    }
+    /**
+      *  Short description.
+      *
+      *  @return boolean
+      */
+    public function isPublic() {
+        $here = Mapper::here();
+        $authorized = $this->authorized;
+        foreach($this->permissions as $url => $permission):
+            if(Mapper::match($url, $here)):
+                $authorized = $permission;
+            endif;
+        endforeach;
+        return $authorized;
     }
     /**
      *  Libera URLs a serem visualizadas sem autenticação.

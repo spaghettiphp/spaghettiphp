@@ -74,18 +74,13 @@ class AccessControlComponent extends Component {
      */
     public function authorized() {
         if($this->auth->loggedIn):
-            $here = Mapper::here();
-            $authorized = $this->auth->authorized;
-            foreach($this->auth->permissions as $url => $permission):
-                if(Mapper::match($url, $here)):
-                    $authorized = $permission;
-                endif;
-            endforeach;
-            if($authorized) return true;
-            elseif(Mapper::here() != "/home")
+            if($this->auth->isPublic()):
                 return true;
-            else
+            elseif(Mapper::here() != "/home"):
+                return true;
+            else:
                 return false;
+            endif;
         else:
             return $this->auth->authorized();
         endif;
