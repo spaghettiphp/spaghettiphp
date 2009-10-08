@@ -105,7 +105,7 @@ class AuthComponent extends Component {
       *  @return void
       */
     public function startup(&$controller) {
-        $this->permissions[$this->loginAction] = true;
+        $this->allow($this->loginAction);
         if($this->autoCheck):
             $this->check();
         endif;

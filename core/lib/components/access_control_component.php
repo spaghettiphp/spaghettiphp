@@ -17,8 +17,17 @@ class AccessControlComponent extends Component {
       *  Short description.
       */
     public $auth;
+    /**
+      *  Short description.
+      */
     public $autoCheck = true;
+    /**
+      *  Short description.
+      */
     public $roleModel = "Roles";
+    /**
+      *  Short description.
+      */
     public $userRoleModel = "UsersRoles";
     
     /**
@@ -39,6 +48,18 @@ class AccessControlComponent extends Component {
         if($this->autoCheck):
             $this->check();
         endif;
+    }
+    /**
+      *  Short description.
+      */
+    public function allow($group, $permissions) {
+        
+    }
+    /**
+      *  Short description.
+      */
+    public function allowUser($user, $permissions) {
+        
     }
     /**
       *  Short description.
