@@ -281,13 +281,14 @@ class AuthComponent extends Component {
       *  @return mixed Campo escolhido ou todas as informações do usuário
       */
     public function user($field = null) {
-        if(empty($this->user)):
-            return null;
-        endif;
-        if(is_null($field)):
-            return $this->user;
+        if($this->loggedIn()):
+            if(is_null($field)):
+                return $this->user;
+            else:
+                return $this->user[$field];
+            endif;
         else:
-            return $this->user[$field];
+            return null;
         endif;
     }
     /**
