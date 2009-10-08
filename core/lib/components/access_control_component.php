@@ -29,6 +29,10 @@ class AccessControlComponent extends Component {
       *  Nome do modelo a ser utilizado para relacionar grupos e usuários.
       */
     public $userRoleModel = "UsersRoles";
+    /**
+     *  Lista de permissões de grupo.
+     */
+    public $permissions = array();
     
     /**
       *  Inicializa o componente.
@@ -56,10 +60,18 @@ class AccessControlComponent extends Component {
         endif;
     }
     /**
-      *  Short description.
+      *  Permite acesso a um grupo de usuários.
+      *
+      *  @param string $group Grupo a receber a permissão
+      *  @param array $permissions Permissões a serem dadas ao grupo
+      *  @return void
       */
     public function allow($group, $permissions) {
-        
+        if(!isset($permissions[$group])):
+            $permissions[$group] = $permissions;
+        else:
+            $permissions[$group] = array_merge($permissions[$group], $permissions);
+        endif;
     }
     /**
       *  Short description.
@@ -76,10 +88,14 @@ class AccessControlComponent extends Component {
         if($this->auth->loggedIn):
             if($this->auth->isPublic()):
                 return true;
-            elseif(Mapper::here() != "/home"):
-                return true;
             else:
-                return false;
+                $groups = $this->getGroups();
+                if($this->hasGroup($groups)):
+                    // check for permissions
+                        // check for user
+                else:
+                    return false;
+                endif;
             endif;
         else:
             return $this->auth->authorized();
@@ -99,6 +115,26 @@ class AccessControlComponent extends Component {
             return false;
         endif;
         return true;
+    }
+    /**
+      *  Short description.
+      *
+      *  @return array
+      */
+    public function getGroup() {
+        $user = $this->auth->user();
+        pr($user);
+    }
+    /**
+      *  Short description.
+      *
+      *  @param array $groups
+      *  @return boolean
+      */
+    public function hasGroup($groups) {
+        $allowedGroups = array_keys($this->permissions);
+        $diff = array_diff($allowedGroups, $groups);
+        return count($allowedGroups) == count($diff);
     }
 }
 
