@@ -29,6 +29,9 @@ class AccessControlComponent extends Component {
       *  Nome do modelo a ser utilizado para relacionar grupos e usuários.
       */
     public $userRoleModel = "UsersRoles";
+    /**
+     *  Lista de permissões de grupo.
+     */
     public $permissions = array();
     
     /**
@@ -85,10 +88,14 @@ class AccessControlComponent extends Component {
         if($this->auth->loggedIn):
             if($this->auth->isPublic()):
                 return true;
-            elseif(Mapper::here() != "/home"):
-                return true;
             else:
-                return false;
+                $groups = $this->getGroups();
+                if($this->hasGroup($groups)):
+                    // check for permissions
+                        // check for user
+                else:
+                    return false;
+                endif;
             endif;
         else:
             return $this->auth->authorized();
@@ -108,6 +115,26 @@ class AccessControlComponent extends Component {
             return false;
         endif;
         return true;
+    }
+    /**
+      *  Short description.
+      *
+      *  @return array
+      */
+    public function getGroup() {
+        $user = $this->auth->user();
+        pr($user);
+    }
+    /**
+      *  Short description.
+      *
+      *  @param array $groups
+      *  @return boolean
+      */
+    public function hasGroup($groups) {
+        $allowedGroups = array_keys($this->permissions);
+        $diff = array_diff($allowedGroups, $groups);
+        return count($allowedGroups) == count($diff);
     }
 }
 
