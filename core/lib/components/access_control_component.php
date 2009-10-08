@@ -33,6 +33,14 @@ class AccessControlComponent extends Component {
      *  Lista de permissões de grupo.
      */
     public $permissions = array();
+    /**
+      *  Short description.
+      */
+    public $userPermissions = array();
+    /**
+      *  Short description.
+      */
+    public $checkUserPermissions = false;
     
     /**
       *  Inicializa o componente.
@@ -76,9 +84,18 @@ class AccessControlComponent extends Component {
     }
     /**
       *  Short description.
+      *
+      *  @param string $user
+      *  @param array $permissions
+      *  @return void
       */
     public function allowUser($user, $permissions) {
-        
+        $this->checkUserPermissions = true;
+        if(!isset($this->permissions[$user])):
+            $this->permissions[$user] = $permissions;
+        else:
+            $this->permissions[$user] = array_merge($this->permissions[$user], $permissions);
+        endif;
     }
     /**
      *  Verifica se o usuário esta autorizado ou não para acessar a URL atual.
@@ -99,6 +116,14 @@ class AccessControlComponent extends Component {
                         endif;
                     endforeach;
                 endforeach;
+                if($this->checkUserPermissions):
+                    $user = $this->auth->user($this->auth->fields["username"]);
+                    foreach($this->userPermissions[$user] as $permission):
+                        if(Mapper::match($permission, $here)):
+                            return true;
+                        endif;
+                    endforeach;
+                endif;
                 return false;
             endif;
         else:
