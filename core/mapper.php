@@ -240,7 +240,14 @@ class Mapper extends Object {
         $path["here"] = $here;
         if(empty($path["controller"])) $path["controller"] = self::getRoot();
         if(empty($path["action"])) $path["action"] = "index";
-        if(!empty($path["prefix"])) $path["action"] = "{$path['prefix']}_{$path['action']}";
+        if(!empty($path["prefix"])):
+            $path["action"] = "{$path['prefix']}_{$path['action']}";
+        elseif($pos = strpos($path["action"], "_")):
+            if(in_array(substr($path["action"], 0, $pos), self::getPrefixes())):
+                $path["prefix"] = substr($path["action"], 0, $pos);
+                $path["action"] = substr($path["action"], $pos + 1);
+            endif;
+        endif;
         if(empty($path["id"])) $path["id"] = null;
         if(empty($path["extension"])) $path["extension"] = Config::read("defaultExtension");
         if(!empty($path["queryString"])):
