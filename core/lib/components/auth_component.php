@@ -90,7 +90,7 @@ class AuthComponent extends Component {
     public $secure = false;
 
     /**
-      *  Inicializa o component.
+      *  Inicializa o componente.
       *
       *  @param object $controller Objeto Controller
       *  @return void
@@ -99,7 +99,7 @@ class AuthComponent extends Component {
         $this->controller = $controller;
     }
     /**
-      *  Faz as operações necessárias após a inicialização do controller.
+      *  Faz as operações necessárias após a inicialização do componente.
       *
       *  @param object $controller Objeto Controller
       *  @return void

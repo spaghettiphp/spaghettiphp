@@ -10,28 +10,31 @@
 
 class AccessControlComponent extends Component {
     /**
-      *  Short description.
+      *  Instância do controller.
       */
     public $controller;
     /**
-      *  Short description.
+      *  Instância do AuthComponent.
       */
     public $auth;
     /**
-      *  Short description.
+      *  Define se AuthComponent::check() será chamado automaticamente.
       */
     public $autoCheck = true;
     /**
-      *  Short description.
+      *  Nome do modelo a ser utilizado para grupos.
       */
     public $roleModel = "Roles";
     /**
-      *  Short description.
+      *  Nome do modelo a ser utilizado para relacionar grupos e usuários.
       */
     public $userRoleModel = "UsersRoles";
     
     /**
-      *  Short description.
+      *  Inicializa o componente.
+      *
+      *  @param object $controller Objeto Controller
+      *  @return void
       */
     public function initialize(&$controller) {
         if(!isset($controller->AuthComponent)):
@@ -42,7 +45,10 @@ class AccessControlComponent extends Component {
         $this->auth->deny();
     }
     /**
-      *  Short description.
+      *  Faz as operações necessárias após a inicialização do componente.
+      *
+      *  @param object $controller Objeto Controller
+      *  @return void
       */
     public function startup(&$controller) {
         if($this->autoCheck):
@@ -62,8 +68,10 @@ class AccessControlComponent extends Component {
         
     }
     /**
-      *  Short description.
-      */
+     *  Verifica se o usuário esta autorizado ou não para acessar a URL atual.
+     *
+     *  @return boolean Verdadeiro caso o usuário esteja autorizado
+     */
     public function authorized() {
         if($this->auth->loggedIn):
             $here = Mapper::here();
@@ -83,7 +91,10 @@ class AccessControlComponent extends Component {
         endif;
     }
     /**
-      *  Short description.
+      *  Verifica se o usuário está autorizado a acessar a URL atual, tomando as
+      *  ações necessárias no caso contrário.
+      *
+      *  @return boolean Verdadeiro caso o usuário esteja autorizado
       */
     public function check() {
         if(!$this->authorized()):
