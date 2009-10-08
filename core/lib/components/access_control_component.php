@@ -46,6 +46,7 @@ class AccessControlComponent extends Component {
         endif;
         $this->controller = $controller;
         $this->auth = $controller->AuthComponent;
+        $this->auth->recursion = 2;
         $this->auth->deny();
     }
     /**
@@ -62,15 +63,15 @@ class AccessControlComponent extends Component {
     /**
       *  Permite acesso a um grupo de usuários.
       *
-      *  @param string $group Grupo a receber a permissão
+      *  @param string $role Grupo a receber a permissão
       *  @param array $permissions Permissões a serem dadas ao grupo
       *  @return void
       */
-    public function allow($group, $permissions) {
-        if(!isset($permissions[$group])):
-            $permissions[$group] = $permissions;
+    public function allow($role, $permissions) {
+        if(!isset($permissions[$role])):
+            $permissions[$role] = $permissions;
         else:
-            $permissions[$group] = array_merge($permissions[$group], $permissions);
+            $permissions[$role] = array_merge($permissions[$role], $permissions);
         endif;
     }
     /**
@@ -89,8 +90,8 @@ class AccessControlComponent extends Component {
             if($this->auth->isPublic()):
                 return true;
             else:
-                $groups = $this->getGroups();
-                if($this->hasGroup($groups)):
+                $roles = $this->getRoles();
+                if($this->hasRole($roles)):
                     // check for permissions
                         // check for user
                 else:
@@ -121,20 +122,26 @@ class AccessControlComponent extends Component {
       *
       *  @return array
       */
-    public function getGroup() {
+    public function getRoles() {
         $user = $this->auth->user();
-        pr($user);
+        $userRoleModel = Inflector::underscore($this->userRoleModel);
+        $roleModel = Inflector::underscore($this->roleModel);
+        $roles = array();
+        foreach($user[$userRoleModel] as $role):
+            $roles []= $role[$roleModel]["name"];
+        endforeach;
+        return $roles;
     }
     /**
       *  Short description.
       *
-      *  @param array $groups
+      *  @param array $roles
       *  @return boolean
       */
-    public function hasGroup($groups) {
-        $allowedGroups = array_keys($this->permissions);
-        $diff = array_diff($allowedGroups, $groups);
-        return count($allowedGroups) == count($diff);
+    public function hasRole($roles) {
+        $allowedRoles = array_keys($this->permissions);
+        $diff = array_diff($allowedRoles, $roles);
+        return count($allowedRoles) != count($diff);
     }
 }
 
