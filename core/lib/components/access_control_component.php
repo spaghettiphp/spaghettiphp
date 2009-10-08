@@ -34,11 +34,15 @@ class AccessControlComponent extends Component {
      */
     public $permissions = array();
     /**
-      *  Short description.
+      *  Lista de permissões de usuários.
       */
     public $userPermissions = array();
     /**
-      *  Short description.
+      *  Define se o componente checará permissões de grupo.
+      */
+    public $checkGroupPermissions = true;
+    /**
+      *  Define se o componente checará permissões específicas para usuários.
       */
     public $checkUserPermissions = false;
     
@@ -107,28 +111,50 @@ class AccessControlComponent extends Component {
             if($this->auth->isPublic()):
                 return true;
             else:
-                $here = Mapper::here();
-                $roles = $this->getRoles();
-                foreach($roles as $role):
-                    foreach($this->permissions[$role] as $permission):
-                        if(Mapper::match($permission, $here)):
-                            return true;
-                        endif;
-                    endforeach;
-                endforeach;
-                if($this->checkUserPermissions):
-                    $user = $this->auth->user($this->auth->fields["username"]);
-                    foreach($this->userPermissions[$user] as $permission):
-                        if(Mapper::match($permission, $here)):
-                            return true;
-                        endif;
-                    endforeach;
+                if(
+                    ($this->checkGroupPermissions && $this->authorizedGroup()) ||
+                    ($this->checkUserPermissions && $this->authorizedUser())
+                ):
+                    return true;
+                else:
+                    return false;
                 endif;
-                return false;
             endif;
         else:
             return $this->auth->authorized();
         endif;
+    }
+    /**
+      *  Short description.
+      *
+      *  @return boolean
+      */
+    public function authorizedGroup() {
+        $here = Mapper::here();
+        $roles = $this->getRoles();
+        foreach($roles as $role):
+            foreach($this->permissions[$role] as $permission):
+                if(Mapper::match($permission, $here)):
+                    return true;
+                endif;
+            endforeach;
+        endforeach;
+        return false;
+    }
+    /**
+      *  Short description.
+      *
+      *  @return boolean
+      */
+    public function authorizedUser() {
+        $here = Mapper::here();
+        $user = $this->auth->user($this->auth->fields["username"]);
+        foreach($this->userPermissions[$user] as $permission):
+            if(Mapper::match($permission, $here)):
+                return true;
+            endif;
+        endforeach;
+        return false;
     }
     /**
       *  Verifica se o usuário está autorizado a acessar a URL atual, tomando as
