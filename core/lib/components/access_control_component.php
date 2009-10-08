@@ -68,10 +68,10 @@ class AccessControlComponent extends Component {
       *  @return void
       */
     public function allow($role, $permissions) {
-        if(!isset($permissions[$role])):
-            $permissions[$role] = $permissions;
+        if(!isset($this->permissions[$role])):
+            $this->permissions[$role] = $permissions;
         else:
-            $permissions[$role] = array_merge($permissions[$role], $permissions);
+            $this->permissions[$role] = array_merge($this->permissions[$role], $permissions);
         endif;
     }
     /**
@@ -91,7 +91,7 @@ class AccessControlComponent extends Component {
                 return true;
             else:
                 $roles = $this->getRoles();
-                if($this->hasRole($roles)):
+                if(!empty($roles)):
                     // check for permissions
                         // check for user
                 else:
@@ -118,9 +118,9 @@ class AccessControlComponent extends Component {
         return true;
     }
     /**
-      *  Short description.
+      *  Retorna os grupos ao qual o usuário atual pertence.
       *
-      *  @return array
+      *  @return array Grupos ao qual o usuário pertence
       */
     public function getRoles() {
         $user = $this->auth->user();
@@ -128,20 +128,12 @@ class AccessControlComponent extends Component {
         $roleModel = Inflector::underscore($this->roleModel);
         $roles = array();
         foreach($user[$userRoleModel] as $role):
-            $roles []= $role[$roleModel]["name"];
+            $roleName = $role[$roleModel]["name"];
+            if(isset($this->permissions[$roleName])):
+                $roles []= $roleName;
+            endif;
         endforeach;
         return $roles;
-    }
-    /**
-      *  Short description.
-      *
-      *  @param array $roles
-      *  @return boolean
-      */
-    public function hasRole($roles) {
-        $allowedRoles = array_keys($this->permissions);
-        $diff = array_diff($allowedRoles, $roles);
-        return count($allowedRoles) != count($diff);
     }
 }
 
