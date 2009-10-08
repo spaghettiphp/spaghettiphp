@@ -88,6 +88,9 @@ class AuthComponent extends Component {
       *  Define um cookie seguro.
       */
     public $secure = false;
+    /**
+      *  Define o nível de recursão do modelo.
+      */
 
     /**
       *  Inicializa o componente.
@@ -221,7 +224,8 @@ class AuthComponent extends Component {
             "conditions" => array_merge(
                 $this->userScope,
                 $conditions
-            )
+            ),
+            "recursion" => is_null($this->recursion) ? $userModel->recursion : $this->recursion
         );
         return $this->user = $userModel->first($params);
     }
