@@ -55,7 +55,7 @@ class Mapper extends Object {
         return $instance[0];
     }
     /**
-     *  Getter para Mapper::here
+     *  Getter para Mapper::here.
      *
      *  @return string Valor de Mapper:here
      */
@@ -64,7 +64,7 @@ class Mapper extends Object {
         return $self->here;
     }
     /**
-     *  Getter para Mapper::base
+     *  Getter para Mapper::base.
      *
      *  @return string Valor de Mapper::base
      */
@@ -79,7 +79,7 @@ class Mapper extends Object {
      *  @param string $url URL a ser normalizada
      *  @return string URL normalizada
      */
-    public static function normalize($url = "") {
+    public static function normalize($url) {
         if(preg_match("/^[a-z]+:/", $url)):
             return $url;
         endif;
@@ -94,12 +94,12 @@ class Mapper extends Object {
         return $url;
     }
     /**
-     *  Define o controller padrão da aplicação
+     *  Define o controller padrão da aplicação.
      *
      *  @param string $controller Controller a ser definido como padrão
      *  @return true
      */
-    public static function root($controller = "") {
+    public static function root($controller) {
         $self = self::getInstance();
         $self->root = $controller;
         return true;
@@ -114,12 +114,12 @@ class Mapper extends Object {
         return $self->root;
     }
     /**
-     *  Short Description
+     *  Habilita um prefixo.
      *
-     *  @param string $prefix description
+     *  @param string $prefix Prefixo a ser habilitado
      *  @return true
      */
-    public static function prefix($prefix = "") {
+    public static function prefix($prefix) {
         $self = self::getInstance();
         if(is_array($prefix)) $prefixes = $prefix;
         else $prefixes = func_get_args();
@@ -129,12 +129,12 @@ class Mapper extends Object {
         return true;
     }
     /**
-     *  Remove um prefixo da lista
+     *  Remove um prefixo da lista.
      *
      *  @param string $prefix Prefixo a ser removido
      *  @return true
      */
-    public static function unsetPrefix($prefix = "") {
+    public static function unsetPrefix($prefix) {
         $self = self::getInstance();
         unset($self->prefixes[$prefix]);
         return true;
@@ -149,43 +149,42 @@ class Mapper extends Object {
         return $self->prefixes;
     }
     /**
-     *  Short Description
+     *  Conecta uma URL a uma rota do Spaghetti.
      *
-     *  @param string $url description
-     *  @param string $route description
-     *  @return mixed description
+     *  @param string $url URL a ser conectada
+     *  @param string $route Rota para a qual a URL será direcionada
+     *  @return true
      */
     public static function connect($url = null, $route = null) {
         if(is_array($url)):
             foreach($url as $key => $value):
                 self::connect($key, $value);
             endforeach;
-            return true;
         elseif(!is_null($url)):
             $self = self::getInstance();
             $url = self::normalize($url);
-            return $self->routes[$url] = rtrim($route, "/");
+            $self->routes[$url] = rtrim($route, "/");
         endif;
-        return false;
+        return true;
     }
     /**
-     *  Short Description
+     *  Desconecta uma URL de uma rota
      *
-     *  @param string $url description
+     *  @param string $url URL a ser desconectada
      *  @return true
      */
-    public static function disconnect($url = "") {
+    public static function disconnect($url) {
         $self = self::getInstance();
         $url = rtrim($url, "/");
         unset($self->routes[$url]);
         return true;
     }
     /**
-     *  Short description.
+     *  Verifica se uma URL é equivalente a outra.
      *
-     *  @param string $check
-     *  @param string $url
-     *  @return boolean
+     *  @param string $check URL a ser checada
+     *  @param string $url URL que checará a primeira
+     *  @return boolean Verdadeiro se as URLs são correspondentes
      */
     public static function match($check, $url = null) {
         if(is_null($url)):
@@ -195,10 +194,10 @@ class Mapper extends Object {
         return preg_match($check, $url);
     }
     /**
-     *  Short Description
+     *  Retorna a rota correspondente a uma URL.
      *
-     *  @param string $url description
-     *  @return string description
+     *  @param string $url URL a ser convertida para uma rota
+     *  @return string Rota para a URL provida
      */
     public static function getRoute($url) {
         $self = self::getInstance();
@@ -258,7 +257,7 @@ class Mapper extends Object {
      *  @param bool $full Verdadeiro para gerar uma URL completa
      *  @return string URL gerada para a aplicação
      */
-    public static function url($path = null, $full = false) {
+    public static function url($path, $full = false) {
         if(is_array($path)):
             $here = self::parse();
             $params = $here["named"];
@@ -272,7 +271,7 @@ class Mapper extends Object {
             $url = "";
             foreach($path as $key => $value):
                 if(!in_array($key, $nonParams)):
-                    $url .= "/" . self::param($key, $value);
+                    $url .= "/" . "{$key}:{$value}";
                 elseif(!is_null($value)):
                     $url .= "/" . $value;
                 endif;
@@ -289,9 +288,6 @@ class Mapper extends Object {
             $url = self::normalize($url);
         endif;
         return $full ? BASE_URL . $url : $url;
-    }
-    public static function param($key, $value) {
-        return "{$key}:{$value}";
     }
 }
 

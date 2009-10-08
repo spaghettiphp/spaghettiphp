@@ -19,6 +19,6 @@ Mapper::root("home");
  * Caso você precise de um painel de administração, você pode descomentar a linha
  * abaixo. Você também pode adicionar quantos prefixos mais forem necessários.
  */
-// Mapper::prefix("admin");
+Mapper::prefix("admin");
 
 ?>
