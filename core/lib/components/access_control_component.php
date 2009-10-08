@@ -52,6 +52,18 @@ class AccessControlComponent extends Component {
     /**
       *  Short description.
       */
+    public function allow($group, $permissions) {
+        
+    }
+    /**
+      *  Short description.
+      */
+    public function allowUser($user, $permissions) {
+        
+    }
+    /**
+      *  Short description.
+      */
     public function authorized() {
         if($this->auth->loggedIn):
             return true;
