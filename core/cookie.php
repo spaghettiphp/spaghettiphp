@@ -41,6 +41,11 @@ class Cookie extends Object {
     public function __construct() {
         $this->key = Config::read("securitySalt");
     }
+    /**
+     *  Retorna uma única instância (Singleton) da classe solicitada.
+     *
+     *  @return object Objeto da classe utilizada
+     */
     public static function getInstance() {
         if(!isset(self::$instance)):
             $c = __CLASS__;
