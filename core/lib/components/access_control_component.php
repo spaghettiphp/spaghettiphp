@@ -66,7 +66,10 @@ class AccessControlComponent extends Component {
       */
     public function authorized() {
         if($this->auth->loggedIn):
-            return true;
+            if(Mapper::here() == "/home")
+                return true;
+            else
+                return false;
         else:
             return $this->auth->authorized();
         endif;
