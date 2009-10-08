@@ -91,7 +91,7 @@ class AccessControlComponent extends Component {
                 return true;
             else:
                 $roles = $this->getRoles();
-                if($this->hasRole($roles)):
+                if(!empty($roles)):
                     // check for permissions
                         // check for user
                 else:
@@ -128,20 +128,12 @@ class AccessControlComponent extends Component {
         $roleModel = Inflector::underscore($this->roleModel);
         $roles = array();
         foreach($user[$userRoleModel] as $role):
-            $roles []= $role[$roleModel]["name"];
+            $roleName = $role[$roleModel]["name"];
+            if(isset($this->permissions[$roleName])):
+                $roles []= $roleName;
+            endif;
         endforeach;
         return $roles;
-    }
-    /**
-      *  Verifica se grupos possuem alguma permissão definida.
-      *
-      *  @param array $roles Grupos a serem verificados
-      *  @return boolean Verdadeiro se pelo menos um grupo possui permissões
-      */
-    public function hasRole($roles) {
-        $allowedRoles = array_keys($this->permissions);
-        $diff = array_diff($allowedRoles, $roles);
-        return count($allowedRoles) != count($diff);
     }
 }
 
