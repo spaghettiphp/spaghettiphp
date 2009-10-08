@@ -90,13 +90,16 @@ class AccessControlComponent extends Component {
             if($this->auth->isPublic()):
                 return true;
             else:
+                $here = Mapper::here();
                 $roles = $this->getRoles();
-                if(!empty($roles)):
-                    // check for permissions
-                        // check for user
-                else:
-                    return false;
-                endif;
+                foreach($roles as $role):
+                    foreach($this->permissions[$role] as $permission):
+                        if(Mapper::match($permission, $here)):
+                            return true;
+                        endif;
+                    endforeach;
+                endforeach;
+                return false;
             endif;
         else:
             return $this->auth->authorized();
