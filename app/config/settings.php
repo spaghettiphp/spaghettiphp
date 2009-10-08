@@ -24,12 +24,12 @@ Config::write("environment", "development");
 Config::write("debugMode", 1);
 
 /**
- *  Short description.
+ *  appEncoding define a codificação a ser enviada ao navegador pela aplicação.
  */
 Config::write("appEncoding", "utf-8");
 
 /**
- *  Short description.
+ *  securitySalt é uma string usada na criptografia de dados.
  */
 Config::write("securitySalt", "pokipoki");
 
