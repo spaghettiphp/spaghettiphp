@@ -30,7 +30,6 @@ class AccessControlComponent extends Component {
         endif;
         $this->controller = $controller;
         $this->auth = $controller->AuthComponent;
-        $this->auth->autoCheck = false;
         $this->auth->deny();
     }
     /**
@@ -46,9 +45,10 @@ class AccessControlComponent extends Component {
       */
     public function authorized() {
         if($this->auth->loggedIn):
-            
+            return true;
+        else:
+            return $this->auth->authorized();
         endif;
-        return true;
     }
     /**
       *  Short description.
