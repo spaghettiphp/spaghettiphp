@@ -17,8 +17,17 @@ class AccessControlComponent extends Component {
       *  Short description.
       */
     public $auth;
+    /**
+      *  Short description.
+      */
     public $autoCheck = true;
+    /**
+      *  Short description.
+      */
     public $roleModel = "Roles";
+    /**
+      *  Short description.
+      */
     public $userRoleModel = "UsersRoles";
     
     /**
