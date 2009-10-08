@@ -296,8 +296,8 @@ class AuthComponent extends Component {
       *  @param string $error Nome do erro
       *  @return void
       */
-    public function error($error) {
-        $this->controller->set("authError", $error);
+    public function error($type, $details = array()) {
+        $this->controller->set("authError", $type);
     }
 }
 
