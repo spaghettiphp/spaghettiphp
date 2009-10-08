@@ -73,8 +73,8 @@ class AccessControlComponent extends Component {
                     $authorized = $permission;
                 endif;
             endforeach;
-            if($authorized) return true
-            else if(Mapper::here() == "/home")
+            if($authorized) return true;
+            elseif(Mapper::here() == "/home")
                 return true;
             else
                 return false;
