@@ -118,9 +118,9 @@ class AccessControlComponent extends Component {
         return true;
     }
     /**
-      *  Short description.
+      *  Retorna os grupos ao qual o usuário atual pertence.
       *
-      *  @return array
+      *  @return array Grupos ao qual o usuário pertence
       */
     public function getRoles() {
         $user = $this->auth->user();
@@ -133,10 +133,10 @@ class AccessControlComponent extends Component {
         return $roles;
     }
     /**
-      *  Short description.
+      *  Verifica se grupos possuem alguma permissão definida.
       *
-      *  @param array $roles
-      *  @return boolean
+      *  @param array $roles Grupos a serem verificados
+      *  @return boolean Verdadeiro se pelo menos um grupo possui permissões
       */
     public function hasRole($roles) {
         $allowedRoles = array_keys($this->permissions);
