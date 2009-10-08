@@ -46,6 +46,7 @@ class AccessControlComponent extends Component {
         endif;
         $this->controller = $controller;
         $this->auth = $controller->AuthComponent;
+        $this->auth->recursion = 2;
         $this->auth->deny();
     }
     /**
@@ -121,9 +122,15 @@ class AccessControlComponent extends Component {
       *
       *  @return array
       */
-    public function getGroup() {
+    public function getGroups() {
         $user = $this->auth->user();
-        pr($user);
+        $userRoleModel = Inflector::underscore($this->userRoleModel);
+        $roleModel = Inflector::underscore($this->roleModel);
+        $roles = array();
+        foreach($user[$userRoleModel] as $role):
+            $roles []= $role[$roleModel]["name"];
+        endforeach;
+        return $roles;
     }
     /**
       *  Short description.
