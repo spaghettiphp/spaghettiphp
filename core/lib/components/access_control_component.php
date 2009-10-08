@@ -68,10 +68,10 @@ class AccessControlComponent extends Component {
       *  @return void
       */
     public function allow($role, $permissions) {
-        if(!isset($permissions[$role])):
-            $permissions[$role] = $permissions;
+        if(!isset($this->permissions[$role])):
+            $this->permissions[$role] = $permissions;
         else:
-            $permissions[$role] = array_merge($permissions[$role], $permissions);
+            $this->permissions[$role] = array_merge($this->permissions[$role], $permissions);
         endif;
     }
     /**
