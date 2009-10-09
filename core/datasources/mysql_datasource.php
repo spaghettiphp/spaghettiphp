@@ -10,13 +10,37 @@
  */
 
 class MysqlDatasource extends Datasource {
+    /**
+     *  Descrição das tabelas do banco de dados.
+     */
     protected $schema = array();
+    /**
+     *  Lista das tabelas contidas no banco de dados.
+     */
     protected $sources = array();
+    /**
+     *  Conexão utilizada pelo banco de dados.
+     */
     protected $connection;
+    /**
+     *  Resultado das consultas ao banco de dados.
+     */
     protected $results;
+    /**
+     *  Verifica se a transação foi iniciada.
+     */
     protected $transactionStarted = false;
+    /**
+     *  Métodos de comparação utilizados nas SQLs.
+     */
     protected $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE", "REGEXP");
+    /**
+     *  Métodos de lógica utilizados nas SQLs.
+     */
     protected $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
+    /**
+     *  Verifica se o banco de dados está conectado.
+     */
     public $connected = false;
 
     /**
