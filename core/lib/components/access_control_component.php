@@ -1,10 +1,10 @@
 <?php
 /**
- *  Short description.
+ *  AccessControlComponent é um componente responsável pela autorização de usuários,
+ *  através de permissões dadas a grupos ou usuários.
  *
- *  @author    José Cláudio Medeiros de Lima <contato@claudiomedeiros.net>
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- *  @copyright Copyright 2009, José Cláudio Medeiros de Lima <contato@claudiomedeiros.net>
+ *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  *
  */
 
@@ -87,10 +87,10 @@ class AccessControlComponent extends Component {
         endif;
     }
     /**
-      *  Short description.
+      *  Permite acesso a um usuário específico.
       *
-      *  @param string $user
-      *  @param array $permissions
+      *  @param string $user Usuário a receber a permissão
+      *  @param array $permissions Permissões a serem dadas ao usuário
       *  @return void
       */
     public function allowUser($user, $permissions) {
@@ -125,9 +125,10 @@ class AccessControlComponent extends Component {
         endif;
     }
     /**
-      *  Short description.
+      *  Verifica se um usuário está autorizado a acessar uma URL através de permissões
+      *  de grupo.
       *
-      *  @return boolean
+      *  @return boolean Verdadeiro se o usuário está autorizado
       */
     public function authorizedGroup() {
         $here = Mapper::here();
@@ -142,9 +143,10 @@ class AccessControlComponent extends Component {
         return false;
     }
     /**
-      *  Short description.
+      *  Verifica se um usuário está autorizado a acessar uma URL através de permissões
+      *  específicas do usuário.
       *
-      *  @return boolean
+      *  @return boolean Verdadeiro se o usuário está autorizado
       */
     public function authorizedUser() {
         $here = Mapper::here();
