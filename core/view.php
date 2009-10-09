@@ -107,6 +107,7 @@ class View extends Object {
         $file = App::path("View", "{$controller}/{$action}.{$ext}");
         if($file):
             $output = $this->renderView($file, $this->data);
+            $layout = is_null($layout) ? $this->layout : $layout;
             if($this->autoLayout && $layout):
                 $output = $this->renderLayout($output, $layout, $ext);
             endif;
