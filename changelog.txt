@@ -1,4 +1,16 @@
-version 0.2b (2009-10-15)
+version 0.2 (2009-12-01)
+    * Fixed some more scrict errors
+    * Fixed PaginationHelper's double URL encoding
+    * Complete API documentation
+    * AuthComponent checks for autoCheck when running at startup
+    * Fixed insecure behavior with prefixed actions
+
+version 0.2b (2009-10-06)
+    * Added Session support
+    * AuthComponent remembers the page being accessed when permission is denied
+    * AuthComponent now uses sha1() with securitySalt as hashing standard
+    * AuthComponent support for various types of password hashing
+    * AuthComponent support for cookie duration, path and domain
     * Added array support for Mapper::url()
     * Added data validation support for Model
     * Added Model::toList()
