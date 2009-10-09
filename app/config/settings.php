@@ -31,6 +31,6 @@ Config::write("appEncoding", "utf-8");
 /**
  *  securitySalt é uma string usada na criptografia de dados.
  */
-Config::write("securitySalt", "pokipoki");
+Config::write("securitySalt", "12345678910111213141516");
 
 ?>
