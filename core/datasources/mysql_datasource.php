@@ -31,15 +31,15 @@ class MysqlDatasource extends Datasource {
      */
     protected $transactionStarted = false;
     /**
-     *  Métodos de comparação utilizados nas SQL's.
+     *  Métodos de comparação utilizados nas SQLs.
      */
     protected $comparison = array("=", "<>", "!=", "<=", "<", ">=", ">", "<=>", "LIKE", "REGEXP");
     /**
-     *  Métodos de lógica utilizados nas SQL's.
+     *  Métodos de lógica utilizados nas SQLs.
      */
     protected $logic = array("or", "or not", "||", "xor", "and", "and not", "&&", "not");
     /**
-     *  Verifica se o banco de dados esta conectado.
+     *  Verifica se o banco de dados está conectado.
      */
     public $connected = false;
 

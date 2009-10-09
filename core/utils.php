@@ -1,6 +1,6 @@
 <?php
 /**
- *  Funções para us geral, na qual ajudam no desenvolvimento do seu projeto com
+ *  Funções para uso geral, que ajudam no desenvolvimento do seu projeto com
  *  o Spaghetti, facilitando na vizualização e comparação dos dados.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
@@ -12,18 +12,22 @@
  *  Exibe os dados repassados para processamento visual.
  *
  *  @param array $data Dados a serem observados
+ *  @return void
  */
 function pr($data) {
     echo "<pre>" . print_r($data, true) . "</pre>";
 }
+
 /**
  *  Retorna os dados enviados em forma de string para exibí-los no navegador.
  * 
  *  @param array $data Dados a serem observados
+ *  @return void
  */
 function dump($data) {
     pr(var_export($data, true));
 }
+
 /**
  *  Analisa um texto, retornando o mesmo de acordo com a condição informada.
  * 
@@ -57,13 +61,14 @@ function pick() {
  *
  *  @param array $array Array a ser utilizado
  *  @param string $index Índice a ser utilizado
- *  @return array Array limpo
+ *  @return array Item removido
  */
 function array_unset(&$array = array(), $index = "") {
     $item = $array[$index];
     unset($array[$index]);
     return $item;
 }
+
 /**
  *  Verifica se um método é público para o objeto em questão.
  *
