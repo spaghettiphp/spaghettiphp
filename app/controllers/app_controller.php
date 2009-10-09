@@ -5,6 +5,7 @@ class AppController extends Controller {
     public function beforeFilter() {
         $this->AuthComponent->allow("/");
         $this->AccessControlComponent->allow("admin", array("/home/index"));
+        pr($this->AccessControlComponent->getGroups());
     }
 }
 
