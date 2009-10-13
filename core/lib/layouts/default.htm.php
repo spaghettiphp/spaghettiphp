@@ -1,29 +1,217 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>Spaghetti* Framework</title>
+        <style type="text/css">
+            * {
+                margin:0;
+                padding:0;
+            }
+            html {
+                background: #37312F;
+            }
+            body {
+                background: #23201E;
+                color: #FFFFFF;
+                font: 12px "Helvetica", "Arial", sans-serif;
+                margin: 40px auto;
+                padding: 50px 70px;
+                width: 580px;
+            }
+            
+            hr {
+                border: none;
+                clear: both;
+            }
+            
+            header {
+                border-bottom: 1px solid #444140;
+                display: block;
+                padding-bottom: 40px;
+            }
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link rel="shortcut icon" href="http://spaghettiphp.org/images/favicon.png" type="image/png" />
-    <title>Spaghetti* Framework &mdash; Seja bem vindo!</title>
+                header #logo {
+                    color: #FFFFFF;
+                    font-size: 26px;
+                    font-weight: bold;
+                    letter-spacing: -2px;
+                    text-decoration: none;
+                }
+                    header #logo span {
+                        color: #99CC00;
+                    }
+                    
+                header #info {
+                    -moz-border-radius: 3px;
+                    -webkit-border-radius: 3px;
+                    border: 1px solid #2F2C2A;
+                    color: #99CC00;
+                    display: block;
+                    float: right;
+                    font-size: 11px;
+                    height: 20px;
+                    line-height: 20px;
+                    outline: none;
+                    margin-top: 5px;
+                    text-align: center;
+                    text-decoration: none;
+                    width: 175px;
+                }
+                
+                    header #info:hover {
+                        background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #23201E), color-stop(1.0, #111111));
+                        border-color: #444140;
+                    }
+                    
+                    header #info:active,
+                    header #info.on {
+                        background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #111111), color-stop(1.0, #23201E));
+                        color: #FFFFFF;
+                    }
+            
+            section#environment {
+                border-bottom: 1px solid #444140;
+                display: none;
+                padding: 20px 0;
+            }
+            
+                section#environment table {
+                    -moz-border-radius: 3px;
+                    -webkit-border-radius: 3px;
+                    border-collapse: collapse;
+                    border: 1px solid #2F2C2A;
+                    width: 100%;
+                }
+                
+                section#environment table th {
+                    background: #282422;
+                    border-bottom: 1px solid #37312F;
+                    padding: 5px 8px;
+                    text-align: left;
+                    width: 180px;
+                }
+                
+                section#environment table td {
+                    border-bottom: 1px solid #2F2C2A;
+                    padding: 5px 8px;
+                    text-align: left;
+                }
+            
+            section#head {
+                border-bottom: 1px solid #444140;
+                display: block;
+                padding: 40px 0;
+            }
+            
+                section#head h1 {
+                    color: #99CC00;
+                    font: lighter 36px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, arial, sans-serif;
+                    margin-bottom: 20px;
+                }
+                
+                section#head p {
+                    font-size: 15px;
+                    line-height: 22px;
+                }
+            
+            section.features {
+                border-bottom: 1px solid #444140;
+                clear: both;
+                display: block;
+                padding: 40px 0;
+            }
+            
+                section.features div {
+                    float: left;
+                    width: 275px;
+                }
+                
+                    section.features div h2 {
+                        color: #99CC00;
+                        font-size: 16px;
+                        font-weight: normal    ;
+                        margin-bottom: 20px;
+                    }
+                    
+                    section.features div p {
+                        line-height: 18px;
+                    }
+                
+                    section.features div:first-child {
+                        margin-right: 20px;
+                    }
+            
+            footer {
+                display: block;
+                padding-top: 40px;
+            }
+            
+                footer p {
+                    color: #37312F;
+                    font-size: 18px;
+                    text-align: center;
+                }
+        </style>
+    </head>
     
-    <?php echo $html->stylesheet("spaghetti.css"); ?>
-    
-    <script type="text/javascript">
-        window.onload = function(){
-            var list = document.getElementsByTagName("ol")[0].getElementsByTagName("li");
-            for(i=0; i<list.length; i++){
-                var title = list[i].getElementsByTagName("strong")[0]
-                title.onclick = function() {
-                    var text = this.parentNode.getElementsByTagName("p")[0]
-                    text.style.display = (text.style.display=="block")? "none" : "block"
+    <body>
+        <header>
+            <a href="http://spaghettiphp.org" id="logo">Spaghetti<span>*</span></a>
+            <a href="#" id="info" onclick="return Environment.toggle()">informações sobre o ambiente</a>
+        </header>
+
+        <section id="environment">
+            <table>
+                <tbody>
+                    <tr>
+        
+                        <th>Versão do PHP</th>
+                        <td>5.2.2</td>
+                    </tr>
+                    <tr>
+                        <th>Versão do MySQL</th>
+                        <td>5.1.3</td>
+                    </tr>
+                    <tr>
+                        <th>Versão do Apache</th>
+                        <td>0.1.2 alpha</td>
+                    </tr>
+                    <tr>
+                        <th>Versão do PHPMyAdmin</th>
+                        <td>12.6</td>
+                    </tr>
+                    <tr>
+                        <th>Caminho raiz</th>
+                        <td>/Users/rafael/Sites/spgsite</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <?php echo $this->contentForLayout ?>
+        
+        <footer>
+            <p>Obrigado por usar Spaghetti* :)</p>
+        </footer>
+
+        <script type="text/javascript">
+            var Environment = {
+                container: document.getElementById("environment"),
+                link: document.getElementById("info"),
+                open: function() {
+                    this.container.style.display = "block"
+                    this.link.className = "on"
+                },
+                close: function() {
+                    this.container.style.display = "none"
+                    this.link.className = ""
+                },
+                toggle: function() {
+                    this.container.style.display == "block" ? this.close() : this.open()
+					return false
                 }
             }
-        }
-    </script>
-</head>
-<body>
-
-<?php echo $this->contentForLayout ?> 
-
-</body>
+        </script>
+    </body>
 </html>
