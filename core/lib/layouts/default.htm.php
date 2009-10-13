@@ -165,26 +165,24 @@
             <table>
                 <tbody>
                     <tr>
-        
+                        <th>Ambiente</th>
+                        <td><?php echo Config::read("environment") ?></td>
+                    </tr>
+                    <tr>
                         <th>Versão do PHP</th>
-                        <td>5.2.2</td>
+                        <td><?php echo phpversion() ?></td>
                     </tr>
+					<?php if(function_exists("apache_get_version")): ?>
                     <tr>
-                        <th>Versão do MySQL</th>
-                        <td>5.1.3</td>
+                        <th>Servidor</th>
+                        <td><?php echo apache_get_version() ?></td>
                     </tr>
-                    <tr>
-                        <th>Versão do Apache</th>
-                        <td>0.1.2 alpha</td>
-                    </tr>
-                    <tr>
-                        <th>Versão do PHPMyAdmin</th>
-                        <td>12.6</td>
-                    </tr>
+					<?php endif ?>
                     <tr>
                         <th>Caminho raiz</th>
-                        <td>/Users/rafael/Sites/spgsite</td>
+                        <td><?php echo ROOT ?></td>
                     </tr>
+					
                 </tbody>
             </table>
         </section>
