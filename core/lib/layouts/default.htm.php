@@ -165,6 +165,10 @@
             <table>
                 <tbody>
                     <tr>
+                        <th>Versão do Spaghetti*</th>
+                        <td><?php echo SPAGHETTI_VERSION ?></td>
+                    </tr>
+                    <tr>
                         <th>Ambiente</th>
                         <td><?php echo Config::read("environment") ?></td>
                     </tr>

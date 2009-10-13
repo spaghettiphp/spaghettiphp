@@ -17,6 +17,11 @@ if(version_compare(PHP_VERSION, "5.0") < 0):
 endif;
 
 /**
+  *  Versão atual do Spaghetti*.
+  */
+define("SPAGHETTI_VERSION", "0.2b");
+
+/**
  *  Alias para DIRECTORY_SEPARATOR. Use para separar diretórios em definições de
  *  constantes.
  */
