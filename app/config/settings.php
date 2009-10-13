@@ -6,7 +6,8 @@
 
 /**
  * defaultExtension define a extensão de arquivo padrão quando nenhuma outra for
- * usada na URL da requisição.
+ * usada na URL da requisição. Desta maneira, seus arquivos de views deverão se chamar
+ * nome_do_arquivo.EXTENSAO.php
  */
 Config::write("defaultExtension", "htm");
 
