@@ -1,106 +1,207 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>Spaghetti* Framework</title>
+		
+		<style type="text/css">
+			* {
+				margin:0;
+				padding:0;
+			}
+			html {
+				background: #37312F;
+			}
+			body {
+				background: #23201E;
+				color: #FFFFFF;
+				font: 12px "Helvetica", "Arial", sans-serif;
+				margin: 40px auto;
+				padding: 50px 70px;
+				width: 580px;
+			}
+			
+			hr {
+				border: none;
+				clear: both;
+			}
+			
+			header {
+				border-bottom: 1px solid #444140;
+				display: block;
+				padding-bottom: 40px;
+			}
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Spaghetti* &mdash; Erro</title>
+				header #logo {
+					color: #FFFFFF;
+					font-size: 26px;
+					font-weight: bold;
+					letter-spacing: -2px;
+					text-decoration: none;
+				}
+					header #logo span {
+						color: #99CC00;
+					}
+					
+				header #info {
+					-moz-border-radius: 3px;
+					-webkit-border-radius: 3px;
+					border: 1px solid #2F2C2A;
+					color: #99CC00;
+					display: block;
+					float: right;
+					font-size: 11px;
+					height: 20px;
+					line-height: 20px;
+					outline: none;
+					margin-top: 5px;
+					text-align: center;
+					text-decoration: none;
+					width: 175px;
+				}
+				
+					header #info:hover {
+						background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #23201E), color-stop(1.0, #111111));
+						border-color: #444140;
+					}
+					
+					header #info:active,
+					header #info.on {
+						background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #111111), color-stop(1.0, #23201E));
+						color: #FFFFFF;
+					}
+			
+			section#environment {
+				border-bottom: 1px solid #444140;
+				display: none;
+				padding: 20px 0;
+			}
+			
+				section#environment table {
+					-moz-border-radius: 3px;
+					-webkit-border-radius: 3px;
+					border-collapse: collapse;
+					border: 1px solid #2F2C2A;
+					width: 100%;
+				}
+				
+				section#environment table th {
+					background: #282422;
+					border-bottom: 1px solid #37312F;
+					padding: 5px 8px;
+					text-align: left;
+					width: 180px;
+				}
+				
+				section#environment table td {
+					border-bottom: 1px solid #2F2C2A;
+					padding: 5px 8px;
+					text-align: left;
+				}
+			
+			section#error {
+				border-bottom: 1px solid #444140;
+				display: block;
+				padding: 40px 0;
+			}
+			
+				section#error h1 {
+					color: #FFCC00;
+					font: lighter 30px/28px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, arial, sans-serif;
+					float: right;
+					margin-bottom: 20px;
+					width: 530px;
+				}
+				
+				section#error p {
+					clear: both;
+					font-size: 15px;
+					line-height: 22px;
+				}
+				
+				section#error .icon {
+					color: #FFCC00;
+					font-size: 55px;
+					display: block;
+					float: left;
+					font: 36px/32px Arial, Verdana, sans-serif;
+				}
+		
+			footer {
+				display: block;
+				padding-top: 40px;
+			}
+			
+				footer p {
+					color: #37312F;
+					font: lighter 16px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, arial, sans-serif;
+					text-align: center;
+				}
+		</style>
+    </head>
     
-    <style type="text/css">
-        
-        * {
-            margin: 0;
-            padding: 0;
-        }
-        
-        html {
-            text-align: center;
-        }
-        
-        body {
-            background: #EEE;
-            font: 12px "Arial","Verdana","Tahoma",sans-serif;
-            margin: 0 auto;
-            text-align: left;
-            width: 780px;
-        }
-        
-        #header {
-            background: #C00;
-            margin-top: 35px;
-            margin-bottom: 25px;
-            padding: 20px;
-        }
-        
-            #header h1 {
-                color: #760000;
-                font: bold 40px "Helvetica", "Arial", sans-serif;
-                letter-spacing: -2px;
-                margin-bottom: 10px;
-                width: 640px;
+    <body>
+        <header>
+            <a href="http://spaghettiphp.org" id="logo">Spaghetti<span>*</span></a>
+            <a href="#" id="info" onclick="return Environment.toggle()">informações sobre o ambiente</a>
+        </header>
+
+        <section id="environment">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Versão do Spaghetti*</th>
+                        <td><?php echo SPAGHETTI_VERSION ?></td>
+                    </tr>
+                    <tr>
+                        <th>Ambiente</th>
+                        <td><?php echo Config::read("environment") ?></td>
+                    </tr>
+                    <tr>
+                        <th>Versão do PHP</th>
+                        <td><?php echo phpversion() ?></td>
+                    </tr>
+					<?php if(function_exists("apache_get_version")): ?>
+                    <tr>
+                        <th>Servidor</th>
+                        <td><?php echo apache_get_version() ?></td>
+                    </tr>
+					<?php endif ?>
+                    <tr>
+                        <th>Caminho raiz</th>
+                        <td><?php echo ROOT ?></td>
+                    </tr>
+					
+                </tbody>
+            </table>
+        </section>
+		
+		<section id="error">
+			<span class="icon">⚠</span>
+        	<?php echo $this->contentForLayout ?>
+        </section>
+
+        <footer>
+            <p>Obrigado por usar Spaghetti* :)</p>
+        </footer>
+
+        <script type="text/javascript">
+            var Environment = {
+                container: document.getElementById("environment"),
+                link: document.getElementById("info"),
+                open: function() {
+                    this.container.style.display = "block"
+                    this.link.className = "on"
+                },
+                close: function() {
+                    this.container.style.display = "none"
+                    this.link.className = ""
+                },
+                toggle: function() {
+                    this.container.style.display == "block" ? this.close() : this.open()
+					return false
+                }
             }
-            
-            #header h1 span.color1 {
-                color: #4B0000;
-            }
-            
-            #header h1 span.color2 {
-                color: #FFF;
-            }
-        
-        #content {
-            border: 1px solid #CCC;
-            border-width: 1px 0;
-            background: #FFF;
-            padding: 20px;
-        }
-        
-            #content h1 {
-                color: #AAA;
-                font: bold 32px "Helvetica", "Arial", sans-serif;
-                letter-spacing: -2px;
-            }
-            
-            #content p {
-                color: #666;
-                font-size: 13px;
-                line-height: 20px;
-            }
-        
-        #footer {
-            color: #666;
-            padding: 10px 20px;
-        }
-        
-            #footer small {
-                font-size: 11px;
-            }
-        
-    </style>
-    
-</head>
-<body>
-    
-    <?php $title = array(
-        "Ops, acho que deu algo errado.",
-        "<em>Houston, we have a problem!</em>",
-        "E agora, quem poder&aacute; nos defender?",
-        "Temos um problema que precisa ser corrigido.",
-        "Voc&ecirc; deveria dar uma olhada no erro abaixo.",
-        "A baga&ccedil;a n&atilde;o funciona.",
-    ); ?>
-    
-    <div id="header">
-        <h1><?php echo $title[array_rand($title)]; ?></h1>
-        <img src="data:image/gif;base64,R0lGODlheQAgAMQAAMwAAOygoNlAQPzw8OJwcNIgIPbQ0NxQUPLAwOmQkM8QEP///9YwMPng4O+wsN9gYOaAgP//MwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEHABEALAAAAAB5ACAAAAX/ICCOZGmeaKqubOu+cCzPdG3fswI5DO7PhQeEIPjJBItF0egiJCElAaHFQCSvi0CB2UIquS3Ik+Ql9UyMARYLBau8y1the4qPHgjEg5wUCRpfJVYLEAp+CQZuK3A4CYQmCn1UfQ9JA3tmSVOKMIw3Vm18CysPS4AAgAmGJWILqy4CdiaxdCxBCQeeDAKvJ7tnJKCzkimAWgWFAcCsxCcFVgUKAVgJUYNJDYUkBQGAa4RwEGpJCL0A0uMLA9oJCGoNeXntBuTxCADPDbwOltUiBwgcyKq0YBMKNRDorXEwQkE6LIn8PLzSIEGsJPzWNHilQOGaRNfWOPq2IJEnAQ4Q/xwYkWCcA45qBhg0kRHCEgEK4xxQJqJAxj0OFzRYCYABvwFbvAQ4YMjnGBHTCDWN+kAIOQhYISAblNUmAE8jGATQMWdagxIEhWo10apEgST+DmYB4GTBMlRzwYoAFBFAkgAl6AH2+4jZqChJ4ihwdFaoH0xmQmoh0TbwgnsprNzj15elY70ARopgkIToCM0inlJu5iexiAfj9iS5OytjEsiVg11WgRq14a+uVx/WS3qBP9Ujco84KXRJ8BU6rixRLsK3CAUCuqrZXNIEY+CBkkvyYiAB1pbBkYugDj7OsucsijMEwN76SCyA7rW6C4gh6MpehHTbCOrRx1p7KBARw/80A6x3oG8jDZBHAAKg9pZQRBnl2n/jJSZAAHmsRWBhwg0THg6V1bcbYfOdtuJ9awzG4XDwmVAge6DZYJaDh5FAzz2gWfeAN9hANmNrC5h2AlxsJWFOjiwoAFlYf/FoR3FQFKckAEIuUEAsT9ZYWSQLtHgdAXRYcRZiC0yJYAyM4RILenbxOMBN3tABiD6H7DkCIOYsJyYxGSVAxwH0NAgAQWMtOh8gd+IjEJQrCIgFbiRpMsIB3wzAqZciqDGpAMsc2dNEV5jmkXQAfIoFApQu4sBDk4k3AJ0lbXkAkQj00IABRMFoSRumXhfAQzyQIM0Vt66y6xUGXHSiDL+cUNlZLoGGxUsKD6xaoAtfyqJsLL4IUAsnPLrRkTrotusCez94QZu79IrXIw0fummgK/X2+5sNIyFAhAA7kePvweneYNtH2SKM7gMBzFSDAO1Y4oC+Dmes8cYohAAAOw==" alt="Spaghetti* Framework" />
-    </div>
-    
-    <div id="content">
-        <?php echo $this->contentForLayout ?>
-    </div>
-    
-    <div id="footer">
-        <small>Spaghetti* Framework 0.2b</small>
-    </div>
-    
-</body>
+        </script>
+    </body>
 </html>
