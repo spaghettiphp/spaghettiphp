@@ -33,9 +33,10 @@ class UploadComponent extends Component {
     /**
      *  Inicializa o componente, padronizando o componente de $_FILES.
      *
+     *  @param object $controller Objeto controller
      *  @return void
      */
-    public function initialize() {
+    public function initialize(&$controller) {
         foreach($_FILES as $file => $content):
             if(is_array($content["name"])):
                 foreach($content["name"] as $name => $value):
@@ -132,11 +133,12 @@ class UploadComponent extends Component {
     /**
      *  Adiciona um novo erro ao componente.
      *
-     *  @param string $message Mensagem de erro
+     *  @param string $type Mensagem de erro
+     *  @param array $details Detalhes do erro
      *  @return false
      */
-    public function error($message = "") {
-        $this->errors []= $message;
+    public function error($type = "", $details = array()) {
+        $this->errors []= $type;
         return false;
     }
     /**
