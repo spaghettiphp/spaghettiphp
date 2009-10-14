@@ -92,7 +92,7 @@ class FormHelper extends HtmlHelper {
         $content = "";
         foreach($selectOptions as $key => $value):
             $optionAttr = array("value" => $key);
-            if($key === $options["value"]):
+            if((string) $key === (string) $options["value"]):
                 $optionAttr["selected"] = true;
                 unset($options["value"]);
             endif;
