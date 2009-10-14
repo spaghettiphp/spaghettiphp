@@ -187,7 +187,7 @@
 			
 				footer p {
 					color: #37312F;
-					font-size: 18px;
+					font: lighter 16px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, arial, sans-serif;
 					text-align: center;
 				}
 		</style>
