@@ -191,16 +191,9 @@ class FormHelper extends HtmlHelper {
             "currentMonth" => date("m"),
             "currentYear" => date("Y")
         ), $options);
-        $days = $months = $years = array();
-        for($i = 1; $i < 32; $i++):
-            $days[$i] = $i;
-        endfor;
-        for($i = 1; $i < 13; $i++):
-            $months[$i] = $i;
-        endfor;
-        for($i = $options["startYear"]; $i < $options["endYear"] + 1; $i++):
-            $years[$i] = $i;
-        endfor;
+        $days = array_range(1, 31);
+        $months = array_range(1, 12);
+        $years = array_range($options["startYear"], $options["endYear"]);
         $selectDay = $this->select($name . "[d]", array("value" => $options["currentDay"], "options" => $days));
         $selectMonth = $this->select($name . "[m]", array("value" => $options["currentMonth"], "options" => $months));
         $selectYear = $this->select($name . "[y]", array("value" => $options["currentYear"], "options" => $years));

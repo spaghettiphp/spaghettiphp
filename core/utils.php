@@ -56,4 +56,19 @@ function can_call_method(&$object, $method) {
     return false;
 }
 
+/**
+  *  Cria um array preenchido com uma sequência.
+  *
+  *  @param integer $min Valor mínimo
+  *  @param integer $max Valor máximo
+  *  @return array Sequência
+  */
+function array_range($min, $max) {
+    $result = array();
+    for($i = $min; $i < $max + 1; $i++):
+        $result[$i] = $i;
+    endfor;
+    return $result;
+}
+
 ?>
