@@ -147,28 +147,31 @@ class FormHelper extends HtmlHelper {
         ), $options);
         $label = array_unset($options, "label");
         $div = array_unset($options, "div");
-        if($options["type"] == "select"):
-            $selectOptions = $options;
-            unset($selectOptions["type"]);
-            $input = $this->select($name, $selectOptions);
-        elseif($options["type"] == "textarea"):
-            $input = $this->tag("textarea", array_unset($options, "value"), $options);
-        elseif($options["type"] == "radio"):
-            $label = false;
-            $input = $this->radio($name, $options);
-        elseif($options["type"] == "date"):
-            $input = $this->date($name, $options);
-        else:
-            if($options["type"] == "hidden"):
-                $div = $label = false;
-            elseif($name == "password"):
-                $options["type"] = "password";
-            endif;
-            $input = $this->tag("input", null, $options, false);
-        endif;
+        switch($options["type"]):
+            case "select":
+                $selectOptions = $options;
+                unset($selectOptions["type"]);
+                $input = $this->select($name, $selectOptions);
+                break;
+            case "radio":
+                $label = false;
+                $input = $this->radio($name, $options);
+                break;
+            case "date":
+                $input = $this->date($name, $options);
+                break;
+            default:
+                if($options["type"] == "hidden"):
+                    $div = $label = false;
+                elseif($name == "password"):
+                    $options["type"] = "password";
+                endif;
+                $input = $this->tag("input", null, $options, false);
+        endswitch;
         if($label):
             $input = $this->tag("label", $label, array("for" => $options["id"])) . $input;
         endif;
+        
         if($div):
             if($div === true):
                 $div = "input {$options['type']}";
@@ -181,6 +184,7 @@ class FormHelper extends HtmlHelper {
      *  Cria um conjunto de caixa de seleção para a data.
      * 
      *  @param string $name Nome do conjunto de caixas de seleção
+     *  @param array $options Opções das caixas de seleção
      *  @return string Conjunto de caixa de seleção
      */
     public function date($name, $options = array()) {
