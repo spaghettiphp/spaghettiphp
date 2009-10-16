@@ -60,12 +60,17 @@ class FormHelper extends HtmlHelper {
             ),
             $attributes
         );
-        if(array_unset($attributes, "tag") == "input"):
-            $attributes["value"] = $text;
-            $button = $this->tag("input", null, $attributes, false);
-        else:
-            $button = $this->tag("button", $text, $attributes);
-        endif;
+        switch(array_unset($attributes, "tag")):
+            case "image":
+                $attributes["alt"] = $text;
+                $attributes["type"] = "image";
+            case "input":
+                $attributes["value"] = $text;
+                $button = $this->tag("input", null, $attributes, false);
+                break;
+            default:
+                $button = $this->tag("button", $text, $attributes);
+        endswitch;
         return $this->output($button);
     }
     /**
