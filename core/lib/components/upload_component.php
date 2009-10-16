@@ -11,15 +11,15 @@
 
 class UploadComponent extends Component {
     /**
-     *  Tipos de arquivo permitidos.
+     *  Tipos de arquivo permitidos, vazio para permitir qualquer arquivo.
      */
-    public $allowedTypes = array("jpg", "jpeg", "gif", "png");
+    public $allowedTypes = array();
     /**
      *  Tamanho máximo permitido (em MB).
      */
     public $maxSize = 2;
     /**
-     *  Caminho padrão dos arquivos enviados a partir de /app
+     *  Caminho padrão dos arquivos enviados a partir de /webroot
      */
     public $path = "/";
     /**
@@ -30,6 +30,7 @@ class UploadComponent extends Component {
      *  Erros gerados durante o upload.
      */
     public $errors = array();
+    
     /**
      *  Inicializa o componente, padronizando o componente de $_FILES.
      *
@@ -67,7 +68,7 @@ class UploadComponent extends Component {
         if($file["size"] > $this->maxSize * 1024 * 1024):
             return $this->error("FileSizeExceeded");
         endif;
-        if(!in_array($this->ext($file["name"]), $this->allowedTypes)):
+        if(!empty($this->allowedTypes) && !in_array($this->ext($file["name"]), $this->allowedTypes)):
             return $this->error("FileTypeNotAllowed");
         endif;
         if($uploadError = $this->UploadError($file["error"])):
@@ -88,7 +89,7 @@ class UploadComponent extends Component {
         $path = is_null($path) ? $this->path : $path;
         $name = is_null($name) ? $file["name"] : $name;
         if($this->validates($file)):
-            $path = APP . $path;
+            $path = APP . DS . "webroot" . $path;
             if(!is_dir($path)):
                 mkdir($path, 0777, true);
             endif;
