@@ -171,7 +171,6 @@ class FormHelper extends HtmlHelper {
         if($label):
             $input = $this->tag("label", $label, array("for" => $options["id"])) . $input;
         endif;
-        
         if($div):
             if($div === true):
                 $div = "input {$options['type']}";
@@ -201,7 +200,7 @@ class FormHelper extends HtmlHelper {
         $selectDay = $this->select($name . "[d]", array("value" => $options["currentDay"], "options" => $days));
         $selectMonth = $this->select($name . "[m]", array("value" => $options["currentMonth"], "options" => $months));
         $selectYear = $this->select($name . "[y]", array("value" => $options["currentYear"], "options" => $years));
-        return $selectDay . $selectMonth . $selectYear;
+        return $this->output($selectDay . $selectMonth . $selectYear);
     }
 }
 
