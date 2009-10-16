@@ -205,9 +205,21 @@ class FormHelper extends HtmlHelper {
         $days = array_range(1, 31);
         $months = array_range(1, 12);
         $years = array_range($options["startYear"], $options["endYear"]);
-        $selectDay = $this->select($name . "[d]", array("value" => $options["currentDay"], "options" => $days));
-        $selectMonth = $this->select($name . "[m]", array("value" => $options["currentMonth"], "options" => $months));
-        $selectYear = $this->select($name . "[y]", array("value" => $options["currentYear"], "options" => $years));
+        $selectDay = $this->select($name . "[d]", array(
+            "value" => $options["currentDay"],
+            "options" => $days,
+            "id" => $options["id"] . "D"
+        ));
+        $selectMonth = $this->select($name . "[m]", array(
+            "value" => $options["currentMonth"],
+            "options" => $months,
+            "id" => $options["id"] . "M"
+        ));
+        $selectYear = $this->select($name . "[y]", array(
+            "value" => $options["currentYear"],
+            "options" => $years,
+            "id" => $options["id"] . "Y"
+        ));
         return $this->output($selectDay . $selectMonth . $selectYear);
     }
 }
