@@ -165,6 +165,9 @@ class FormHelper extends HtmlHelper {
             case "date":
                 $input = $this->date($name, $options);
                 break;
+            case "textarea":
+                $input = $this->tag("textarea", array_unset($options, "value"), $options);
+                break;
             default:
                 if($options["type"] == "hidden"):
                     $div = $label = false;
