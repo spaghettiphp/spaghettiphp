@@ -29,17 +29,27 @@ class PaginationHelper extends HtmlHelper {
      *
      *  @return string
      */
-    public function numbers() {
+    public function numbers($options = array()) {
+        $options = array_merge(
+            array(
+                "modulus" => 3,
+                "before" => null,
+                "after" => null,
+                "tag" => "span"
+            ),
+            $options
+        );
         $page = $this->model->pagination["page"];
         $pages = $this->model->pagination["totalPages"];
         $numbers = "";
-        for($i = $page - 3; $i <= $page + 3; $i++):
+        for($i = $page - $options["modulus"]; $i <= $page + $options["modulus"]; $i++):
             if($i > 0 && $i <= $pages):
                 if($i != $page):
-                    $numbers .= $this->link($i, array("page" => $i));
+                    $number = $this->link($i, array("page" => $i));
                 else:
-                    $numbers .= $i;
+                    $number = $i;
                 endif;
+                $numbers .= $this->tag($options["tag"], $number);
             endif;
         endfor;
         return $numbers;
