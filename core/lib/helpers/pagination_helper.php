@@ -27,21 +27,21 @@ class PaginationHelper extends HtmlHelper {
     /**
      *  Short description.
      *
+     *  @param array $options
      *  @return string
      */
     public function numbers($options = array()) {
         $options = array_merge(
             array(
                 "modulus" => 3,
-                "before" => null,
-                "after" => null,
+                "separator" => null,
                 "tag" => "span"
             ),
             $options
         );
         $page = $this->model->pagination["page"];
         $pages = $this->model->pagination["totalPages"];
-        $numbers = "";
+        $numbers = array();
         for($i = $page - $options["modulus"]; $i <= $page + $options["modulus"]; $i++):
             if($i > 0 && $i <= $pages):
                 if($i != $page):
@@ -49,10 +49,10 @@ class PaginationHelper extends HtmlHelper {
                 else:
                     $number = $i;
                 endif;
-                $numbers .= $this->tag($options["tag"], $number);
+                $numbers []= $this->tag($options["tag"], $number);
             endif;
         endfor;
-        return $numbers;
+        return join($options["separator"], $numbers);
     }
     /**
      *  Gera o link para a página seguinte de acordo com os dados encontrados.
