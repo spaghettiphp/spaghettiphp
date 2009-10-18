@@ -25,6 +25,26 @@ class PaginationHelper extends HtmlHelper {
         return $this->model = ClassRegistry::load($model);
     }
     /**
+     *  Short description.
+     *
+     *  @return string
+     */
+    public function numbers() {
+        $page = $this->model->pagination["page"];
+        $pages = $this->model->pagination["totalPages"];
+        $numbers = "";
+        for($i = $page - 3; $i <= $page + 3; $i++):
+            if($i > 0 && $i <= $pages):
+                if($i != $page):
+                    $numbers .= $this->link($i, array("page" => $i));
+                else:
+                    $numbers .= $i;
+                endif;
+            endif;
+        endfor;
+        return $numbers;
+    }
+    /**
      *  Gera o link para a página seguinte de acordo com os dados encontrados.
      *
      *  @param string $text Texto a ser expresso no link
