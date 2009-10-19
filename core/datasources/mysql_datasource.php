@@ -86,7 +86,6 @@ class MysqlDatasource extends Datasource {
      *  @return mixed Resultado da consulta
      */
     public function query($sql = null) {
-        pr($sql);
         $this->results = mysql_query($sql, $this->getConnection());
         return $this->results;
     }
