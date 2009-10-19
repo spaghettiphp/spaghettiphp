@@ -240,11 +240,9 @@ class Mapper extends Object {
         $path["here"] = $here;
         if(empty($path["controller"])) $path["controller"] = self::getRoot();
         if(empty($path["action"])) $path["action"] = "index";
-        if($pos = strpos($path["action"], "_")):
-            if(in_array(substr($path["action"], 0, $pos), self::getPrefixes())):
-                $path["prefix"] = substr($path["action"], 0, $pos);
-                $path["action"] = substr($path["action"], $pos + 1);
-            endif;
+        if($filtered = self::filterAction($path["action"])):
+            $path["prefix"] = $filtered["prefix"];
+            $path["action"] = $filtered["action"];
         endif;
         if(!empty($path["prefix"])):
             $path["action"] = "{$path['prefix']}_{$path['action']}";
@@ -281,10 +279,8 @@ class Mapper extends Object {
                 if(!in_array($key, $nonParams)):
                     $url .= "/" . "{$key}:{$value}";
                 elseif(!is_null($value)):
-                    if($key == "action" && $pos = strpos($path["action"], "_")):
-                        if(in_array(substr($path["action"], 0, $pos), self::getPrefixes())):
-                            $value = substr($path["action"], $pos + 1);
-                        endif;
+                    if($key == "action" && $filtered = self::filterAction($value)):
+                        $value = $filtered["action"];
                     endif;
                     $url .= "/" . $value;
                 endif;
@@ -301,6 +297,26 @@ class Mapper extends Object {
             $url = self::normalize($url);
         endif;
         return $full ? BASE_URL . $url : $url;
+    }
+    /**
+      *  Filtra uma action, removendo prefixos.
+      *
+      *  @param string $action Nome da action a ser filtrada
+      *  @return mixed Array contendo prefixo e action, falso caso a action não
+      *                contenha prefixos
+      */
+    public static function filterAction($action) {
+        if(strpos($action, "_") !== false):
+            foreach(self::getPrefixes() as $prefix):
+                if(strpos($action, $prefix) === 0):
+                    return array(
+                        "action" => substr($action, strlen($prefix) + 1),
+                        "prefix" => $prefix
+                    );
+                endif;
+            endforeach;
+        endif;
+        return false;
     }
 }
 
