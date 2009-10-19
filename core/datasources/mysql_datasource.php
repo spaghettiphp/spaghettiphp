@@ -86,6 +86,7 @@ class MysqlDatasource extends Datasource {
      *  @return mixed Resultado da consulta
      */
     public function query($sql = null) {
+        pr($sql);
         $this->results = mysql_query($sql, $this->getConnection());
         return $this->results;
     }
@@ -354,7 +355,13 @@ class MysqlDatasource extends Datasource {
     public function value($value = "", $column = null) {
         switch($column):
             case "boolean":
-                return $value === true ? 1 : ($value === false ? 0 : !empty($value));
+                if($value === true):
+                    return "1";
+                elseif($value === false):
+                    return "0";
+                else:
+                    return !empty($value) ? "1" : "0";
+                endif;
             case "integer":
             case "float":
                 if($value === "" or is_null($value)):
