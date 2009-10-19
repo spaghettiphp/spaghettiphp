@@ -34,7 +34,7 @@ class PaginationHelper extends HtmlHelper {
         $options = array_merge(
             array(
                 "modulus" => 3,
-                "separator" => null,
+                "separator" => " ",
                 "tag" => "span"
             ),
             $options
