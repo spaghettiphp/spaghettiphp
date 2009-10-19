@@ -35,7 +35,8 @@ class PaginationHelper extends HtmlHelper {
             array(
                 "modulus" => 3,
                 "separator" => " ",
-                "tag" => "span"
+                "tag" => "span",
+                "current" => "current"
             ),
             $options
         );
@@ -45,11 +46,13 @@ class PaginationHelper extends HtmlHelper {
         for($i = $page - $options["modulus"]; $i <= $page + $options["modulus"]; $i++):
             if($i > 0 && $i <= $pages):
                 if($i != $page):
+                    $attributes = array();
                     $number = $this->link($i, array("page" => $i));
                 else:
+                    $attributes = array("class" => $options["current"]);
                     $number = $i;
                 endif;
-                $numbers []= $this->tag($options["tag"], $number);
+                $numbers []= $this->tag($options["tag"], $number, $attributes);
             endif;
         endfor;
         return join($options["separator"], $numbers);
