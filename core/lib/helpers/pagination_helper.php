@@ -25,10 +25,10 @@ class PaginationHelper extends HtmlHelper {
         return $this->model = ClassRegistry::load($model);
     }
     /**
-     *  Short description.
+     *  Gera uma lista de páginas.
      *
-     *  @param array $options
-     *  @return string
+     *  @param array $options Opções da lista
+     *  @return string Lista de páginas
      */
     public function numbers($options = array()) {
         $options = array_merge(
