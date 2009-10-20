@@ -19,10 +19,8 @@ class Dispatcher extends Object {
         $path["controller"] = Inflector::hyphenToUnderscore($path["controller"]);
         $path["action"] = Inflector::hyphenToUnderscore($path["action"]);
         $controller_name = Inflector::camelize($path["controller"]) . "Controller";
-        $controller_file = $path["controller"];
-        $action = $path["action"];
         if($controller =& ClassRegistry::load($controller_name, "Controller")):
-            if(!can_call_method($controller, $action) && !App::path("View", "{$controller_file}/{$action}.{$path['extension']}")):
+            if(!can_call_method($controller, $path['action']) && !App::path("View", "{$path['controller']}/{$path['action']}.{$path['extension']}")):
                 $this->error("missingAction", array(
                     "controller" => $path["controller"],
                     "action" => $path["action"]
@@ -30,7 +28,7 @@ class Dispatcher extends Object {
                 return false;
             endif;
         else:
-            if(App::path("View", "{$controller_file}/{$action}.{$path['extension']}")):
+            if(App::path("View", "{$path['controller']}/{$path['action']}.{$path['extension']}")):
                 $controller =& ClassRegistry::load("AppController", "Controller");
             else:
                 $this->error("missingController", array(
@@ -43,10 +41,10 @@ class Dispatcher extends Object {
         $controller->componentEvent("initialize");
         $controller->beforeFilter();
         $controller->componentEvent("startup");
-        if(in_array($action, $controller->methods) && can_call_method($controller, $action)):
+        if(in_array($path["action"], $controller->methods) && can_call_method($controller, $path["action"])):
             $params = $path["params"];
             if(!is_null($path["id"])) $params = array_merge(array($path["id"]), $params);
-            call_user_func_array(array(&$controller, $action), $params);
+            call_user_func_array(array(&$controller, $path["action"]), $params);
         endif;
         if($controller->autoRender):
             $controller->render();
