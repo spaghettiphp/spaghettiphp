@@ -40,10 +40,8 @@ class ClassRegistry {
         endif;
         if(class_exists($class)):
             ${$class} = new $class;
-            return ${$class};
-        else:
-            return false;
         endif;
+        return ${$class};
     }
     /**
      *  Adiciona uma instância de uma classe no registro.
