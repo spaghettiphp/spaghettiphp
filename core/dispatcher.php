@@ -16,24 +16,27 @@ class Dispatcher extends Object {
      */ 
     public function dispatch() {
         $path = Mapper::parse();
-        $controllerName = Inflector::camelize("{$path['controller']}_controller");
+        $controller_name = Inflector::camelize($path["controller"]) . "Controller";
+        $controller_file = Inflector::hyphenToUnderscore($path["controller"]);
         $action = Inflector::hyphenToUnderscore($path["action"]);
-        $controllerFile = Inflector::hyphenToUnderscore($path["controller"]);
-        
-        if($controller =& ClassRegistry::load($controllerName, "Controller")):
-            if(!can_call_method($controller, $action) && !App::path("View", "{$controllerFile}/{$action}.{$path['extension']}")):
-                $this->error("missingAction", array("controller" => $controllerName, "action" => $action));
+        if($controller =& ClassRegistry::load($controller_name, "Controller")):
+            if(!can_call_method($controller, $action) && !App::path("View", "{$controller_file}/{$action}.{$path['extension']}")):
+                $this->error("missingAction", array(
+                    "controller" => $path["controller"],
+                    "action" => $path["action"]
+                ));
                 return false;
             endif;
         else:
-            if(App::path("View", "{$controllerFile}/{$action}.{$path['extension']}")):
+            if(App::path("View", "{$controller_file}/{$action}.{$path['extension']}")):
                 $controller =& ClassRegistry::load("AppController", "Controller");
             else:
-                $this->error("missingController", array("controller" => $controllerName));
+                $this->error("missingController", array(
+                    "controller" => $path["controller"]
+                ));
                 return false;
             endif;
         endif;
-
         $controller->params = $path;
         $controller->componentEvent("initialize");
         $controller->beforeFilter();
