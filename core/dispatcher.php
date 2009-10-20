@@ -16,9 +16,11 @@ class Dispatcher extends Object {
      */ 
     public function dispatch() {
         $path = Mapper::parse();
+        $path["controller"] = Inflector::hyphenToUnderscore($path["controller"]);
+        $path["action"] = Inflector::hyphenToUnderscore($path["action"]);
         $controller_name = Inflector::camelize($path["controller"]) . "Controller";
-        $controller_file = Inflector::hyphenToUnderscore($path["controller"]);
-        $action = Inflector::hyphenToUnderscore($path["action"]);
+        $controller_file = $path["controller"];
+        $action = $path["action"];
         if($controller =& ClassRegistry::load($controller_name, "Controller")):
             if(!can_call_method($controller, $action) && !App::path("View", "{$controller_file}/{$action}.{$path['extension']}")):
                 $this->error("missingAction", array(
