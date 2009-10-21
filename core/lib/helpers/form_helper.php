@@ -195,13 +195,22 @@ class FormHelper extends HtmlHelper {
      *  @return string Conjunto de caixa de seleção
      */
     public function date($name, $options = array()) {
+        //$options['value'] pode receber uma data dd/mm/aa e ele servirá de valor inicial
+        if(!empty($options['value'])):
+            $new_options = array_combine(
+                array('currentDay','currentMonth','currentYear'), 
+                explode('/',$options['value'])
+            );
+        else:
+            $new_options = array();
+        endif;
         $options = array_merge(array(
             "startYear" => 1980,
             "endYear" => date("Y"),
             "currentDay" => date("d"),
             "currentMonth" => date("m"),
             "currentYear" => date("Y")
-        ), $options);
+        ), $options, $new_options);
         $days = array_range(1, 31);
         $months = array_range(1, 12);
         $years = array_range($options["startYear"], $options["endYear"]);
