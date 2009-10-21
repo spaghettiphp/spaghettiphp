@@ -236,26 +236,21 @@ class AuthComponent extends Component {
       *  @return void
       */
     public function login() {
-        if(!$this->loggedIn()):
-            if(!empty($this->controller->data)):
-                $password = $this->hash($this->controller->data[$this->fields["password"]]);
-                $user = $this->identify(array(
-                    $this->fields["username"] => $this->controller->data[$this->fields["username"]],
-                    $this->fields["password"] => $password
-                ));
-                if(!empty($user)):
-                    Cookie::set("domain", $this->domain);
-                    Cookie::set("path", $this->path);
-                    Cookie::set("secure", $this->secure);
-                    Cookie::write("user_id", $user[$this->fields["id"]], $this->expires);
-                    Cookie::write("password", $password, $this->expires);
-                    $redirect = Cookie::read("action");
-                    if(is_null($redirect)):
-                        $redirect = $this->loginRedirect;
-                    else:
-                        Cookie::delete("action");
-                    endif;
-                    $this->controller->redirect($redirect);
+        if(!empty($this->controller->data)):
+            $password = $this->hash($this->controller->data[$this->fields["password"]]);
+            $user = $this->identify(array(
+                $this->fields["username"] => $this->controller->data[$this->fields["username"]],
+                $this->fields["password"] => $password
+            ));
+            if(!empty($user)):
+                Cookie::set("domain", $this->domain);
+                Cookie::set("path", $this->path);
+                Cookie::set("secure", $this->secure);
+                Cookie::write("user_id", $user[$this->fields["id"]], $this->expires);
+                Cookie::write("password", $password, $this->expires);
+                $redirect = Cookie::read("action");
+                if(!$redirect):
+                    $redirect = $this->loginRedirect;
                 else:
                     $this->controller->set("authError", "wrongData");
                 endif;
