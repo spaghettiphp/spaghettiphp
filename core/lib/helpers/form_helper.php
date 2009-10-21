@@ -143,6 +143,48 @@ class FormHelper extends HtmlHelper {
         return $this->output($content);
     }
     /**
+     *  Cria um conjunto de caixa de seleção para a data.
+     * 
+     *  @param string $name Nome do conjunto de caixas de seleção
+     *  @param array $options Opções das caixas de seleção
+     *  @return string Conjunto de caixa de seleção
+     */
+    public function date($name, $options = array()) {
+        $options = array_merge(array(
+            "value" => null,
+            "startYear" => 1980,
+            "endYear" => date("Y"),
+            "currentDay" => date("d"),
+            "currentMonth" => date("m"),
+            "currentYear" => date("Y")
+        ), $options);
+        if(!is_null($options["value"])):
+            $date = strtotime($options["value"]);
+            $options["currentDay"] = date("d", $date);
+            $options["currentMonth"] = date("m", $date);
+            $options["currentYear"] = date("Y", $date);
+        endif;
+        $days = array_range(1, 31);
+        $months = array_range(1, 12);
+        $years = array_range($options["startYear"], $options["endYear"]);
+        $selectDay = $this->select($name . "[d]", array(
+            "value" => $options["currentDay"],
+            "options" => $days,
+            "id" => $options["id"] . "D"
+        ));
+        $selectMonth = $this->select($name . "[m]", array(
+            "value" => $options["currentMonth"],
+            "options" => $months,
+            "id" => $options["id"] . "M"
+        ));
+        $selectYear = $this->select($name . "[y]", array(
+            "value" => $options["currentYear"],
+            "options" => $years,
+            "id" => $options["id"] . "Y"
+        ));
+        return $this->output($selectDay . $selectMonth . $selectYear);
+    }
+    /**
      *  Cria caixa de entrada formatada e com label.
      * 
      *  @param string $name Nome do campo de entrada
@@ -193,50 +235,6 @@ class FormHelper extends HtmlHelper {
             $input = $this->div($input, $div);
         endif;
         return $this->output($input);
-    }
-    /**
-     *  Cria um conjunto de caixa de seleção para a data.
-     * 
-     *  @param string $name Nome do conjunto de caixas de seleção
-     *  @param array $options Opções das caixas de seleção
-     *  @return string Conjunto de caixa de seleção
-     */
-    public function date($name, $options = array()) {
-        //$options['value'] pode receber uma data dd/mm/aa e ele servirá de valor inicial
-        if(!empty($options['value'])):
-            $new_options = array_combine(
-                array('currentDay','currentMonth','currentYear'), 
-                explode('/',$options['value'])
-            );
-        else:
-            $new_options = array();
-        endif;
-        $options = array_merge(array(
-            "startYear" => 1980,
-            "endYear" => date("Y"),
-            "currentDay" => date("d"),
-            "currentMonth" => date("m"),
-            "currentYear" => date("Y")
-        ), $options, $new_options);
-        $days = array_range(1, 31);
-        $months = array_range(1, 12);
-        $years = array_range($options["startYear"], $options["endYear"]);
-        $selectDay = $this->select($name . "[d]", array(
-            "value" => $options["currentDay"],
-            "options" => $days,
-            "id" => $options["id"] . "D"
-        ));
-        $selectMonth = $this->select($name . "[m]", array(
-            "value" => $options["currentMonth"],
-            "options" => $months,
-            "id" => $options["id"] . "M"
-        ));
-        $selectYear = $this->select($name . "[y]", array(
-            "value" => $options["currentYear"],
-            "options" => $years,
-            "id" => $options["id"] . "Y"
-        ));
-        return $this->output($selectDay . $selectMonth . $selectYear);
     }
 }
 
