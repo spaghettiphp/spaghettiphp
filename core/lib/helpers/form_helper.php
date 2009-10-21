@@ -90,8 +90,15 @@ class FormHelper extends HtmlHelper {
         $selectOptions = array_unset($options, "options");
         if(($empty = array_unset($options, "empty")) !== false):
             $keys = array_keys($selectOptions);
-            array_unshift($keys, $empty);
-            $values = array_merge(array($empty), $selectOptions);
+            if(is_array($empty)):
+                $emptyKeys = array_keys($empty);
+                $key = $emptyKeys[0];
+                $values = array_merge($empty, $selectOptions);
+            else:
+                $key = $empty;
+                $values = array_merge(array($empty), $selectOptions);
+            endif;
+            array_unshift($keys, $key);
             $selectOptions = array_combine($keys, $values);
         endif;
         $content = "";
