@@ -69,7 +69,7 @@ class Controller extends Object {
         endif;
         
         $this->methods = $this->getMethods();
-        $this->data = $_POST;
+        $this->data = array_merge($_POST, $_FILES);
         $this->loadComponents();
         $this->loadModels();
     }
