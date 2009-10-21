@@ -112,7 +112,7 @@ class Cookie extends Object {
     public static function write($name, $value, $expires = null) {
         $self = self::getInstance();
         $expires = $self->expire($expires);
-        $path = Mapper::base() . $self->path;
+        $path = Mapper::normalize(Mapper::base() . $self->path);
         return setcookie("{$self->name}[{$name}]", self::encrypt($value), $expires, $path, $self->domain, $self->secure);
     }
     /**
