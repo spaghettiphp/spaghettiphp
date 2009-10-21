@@ -522,7 +522,7 @@ class Model extends Object {
                 $rule = array_merge($defaults, $rule);
                 $required = !isset($data[$field]) && $rule["required"];
                 if($required):
-                    $this->errors[$field] = "required";
+                    $this->errors[$field] = is_null($rule["message"]) ? $rule["rule"] : $rule["message"];
                 elseif(isset($data[$field])):
                     if(!$this->callValidationMethod($rule["rule"], $data[$field])):
                         $message = is_null($rule["message"]) ? $rule["rule"] : $rule["message"];
