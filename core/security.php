@@ -44,7 +44,7 @@ class Security extends Object {
       *  @param mixed $salt Salt a ser usado
       *  @return string Hash do valor
       */
-    public function hash($text, $hash = null, $salt = false) {
+    public static function hash($text, $hash = null, $salt = false) {
         if($salt):
             if(is_string($salt)):
                 $text = $salt . $text;
