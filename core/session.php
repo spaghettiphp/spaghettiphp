@@ -31,6 +31,7 @@ class Session extends Object {
      *  @return string Valor da variável solicitada
      */
     public static function read($name) {
+        if(!self::started()) self::start();
         return $_SESSION[$name];
     }
     /**
@@ -40,6 +41,7 @@ class Session extends Object {
      *  @param string $value Conteudo da variável
      */
     public static function write($name, $value) {
+        if(!self::started()) self::start();
         $_SESSION[$name] = $value;
     }
     /**
@@ -49,6 +51,7 @@ class Session extends Object {
      *  @return boolean Verdadeiro para remoção da variável
      */
     public static function delete($name) {
+        if(!self::started()) self::start();
         unset($_SESSION[$name]);
         return true;
     }
