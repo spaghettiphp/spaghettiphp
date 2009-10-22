@@ -28,7 +28,7 @@ abstract class Object {
      *  @param string $type Tipo do erro ocorrido
      *  @param string $details Detalhes do erro ocorrido
      */
-    protected function error($type = "", $details = array()) {
+    protected function error($type, $details = array()) {
         new Error($type, $details);
     }
     /**
