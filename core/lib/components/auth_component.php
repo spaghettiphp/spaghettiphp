@@ -141,7 +141,7 @@ class AuthComponent extends Component {
       */
     public function check() {
         if(!$this->authorized()):
-            Session::write("Auth.action", Mapper::here());
+            $this->setAction(Mapper::here());
             $this->error($this->authError);
             $this->controller->redirect($this->loginAction);
             return false;
@@ -266,11 +266,9 @@ class AuthComponent extends Component {
                 Cookie::set("secure", $this->secure);
                 Cookie::write("user_id", $user[$this->fields["id"]], $this->expires);
                 Cookie::write("password", $password, $this->expires);
-                $redirect = Session::read("Auth.action");
+                $redirect = $this->getAction();
                 if(!$redirect):
                     $redirect = $this->loginRedirect;
-                else:
-                    Session::delete("Auth.action");
                 endif;
                 $this->controller->redirect($this->loginRedirect);
             else:
@@ -306,9 +304,29 @@ class AuthComponent extends Component {
         endif;
     }
     /**
+      *  Armazena a action requisitada quando a autorização falhou.
+      *
+      *  @param string $action Endereço da action
+      *  @return void
+      */
+    public function setAction($action) {
+        Session::write("Auth.action", $action);
+    }
+    /**
+      *  Retorna a action requisitada quando a autorização falhou.
+      *
+      *  @return string Endereço da action
+      */
+    public function getAction() {
+        $action  = Session::read("Auth.action");
+        Session::delete("Auth.action");
+        return $action;
+    }
+    /**
       *  Define um erro ocorrido durante a autenticação.
       *
-      *  @param string $error Nome do erro
+      *  @param string $type Nome do erro
+      *  @param array $details Detalhes do erro
       *  @return void
       */
     public function error($type, $details = array()) {
