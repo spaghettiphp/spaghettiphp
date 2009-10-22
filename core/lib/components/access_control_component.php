@@ -80,11 +80,10 @@ class AccessControlComponent extends Component {
       *  @return void
       */
     public function allow($role, $permissions) {
-        if(!isset($this->permissions[$role])):
-            $this->permissions[$role] = $permissions;
-        else:
-            $this->permissions[$role] = array_merge($this->permissions[$role], $permissions);
+        if(isset($this->permissions[$role])):
+            $permissions = array_merge($this->permissions[$role], $permissions);
         endif;
+        $this->permissions[$role] = $permissions;
     }
     /**
       *  Permite acesso a um usuário específico.
@@ -95,11 +94,10 @@ class AccessControlComponent extends Component {
       */
     public function allowUser($user, $permissions) {
         $this->checkUserPermissions = true;
-        if(!isset($this->permissions[$user])):
-            $this->userPermissions[$user] = $permissions;
-        else:
-            $this->userPermissions[$user] = array_merge($this->userPermissions[$user], $permissions);
+        if(isset($this->permissions[$user])):
+            $permissions = array_merge($this->userPermissions[$user], $permissions);
         endif;
+        $this->userPermissions[$user] = $permissions;
     }
     /**
      *  Verifica se o usuário esta autorizado ou não para acessar a URL atual.
