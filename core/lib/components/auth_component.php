@@ -92,8 +92,13 @@ class AuthComponent extends Component {
       *  Define o nível de recursão do modelo.
       */
     public $recursion;
-
+    /**
+      *  Mensagem de erro para falha no login.
+      */
     public $loginError = "loginFailed";
+    /**
+      *  Mensagem de erro para acesso não autorizado.
+      */
     public $authError = "notAuthorized";
 
     /**
