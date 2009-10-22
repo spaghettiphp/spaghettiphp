@@ -109,14 +109,10 @@ class AccessControlComponent extends Component {
             if($this->auth->isPublic()):
                 return true;
             else:
-                if(
+                return (
                     ($this->checkGroupPermissions && $this->authorizedGroup()) ||
                     ($this->checkUserPermissions && $this->authorizedUser())
-                ):
-                    return true;
-                else:
-                    return false;
-                endif;
+                );
             endif;
         else:
             return $this->auth->authorized();
