@@ -89,7 +89,7 @@ class Cookie extends Object {
       */
     public static function delete($name) {
         $self = self::getInstance();
-        $path = Mapper::base() . $self->path;
+        $path = Mapper::normalize(Mapper::base() . $self->path);
         return setcookie("{$self->name}[{$name}]", "", time() - 42000, $path, $self->domain, $self->secure);
     }
     /**

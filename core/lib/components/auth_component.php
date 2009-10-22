@@ -292,6 +292,9 @@ class AuthComponent extends Component {
       *  @return void
       */
     public function logout() {
+        Cookie::set("domain", $this->domain);
+        Cookie::set("path", $this->path);
+        Cookie::set("secure", $this->secure);
         Cookie::delete("user_id");
         Cookie::delete("password");
         $this->controller->redirect($this->logoutRedirect);
