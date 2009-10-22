@@ -133,7 +133,7 @@ class AuthComponent extends Component {
       */
     public function check() {
         if(!$this->authorized()):
-            Cookie::write("action", Mapper::here());
+            Session::write("Auth.action", Mapper::here());
             $this->controller->redirect($this->loginAction);
             return false;
         endif;
@@ -257,11 +257,11 @@ class AuthComponent extends Component {
                 Cookie::set("secure", $this->secure);
                 Cookie::write("user_id", $user[$this->fields["id"]], $this->expires);
                 Cookie::write("password", $password, $this->expires);
-                $redirect = Cookie::read("action");
+                $redirect = Session::read("Auth.action");
                 if(!$redirect):
                     $redirect = $this->loginRedirect;
                 else:
-                    Cookie::delete("action");
+                    Session::delete("Auth.action");
                 endif;
                 $this->controller->redirect($this->loginRedirect);
             else:
