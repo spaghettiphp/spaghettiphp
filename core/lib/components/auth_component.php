@@ -93,6 +93,9 @@ class AuthComponent extends Component {
       */
     public $recursion;
 
+    public $loginError = "loginFailed";
+    public $authError = "notAuthorized";
+
     /**
       *  Inicializa o componente.
       *
@@ -134,7 +137,7 @@ class AuthComponent extends Component {
     public function check() {
         if(!$this->authorized()):
             Session::write("Auth.action", Mapper::here());
-            $this->error("notAuthorized");
+            $this->error($this->authError);
             $this->controller->redirect($this->loginAction);
             return false;
         endif;
@@ -266,7 +269,7 @@ class AuthComponent extends Component {
                 endif;
                 $this->controller->redirect($this->loginRedirect);
             else:
-                $this->error("loginFailed");
+                $this->error($this->loginError);
             endif;
         endif;
     }

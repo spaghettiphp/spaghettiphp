@@ -167,7 +167,7 @@ class AccessControlComponent extends Component {
     public function check() {
         if(!$this->authorized()):
             Cookie::write("action", Mapper::here());
-            $this->auth->error("notAuthorized");
+            $this->auth->error($this->auth->authError);
             $this->controller->redirect($this->auth->loginAction);
             return false;
         endif;
