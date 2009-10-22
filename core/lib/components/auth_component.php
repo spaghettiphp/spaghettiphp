@@ -88,18 +88,13 @@ class AuthComponent extends Component {
       *  Define um cookie seguro.
       */
     public $secure = false;
-<<<<<<< HEAD:core/lib/components/auth_component.php
-
-    /**
-      *  Inicializa o component.
-=======
     /**
       *  Define o nível de recursão do modelo.
       */
+    public $recursion;
 
     /**
       *  Inicializa o componente.
->>>>>>> access_control:core/lib/components/auth_component.php
       *
       *  @param object $controller Objeto Controller
       *  @return void
@@ -108,21 +103,13 @@ class AuthComponent extends Component {
         $this->controller = $controller;
     }
     /**
-<<<<<<< HEAD:core/lib/components/auth_component.php
-      *  Faz as operações necessárias após a inicialização do controller.
-=======
       *  Faz as operações necessárias após a inicialização do componente.
->>>>>>> access_control:core/lib/components/auth_component.php
       *
       *  @param object $controller Objeto Controller
       *  @return void
       */
     public function startup(&$controller) {
-<<<<<<< HEAD:core/lib/components/auth_component.php
-        $this->permissions[$this->loginAction] = true;
-=======
         $this->allow($this->loginAction);
->>>>>>> access_control:core/lib/components/auth_component.php
         if($this->autoCheck):
             $this->check();
         endif;
@@ -158,26 +145,12 @@ class AuthComponent extends Component {
      *  @return boolean Verdadeiro caso o usuário esteja autorizado
      */
     public function authorized() {
-<<<<<<< HEAD:core/lib/components/auth_component.php
-        if($this->loggedIn()):
-            return true;
-        else:
-            $here = Mapper::here();
-            $authorized = $this->authorized;
-            foreach($this->permissions as $url => $permission):
-                if(Mapper::match($url, $here)):
-                    $authorized = $permission;
-                endif;
-            endforeach;
-            return $authorized;
-        endif;
-=======
         return $this->loggedIn() || $this->isPublic();
     }
     /**
-      *  Short description.
+      *  Verifica se uma action é pública.
       *
-      *  @return boolean
+      *  @return boolean Verdadeiro se a action é pública
       */
     public function isPublic() {
         $here = Mapper::here();
@@ -188,7 +161,6 @@ class AuthComponent extends Component {
             endif;
         endforeach;
         return $authorized;
->>>>>>> access_control:core/lib/components/auth_component.php
     }
     /**
      *  Libera URLs a serem visualizadas sem autenticação.
@@ -289,11 +261,12 @@ class AuthComponent extends Component {
                 if(!$redirect):
                     $redirect = $this->loginRedirect;
                 else:
-                    $this->controller->set("authError", "wrongData");
+                    Cookie::delete("action");
                 endif;
+                $this->controller->redirect($this->loginRedirect);
+            else:
+                $this->error("loginFailed");
             endif;
-        else:
-            $this->controller->redirect($this->loginRedirect);
         endif;
     }
     /**
