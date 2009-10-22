@@ -261,11 +261,7 @@ class AuthComponent extends Component {
                 $this->fields["password"] => $password
             ));
             if(!empty($user)):
-                Cookie::set("domain", $this->domain);
-                Cookie::set("path", $this->path);
-                Cookie::set("secure", $this->secure);
-                Cookie::write("user_id", $user[$this->fields["id"]], $this->expires);
-                Cookie::write("password", $password, $this->expires);
+                $this->authenticate($user[$this->fields["id"]], $password);
                 $redirect = $this->getAction();
                 if(!$redirect):
                     $redirect = $this->loginRedirect;
@@ -275,6 +271,20 @@ class AuthComponent extends Component {
                 $this->error($this->loginError);
             endif;
         endif;
+    }
+    /**
+      *  Autentica um usuário.
+      *
+      *  @param string $id ID do usuário
+      *  @param string $password Senha do usuário
+      *  @return void
+      */
+    public function authenticate($id, $password) {
+        Cookie::set("domain", $this->domain);
+        Cookie::set("path", $this->path);
+        Cookie::set("secure", $this->secure);
+        Cookie::write("user_id", $id, $this->expires);
+        Cookie::write("password", $password, $this->expires);
     }
     /**
       *  Efetua o logout do usuário.
