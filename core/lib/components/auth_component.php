@@ -134,6 +134,7 @@ class AuthComponent extends Component {
     public function check() {
         if(!$this->authorized()):
             Session::write("Auth.action", Mapper::here());
+            $this->error("notAuthorized");
             $this->controller->redirect($this->loginAction);
             return false;
         endif;
