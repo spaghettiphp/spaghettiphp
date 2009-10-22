@@ -330,7 +330,7 @@ class AuthComponent extends Component {
       *  @return void
       */
     public function error($type, $details = array()) {
-        $this->controller->set("authError", $type);
+        Session::write("Auth.error", $type);
     }
 }
 
