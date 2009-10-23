@@ -64,6 +64,9 @@ class FormHelper extends HtmlHelper {
             case "image":
                 $attributes["alt"] = $text;
                 $attributes["type"] = "image";
+                if(!$this->external($attributes["src"])):
+                    $attributes["src"] = Mapper::url("/images/" . $attributes["src"]);
+                endif;
             case "input":
                 $attributes["value"] = $text;
                 $button = $this->tag("input", null, $attributes, false);
