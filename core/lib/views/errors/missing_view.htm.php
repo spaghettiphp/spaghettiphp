@@ -1,2 +1,2 @@
 <h1><em>View</em> não encontrada.</h1>
-<p>O arquivo <code>app/views/<?php echo Inflector::underscore($details['controller']) ?>/<?php echo "{$details['view']}.{$details['extension']}" ?></code> não pôde ser encontrado. Verifique se ele existe, e se possui seu método correspondente no controller.</p>
+<p>O arquivo <code>app/views/<?php echo Inflector::underscore($details['controller']) ?>/<?php echo "{$details['view']}.{$details['extension']}" ?>.php</code> não pôde ser encontrado. Verifique se ele existe, e se possui seu método correspondente no controller.</p>
