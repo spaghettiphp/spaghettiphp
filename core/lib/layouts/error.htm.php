@@ -132,12 +132,16 @@
     <body>
         <header>
             <a href="http://spaghettiphp.org" id="logo">Spaghetti<span>*</span></a>
+            <?php if(Config::read("environment") == "development"): ?>
             <a href="#" id="info" onclick="return Environment.toggle()">informações sobre o ambiente</a>
+            <?php endif ?>
         </header>
 
+        <?php if(Config::read("environment") == "development"): ?>
         <section id="environment">
             <?php echo $this->element("environment"); ?>
         </section>
+        <?php endif ?>
 		
 		<section id="error">
         	<?php echo $this->contentForLayout ?>
