@@ -1,9 +1,17 @@
 version 0.2 (2009-12-01)
-    * Fixed some more scrict errors
-    * Fixed PaginationHelper's double URL encoding
-    * Complete API documentation
+    * Added AccessControlComponent
+    * Added new welcome and error screens
+    * Added PaginationHelper::numbers()
+    * Added support for image inputs in FormHelper::submit()
+    * Added support for FormHelper::date()
+    * Added cookie options in AuthComponent
     * AuthComponent checks for autoCheck when running at startup
+    * Merged $_POST and $_FILES in Controller::data
+    * Complete API documentation
     * Fixed insecure behavior with prefixed actions
+    * Fixed PaginationHelper's double URL encoding
+    * Fixed some more scrict errors
+    * Fixed lots of minor bugs
 
 version 0.2b (2009-10-06)
     * Added Session support
