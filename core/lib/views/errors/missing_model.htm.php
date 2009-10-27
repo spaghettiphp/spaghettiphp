@@ -1,2 +1,2 @@
-<h1>Model não encontrado.</h1>
-<p>O model não foi encontrado. O arquivo <code>app/models/<?php echo strtolower($details["model"]) ?>.php</code> realmente existe?</p>
+<h1><?php echo $this->pageTitle = "Model não encontrado" ?></h1>
+<p>O model <strong><?php echo Inflector::camelize($details["model"]) ?></strong> não foi encontrado. O arquivo <code>app/models/<?php echo Inflector::underscore($details["model"]) ?>.php</code> realmente existe?</p>
