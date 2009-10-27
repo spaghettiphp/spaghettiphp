@@ -125,10 +125,14 @@ class FormHelper extends HtmlHelper {
     public function radio($name, $options = array()) {
         $options = array_merge(array(
             "options" => array(),
-            "value" => null
+            "value" => null,
+            "legend" => Inflector::camelize($name)
         ), $options);
         $content = "";
         $radioOptions = array_unset($options, "options");
+        if($legend = array_unset($options, "legend")):
+            $content = $this->tag("legend", $legend);
+        endif;
         foreach($radioOptions as $key => $value):
             $radioAttr = array(
                 "type" => "radio",
@@ -136,13 +140,14 @@ class FormHelper extends HtmlHelper {
                 "id" => Inflector::camelize("{$name}_{$key}"),
                 "name" => $name,
             );
-            if($key === $options["value"]):
+            if($key === (string) $options["value"]):
                 $radioAttr["checked"] = true;
                 unset($options["value"]);
             endif;
             $content .= $this->tag("input", null, $radioAttr, false);
             $content .= $this->tag("label", $value, array("for" => $radioAttr["id"]));
         endforeach;
+        $content = $this->tag("fieldset", $content);
         return $this->output($content);
     }
     /**
@@ -210,6 +215,7 @@ class FormHelper extends HtmlHelper {
                 $input = $this->select($name, $selectOptions);
                 break;
             case "radio":
+                $options["legend"] = $label;
                 $label = false;
                 $input = $this->radio($name, $options);
                 break;
