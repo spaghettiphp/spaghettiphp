@@ -248,6 +248,16 @@ class Model extends Object {
         return $db->query($query);
     }
     /**
+     *  Executa uma consulta diretamente no datasource, retornando os resultados.
+     *
+     *  @param string $query Consulta a ser executada
+     *  @return array Resultado da consulta
+     */
+    public function fetch($query) {
+        $db =& self::getConnection($this->environment);
+        return $db->fetchAll($query);
+    }
+    /**
      *  Inicia uma transação SQL.
      *
      *  @return boolean Verdadeiro se a transação foi iniciada
