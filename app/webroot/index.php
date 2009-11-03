@@ -33,14 +33,9 @@ define("DS", DIRECTORY_SEPARATOR);
 define("ROOT", dirname(dirname(dirname(__FILE__))));
 
 /**
- *  Protocolo HTTP
- */
-define("PROTOCOL", $_SERVER['SERVER_PROTOCOL'] == 'HTTP/1.1' ? 'http' : 'https');
-
-/**
  *  URL do domínio em que a aplicação está instalada.
  */
-define("BASE_URL", PROTOCOL . "://" . $_SERVER["HTTP_HOST"]);
+define("BASE_URL", "http" . ($_SERVER["HTTPS"] == "on" ? "s" : "") . "://" . $_SERVER["HTTP_HOST"]);
 
 /**
  *  Definições dos caminhos do Spaghetti. Essas definições só precisam ser editadas
