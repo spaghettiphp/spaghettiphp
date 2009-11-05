@@ -167,7 +167,7 @@ class FormHelper extends HtmlHelper {
             "value" => null,
             "startYear" => 1980,
             "endYear" => date("Y"),
-            "currentDay" => date("d", $date),
+            "currentDay" => date("j", $date),
             "currentMonth" => date("m", $date),
             "currentYear" => date("Y", $date)
         ), $options);
