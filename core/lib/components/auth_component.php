@@ -101,7 +101,7 @@ class AuthComponent extends Component {
       */
     public $authError = "notAuthorized";
     
-    public $redirect = false;
+    public $authenticate = false;
 
     /**
       *  Inicializa o componente.
@@ -266,8 +266,7 @@ class AuthComponent extends Component {
                 $this->fields["password"] => $password
             ));
             if(!empty($user)):
-                $this->authenticate($user[$this->fields["id"]], $password);
-                $this->redirect = true;
+                $this->authenticate = true;
             else:
                 $this->error($this->loginError);
             endif;
@@ -275,12 +274,12 @@ class AuthComponent extends Component {
     }
     
     public function loginRedirect() {
-        if($this->redirect):
-            $redirect = $this->getAction();
-            if(!$redirect):
-                $redirect = $this->loginRedirect;
+        if($this->authenticate):
+            $this->authenticate($this->user["id"], $this->user["password"]);
+            if($redirect = $this->getAction()):
+                $this->loginRedirect = $redirect;
             endif;
-            $this->controller->redirect($redirect);
+            $this->controller->redirect($this->loginRedirect);
         endif;
     }
     /**
