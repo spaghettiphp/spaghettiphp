@@ -56,11 +56,11 @@ class Session extends Object {
         return true;
     }
     
-    public function writeFlash($key, $value) {
+    public static function writeFlash($key, $value) {
         self::write('Flash.' . $key, $value);
     }
     
-    public function flash($key) {
+    public static function flash($key) {
         $value = self::read('Flash.' . $key);
         self::delete('Flash.' . $key);
         return $value;
