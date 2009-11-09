@@ -353,7 +353,7 @@ class AuthComponent extends Component {
       *  @return void
       */
     public function error($type, $details = array()) {
-        Session::write("Auth.error", $type);
+        Session::setFlash("Auth.error", $type);
     }
 }
 
