@@ -56,7 +56,7 @@ class Session extends Object {
         return true;
     }
     
-    public function setFlash($key, $value) {
+    public function writeFlash($key, $value) {
         self::write('Flash.' . $key, $value);
     }
     
