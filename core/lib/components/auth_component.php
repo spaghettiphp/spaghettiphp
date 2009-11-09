@@ -100,6 +100,8 @@ class AuthComponent extends Component {
       *  Mensagem de erro para acesso não autorizado.
       */
     public $authError = "notAuthorized";
+    
+    public $redirect = false;
 
     /**
       *  Inicializa o componente.
@@ -121,6 +123,9 @@ class AuthComponent extends Component {
         if($this->autoCheck):
             $this->check();
         endif;
+        if(Mapper::match($this->loginAction)):
+            $this->login();
+        endif;
     }
     /**
       *  Finaliza o component.
@@ -130,7 +135,7 @@ class AuthComponent extends Component {
       */
     public function shutdown(&$controller) {
         if(Mapper::match($this->loginAction)):
-            $this->login();
+            $this->loginRedirect();
         endif;
     }
     /**
@@ -262,14 +267,20 @@ class AuthComponent extends Component {
             ));
             if(!empty($user)):
                 $this->authenticate($user[$this->fields["id"]], $password);
-                $redirect = $this->getAction();
-                if(!$redirect):
-                    $redirect = $this->loginRedirect;
-                endif;
-                $this->controller->redirect($this->loginRedirect);
+                $this->redirect = true;
             else:
                 $this->error($this->loginError);
             endif;
+        endif;
+    }
+    
+    public function loginRedirect() {
+        if($this->redirect):
+            $redirect = $this->getAction();
+            if(!$redirect):
+                $redirect = $this->loginRedirect;
+            endif;
+            $this->controller->redirect($redirect);
         endif;
     }
     /**
