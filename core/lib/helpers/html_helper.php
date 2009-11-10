@@ -103,6 +103,13 @@ class HtmlHelper extends Helper {
      *  @return string HTML da imagem a ser inserida
      */
     public function image($src, $attr = array(), $full = false) {
+        $attr = array_merge(
+            array(
+                "alt" => "",
+                "title" => isset($attr["alt"]) ? $attr["alt"] : ""
+            ),
+            $attr
+        );
         if(!$this->external($src)):
             $src = Mapper::url("/images/" . $src, $full);
         endif;
