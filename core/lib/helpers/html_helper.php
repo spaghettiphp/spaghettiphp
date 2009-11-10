@@ -110,6 +110,19 @@ class HtmlHelper extends Helper {
         return $this->output($this->tag("img", null, $attr, true));
     }
     /**
+      *  Short description.
+      *
+      *  @param string $src
+      *  @param array $img_attr
+      *  @param string $url
+      *  @param array $attr
+      *  @param boolean $full
+      *  @return string
+      */
+    public function imagelink($src, $img_attr, $url, $attr = array(), $full = false) {
+        return $this->link($this->image($src, $img_attr, $full), $url, $attr, $full);
+    }
+    /**
      *  Cria elementos de folha de estilho para serem usados no HTML.
      * 
      *  @param string $href Caminho da folha de estilo a ser inserida no HTML
