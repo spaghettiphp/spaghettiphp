@@ -113,13 +113,14 @@ class HtmlHelper extends Helper {
       *  Short description.
       *
       *  @param string $src
-      *  @param array $img_attr
       *  @param string $url
+      *  @param array $img_attr
       *  @param array $attr
       *  @param boolean $full
       *  @return string
       */
-    public function imagelink($src, $img_attr, $url, $attr = array(), $full = false) {
+    public function imagelink($src, $url, $img_attr = array(), $attr = array(), $full = false) {
+        
         return $this->link($this->image($src, $img_attr, $full), $url, $attr, $full);
     }
     /**
