@@ -38,14 +38,7 @@ class View extends Object {
      */
     public $params = array();
     
-    public function __construct(&$controller = null) {
-        if($controller):
-            $this->autoLayout = $controller->autoLayout;
-            $this->helpers = $controller->helpers;
-            $this->params = $controller->params;
-            $this->layout = $controller->layout;
-            $this->data = $controller->viewData;
-        endif;
+    public function __construct() {
         $this->loadHelpers();
     }
     /**

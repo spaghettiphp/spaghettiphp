@@ -53,7 +53,7 @@ class Controller extends Object {
     /**
      *  Variáveis a serem enviadas para a view.
      */
-    public $viewData = array();
+    public $view = array();
     public $methods = array();
 
     public function __construct() {
@@ -173,8 +173,14 @@ class Controller extends Object {
      */
     public function render($action = null, $layout = null) {
         $this->beforeRender();
-        $view = new View($this);
+        $view = new View;
+        $view->autoLayout = $this->autoLayout;
+        $view->helpers = $this->helpers;
+        $view->params = $this->params;
+        $view->layout = $this->layout;
+        $view->data = $this->view;
         $this->autoRender = false;
+
         return $this->output .= $view->render($action, $layout);
     }
     /**
@@ -256,20 +262,20 @@ class Controller extends Object {
                 $this->set($key, $value);
             endforeach;
         elseif(!is_null($value)):
-            return $this->viewData[$var] = $value;
+            return $this->view[$var] = $value;
         endif;
         return true;
     }
     /**
-     *  Recupera uma variável de Controller::viewData.
+     *  Recupera uma variável de Controller::view.
      *
      *  @param string $var Nome da variável a ser lida
      *  @return mixed Valor da variável
      */
     public function get($var = null) {
         if(!is_null($var)):
-            if(isset($this->viewData[$var])):
-                return $this->viewData[$var];
+            if(isset($this->view[$var])):
+                return $this->view[$var];
             endif;
         endif;
         return false;
