@@ -24,7 +24,7 @@ class View extends Object {
     /**
      *  Helpers já carregados.
      */
-    public $loadedHelpers = array();
+    public $loadedHelpers = null;
     /**
      *  Layout a ser utilizado na renderização.
      */
@@ -38,15 +38,13 @@ class View extends Object {
      */
     public $params = array();
     
-    public function __construct() {
-        $this->loadHelpers();
-    }
     /**
      *  Carrega os helpers definidos.
      *
      *  @return array Instâncias dos helpers
      */
     public function loadHelpers() {
+        $this->loadedHelpers = array();
         foreach($this->helpers as $helper):
             $class = "{$helper}Helper";
             $helper = Inflector::underscore($helper);
@@ -71,6 +69,9 @@ class View extends Object {
      *  @return string Resultado da renderização
      */
     public function renderView($filename, $data = array()) {
+        if(is_null($this->loadedHelpers)):
+            $this->loadHelpers();
+        endif;
         extract($data, EXTR_OVERWRITE);
         extract($this->loadedHelpers, EXTR_PREFIX_SAME, "helper_");
         ob_start();
