@@ -292,7 +292,7 @@ class Model extends Object {
      */
     public function all($params = array()) {
         $db =& self::getConnection($this->environment);
-        $params = array_merge(
+        $params = array_merge_recursive(
             array(
                 "fields" => array_keys($this->schema),
                 "conditions" => $this->conditions,
