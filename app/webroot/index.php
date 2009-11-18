@@ -35,7 +35,7 @@ define("ROOT", dirname(dirname(dirname(__FILE__))));
 /**
  *  URL do domínio em que a aplicação está instalada.
  */
-define("BASE_URL", "http" . ($_SERVER["HTTPS"] == "on" ? "s" : "") . "://" . $_SERVER["HTTP_HOST"]);
+define("BASE_URL", "http" . (isset($_SERVER["HTTPS"]) ? "s" : "") . "://" . $_SERVER["HTTP_HOST"]);
 
 /**
  *  Definições dos caminhos do Spaghetti. Essas definições só precisam ser editadas
