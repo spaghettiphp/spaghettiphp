@@ -292,10 +292,10 @@ class Model extends Object {
      */
     public function all($params = array()) {
         $db =& self::getConnection($this->environment);
-        $params = array_merge_recursive(
+        $params = array_merge(
             array(
                 "fields" => array_keys($this->schema),
-                "conditions" => $this->conditions,
+                "conditions" => isset($params['conditions']) ? array_merge($this->conditions, $params['conditions']) : $this->conditions,
                 "order" => $this->order,
                 "limit" => $this->limit,
                 "recursion" => $this->recursion
