@@ -19,17 +19,6 @@ Config::write("defaultExtension", "htm");
 Config::write("environment", "development");
 
 /**
- *  debugMode define o nível de mensagens de erro que você receberá enquanto
- *  estiver desenvolvendo.
- */
-Config::write("debugMode", 1);
-
-/**
- *  appEncoding define a codificação a ser enviada ao navegador pela aplicação.
- */
-Config::write("appEncoding", "utf-8");
-
-/**
  *  securitySalt é uma string usada na criptografia de dados. Esta string não
  *  tem limite de caracteres e aceita qualquer tipo de caracter.
  */
