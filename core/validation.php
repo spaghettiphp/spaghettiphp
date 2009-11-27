@@ -108,7 +108,7 @@ class Validation extends Object {
       *  @return boolean Verdadeiro caso o valor seja válido
       */
     public function regex($value, $regex) {
-        return preg_match($value, $regex);
+        return preg_match($regex, $value);
     }
     /**
       *  Valida uma data no formato d/m/y.
