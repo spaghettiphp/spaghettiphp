@@ -295,7 +295,7 @@ class Model extends Object {
         $params = array_merge(
             array(
                 "fields" => array_keys($this->schema),
-                "conditions" => $this->conditions,
+                "conditions" => isset($params['conditions']) ? array_merge($this->conditions, $params['conditions']) : $this->conditions,
                 "order" => $this->order,
                 "limit" => $this->limit,
                 "recursion" => $this->recursion
