@@ -20,7 +20,9 @@
 				padding: 50px 70px;
 				width: 580px;
 			}
-			
+			a {
+				color: #9c0;
+			}
 			hr {
 				border: none;
 				clear: both;
