@@ -7,22 +7,22 @@
 	<div>
 		<span>1</span>
 		<h3>Configure seu arquivo de banco de dados</h3>
-		<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
+		<p>Você encontrará as configurações para banco de dados em <code>/app/config/database.php</code>. Basta definir as configurações necessárias e você já vai estar pronto para começar!</p>
 	</div>
 	<div>
 		<span>2</span>
-		<h3>Configure seu arquivo de banco de dados</h3>
-		<p>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</p>
+		<h3>Crie seu primeiro controller</h3>
+		<p>Crie um novo controller em <code>/app/controllers</code>, ou mesmo modifique HomeController, e comece a adicionar as funcionalidades de sua aplicação.</p>
 	</div>
 	<div>
 		<span>3</span>
-		<h3>Escreva seu primeiro controller</h3>
-		<p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et</p>
+		<h3>Crie seus models</h3>
+		<p>Para poder ter acesso ao banco de dados, você precisará criar models. Basta colocá-los em <code>/app/models</code> e importá-los em seu controller, e você esquecerá que já teve que escrever SQL.</p>
 	</div>
 	<div>
 		<span>4</span>
 		<h3>Crie views e layouts para suas actions</h3>
-		<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. </p>
+		<p>Depois de adicionar funcionalidade, é hora de mostrá-la para seus usuários. Crie suas views em <code>/app/views</code> e seus layouts em <code>/app/layouts</code> e mostre o que sua aplicação pode fazer!</p>
 	</div>
 	<hr class="clear" />
 </section>

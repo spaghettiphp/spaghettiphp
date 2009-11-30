@@ -23,6 +23,9 @@
 			a {
 				color: #9c0;
 			}
+			code {
+				font: 10px Monaco, Consolas, "Courier New", monospace;
+			}
 			hr {
 				border: none;
 				clear: both;
