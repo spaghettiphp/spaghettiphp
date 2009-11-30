@@ -1,0 +1,2 @@
+<h1><?php echo $this->pageTitle = "Helper não encontrado" ?></h1>
+<p>O arquivo <code>app/helpers/<?php echo Inflector::underscore($details['helper']) ?>.php</code> não pôde ser encontrado. Verifique se ele existe, e se possui sua classe <code><?php echo $details['helper'] ?></code> correspondente.</p>

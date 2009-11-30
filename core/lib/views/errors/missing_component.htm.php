@@ -1,0 +1,2 @@
+<h1><?php echo $this->pageTitle = "Component não encontrada" ?></h1>
+<p>O arquivo <code>app/components/<?php echo Inflector::underscore($details['component']) ?>.php</code> não pôde ser encontrado. Verifique se ele existe, e se possui sua classe <code><?php echo $details['component'] ?></code> correspondente.</p>
