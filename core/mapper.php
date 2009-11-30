@@ -293,8 +293,10 @@ class Mapper extends Object {
                 return $path;
             elseif(substr($path, 0, 1) == "/"):
                 $url = self::base() . $path;
+            elseif(substr($path, 0, 1) != "#"):
+                $path = "/" . $path;
             else:
-                $url = self::base() . self::here() . "/" . $path;
+                $url = self::base() . self::here() . $path;
             endif;
             $url = self::normalize($url);
         endif;
