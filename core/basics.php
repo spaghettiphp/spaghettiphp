@@ -80,17 +80,15 @@ class App extends Object {
     public static function path($type = "Core", $file = "", $ext = "php") {
         $paths = array(
             "Core" => array(CORE),
-            "App" => array(APP, LIB),
-            "Lib" => array(LIB),
-
-            "Model" => array(APP . DS . "models", LIB . DS . "models"),
-            "Datasource" => array(APP . DS . "models/datasources", CORE . DS . "datasources"),
             "Controller" => array(APP . DS . "controllers", LIB . DS . "controllers"),
+            "Model" => array(APP . DS . "models", LIB . DS . "models"),
             "View" => array(APP . DS . "views", LIB . DS . "views"),
             "Layout" => array(APP . DS . "layouts", LIB . DS . "layouts"),
             "Component" => array(APP . DS . "components", LIB . DS . "components"),
             "Helper" => array(APP . DS . "helpers", LIB . DS . "helpers"),
-
+            "App" => array(APP, LIB),
+            "Lib" => array(LIB),
+            "Datasource" => array(APP . DS . "models/datasources", CORE . DS . "datasources"),
             "Script" => array(ROOT . DS . "script"),
             "Command" => array(ROOT. DS . "script" . DS . "commands"),
             "Task" => array(ROOT. DS . "script" . DS . "tasks"),
