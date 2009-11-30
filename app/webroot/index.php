@@ -19,7 +19,7 @@ endif;
 /**
   *  Versão atual do Spaghetti*.
   */
-define("SPAGHETTI_VERSION", "0.2b");
+define("SPAGHETTI_VERSION", "0.2");
 
 /**
  *  Alias para DIRECTORY_SEPARATOR. Use para separar diretórios em definições de
