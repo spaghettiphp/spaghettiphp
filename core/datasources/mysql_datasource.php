@@ -147,7 +147,7 @@ class MysqlDatasource extends Datasource {
      *  @param string $column Descrição da coluna no banco de dados
      *  @return string Tipo básico da coluna
      */
-    public function column($column = "") {
+    public function column($column) {
         preg_match("/([a-z]*)\(?([^\)]*)?\)?/", $column, $type);
         list($column, $type, $limit) = $type;
         if(in_array($type, array("date", "time", "datetime", "timestamp"))):
@@ -188,7 +188,7 @@ class MysqlDatasource extends Datasource {
      *  @param string $table Tabela a ser descrita
      *  @return array Descrição da tabela
      */
-    public function describe($table = null) {
+    public function describe($table) {
         if(!isset($this->schema[$table])):
             if(!$this->query("SHOW COLUMNS FROM {$table}")) return false;
             $columns = $this->fetchAll();
@@ -350,9 +350,10 @@ class MysqlDatasource extends Datasource {
      *  Escapa um valor para uso em consultas SQL.
      *
      *  @param string $value Valor a ser escapado
+     *  @param string $column Tipo do valor a ser escapado
      *  @return string Valor escapado
      */
-    public function value($value = "", $column = null) {
+    public function value($value, $column = null) {
         switch($column):
             case "boolean":
                 if($value === true):

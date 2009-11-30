@@ -648,6 +648,17 @@ class Model extends Object {
         $db =& self::getConnection($this->environment);
         return $db->getAffectedRows();
     }
+    /**
+     *  Escapa um valor para uso em consultas SQL.
+     *
+     *  @param string $value Valor a ser escapado
+     *  @param string $column Tipo do valor a ser escapado
+     *  @return string Valor escapado
+     */
+    public function escape($value, $column = null) {
+        $db =& self::getConnection($this->environment);
+        return $db->value($value, $column);
+    }
 }
 
 ?>
