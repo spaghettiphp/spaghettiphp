@@ -239,6 +239,10 @@ class FormHelper extends HtmlHelper {
         if($div):
             if($div === true):
                 $div = "input {$options['type']}";
+            else:
+                $div = array_merge(array(
+                    "class" => "input {$options['type']}"
+                ), $div);
             endif;
             $input = $this->div($input, $div);
         endif;
