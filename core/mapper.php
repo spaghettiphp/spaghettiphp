@@ -287,19 +287,19 @@ class Mapper extends Object {
                     $url .= "/" . $value;
                 endif;
             endforeach;
-            $url = self::normalize(self::base() . $url);
         else:
             if(preg_match("/^[a-z]+:/", $path)):
                 return $path;
             elseif(substr($path, 0, 1) == "/"):
-                $url = self::base() . $path;
-            elseif(substr($path, 0, 1) != "#"):
-                $url = self::base() . self::here() . "/" . $path;
+                $url = $path;
             else:
-                $url = self::base() . self::here() . $path;
+                if(substr($path, 0, 1) != "#"):
+                    $path = "/" . $path;
+                endif;
+                $url = self::here() . $path;
             endif;
-            $url = self::normalize($url);
         endif;
+        $url = self::normalize(self::base() . $url);
         return $full ? BASE_URL . $url : $url;
     }
     /**
