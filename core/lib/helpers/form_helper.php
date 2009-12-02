@@ -224,6 +224,7 @@ class FormHelper extends HtmlHelper {
                 $options["id"] = $options["id"] . "D";
                 break;
             case "textarea":
+                unset($options["type"]);
                 $input = $this->tag("textarea", array_unset($options, "value"), $options);
                 break;
             default:
