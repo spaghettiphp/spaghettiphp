@@ -221,6 +221,7 @@ class FormHelper extends HtmlHelper {
                 break;
             case "date":
                 $input = $this->date($name, $options);
+                $options["id"] = $options["id"] . "D";
                 break;
             case "textarea":
                 $input = $this->tag("textarea", array_unset($options, "value"), $options);
