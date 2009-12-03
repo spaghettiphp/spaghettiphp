@@ -224,15 +224,16 @@ class FormHelper extends HtmlHelper {
                 break;
             case "textarea":
                 unset($options["type"]);
-                $value = array_unset($options, "value");
+                $value = Sanitize::html(array_unset($options, "value"));
                 $input = $this->tag("textarea", $value, $options);
                 break;
+            case "hidden":
+                $div = $label = false;
             default:
-                if($options["type"] == "hidden"):
-                    $div = $label = false;
-                elseif($name == "password"):
+                if($name == "password"):
                     $options["type"] = "password";
                 endif;
+                $options["value"] = Sanitize::html($options["value"]);
                 $input = $this->tag("input", null, $options, false);
         endswitch;
         if($label):
