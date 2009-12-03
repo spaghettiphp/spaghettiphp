@@ -11,13 +11,6 @@
 
 class Validation extends Object {
     /**
-     *  Padrões comuns usados em vários lugares.
-     */
-    public static $patterns = array(
-        "ip" => "(?:(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|(?:(?:1[0-9])?|[1-9]?)[0-9])",
-        "hostname" => "(?:[a-z0-9][-a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel)"
-    );
-    /**
      *  Valida um valor alfanumérico (letras e números).
      *
      *  @param string $value Valor a ser validado
@@ -39,7 +32,12 @@ class Validation extends Object {
         if(!is_numeric($value)):
             $value = strlen($value);
         endif;
-        return $value >= $min && $value <= $max;
+        return filter_var($value, FILTER_VALIDATE_INT, array(
+            "options" => array(
+                "min_range" => $min,
+                "max_range" => $max,
+            )
+        ));
     }
     /**
       *  Valida se um valor é vazio.
@@ -143,9 +141,9 @@ class Validation extends Object {
       *  @return boolean Verdadeiro caso o valor seja válido
       */
     public static function email($value, $checkHost = false) {
-        $match = preg_match("/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@" . self::$patterns["hostname"] . "$/i", $value);
+        $match = filter_var($value, FILTER_VALIDATE_EMAIL);
         if($match && $checkHost):
-            preg_match("/@(" . self::$patterns["hostname"] . ")$/i", $value, $reg);
+            preg_match("/@((?:[a-z0-9][-a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel))$/i", $value, $reg);
             $host = gethostbynamel($reg[1]);
             return is_array($host);
         endif;
@@ -168,7 +166,7 @@ class Validation extends Object {
       *  @return boolean Verdadeiro caso o valor seja válido.
       */
     public static function ip($value) {
-        return preg_match("/^" . self::$patterns["ip"] . "$/", $value);
+        return filter_var($value, FILTER_VALIDATE_IP);
     }
     /**
      *  Valida se um valor tem um tamanho mínimo.
@@ -289,15 +287,8 @@ class Validation extends Object {
       *  @param boolean $strict Limitar a URL a protocolos válidos
       *  @return boolean Verdadeiro caso o valor seja válido
       */
-    public static function url($value, $strict = false) {
-        $chars = '([' . preg_quote('!"$&\'()*+,-.@_:;=') . '\/0-9a-z]|(\%[0-9a-f]{2}))';
-        $regex = "(?:(?:https?|ftps?|file|news|gopher)://)?"
-               . "(?:" . self::$patterns["ip"] . "|" . self::$patterns["hostname"] . ")"
-               . "(?::[1-9][0-9]{0,3})?"
-               . "(?:/?|/{$chars}*)?"
-               . "(?:\?{$chars}*)?"
-               . "(?:#{$chars}*)?";
-        return preg_match("%^{$regex}$%i", $value);
+    public static function url($value) {
+        return filter_var($value, FILTER_VALIDATE_URL);
     }
 }
 
