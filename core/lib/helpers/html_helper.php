@@ -30,7 +30,7 @@ class HtmlHelper extends Helper {
         $html = "<{$tag}";
         $attr = $this->attr($attr);
         if(!empty($attr)):
-            $html .= " $attr";
+            $html .= " {$attr}";
         endif;
         $html .= ($empty ? " /" : "") . ">";
         return $html;
@@ -117,18 +117,18 @@ class HtmlHelper extends Helper {
         return $this->output($this->tag("img", null, $attr, true));
     }
     /**
-      *  Short description.
+      *  Cria um link de imagem.
       *
-      *  @param string $src
-      *  @param string $url
-      *  @param array $img_attr
-      *  @param array $attr
-      *  @param boolean $full
-      *  @return string
+      *  @param string $src Endereço da imagem
+      *  @param string $url URL para o link
+      *  @param array $img_attr Atributos da imagem
+      *  @param array $attr Atributos do link
+      *  @param boolean $full Verdadeiro para gerar uma URL completa
+      *  @return string HTML do link a ser inserido
       */
     public function imagelink($src, $url, $img_attr = array(), $attr = array(), $full = false) {
-        
-        return $this->link($this->image($src, $img_attr, $full), $url, $attr, $full);
+        $image = $this->image($src, $img_attr, $full);
+        return $this->link($image, $url, $attr, $full);
     }
     /**
      *  Cria elementos de folha de estilho para serem usados no HTML.
@@ -240,9 +240,6 @@ class HtmlHelper extends Helper {
      *  @return string Tag META
      */
     public function charset($charset = null) {
-        if(is_null($charset)):
-            $charset = Config::read("appEncoding");
-        endif;
         $attr = array(
             "http-equiv" => "Content-type",
             "content" => "text/html; charset={$charset}"
