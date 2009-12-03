@@ -92,7 +92,7 @@ class HtmlHelper extends Helper {
             $url = $text;
         endif;
         $attr["href"] = Mapper::url($url, $full);
-        return $this->output($this->tag("a", $text, $attr));
+        return $this->tag("a", $text, $attr);
     }
     /**
      *  Cria um elemento de imagem para ser na aplicação.
@@ -114,7 +114,7 @@ class HtmlHelper extends Helper {
             $src = Mapper::url("/images/" . $src, $full);
         endif;
         $attr["src"] = $src;
-        return $this->output($this->tag("img", null, $attr, true));
+        return $this->tag("img", null, $attr, true);
     }
     /**
       *  Cria um link de imagem.
@@ -157,7 +157,7 @@ class HtmlHelper extends Helper {
                 ),
                 $attr
             );
-            $output = $this->output($this->tag("link", null, $attr, true));
+            $output = $this->tag("link", null, $attr, true);
         endif;
         if($inline):
             return $output;
@@ -192,7 +192,7 @@ class HtmlHelper extends Helper {
                 ),
                 $attr
             );
-            $output = $this->output($this->tag("script", null, $attr));
+            $output = $this->tag("script", null, $attr);
         endif;
         if($inline):
             return $output;
@@ -231,7 +231,7 @@ class HtmlHelper extends Helper {
         if(!is_array($attr)):
             $attr = array("class" => $attr);
         endif;
-        return $this->output($this->tag("div", $content, $attr));
+        return $this->tag("div", $content, $attr);
     }
     /**
      *  Adiciona uma meta tag para definir o charset da página.
@@ -244,7 +244,7 @@ class HtmlHelper extends Helper {
             "http-equiv" => "Content-type",
             "content" => "text/html; charset={$charset}"
         );
-        return $this->output($this->tag("meta", null, $attr));
+        return $this->tag("meta", null, $attr);
     }
     /**
      *  Verifica se uma URL é externa.

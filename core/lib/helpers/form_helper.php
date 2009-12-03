@@ -29,7 +29,7 @@ class FormHelper extends HtmlHelper {
             $attributes["method"] = "post";
             $attributes["enctype"] = "multipart/form-data";
         endif;
-        return $this->output($this->openTag("form", $attributes));
+        return $this->openTag("form", $attributes);
     }
     /**
      *  Fecha um elemento HTML do formulário de acordo com os atributos repassados.
@@ -43,7 +43,7 @@ class FormHelper extends HtmlHelper {
         if(!is_null($submit)):
             $form = $this->submit($submit, $attributes) . $form;
         endif;
-        return $this->output($form);
+        return $form;
     }
     /**
      *  Cria um botão de envio dos dados do formulário.
@@ -74,7 +74,7 @@ class FormHelper extends HtmlHelper {
             default:
                 $button = $this->tag("button", $text, $attributes);
         endswitch;
-        return $this->output($button);
+        return $button;
     }
     /**
      *  Cria uma caixa de seleção.
@@ -113,7 +113,7 @@ class FormHelper extends HtmlHelper {
             endif;
             $content .= $this->tag("option", $value, $optionAttr);
         endforeach;
-        return $this->output($this->tag("select", $content, $options));
+        return $this->tag("select", $content, $options);
     }
     /**
      *  Cria um input radio.
@@ -148,7 +148,7 @@ class FormHelper extends HtmlHelper {
             $content .= $this->tag("label", $value, array("for" => $radioAttr["id"]));
         endforeach;
         $content = $this->tag("fieldset", $content);
-        return $this->output($content);
+        return $content;
     }
     /**
      *  Cria um conjunto de caixa de seleção para a data.
@@ -189,7 +189,7 @@ class FormHelper extends HtmlHelper {
             "options" => $years,
             "id" => $options["id"] . "Y"
         ));
-        return $this->output($selectDay . $selectMonth . $selectYear);
+        return $selectDay . $selectMonth . $selectYear;
     }
     /**
      *  Cria caixa de entrada formatada e com label.
@@ -248,7 +248,7 @@ class FormHelper extends HtmlHelper {
             endif;
             $input = $this->div($input, $div);
         endif;
-        return $this->output($input);
+        return $input;
     }
 }
 
