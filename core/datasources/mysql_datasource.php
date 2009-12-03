@@ -49,9 +49,11 @@ class MysqlDatasource extends Datasource {
      *  @return resource Conexão com o banco de dados
      */
     public function connect() {
-        $this->connection = mysql_connect($this->config["host"], $this->config["user"], $this->config["password"]);
-        if(mysql_select_db($this->config["database"], $this->connection)):
+        $this->connection = @mysql_connect($this->config["host"], $this->config["user"], $this->config["password"]);
+        if(@mysql_select_db($this->config["database"], $this->connection)):
             $this->connected = true;
+        else:
+            $this->error("connectionError");
         endif;
         return $this->connection;
     }
