@@ -31,29 +31,27 @@ class PaginationHelper extends HtmlHelper {
      *  @return string Lista de páginas
      */
     public function numbers($options = array()) {
-        $options = array_merge(
-            array(
-                "modulus" => 3,
-                "separator" => " ",
-                "tag" => "span",
-                "current" => "current"
-            ),
-            $options
+        if(!$this->model) return null;
+        $options += array(
+            "modulus" => 3,
+            "separator" => " ",
+            "tag" => "span",
+            "current" => "current"
         );
         $page = $this->model->pagination["page"];
         $pages = $this->model->pagination["totalPages"];
         $numbers = array();
-        for($i = $page - $options["modulus"]; $i <= $page + $options["modulus"]; $i++):
-            if($i > 0 && $i <= $pages):
-                if($i != $page):
-                    $attributes = array();
-                    $number = $this->link($i, array("page" => $i));
-                else:
-                    $attributes = array("class" => $options["current"]);
-                    $number = $i;
-                endif;
-                $numbers []= $this->tag($options["tag"], $number, $attributes);
+        $start = max($page - $options["modulus"], 1);
+        $end = min($page + $options["modulus"], $pages);
+        for($i =$start; $i <= $end; $i++):
+            if($i == $page):
+                $attributes = array("class" => $options["current"]);
+                $number = $i;
+            else:
+                $attributes = array();
+                $number = $this->link($i, array("page" => $i));
             endif;
+            $numbers []= $this->tag($options["tag"], $number, $attributes);
         endfor;
         return join($options["separator"], $numbers);
     }
@@ -94,8 +92,7 @@ class PaginationHelper extends HtmlHelper {
      */
     public function first($text, $attr = array()) {
         if($this->hasPrevious()):
-            $page = 1;
-            return $this->link($text, array("page" => $page), $attr);
+            return $this->link($text, array("page" => 1), $attr);
         endif;
         return "";
     }
