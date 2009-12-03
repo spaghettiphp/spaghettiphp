@@ -1,6 +1,7 @@
 version 0.2.1 (2010-?)
     * Added Sanitize
     * Sanitizing form fields
+    * Added connectionError when Spaghetti* can't connect to the database
     * Removed Helper::output()
     * Fixed attributes in FormHelper::input()
     * Fixed anchors in Mapper::url()
