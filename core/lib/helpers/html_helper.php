@@ -103,12 +103,9 @@ class HtmlHelper extends Helper {
      *  @return string HTML da imagem a ser inserida
      */
     public function image($src, $attr = array(), $full = false) {
-        $attr = array_merge(
-            array(
-                "alt" => "",
-                "title" => isset($attr["alt"]) ? $attr["alt"] : ""
-            ),
-            $attr
+        $attr += array(
+            "alt" => "",
+            "title" => isset($attr["alt"]) ? $attr["alt"] : ""
         );
         if(!$this->external($src)):
             $src = Mapper::url("/images/" . $src, $full);
@@ -149,13 +146,10 @@ class HtmlHelper extends Helper {
             if(!$this->external($href)):
                 $href = Mapper::url("/styles/" . $this->extension($href, "css"), $full);
             endif;
-            $attr = array_merge(
-                array(
-                    "href" => $href,
-                    "rel" => "stylesheet",
-                    "type" => "text/css"
-                ),
-                $attr
+            $attr += array(
+                "href" => $href,
+                "rel" => "stylesheet",
+                "type" => "text/css"
             );
             $output = $this->tag("link", null, $attr, true);
         endif;
@@ -185,12 +179,9 @@ class HtmlHelper extends Helper {
             if(!$this->external($src)):
                 $src = Mapper::url("/scripts/" . $this->extension($src, "js"), $full);
             endif;
-            $attr = array_merge(
-                array(
-                    "src" => $src,
-                    "type" => "text/javascript"
-                ),
-                $attr
+            $attr += array(
+                "src" => $src,
+                "type" => "text/javascript"
             );
             $output = $this->tag("script", null, $attr);
         endif;
