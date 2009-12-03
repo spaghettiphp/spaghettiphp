@@ -18,18 +18,15 @@ class FormHelper extends HtmlHelper {
      *  @return string Tag FORM aberto e formatado
      */
     public function create($action = null, $options = array()) {
-        $attributes = array_merge(
-            array(
-                "method" => "post",
-                "action" => Mapper::url($action)
-            ),
-            $options
+        $options += array(
+            "method" => "post",
+            "action" => Mapper::url($action)
         );
-        if($attributes["method"] == "file"):
-            $attributes["method"] = "post";
-            $attributes["enctype"] = "multipart/form-data";
+        if($options["method"] == "file"):
+            $options["method"] = "post";
+            $options["enctype"] = "multipart/form-data";
         endif;
-        return $this->openTag("form", $attributes);
+        return $this->openTag("form", $options);
     }
     /**
      *  Fecha um elemento HTML do formulário de acordo com os atributos repassados.
@@ -53,12 +50,9 @@ class FormHelper extends HtmlHelper {
      *  @return string Botão de envio do formulário
      */
     public function submit($text, $attributes = array()) {
-        $attributes = array_merge(
-            array(
-                "type" => "submit",
-                "tag" => "button"
-            ),
-            $attributes
+        $attributes += array(
+            "type" => "submit",
+            "tag" => "button"
         );
         switch(array_unset($attributes, "tag")):
             case "image":
@@ -69,12 +63,11 @@ class FormHelper extends HtmlHelper {
                 endif;
             case "input":
                 $attributes["value"] = $text;
-                $button = $this->tag("input", null, $attributes, false);
+                return $this->tag("input", null, $attributes, false);
                 break;
             default:
-                $button = $this->tag("button", $text, $attributes);
+                return $this->tag("button", $text, $attributes);
         endswitch;
-        return $button;
     }
     /**
      *  Cria uma caixa de seleção.
@@ -84,13 +77,14 @@ class FormHelper extends HtmlHelper {
      *  @return string Caixa de seleção do formulário
      */
     public function select($name, $options = array()) {
-        $options = array_merge(array(
+        $options += array(
             "name" => $name,
             "options" => array(),
             "value" => null,
             "empty" => false
-        ), $options);
+        );
         $selectOptions = array_unset($options, "options");
+        $selectValue = array_unset($options, "value");
         if(($empty = array_unset($options, "empty")) !== false):
             $keys = array_keys($selectOptions);
             if(is_array($empty)):
@@ -106,14 +100,14 @@ class FormHelper extends HtmlHelper {
         endif;
         $content = "";
         foreach($selectOptions as $key => $value):
-            $optionAttr = array("value" => $key);
-            if((string) $key === (string) $options["value"]):
-                $optionAttr["selected"] = true;
-                unset($options["value"]);
+            $option = array("value" => $key);
+            if((string) $key === (string) $selectValue):
+                $option["selected"] = true;
             endif;
-            $content .= $this->tag("option", $value, $optionAttr);
+            $content .= $this->tag("option", $value, $option);
         endforeach;
         return $this->tag("select", $content, $options);
+
     }
     /**
      *  Cria um input radio.
@@ -123,13 +117,14 @@ class FormHelper extends HtmlHelper {
      *  @return string Input do formulário
      */
     public function radio($name, $options = array()) {
-        $options = array_merge(array(
+        $options += array(
             "options" => array(),
             "value" => null,
             "legend" => Inflector::camelize($name)
-        ), $options);
+        );
         $content = "";
         $radioOptions = array_unset($options, "options");
+        $radioValue = array_unset($options, "value");
         if($legend = array_unset($options, "legend")):
             $content = $this->tag("legend", $legend);
         endif;
@@ -138,14 +133,14 @@ class FormHelper extends HtmlHelper {
                 "type" => "radio",
                 "value" => $key,
                 "id" => Inflector::camelize("{$name}_{$key}"),
-                "name" => $name,
+                "name" => $name
             );
-            if($key === (string) $options["value"]):
+            if((string) $key === (string) $radioValue):
                 $radioAttr["checked"] = true;
-                unset($options["value"]);
             endif;
+            $for = array("for" => $radioAttr["id"]);
             $content .= $this->tag("input", null, $radioAttr, false);
-            $content .= $this->tag("label", $value, array("for" => $radioAttr["id"]));
+            $content .= $this->tag("label", $value, $for);
         endforeach;
         $content = $this->tag("fieldset", $content);
         return $content;
@@ -163,14 +158,15 @@ class FormHelper extends HtmlHelper {
         else:
             $date = time();
         endif;
-        $options = array_merge(array(
+        $options += array(
             "value" => null,
             "startYear" => 1980,
             "endYear" => date("Y"),
             "currentDay" => date("j", $date),
             "currentMonth" => date("n", $date),
-            "currentYear" => date("Y", $date)
-        ), $options);
+            "currentYear" => date("Y", $date),
+            "format" => "dmy"
+        );
         $days = array_range(1, 31);
         $months = array_range(1, 12);
         $years = array_range($options["startYear"], $options["endYear"]);
@@ -189,7 +185,11 @@ class FormHelper extends HtmlHelper {
             "options" => $years,
             "id" => $options["id"] . "Y"
         ));
-        return $selectDay . $selectMonth . $selectYear;
+        if($format == "ymd"):
+            return $selectYear . $selectMonth . $selectDay;
+        else:
+            return $selectDay . $selectMonth . $selectYear;
+        endif;
     }
     /**
      *  Cria caixa de entrada formatada e com label.
@@ -199,20 +199,19 @@ class FormHelper extends HtmlHelper {
      *  @return string Campo de entrada do formulário
      */
     public function input($name, $options = array()) {
-        $options = array_merge(array(
+        $options += array(
             "name" => $name,
             "type" => "text",
             "id" => Inflector::camelize("form_" . Inflector::slug($name)),
             "label" => Inflector::humanize($name),
             "div" => true
-        ), $options);
+        );
         $label = array_unset($options, "label");
         $div = array_unset($options, "div");
         switch($options["type"]):
             case "select":
-                $selectOptions = $options;
                 unset($selectOptions["type"]);
-                $input = $this->select($name, $selectOptions);
+                $input = $this->select($name, $options);
                 break;
             case "radio":
                 $options["legend"] = $label;
@@ -225,7 +224,8 @@ class FormHelper extends HtmlHelper {
                 break;
             case "textarea":
                 unset($options["type"]);
-                $input = $this->tag("textarea", array_unset($options, "value"), $options);
+                $value = array_unset($options, "value");
+                $input = $this->tag("textarea", $value, $options);
                 break;
             default:
                 if($options["type"] == "hidden"):
@@ -236,15 +236,14 @@ class FormHelper extends HtmlHelper {
                 $input = $this->tag("input", null, $options, false);
         endswitch;
         if($label):
-            $input = $this->tag("label", $label, array("for" => $options["id"])) . $input;
+            $for = array("for" => $options["id"]);
+            $input = $this->tag("label", $label, $for) . $input;
         endif;
         if($div):
             if($div === true):
                 $div = "input {$options['type']}";
-            else:
-                $div = array_merge(array(
-                    "class" => "input {$options['type']}"
-                ), $div);
+            elseif(is_array($div)):
+                $div += array("class" => "input {$options['type']}");
             endif;
             $input = $this->div($input, $div);
         endif;
