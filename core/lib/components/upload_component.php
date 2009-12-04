@@ -111,7 +111,7 @@ class UploadComponent extends Component {
      */
     public function delete($filename = "", $path = null) {
         $path = is_null($path) ? $this->path : $path;
-        $file = APP . $path . DS . $filename;
+        $file = APP . DS . "webroot" . $path . $filename;
         if(file_exists($file)):
             if(unlink($file)):
                 return true;

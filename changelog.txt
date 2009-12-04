@@ -1,13 +1,14 @@
 version 0.2.1 (2010-?)
-    * Added Sanitize
-    * Sanitizing form fields
     * Added connectionError when Spaghetti* can't connect to the database
-    * Some Validation methods now use filter_var()
-    * Removed Helper::output()
-    * Fixed attributes in FormHelper::input()
+    * Added Sanitize
     * Fixed anchors in Mapper::url()
+    * Fixed attributes in FormHelper::input()
     * Fixed missing class when passing arrays for div in FormHelper::input()
     * Lots of refactoring
+    * Moved ImageComponent and UploadComponent's base path to WEBROOT
+    * Removed Helper::output()
+    * Sanitizing form fields
+    * Some Validation methods now use filter_var()
 
 version 0.2 (2009-12-01)
     * HtmlHelper::image() now has default alt and title attributes
