@@ -269,7 +269,7 @@ class MysqlDatasource extends Datasource {
             "fields" => is_array($f = $params["fields"]) ? join(",", $f) : $f,
             "conditions" => ($c = $this->sqlConditions($table, $params["conditions"])) ? "WHERE {$c}" : "",
             "order" => is_null($params["order"]) ? "" : "ORDER BY {$params['order']}",
-            "groupBy" => is_null($params["groupBy"]) ? "" : "GROUP BY {$params['groupBy']}",
+            "groupBy" => !isset($params["groupBy"]) ? "" : "GROUP BY {$params['groupBy']}",
             "limit" => is_null($params["limit"]) ? "" : "LIMIT {$params['limit']}"
         ));
         return $this->fetchAll($query);
