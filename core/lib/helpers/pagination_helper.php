@@ -128,7 +128,7 @@ class PaginationHelper extends HtmlHelper {
      */
     public function hasPrevious() {
         if($this->model):
-            return $this->model->pagination["page"] != 1;
+            return $this->model->pagination["page"] > 1;
         endif;
         return null;
     }
