@@ -273,9 +273,10 @@ class Mapper extends Object {
                 "prefix" => $here["prefix"],
                 "controller" => $here["controller"],
                 "action" => $here["action"],
-                "id" => $here["id"]
+                "id" => $here["id"],
+                "params" => $here["params"]
             ), $params, $path);
-            $nonParams = array("prefix", "controller", "action", "id");
+            $nonParams = array("prefix", "controller", "action", "id", "params");
             $url = "";
             foreach($path as $key => $value):
                 if(!in_array($key, $nonParams)):
@@ -283,6 +284,8 @@ class Mapper extends Object {
                 elseif(!is_null($value)):
                     if($key == "action" && $filtered = self::filterAction($value)):
                         $value = $filtered["action"];
+                    elseif($key == "params"):
+                        $value = join("/", $value);
                     endif;
                     $url .= "/" . $value;
                 endif;
