@@ -208,9 +208,10 @@ class FormHelper extends HtmlHelper {
         );
         $label = array_unset($options, "label");
         $div = array_unset($options, "div");
+        $type = $options["type"];
         switch($options["type"]):
             case "select":
-                unset($selectOptions["type"]);
+                unset($options["type"]);
                 $input = $this->select($name, $options);
                 break;
             case "radio":
@@ -242,7 +243,7 @@ class FormHelper extends HtmlHelper {
         endif;
         if($div):
             if($div === true):
-                $div = "input {$options['type']}";
+                $div = "input {$type}";
             elseif(is_array($div)):
                 $div += array("class" => "input {$options['type']}");
             endif;
