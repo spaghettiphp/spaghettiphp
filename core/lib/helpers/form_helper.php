@@ -154,6 +154,10 @@ class FormHelper extends HtmlHelper {
      */
     public function date($name, $options = array()) {
         if(!is_null($options["value"])):
+            if(is_array($options["value"])):
+                $v = $options["value"];
+                $options["value"] = "{$v['y']}-{$v['m']}-{$v['d']}";
+            endif;
             $date = strtotime($options["value"]);
         else:
             $date = time();
