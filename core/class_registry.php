@@ -52,34 +52,8 @@ class ClassRegistry {
      */
     public static function addObject($key, &$object) {
         $self =& ClassRegistry::getInstance();
-        if(array_key_exists($key, $self->objects) === false):
+        if(!array_key_exists($key, $self->objects)):
             $self->objects[$key] =& $object;
-            return true;
-        endif;
-        return false;
-    }
-    /**
-     *  Remove uma instância de uma classe do registro.
-     *  
-     *  @param string $key
-     *  @return boolean true
-     */
-    public static function removeObject($key) {
-        $self =& ClassRegistry::getInstance();
-        if(array_key_exists($key, $self->objects) === true):
-            unset($self->objects[$key]);
-        endif;
-        return true;
-    }
-    /**
-     *  Verifica se uma se uma chave já está registrada.
-     * 
-     *  @param string $key
-     *  @return boolean
-     */
-    public static function isKeySet($key) {
-        $self =& ClassRegistry::getInstance();
-        if(array_key_exists($key, $self->objects)):
             return true;
         endif;
         return false;
@@ -93,7 +67,7 @@ class ClassRegistry {
     public static function &getObject($key) {
         $self =& ClassRegistry::getInstance();
         $return = false;
-        if(self::isKeySet($key)):
+        if(array_key_exists($key, $self->objects)):
             $return =& $self->objects[$key];
         endif;
         return $return;
@@ -108,7 +82,7 @@ class ClassRegistry {
     public static function &duplicate($key, $class) {
         $self =& ClassRegistry::getInstance();
         $duplicate = false;
-        if (self::isKeySet($key)):
+        if(array_key_exists($key, $self->objects)):
             $object =& self::getObject($key);
             if($object instanceof $class):
                 $duplicate =& $object;
@@ -116,16 +90,6 @@ class ClassRegistry {
             unset($object);
         endif;
         return $duplicate;
-    }
-    /**
-     *  Limpa todos os objetos instanciados do registro.
-     * 
-     *  @return boolean true
-     */
-    public static function flush() {
-        $self =& ClassRegistry::getInstance();
-        $self->objects = array();
-        return true;
     }
 }
 
