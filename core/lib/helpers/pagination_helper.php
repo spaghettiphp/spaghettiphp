@@ -13,7 +13,7 @@ class PaginationHelper extends HtmlHelper {
     /**
      *  Model a ser utilizado na paginação.
      */
-    public $model = false;
+    public $model;
 
     /**
      *  Carrega o Model a ser utilizado na paginação.
@@ -22,7 +22,8 @@ class PaginationHelper extends HtmlHelper {
      *  @return object
      */
     public function model($model) {
-        return $this->model = ClassRegistry::load($model);
+        $this->model = ClassRegistry::load($model);
+        return $this;
     }
     /**
      *  Gera uma lista de páginas.
@@ -131,6 +132,16 @@ class PaginationHelper extends HtmlHelper {
             return $this->model->pagination["page"] > 1;
         endif;
         return null;
+    }
+    
+    public function page() {
+        return $this->model->pagination["page"];
+    }
+    public function pages() {
+        return $this->model->pagination["totalPages"];
+    }
+    public function records() {
+        return $this->model->pagination["totalRecords"];
     }
 }
 
