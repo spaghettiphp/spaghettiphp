@@ -208,7 +208,8 @@ class FormHelper extends HtmlHelper {
             "type" => "text",
             "id" => Inflector::camelize("form_" . Inflector::slug($name)),
             "label" => Inflector::humanize($name),
-            "div" => true
+            "div" => true,
+            "value" => ""
         );
         $label = array_unset($options, "label");
         $div = array_unset($options, "div");
