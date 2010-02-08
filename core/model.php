@@ -78,9 +78,9 @@ class Model extends Object {
      *  Associações entre modelos disponíveis
      */
     public $associations = array(
-        "hasMany" => array("foreignKey", "conditions"),
-        "belongsTo" => array("foreignKey", "conditions"),
-        "hasOne" => array("foreignKey", "conditions")
+        "hasMany" => array("primaryKey", "foreignKey", "conditions", "limit", "order"),
+        "belongsTo" => array("primaryKey", "foreignKey", "conditions"),
+        "hasOne" => array("primaryKey", "foreignKey", "conditions")
     );
 
     public $pagination = array();
@@ -231,6 +231,9 @@ class Model extends Object {
                         break;
                     case "conditions":
                         $data = array();
+                        break;
+                    default:
+                        $data = null;
                 endswitch;
                 $association[$key] = $data;
             endif;
@@ -350,6 +353,10 @@ class Model extends Object {
                             )
                         );
                         $params["recursion"] = $recursion - 2;
+                        if($type == "hasMany"):
+                            $params["limit"] = $association["limit"];
+                            $params["order"] = $association["order"];
+                        endif;
                     endif;
                     $result = $this->{$model}->all($params);
                     if($type != "hasMany" && !empty($result)):
