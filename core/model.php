@@ -530,6 +530,9 @@ class Model extends Object {
                     $rule = array("rule" => $rule);
                 endif;
                 $rule = array_merge($defaults, $rule);
+                if($rule["allowEmpty"] && empty($data[$field])):
+                    continue;
+                endif;
                 $required = !isset($data[$field]) && $rule["required"];
                 if($required):
                     $this->errors[$field] = is_null($rule["message"]) ? $rule["rule"] : $rule["message"];
