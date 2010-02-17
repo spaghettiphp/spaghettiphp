@@ -73,6 +73,24 @@ class Controller extends Object {
         $this->loadComponents();
         $this->loadModels();
     }
+
+    /**
+     *  Carrega models e components
+     *
+     *  @param string $class Class a ser carregada
+     *  @return object
+     */
+    public function __get($class){
+        if(!isset($this->{$class})):
+            $pattern = '(^[A-Z]+([a-z]+(Component)?))';
+            if(preg_match($pattern, $class, $out)):
+                $type = (isset($out[2])) ? 'Component' : 'Model';
+                $this->{$class} = ClassRegistry::load($class, $type);
+                if($type == 'Component') $this->{$class}->initialize($this);
+                return $this->{$class};
+            endif;
+        endif;
+   }
     /**
      *  Retorna os métodos do controller.
      *
