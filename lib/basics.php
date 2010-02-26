@@ -14,15 +14,6 @@
  */
 abstract class Object {
     /**
-     *  Loga os eventos processados pelo framework.
-     * 
-     *  @param string $message Mensagem do log
-     *  @return string Retorna a mensagem a ser trabalhada
-     */
-    protected function log($message = "") {
-        return $message;
-    }
-    /**
      *  Reporta ao usuário o erro encontrado.
      * 
      *  @param string $type Tipo do erro ocorrido
@@ -54,7 +45,7 @@ class App extends Object {
      *  @param string $ext Extensão do(s) arquivo(s) a ser(em) importado(s)
      *  @return mixed Arquivo incluído ou falso em caso de erro
      */
-    public static function import($type = "Core", $file = "", $ext = "php") {
+    public static function import($type, $file, $ext = 'php') {
         if(is_array($file)):
             foreach($file as $file):
                 $include = self::import($type, $file, $ext);
@@ -77,25 +68,24 @@ class App extends Object {
      *  @param string $ext Extensão do arquivo a ser buscado
      *  @return mixed Caminho completo do arquivo ou falso caso não exista
      */
-    public static function path($type = "Core", $file = "", $ext = "php") {
+    public static function path($type, $file, $ext = 'php') {
         $paths = array(
-            "Core" => array(CORE),
-            "Controller" => array(APP . DS . "controllers"),
-            "Model" => array(APP . DS . "models"),
-            "View" => array(APP . DS . "views"),
-            "Layout" => array(APP . DS . "layouts"),
-            "Component" => array(APP . DS . "components"),
-            "Helper" => array(APP . DS . "helpers"),
-            "App" => array(APP),
-            "Datasource" => array(APP . DS . "models/datasources", CORE . DS . "datasources")
+            'Core' => CORE,
+            'Controller' => APP . '/controllers',
+            'Model' => APP . '/models',
+            'View' => APP . '/views',
+            'Layout' => APP . '/layouts',
+            'Component' => APP . '/components',
+            'Helper' => APP . '/helpers',
+            'App' => APP,
+            'Datasource' => CORE . '/datasources'
         );
  
-        foreach($paths[$type] as $path):
-            $file_path = $path . DS . "{$file}.{$ext}";
-            if(file_exists($file_path)):
-                return $file_path;
-            endif;
-        endforeach;
+        $path = $paths[$type];
+        $file_path = $path . '/' . $file . '.' . $ext;
+        if(file_exists($file_path)):
+            return $file_path;
+        endif;
         return false;
     }
 }
@@ -130,7 +120,7 @@ class Config extends Object {
      *  @param string $key Nome da chave da configuração
      *  @return mixed Valor de configuração da respectiva chave
      */
-    public static function read($key = "") {
+    public static function read($key) {
         $self = self::getInstance();
         return $self->config[$key];
     }
@@ -141,7 +131,7 @@ class Config extends Object {
      *  @param string $value Valor da chave da configuração
      *  @return boolean true
      */
-    public static function write($key = "", $value = "") {
+    public static function write($key, $value) {
         $self = self::getInstance();
         $self->config[$key] = $value;
         return true;
@@ -153,18 +143,16 @@ class Config extends Object {
  *  amigáveis.
  */
 class Error extends Object {
-    public function __construct($type = "", $details = array()) {
+    public function __construct($type = '', $details = array()) {
         $view = new View;
         $filename = Inflector::underscore($type);
-        $viewFile = App::path("View", "errors/{$filename}.htm");
+        $viewFile = App::path('View', 'errors/' . $filename . '.htm');
         if(!$viewFile):
-            $viewFile = App::path("View", "errors/missing_error.htm");
-            $details = array("error" => $type);
+            $viewFile = App::path('View', 'errors/missing_error.htm');
+            $details = array('error' => $type);
         endif;
-        $content = $view->renderView($viewFile, array("details" => $details));
-        echo $view->renderLayout($content, "error", "htm");
+        $content = $view->renderView($viewFile, array('details' => $details));
+        echo $view->renderLayout($content, 'error', 'htm');
         $this->stop();
     }
 }
-
-?>
