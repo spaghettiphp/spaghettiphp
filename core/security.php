@@ -63,6 +63,16 @@ class Security extends Object {
         endswitch;
         return false;
     }
+
+    /**
+      *  Cria um identificador único baseado no sistema operacional, navegador e ip do visitante
+      *
+      *  @return string Identificador único
+      */
+    public static function token(){
+        return ($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']) . Session::id();
+    }
+
 }
 
 ?>
