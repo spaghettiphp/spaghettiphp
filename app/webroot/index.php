@@ -47,10 +47,6 @@ define("BASE_URL", "http" . (isset($_SERVER["HTTPS"]) ? "s" : "") . "://" . $_SE
  */
 define("CORE", ROOT . DS . "lib");
 /**
- *  Caminho completo para a biblioteca do Spaghetti.
- */
-define("LIB", CORE . DS . "lib");
-/**
  *  Caminho completo para a pasta da aplicação do Spaghetti.
  */
 define("APP", ROOT . DS . "app");
