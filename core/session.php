@@ -65,6 +65,15 @@ class Session extends Object {
         self::delete('Flash.' . $key);
         return $value;
     }
+    /**
+     *  O ID da sessão ativa
+     *
+     *  @return string O ID da sessão ativa
+     */
+    public static function id() {
+        if(!self::started()) self::start();
+        return session_id();
+    }
 }
 
 ?>
