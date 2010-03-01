@@ -89,11 +89,11 @@ class UploadComponent extends Component {
         $path = is_null($path) ? $this->path : $path;
         $name = is_null($name) ? $file["name"] : $name;
         if($this->validates($file)):
-            $path = APP . DS . "webroot" . $path;
+            $path = APP . "/webroot" . $path;
             if(!is_dir($path)):
                 mkdir($path, 0777, true);
             endif;
-            if(move_uploaded_file($file["tmp_name"], $path . DS . $name)):
+            if(move_uploaded_file($file["tmp_name"], $path . '/' . $name)):
                 return true;
             else:
                 return $this->error("CantMoveFile");
@@ -111,7 +111,7 @@ class UploadComponent extends Component {
      */
     public function delete($filename = "", $path = null) {
         $path = is_null($path) ? $this->path : $path;
-        $file = APP . DS . "webroot" . $path . $filename;
+        $file = APP . "/webroot" . $path . $filename;
         if(file_exists($file)):
             if(unlink($file)):
                 return true;

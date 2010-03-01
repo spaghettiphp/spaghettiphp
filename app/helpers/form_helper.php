@@ -7,7 +7,7 @@
  *
  */
 
-App::import("Helper", "html_helper");
+require_once 'app/helpers/html_helper.php';
 
 class FormHelper extends HtmlHelper {
     /**

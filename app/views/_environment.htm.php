@@ -20,7 +20,7 @@
 		<?php endif ?>
         <tr>
             <th>Caminho raiz</th>
-            <td><?php echo ROOT ?></td>
+            <td><?php echo SPAGHETTI_ROOT ?></td>
         </tr>
 		
     </tbody>

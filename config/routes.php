@@ -13,12 +13,10 @@
  * verá toda vez que acessar a raíz de seu sistema. Você pode escolher o controller
  * que mais fizer sentido para você
  */
-Mapper::root("home");
+Mapper::root('home');
 
 /**
  * Caso você precise de um painel de administração, você pode descomentar a linha
  * abaixo. Você também pode adicionar quantos prefixos mais forem necessários.
  */
-// Mapper::prefix("admin");
-
-?>
+// Mapper::prefix('admin');

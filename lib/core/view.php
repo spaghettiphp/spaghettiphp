@@ -147,7 +147,7 @@ class View extends Object {
      *  @return string Resultado da renderização
      */
     public function element($element, $params = array()) {
-        $element = dirname($element) . DS . "_" . basename($element);
+        $element = dirname($element) . "/_" . basename($element);
         $ext = $this->params["extension"] ? $this->params["extension"] : Config::read("defaultExtension");
         return $this->renderView(App::path("View", "{$element}.{$ext}"), $params);
     }

@@ -100,7 +100,7 @@ class ImageComponent extends Component {
      *  @return string Caminho do arquivo
      */
     public function filePath($filename = "") {
-        return APP . DS . "webroot" . DS . $filename;
+        return APP . "/webroot/" . $filename;
     }
 }
 

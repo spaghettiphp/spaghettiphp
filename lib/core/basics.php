@@ -9,30 +9,6 @@
  
 
 /**
- *  Object é a classe abstrata herdada por todas as outras classes do Spaghetti,
- *  provendo funcionalidade básica para o framework.
- */
-abstract class Object {
-    /**
-     *  Reporta ao usuário o erro encontrado.
-     * 
-     *  @param string $type Tipo do erro ocorrido
-     *  @param string $details Detalhes do erro ocorrido
-     */
-    protected function error($type, $details = array()) {
-        new Error($type, $details);
-    }
-    /**
-     *  Paraliza a execução do script atual.
-     * 
-     *  @param string $status
-     */
-    protected function stop($status = null) {
-        exit($status);
-    }
-}
-
-/**
  *  App cuida de tarefas relativas a importação de arquivos dentro de uma aplicação
  *  do Spaghetti.
  */
@@ -70,7 +46,8 @@ class App extends Object {
      */
     public static function path($type, $file, $ext = 'php') {
         $paths = array(
-            'Core' => CORE,
+            'Config' => SPAGHETTI_ROOT . '/config',
+            'Core' => SPAGHETTI_ROOT . '/lib/core',
             'Controller' => APP . '/controllers',
             'Model' => APP . '/models',
             'View' => APP . '/views',
@@ -78,7 +55,7 @@ class App extends Object {
             'Component' => APP . '/components',
             'Helper' => APP . '/helpers',
             'App' => APP,
-            'Datasource' => CORE . '/datasources'
+            'Datasource' => SPAGHETTI_ROOT . '/lib/core/model/datasources'
         );
  
         $path = $paths[$type];
@@ -87,54 +64,6 @@ class App extends Object {
             return $file_path;
         endif;
         return false;
-    }
-}
-
-/**
- *  Config é a classe que toma conta de todas as configurações necessárias para
- *  uma aplicação do Spaghetti.
- */
-class Config extends Object {
-    /**
-     *  Definições de configurações.
-     *
-     *  @var array
-     */
-    private $config = array();
-    /**
-     *  Retorna uma única instância (Singleton) da classe solicitada.
-     *
-     *  @staticvar object $instance Objeto a ser verificado
-     *  @return object Objeto da classe utilizada
-     */
-    public static function &getInstance() {
-        static $instance = array();
-        if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = new Config();
-        endif;
-        return $instance[0];
-    }
-    /**
-     *  Retorna o valor de uma determinada chave de configuração.
-     *
-     *  @param string $key Nome da chave da configuração
-     *  @return mixed Valor de configuração da respectiva chave
-     */
-    public static function read($key) {
-        $self = self::getInstance();
-        return $self->config[$key];
-    }
-    /**
-     *  Grava o valor de uma configuração da aplicação para determinada chave.
-     *
-     *  @param string $key Nome da chave da configuração
-     *  @param string $value Valor da chave da configuração
-     *  @return boolean true
-     */
-    public static function write($key, $value) {
-        $self = self::getInstance();
-        $self->config[$key] = $value;
-        return true;
     }
 }
 
