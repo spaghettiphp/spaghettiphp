@@ -36,7 +36,8 @@ function dump($data) {
  *  @return array Item removido
  */
 function array_unset(&$array = array(), $index = "") {
-    if($item = isset($array[$index])):
+    if(array_key_exists($index, $array)):
+		$item = $array[$index];
         unset($array[$index]);
         return $item;
     endif;
