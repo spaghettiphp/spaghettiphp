@@ -36,9 +36,11 @@ function dump($data) {
  *  @return array Item removido
  */
 function array_unset(&$array = array(), $index = "") {
-    $item = $array[$index];
-    unset($array[$index]);
-    return $item;
+    if($item = isset($array[$index])):
+        unset($array[$index]);
+        return $item;
+    endif;
+    return false;
 }
 
 /**
