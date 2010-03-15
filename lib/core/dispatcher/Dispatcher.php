@@ -8,7 +8,7 @@ class Dispatcher extends Object {
         $controller_name = Inflector::camelize($path['controller']) . 'Controller';
         $view_path = $path['controller'] . '/' . $path['action'] . '.' . $path['extension'];
         if(Loader::exists('Controller', $controller_name)):
-            $controller =& Loader::instance('Controller', $controller_name);
+            $controller = Loader::instance('Controller', $controller_name);
             if(!can_call_method($controller, $path['action']) && !Loader::exists('View', $view_path)):
                 $this->error('missingAction', array(
                     'controller' => $path['controller'],
@@ -18,7 +18,7 @@ class Dispatcher extends Object {
             endif;
         else:
             if(Loader::exists('View', $view_path)):
-                $controller =& Loader::instance('Controller', 'AppController');
+                $controller = Loader::instance('Controller', 'AppController');
             else:
                 $this->error('missingController', array(
                     'controller' => $path['controller']
