@@ -1,17 +1,6 @@
 <?php
-/**
- *  ClassRegistry faz o registro e gerenciamento de instâncias das classes utilizadas
- *  pelo Spaghetti*, evitando a criação de várias instâncias de uma mesma classe.
- *
- *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
- *
- */
 
 class ClassRegistry {
-    /**
-     *  Nome das classes a serem utilizados pelo Spaghetti
-     */
     public $objects = array();
 
     public static function &getInstance() {
@@ -21,15 +10,7 @@ class ClassRegistry {
         endif;
         return $instance[0];
     }
-    /**
-     *  Carrega a classe, registrando o objeto, retornando uma instância
-     *  para a mesma.
-     *
-     *  @param string $class Classe a ser inicializada
-     *  @param string $type Tipo da classe
-     *  @return object Instância da classe
-     */
-    public static function &load($class, $type = "Model") {
+    public static function &load($class, $type = 'Model') {
         $self =& ClassRegistry::getInstance();
         if($object =& $self->duplicate($class, $class)):
             return $object;
@@ -43,13 +24,6 @@ class ClassRegistry {
         endif;
         return ${$class};
     }
-    /**
-     *  Adiciona uma instância de uma classe no registro.
-     * 
-     *  @param string $key
-     *  @param object &$object
-     *  @return boolean
-     */
     public static function addObject($key, &$object) {
         $self =& ClassRegistry::getInstance();
         if(!array_key_exists($key, $self->objects)):
@@ -58,12 +32,6 @@ class ClassRegistry {
         endif;
         return false;
     }
-    /**
-     *  Retorna a instância da respectiva chave solicitada.
-     * 
-     *  @param string $key
-     *  @return mixed
-     */
     public static function &getObject($key) {
         $self =& ClassRegistry::getInstance();
         $return = false;
@@ -72,13 +40,6 @@ class ClassRegistry {
         endif;
         return $return;
     }
-    /**
-     *  Retorna uma cópia de uma instância já registrada.
-     * 
-     *  @param string $key
-     *  @param object $class
-     *  @return mixed
-     */
     public static function &duplicate($key, $class) {
         $self =& ClassRegistry::getInstance();
         $duplicate = false;
@@ -92,5 +53,3 @@ class ClassRegistry {
         return $duplicate;
     }
 }
-
-?>

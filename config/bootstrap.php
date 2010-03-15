@@ -37,7 +37,6 @@ require 'lib/core/validation.php';
 
 require 'config/settings.php';
 require 'config/routes.php';
-require 'config/database.php';
 
 require 'app/controllers/app_controller.php';
 require 'app/models/app_model.php';
