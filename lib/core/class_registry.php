@@ -34,8 +34,8 @@ class ClassRegistry {
         if($object =& $self->duplicate($class, $class)):
             return $object;
         elseif(!class_exists($class)):
-            if(App::path($type, Inflector::underscore($class))):
-                App::import($type, Inflector::underscore($class));
+            if(Loader::exists($type, Inflector::underscore($class))):
+                require_once Loader::path($type, $class);
             endif;
         endif;
         if(class_exists($class)):

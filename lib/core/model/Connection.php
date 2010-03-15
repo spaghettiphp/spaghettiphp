@@ -36,10 +36,8 @@ class Connection extends Object {
     }
     public static function loadDatasource($datasource) {
         if(!class_exists($datasource)):
-            if(App::path('Datasource', Inflector::underscore($datasource))):
-                App::import('Datasource', Inflector::underscore($datasource));
-            endif;
+            require 'lib/core/model/datasources/' . $datasource . '.php';
         endif;
-        return class_exists($datasource);
+        return true;
    }
 }

@@ -32,7 +32,6 @@ require 'lib/core/storage/Session.php';
 require 'lib/core/security/Security.php';
 require 'lib/core/security/Sanitize.php';
 
-require 'lib/core/basics.php';
 require 'lib/core/class_registry.php';
 require 'lib/core/validation.php';
 

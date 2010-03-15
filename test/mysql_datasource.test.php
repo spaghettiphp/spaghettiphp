@@ -7,8 +7,6 @@
  *
  */
 
-App::import("Datasource", "mysql_datasource");
-
 class MysqlDatasourceTest extends MysqlDatasource {
     protected $schema = array(
         "table" => array(

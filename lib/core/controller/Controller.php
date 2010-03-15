@@ -50,9 +50,10 @@ class Controller extends Object {
     public function loadComponents() {
         foreach($this->components as $component):
             $component = $component . 'Component';
-            if(!$this->{$component} = Loader::instance('Component', $component)):
+            if(Loader::exists('Component', $component)):
+                $this->{$component} = Loader::instance('Component', $component);
+            else:
                 $this->error('missingComponent', array('component' => $component));
-                return false;
             endif;
         endforeach;
         return true;

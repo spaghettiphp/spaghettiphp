@@ -16,8 +16,8 @@ class View extends Object {
             $helper = Inflector::underscore($helper);
             $file = $helper . '_helper';
             if(!class_exists($class)):
-                if(App::path('Helper', $file)):
-                    App::import('Helper', $file);
+                if(Loader::exists('Helper', $file)):
+                    require_once Loader::path('Helper', $file);
                 else:
                     $this->error('missingHelper', array('helper' => $class));
                     return false;
@@ -50,8 +50,8 @@ class View extends Object {
             $action = $filename[0];
             $ext = $filename[1] ? $filename[1] : $this->params['extension'];
         endif;
-        $file = App::path('View', $controller . '/' . $action . '.' . $ext);
-        if($file):
+        if(Loader::exists('View', $controller . '/' . $action . '.' . $ext)):
+            $file = Loader::path('View', $controller . '/' . $action . '.' . $ext);
             $output = $this->renderView($file, $this->data);
             $layout = is_null($layout) ? $this->layout : $layout;
             if($this->autoLayout && $layout):
@@ -71,8 +71,8 @@ class View extends Object {
         if(is_null($ext)):
             $ext = $this->params['extension'];
         endif;
-        $file = App::path('Layout', $layout . '.' . $ext);
-        if($file):
+        if(Loader::exists('Layout', $layout . '.' . $ext)):
+            $file = Loader::path('Layout', $layout . '.' . $ext);
             $this->contentForLayout = $content;
             return $this->renderView($file, $this->data);
         else:
@@ -86,6 +86,6 @@ class View extends Object {
     public function element($element, $params = array()) {
         $element = dirname($element) . '/_' . basename($element);
         $ext = $this->params['extension'] ? $this->params['extension'] : Config::read('defaultExtension');
-        return $this->renderView(App::path('View', $element . '.' . $ext), $params);
+        return $this->renderView(Loader::path('View', $element . '.' . $ext), $params);
     }
 }
