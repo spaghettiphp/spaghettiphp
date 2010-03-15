@@ -11,6 +11,7 @@ require 'lib/core/common/Object.php';
 require 'lib/core/common/Config.php';
 require 'lib/core/common/Inflector.php';
 require 'lib/core/common/Error.php';
+require 'lib/core/common/Utils.php';
 
 require 'lib/core/dispatcher/Dispatcher.php';
 require 'lib/core/dispatcher/Mapper.php';
@@ -32,7 +33,6 @@ require 'lib/core/class_registry.php';
 require 'lib/core/component.php';
 require 'lib/core/connection.php';
 require 'lib/core/helper.php';
-require 'lib/core/utils.php';
 require 'lib/core/validation.php';
 
 require 'config/settings.php';
