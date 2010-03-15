@@ -1,7 +1,7 @@
 <?php
 
 class Debug extends Object {
-    public static function errorReporting($level) {
+    public static function reportErrors($level) {
         switch($level):
             case 3:
                 $level = E_ALL | E_STRICT;
@@ -16,6 +16,15 @@ class Debug extends Object {
                 $level = 0;
         endswitch;
         ini_set('error_reporting', $level);
+    }
+    public static function errorHandler($handler = null) {
+        if(is_null($handler)):
+            $handler = array('Debug', 'handleError');
+        endif;
+        set_error_handler($handler);
+    }
+    public static function handleError($code, $message, $file, $line, $context) {
+        throw new PhpErrorException($message, $code, $file, $line, $context);
     }
     public static function pr($data) {
         echo '<pre>' . print_r($data, true) . '</pre>';

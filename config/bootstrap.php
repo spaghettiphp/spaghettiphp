@@ -13,8 +13,11 @@ require 'lib/core/common/Config.php';
 require 'lib/core/common/Inflector.php';
 require 'lib/core/common/Error.php';
 require 'lib/core/common/Utils.php';
+require 'lib/core/common/Exceptions.php';
 
 require 'lib/core/debug/Debug.php';
+
+Debug::errorHandler();
 
 require 'lib/core/dispatcher/Dispatcher.php';
 require 'lib/core/dispatcher/Mapper.php';
@@ -37,8 +40,10 @@ require 'lib/core/security/Sanitize.php';
 require 'lib/core/class_registry.php';
 require 'lib/core/validation.php';
 
+require 'app/controllers/app_controller.php';
+require 'app/models/app_model.php';
+
 require 'config/settings.php';
 require 'config/routes.php';
 
-require 'app/controllers/app_controller.php';
-require 'app/models/app_model.php';
+Debug::reportErrors(Config::read('Debug.level'));
