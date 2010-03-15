@@ -157,7 +157,7 @@ class Controller extends Object {
         header('Location: ' . Mapper::url($url, true));
         if($exit) $this->stop();
     }
-    public function set($var, $value) {
+    public function set($var, $value = null) {
         if(is_array($var)):
             foreach($var as $key => $value):
                 $this->set($key, $value);
