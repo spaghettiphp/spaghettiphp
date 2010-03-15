@@ -173,7 +173,7 @@ class Mapper extends Object {
                 if(!in_array($key, $nonParams)):
                     $url .= '/' . $key . ':' . $value;
                 elseif(!is_null($value)):
-                    if($key == "action" && $filtered = self::filterAction($value)):
+                    if($key == 'action' && $filtered = self::filterAction($value)):
                         $value = $filtered['action'];
                     elseif($key == 'params'):
                         $value = join('/', $value);

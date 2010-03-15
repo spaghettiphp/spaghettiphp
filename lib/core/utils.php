@@ -35,13 +35,13 @@ function dump($data) {
  *  @param string $index Índice a ser utilizado
  *  @return array Item removido
  */
-function array_unset(&$array = array(), $index = "") {
+function array_unset(&$array = array(), $index) {
     if(array_key_exists($index, $array)):
-		$item = $array[$index];
+        $item = $array[$index];
         unset($array[$index]);
         return $item;
     endif;
-    return false;
+    return null;
 }
 
 /**

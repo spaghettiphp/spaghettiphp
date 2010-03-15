@@ -7,7 +7,7 @@ class Inflector extends Object {
     public static function humanize($string) {
         return ucwords(str_replace(array('_', '-'), ' ', $string));
     }
-    public static function underscore($string = '') {
+    public static function underscore($string) {
         return strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $string));
     }
     public static function slug($string, $replace = '-') {

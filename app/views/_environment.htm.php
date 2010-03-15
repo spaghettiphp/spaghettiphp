@@ -12,16 +12,16 @@
             <th>Versão do PHP</th>
             <td><?php echo phpversion() ?></td>
         </tr>
-		<?php if(function_exists("apache_get_version")): ?>
+        <?php if(function_exists("apache_get_version")): ?>
         <tr>
             <th>Servidor</th>
             <td><?php echo apache_get_version() ?></td>
         </tr>
-		<?php endif ?>
+        <?php endif ?>
         <tr>
             <th>Caminho raiz</th>
             <td><?php echo SPAGHETTI_ROOT ?></td>
         </tr>
-		
+        
     </tbody>
 </table>

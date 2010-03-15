@@ -101,7 +101,7 @@ class MysqlDatasource extends Datasource {
             $columns = $this->fetchAll();
             $schema = array();
             foreach($columns as $column):
-                $schema[$column["Field"]] = array(
+                $schema[$column['Field']] = array(
                     'type' => $this->column($column['Type']),
                     'null' => $column['Null'] == 'YES' ? true : false,
                     'default' => $column['Default'],
@@ -153,7 +153,7 @@ class MysqlDatasource extends Datasource {
     public function update($table = null, $params = array()) {
         $updateValues = array();
         $schema = $this->describe($table);
-        foreach($params["data"] as $field => $value):
+        foreach($params['data'] as $field => $value):
             $column = isset($schema[$field]) ? $schema[$field]['type'] : null;
             $updateValues []= $field . '=' . $this->value($value, $column);
         endforeach;
