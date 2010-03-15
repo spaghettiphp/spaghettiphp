@@ -10,6 +10,7 @@ define('BASE_URL', 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SE
 require 'lib/core/common/Object.php';
 require 'lib/core/common/Config.php';
 require 'lib/core/common/Inflector.php';
+require 'lib/core/common/Error.php';
 
 require 'lib/core/dispatcher/Dispatcher.php';
 require 'lib/core/dispatcher/Mapper.php';
