@@ -17,10 +17,13 @@ require 'lib/core/dispatcher/Dispatcher.php';
 require 'lib/core/dispatcher/Mapper.php';
 
 require 'lib/core/model/Model.php';
+require 'lib/core/model/Connection.php';
 
 require 'lib/core/controller/Controller.php';
+require 'lib/core/controller/Component.php';
 
 require 'lib/core/view/View.php';
+require 'lib/core/view/Helper.php';
 
 require 'lib/core/storage/Cookie.php';
 require 'lib/core/storage/Session.php';
@@ -30,9 +33,6 @@ require 'lib/core/security/Sanitize.php';
 
 require 'lib/core/basics.php';
 require 'lib/core/class_registry.php';
-require 'lib/core/component.php';
-require 'lib/core/connection.php';
-require 'lib/core/helper.php';
 require 'lib/core/validation.php';
 
 require 'config/settings.php';
