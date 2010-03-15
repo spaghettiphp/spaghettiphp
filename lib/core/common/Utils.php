@@ -1,13 +1,5 @@
 <?php
 
-function pr($data) {
-    echo '<pre>' . print_r($data, true) . '</pre>';
-}
-
-function dump($data) {
-    pr(var_export($data, true));
-}
-
 function array_unset(&$array = array(), $index) {
     if(array_key_exists($index, $array)):
         $item = $array[$index];
