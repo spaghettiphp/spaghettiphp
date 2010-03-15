@@ -21,15 +21,17 @@ require 'lib/core/controller/Controller.php';
 
 require 'lib/core/view/View.php';
 
+require 'lib/core/storage/Cookie.php';
+require 'lib/core/storage/Session.php';
+
+require 'lib/core/security/Security.php';
+require 'lib/core/security/Sanitize.php';
+
 require 'lib/core/basics.php';
 require 'lib/core/class_registry.php';
 require 'lib/core/component.php';
 require 'lib/core/connection.php';
-require 'lib/core/cookie.php';
 require 'lib/core/helper.php';
-require 'lib/core/sanitize.php';
-require 'lib/core/security.php';
-require 'lib/core/session.php';
 require 'lib/core/utils.php';
 require 'lib/core/validation.php';
 
