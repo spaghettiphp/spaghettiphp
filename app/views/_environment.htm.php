@@ -6,7 +6,7 @@
         </tr>
         <tr>
             <th>Ambiente</th>
-            <td><?php echo Config::read("environment") ?></td>
+            <td><?php echo Config::read("App.environment") ?></td>
         </tr>
         <tr>
             <th>Versão do PHP</th>

@@ -25,7 +25,7 @@ class Security extends Object {
             if(is_string($salt)):
                 $text = $salt . $text;
             else:
-                $text = Config::read('securitySalt') . $text;
+                $text = Config::read('Security.salt') . $text;
             endif;
         endif;
         switch($hash):

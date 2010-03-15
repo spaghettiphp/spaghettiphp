@@ -85,7 +85,7 @@ class View extends Object {
     }
     public function element($element, $params = array()) {
         $element = dirname($element) . '/_' . basename($element);
-        $ext = $this->params['extension'] ? $this->params['extension'] : Config::read('defaultExtension');
+        $ext = $this->params['extension'] ? $this->params['extension'] : Config::read('App.defaultExtension');
         return $this->renderView(Loader::path('View', $element . '.' . $ext), $params);
     }
 }

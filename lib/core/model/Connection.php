@@ -16,7 +16,7 @@ class Connection extends Object {
     }
     public static function &getDatasource($environment = null) {
         $self = self::getInstance();
-        $environment = is_null($environment) ? Config::read('environment') : $environment;
+        $environment = is_null($environment) ? Config::read('App.environment') : $environment;
         if(isset($self->config[$environment])):
             $config = $self->config[$environment];
         else:

@@ -28,7 +28,7 @@ class Model extends Object {
 
     public function __construct() {
         if(is_null($this->environment)):
-            $this->environment = Config::read('environment');
+            $this->environment = Config::read('App.environment');
         endif;
         if(is_null($this->table)):
             $database = Config::read('database');

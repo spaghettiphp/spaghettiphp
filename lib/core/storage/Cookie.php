@@ -10,7 +10,7 @@ class Cookie extends Object {
     public static $instance;
     
     public function __construct() {
-        $this->key = Config::read('securitySalt');
+        $this->key = Config::read('Security.salt');
     }
     public static function getInstance() {
         if(!isset(self::$instance)):
