@@ -1,13 +1,3 @@
-<?php
-/**
- *  Se você está vendo esse arquivo, provavelmente o mod_rewrite ou .htaccess não
- *  são suportados ou não estão habilitados no servidor.
- *
- *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
- *
- */
-?>
 <!DOCTYPE html>
 <html>
     <head>
