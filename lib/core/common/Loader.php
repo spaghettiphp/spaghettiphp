@@ -2,8 +2,11 @@
 
 class Loader {
     public static function import($type, $file) {
-        $paths = array(
-            
-        );
+    }
+    public static function instance($type, $class) {
+        if(!class_exists($class)):
+            App::import($type, Inflector::underscore($class));
+        endif;
+        return new $class;
     }
 }

@@ -8,6 +8,7 @@ set_include_path(SPAGHETTI_ROOT . PATH_SEPARATOR . get_include_path());
 define('BASE_URL', 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST']);
 
 require 'lib/core/common/Object.php';
+require 'lib/core/common/Loader.php';
 require 'lib/core/common/Config.php';
 require 'lib/core/common/Inflector.php';
 require 'lib/core/common/Error.php';

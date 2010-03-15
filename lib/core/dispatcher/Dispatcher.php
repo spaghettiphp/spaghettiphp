@@ -7,7 +7,7 @@ class Dispatcher extends Object {
         $path['action'] = Inflector::hyphenToUnderscore($path['action']);
         $controller_name = Inflector::camelize($path['controller']) . 'Controller';
         $view_path = $path['controller'] . '/' . $path['action'] . '.' . $path['extension'];
-        if($controller =& ClassRegistry::load($controller_name, 'Controller')):
+        if($controller =& Loader::instance('Controller', $controller_name)):
             if(!can_call_method($controller, $path['action']) && !App::path('View', $view_path)):
                 $this->error('missingAction', array(
                     'controller' => $path['controller'],
@@ -17,7 +17,7 @@ class Dispatcher extends Object {
             endif;
         else:
             if(App::path('View', $view_path)):
-                $controller =& ClassRegistry::load('AppController', 'Controller');
+                $controller =& Loader::instance('Controller', 'AppController');
             else:
                 $this->error('missingController', array(
                     'controller' => $path['controller']

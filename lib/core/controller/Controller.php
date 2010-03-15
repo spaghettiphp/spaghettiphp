@@ -50,7 +50,7 @@ class Controller extends Object {
     public function loadComponents() {
         foreach($this->components as $component):
             $component = $component . 'Component';
-            if(!$this->{$component} = ClassRegistry::load($component, 'Component')):
+            if(!$this->{$component} = Loader::instance('Component', $component)):
                 $this->error('missingComponent', array('component' => $component));
                 return false;
             endif;
