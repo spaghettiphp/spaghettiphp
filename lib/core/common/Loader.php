@@ -6,7 +6,7 @@ class Loader {
             'Controller' => '/controllers/',
             'Model' => '/models/',
             'View' => '/views/',
-            'Layout' => '/layouts/',
+            'Layout' => '/views/layouts/',
             'Component' => '/components/',
             'Helper' => '/helpers/'
         );
