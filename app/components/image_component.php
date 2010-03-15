@@ -100,7 +100,7 @@ class ImageComponent extends Component {
      *  @return string Caminho do arquivo
      */
     public function filePath($filename = "") {
-        return APP . "/webroot/" . $filename;
+        return SPAGHETTI_APP . "/webroot/" . $filename;
     }
 }
 

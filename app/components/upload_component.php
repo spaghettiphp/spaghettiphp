@@ -89,7 +89,7 @@ class UploadComponent extends Component {
         $path = is_null($path) ? $this->path : $path;
         $name = is_null($name) ? $file["name"] : $name;
         if($this->validates($file)):
-            $path = APP . "/webroot" . $path;
+            $path = SPAGHETTI_APP . "/webroot" . $path;
             if(!is_dir($path)):
                 mkdir($path, 0777, true);
             endif;
@@ -111,7 +111,7 @@ class UploadComponent extends Component {
      */
     public function delete($filename = "", $path = null) {
         $path = is_null($path) ? $this->path : $path;
-        $file = APP . "/webroot" . $path . $filename;
+        $file = SPAGHETTI_APP . "/webroot" . $path . $filename;
         if(file_exists($file)):
             if(unlink($file)):
                 return true;

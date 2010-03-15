@@ -6,7 +6,6 @@ define('SPAGHETTI_APP', SPAGHETTI_ROOT . '/app');
 set_include_path(SPAGHETTI_ROOT . PATH_SEPARATOR . get_include_path());
 
 define('BASE_URL', 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST']);
-define('APP', SPAGHETTI_APP);
 
 require 'lib/core/common/Object.php';
 require 'lib/core/common/Config.php';
@@ -17,11 +16,12 @@ require 'lib/core/dispatcher/Mapper.php';
 
 require 'lib/core/model/Model.php';
 
+require 'lib/core/controller/Controller.php';
+
 require 'lib/core/basics.php';
 require 'lib/core/class_registry.php';
 require 'lib/core/component.php';
 require 'lib/core/connection.php';
-require 'lib/core/controller.php';
 require 'lib/core/cookie.php';
 require 'lib/core/helper.php';
 require 'lib/core/sanitize.php';

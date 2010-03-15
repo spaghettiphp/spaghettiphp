@@ -48,13 +48,13 @@ class App extends Object {
         $paths = array(
             'Config' => SPAGHETTI_ROOT . '/config',
             'Core' => SPAGHETTI_ROOT . '/lib/core',
-            'Controller' => APP . '/controllers',
-            'Model' => APP . '/models',
-            'View' => APP . '/views',
-            'Layout' => APP . '/layouts',
-            'Component' => APP . '/components',
-            'Helper' => APP . '/helpers',
-            'App' => APP,
+            'Controller' => SPAGHETTI_APP . '/controllers',
+            'Model' => SPAGHETTI_APP . '/models',
+            'View' => SPAGHETTI_APP . '/views',
+            'Layout' => SPAGHETTI_APP . '/layouts',
+            'Component' => SPAGHETTI_APP . '/components',
+            'Helper' => SPAGHETTI_APP . '/helpers',
+            'App' => SPAGHETTI_APP,
             'Datasource' => SPAGHETTI_ROOT . '/lib/core/model/datasources'
         );
  
