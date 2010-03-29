@@ -10,7 +10,7 @@ class Mapper extends Object {
     public function __construct() {
         if(is_null($this->base)):
             $this->base = dirname($_SERVER['PHP_SELF']);
-            while(in_array(basename($this->base), array('app', 'webroot'))):
+            while(in_array(basename($this->base), array('public'))):
                 $this->base = dirname($this->base);
             endwhile;
             if($this->base == DIRECTORY_SEPARATOR || $this->base == '.'):
