@@ -14,6 +14,7 @@ require 'lib/core/common/Inflector.php';
 require 'lib/core/common/Error.php';
 require 'lib/core/common/Utils.php';
 require 'lib/core/common/Exceptions.php';
+require 'lib/core/common/Validation.php';
 
 require 'lib/core/debug/Debug.php';
 
@@ -38,7 +39,6 @@ require 'lib/core/security/Security.php';
 require 'lib/core/security/Sanitize.php';
 
 require 'lib/core/class_registry.php';
-require 'lib/core/validation.php';
 
 require 'app/controllers/app_controller.php';
 require 'app/models/app_model.php';
