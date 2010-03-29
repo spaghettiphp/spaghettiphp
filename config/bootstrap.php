@@ -34,7 +34,6 @@ require 'lib/core/security/Security.php';
 require 'lib/core/security/Sanitize.php';
 
 require 'lib/core/class_registry.php';
-require 'lib/core/validation.php';
 
 require 'config/settings.php';
 require 'config/routes.php';
