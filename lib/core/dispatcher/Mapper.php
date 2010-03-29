@@ -8,16 +8,16 @@ class Mapper extends Object {
     public $root = null;
 
     public function __construct() {
-        if(is_null($this->base)):
+        if(!$this->base):
             $this->base = dirname($_SERVER['PHP_SELF']);
-            while(in_array(basename($this->base), array('public'))):
+            if(basename($this->base) == 'public'):
                 $this->base = dirname($this->base);
-            endwhile;
-            if($this->base == DIRECTORY_SEPARATOR || $this->base == '.'):
-                $this->base = '/';
+                if($this->base == DIRECTORY_SEPARATOR || $this->base == '.'):
+                    $this->base = '/';
+                endif;
             endif;
         endif;
-        if(is_null($this->here)):
+        if(!$this->here):
             $start = strlen($this->base);
             $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
         endif;
