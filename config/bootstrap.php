@@ -13,6 +13,7 @@ require 'lib/core/common/Config.php';
 require 'lib/core/common/Inflector.php';
 require 'lib/core/common/Error.php';
 require 'lib/core/common/Utils.php';
+require 'lib/core/common/Validation.php';
 
 require 'lib/core/dispatcher/Dispatcher.php';
 require 'lib/core/dispatcher/Mapper.php';
