@@ -1,15 +1,18 @@
 <?php
 
+require 'lib/core/model/datasources/Datasource.php';
+
 class Connection extends Object {
     protected $config = array();
     protected $datasources = array();
+    public static $instance;
 
     public static function &getInstance() {
-        static $instance = array();
-        if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = new Connection;
+        if(!isset(self::$instance)):
+            $c = __CLASS__;
+            self::$instance = new $c;
         endif;
-        return $instance[0];
+        return self::$instance;
     }
     public static function add($name, $connection = null) {
         $self = self::getInstance();
@@ -19,25 +22,25 @@ class Connection extends Object {
             $self->config[$name] = $connection;
         endif;
     }
-    public static function &getDatasource($environment = null) {
+    public static function &getDatasource($connection = null) {
         $self = self::getInstance();
-        $environment = is_null($environment) ? Config::read('App.environment') : $environment;
-        if(isset($self->config[$environment])):
-            $config = $self->config[$environment];
-        else:
-            trigger_error('Can\'t find database configuration. Check /app/config/database.php', E_USER_ERROR);
+        $connection = is_null($connection) ? Config::read('App.environment') : $connection;
+        if(!array_key_exists($connection, $self->config)):
+            trigger_error('Can\'t find database configuration. Check /config/connections.php', E_USER_ERROR);
             return false;
         endif;
-        $datasource = Inflector::camelize($config['driver'] . '_datasource');
-        if(isset($self->datasources[$environment])):
-            return $self->datasources[$environment];
-        elseif(self::loadDatasource($datasource)):
-            $self->datasources[$environment] = new $datasource($config);
-            return $self->datasources[$environment];
-        else:
-            trigger_error('Can\'t find ' . $datasource . ' datasource', E_USER_ERROR);
-            return false;
+        $config = $self->config[$connection];
+        $datasource = $config['driver'] . 'Datasource';
+        if(!array_key_exists($connection, $self->datasources)):
+            if(self::loadDatasource($datasource)):
+                $self->datasources[$connection] = new $datasource($config);
+            else:
+                trigger_error('Can\'t find ' . $datasource . ' datasource', E_USER_ERROR);
+                return false;
+            endif;
         endif;
+        
+        return $self->datasources[$connection];
     }
     public static function loadDatasource($datasource) {
         if(!class_exists($datasource)):

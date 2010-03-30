@@ -1,7 +1,5 @@
 <?php
 
-require 'lib/core/model/datasources/Datasource.php';
-
 class Model extends Object {
     public $belongsTo = array();
     public $hasMany = array();

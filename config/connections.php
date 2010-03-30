@@ -2,15 +2,15 @@
 
 Connection::add(array(
     'development' => array(
-        'driver' => 'mysql',
+        'driver' => 'Mysql',
         'host' => 'localhost',
         'user' => 'root',
         'password' => '',
-        'database' => 'microblog',
+        'database' => 'test',
         'prefix' => ''
     ),
     'production' => array(
-        'driver' => '',
+        'driver' => 'Mysql',
         'host' => '',
         'user' => '',
         'password' => '',
