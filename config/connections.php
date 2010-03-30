@@ -2,7 +2,7 @@
 
 Connection::add(array(
     'development' => array(
-        'driver' => 'Mysql',
+        'driver' => 'MySql',
         'host' => 'localhost',
         'user' => 'root',
         'password' => '',
@@ -10,7 +10,7 @@ Connection::add(array(
         'prefix' => ''
     ),
     'production' => array(
-        'driver' => 'Mysql',
+        'driver' => 'MySql',
         'host' => '',
         'user' => '',
         'password' => '',

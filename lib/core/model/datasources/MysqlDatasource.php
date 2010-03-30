@@ -1,6 +1,6 @@
 <?php
 
-class MysqlDatasource extends Datasource {
+class MySqlDatasource extends Datasource {
     protected $schema = array();
     protected $sources = array();
     protected $connection;
