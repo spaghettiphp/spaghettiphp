@@ -3,9 +3,10 @@
 class Mapper extends Object {
     public $prefixes = array();
     public $routes = array();
-    private $here = null;
-    private $base = null;
+    protected $here = null;
+    protected $base = null;
     public $root = null;
+    public static $instance;
 
     public function __construct() {
         if(!$this->base):
@@ -23,11 +24,11 @@ class Mapper extends Object {
         endif;
     }
     public static function &getInstance() {
-        static $instance = array();
-        if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = new Mapper();
+        if(!isset(self::$instance)):
+            $c = __CLASS__;
+            self::$instance = new $c;
         endif;
-        return $instance[0];
+        return self::$instance;
     }
     public static function here() {
         $self = self::getInstance();
