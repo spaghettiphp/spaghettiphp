@@ -34,7 +34,7 @@ class View extends Object {
         extract($data, EXTR_OVERWRITE);
         extract($this->loadedHelpers, EXTR_PREFIX_SAME, 'helper_');
         ob_start();
-        include $filename;
+        require $filename;
         $output = ob_get_clean();
         return $output;
     }

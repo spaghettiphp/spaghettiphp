@@ -23,9 +23,10 @@ class Model extends Object {
         'hasOne' => array('primaryKey', 'foreignKey', 'conditions')
     );
     public $pagination = array();
+    protected $connection;
 
     public function __construct() {
-        if(is_null($this->environment)):
+        if(!$this->environment):
             $this->environment = Config::read('App.environment');
         endif;
         if(is_null($this->table)):
@@ -49,15 +50,14 @@ class Model extends Object {
             return false;
         endif;
     }
-    public static function &getConnection($environment = null) {
-        static $instance = array();
-        if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = Connection::getDatasource($environment);
+    public function connection($connection = null) {
+        if(!$this->connection):
+            $this->connection = Connection::get($connection);
         endif;
-        return $instance[0];
+        return $this->connection;
     }
     public function setSource($table) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         if($table):
             $this->table = $table;
             $sources = $db->listSources();
@@ -72,7 +72,7 @@ class Model extends Object {
         return true;
     }
     public function describe() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         $schema = $db->describe($this->table);
         if(is_null($this->primaryKey)):
             foreach($schema as $field => $describe):
@@ -139,27 +139,27 @@ class Model extends Object {
         return $association;
     }
     public function query($query) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->query($query);
     }
     public function fetch($query) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->fetchAll($query);
     }
     public function begin() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->begin();
     }
     public function commit() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->commit();
     }
     public function rollback() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->rollback();
     }
     public function all($params = array()) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         $params = array_merge(
             array(
                 'fields' => array_keys($this->schema),
@@ -221,7 +221,7 @@ class Model extends Object {
         return $results;
     }
     public function count($params = array()) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         $params = array_merge(
             array('fields' => '*', 'conditions' => $this->conditions),
             $params
@@ -279,11 +279,11 @@ class Model extends Object {
         return !empty($row);
     }
     public function insert($data) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->create($this->table, $data);
     }
     public function update($params, $data) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         $params = array_merge(
             array('conditions' => array(), 'order' => null, 'limit' => null),
             $params
@@ -378,7 +378,7 @@ class Model extends Object {
         return $created;
     }
     public function delete($id, $dependent = true) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         $params = array('conditions' => array($this->primaryKey => $id), 'limit' => 1);
         if($this->exists($id) && $this->deleteAll($params)):
             if($dependent):
@@ -399,7 +399,7 @@ class Model extends Object {
         return true;
     }
     public function deleteAll($params = array()) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         $params = array_merge(
             array('conditions' => $this->conditions, 'order' => $this->order, 'limit' => $this->limit),
             $params
@@ -407,15 +407,15 @@ class Model extends Object {
         return $db->delete($this->table, $params);
     }
     public function getInsertId() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->getInsertId();
     }
     public function getAffectedRows() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->getAffectedRows();
     }
     public function escape($value, $column = null) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection($this->environment);
         return $db->value($value, $column);
     }
 }
