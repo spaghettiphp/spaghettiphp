@@ -1,12 +1,12 @@
 <?php
 
-Connection::add('default', array(
+Connection::add(array(
     'development' => array(
         'driver' => 'mysql',
         'host' => 'localhost',
         'user' => 'root',
         'password' => '',
-        'database' => 'app_name',
+        'database' => 'microblog',
         'prefix' => ''
     ),
     'production' => array(

@@ -1,12 +1,9 @@
 <?php
 
 class Connection extends Object {
-    private $config = array();
-    private $datasources = array();
+    protected $config = array();
+    protected $datasources = array();
 
-    public function __construct() {
-        $this->config = Config::read('database');
-    }
     public static function &getInstance() {
         static $instance = array();
         if(!isset($instance[0]) || !$instance[0]):
@@ -14,11 +11,14 @@ class Connection extends Object {
         endif;
         return $instance[0];
     }
-    
     public static function add($name, $connection = null) {
-        
+        $self = self::getInstance();
+        if(is_array($name)):
+            $self->config += $name;
+        else:
+            $self->config[$name] = $connection;
+        endif;
     }
-    
     public static function &getDatasource($environment = null) {
         $self = self::getInstance();
         $environment = is_null($environment) ? Config::read('App.environment') : $environment;
