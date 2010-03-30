@@ -1,7 +1,7 @@
 <?php
 
 require 'config/environments/' . Config::read('App.environment') . '.php';
-require 'config/database.php';
+require 'config/connections.php';
 
 Config::write('App.defaultExtension', 'htm');
 Config::write('App.environment', 'development');

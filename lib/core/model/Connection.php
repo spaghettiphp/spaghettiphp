@@ -14,6 +14,11 @@ class Connection extends Object {
         endif;
         return $instance[0];
     }
+    
+    public static function add($name, $connection = null) {
+        
+    }
+    
     public static function &getDatasource($environment = null) {
         $self = self::getInstance();
         $environment = is_null($environment) ? Config::read('App.environment') : $environment;

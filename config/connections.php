@@ -1,12 +1,12 @@
 <?php
 
-Config::write('database', array(
+Connection::add('default', array(
     'development' => array(
         'driver' => 'mysql',
-        'host' => '',
-        'user' => '',
+        'host' => 'localhost',
+        'user' => 'root',
         'password' => '',
-        'database' => '',
+        'database' => 'app_name',
         'prefix' => ''
     ),
     'production' => array(
