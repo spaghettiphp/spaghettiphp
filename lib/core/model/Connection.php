@@ -36,7 +36,6 @@ class Connection extends Object {
         return $self->connections[$connection];
     }
     public static function create($config) {
-        $self = self::instance();
         $datasource = $config['driver'] . 'Datasource';
         if(!class_exists($datasource)):
             require 'lib/core/model/datasources/' . $datasource . '.php';

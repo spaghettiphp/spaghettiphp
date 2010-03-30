@@ -1,7 +1,7 @@
 <?php
 
 class Dispatcher extends Object {
-    public function dispatch() {
+    public static function dispatch() {
         $path = Mapper::parse();
         $path['controller'] = Inflector::hyphenToUnderscore($path['controller']);
         $path['action'] = Inflector::hyphenToUnderscore($path['action']);
@@ -10,7 +10,7 @@ class Dispatcher extends Object {
         if(Loader::exists('Controller', $controller_name)):
             $controller =& Loader::instance('Controller', $controller_name);
             if(!can_call_method($controller, $path['action']) && !Loader::exists('View', $view_path)):
-                $this->error('missingAction', array(
+                $controller->error('missingAction', array(
                     'controller' => $path['controller'],
                     'action' => $path['action']
                 ));
@@ -20,7 +20,7 @@ class Dispatcher extends Object {
             if(Loader::exists('View', $view_path)):
                 $controller =& Loader::instance('Controller', 'AppController');
             else:
-                $this->error('missingController', array(
+                $controller->error('missingController', array(
                     'controller' => $path['controller']
                 ));
                 return false;
@@ -39,8 +39,8 @@ class Dispatcher extends Object {
             $controller->render();
         endif;
         $controller->componentEvent('shutdown');
-        echo $controller->output;
+        $output = $controller->output;
         $controller->afterFilter();
-        return $controller;
+        return $output;
     }
 }
