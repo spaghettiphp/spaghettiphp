@@ -4,16 +4,16 @@ class Model extends Object {
     public $belongsTo = array();
     public $hasMany = array();
     public $hasOne = array();
-    public $id = null;
+    public $id;
     public $recursion = 0;
     public $schema = array();
-    public $table = null;
-    public $primaryKey = null;
-    public $displayField = null;
-    public $environment = null;
+    public $table;
+    public $primaryKey;
+    public $displayField;
+    public $connection;
     public $conditions = array();
-    public $order = null;
-    public $limit = null;
+    public $order;
+    public $limit;
     public $perPage = 20;
     public $validates = array();
     public $errors = array();
@@ -23,15 +23,15 @@ class Model extends Object {
         'hasOne' => array('primaryKey', 'foreignKey', 'conditions')
     );
     public $pagination = array();
-    protected $connection;
+    protected $conn;
 
     public function __construct() {
-        if(!$this->environment):
-            $this->environment = Config::read('App.environment');
+        if(!$this->connection):
+            $this->connection = Config::read('App.environment');
         endif;
         if(is_null($this->table)):
             $database = Config::read('database');
-            $this->table = $database[$this->environment]['prefix'] . Inflector::underscore(get_class($this));
+            $this->table = $database[$this->connection]['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
         ClassRegistry::addObject(get_class($this), $this);
@@ -50,14 +50,14 @@ class Model extends Object {
             return false;
         endif;
     }
-    public function connection($connection = null) {
-        if(!$this->connection):
-            $this->connection = Connection::get($connection);
+    public function connection() {
+        if(!$this->conn):
+            $this->conn = Connection::get($this->connection);
         endif;
-        return $this->connection;
+        return $this->conn;
     }
     public function setSource($table) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         if($table):
             $this->table = $table;
             $sources = $db->listSources();
@@ -72,7 +72,7 @@ class Model extends Object {
         return true;
     }
     public function describe() {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         $schema = $db->describe($this->table);
         if(is_null($this->primaryKey)):
             foreach($schema as $field => $describe):
@@ -139,27 +139,27 @@ class Model extends Object {
         return $association;
     }
     public function query($query) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->query($query);
     }
     public function fetch($query) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->fetchAll($query);
     }
     public function begin() {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->begin();
     }
     public function commit() {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->commit();
     }
     public function rollback() {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->rollback();
     }
     public function all($params = array()) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         $params = array_merge(
             array(
                 'fields' => array_keys($this->schema),
@@ -221,7 +221,7 @@ class Model extends Object {
         return $results;
     }
     public function count($params = array()) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         $params = array_merge(
             array('fields' => '*', 'conditions' => $this->conditions),
             $params
@@ -279,11 +279,11 @@ class Model extends Object {
         return !empty($row);
     }
     public function insert($data) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->create($this->table, $data);
     }
     public function update($params, $data) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         $params = array_merge(
             array('conditions' => array(), 'order' => null, 'limit' => null),
             $params
@@ -378,7 +378,7 @@ class Model extends Object {
         return $created;
     }
     public function delete($id, $dependent = true) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         $params = array('conditions' => array($this->primaryKey => $id), 'limit' => 1);
         if($this->exists($id) && $this->deleteAll($params)):
             if($dependent):
@@ -399,7 +399,7 @@ class Model extends Object {
         return true;
     }
     public function deleteAll($params = array()) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         $params = array_merge(
             array('conditions' => $this->conditions, 'order' => $this->order, 'limit' => $this->limit),
             $params
@@ -407,15 +407,15 @@ class Model extends Object {
         return $db->delete($this->table, $params);
     }
     public function getInsertId() {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->getInsertId();
     }
     public function getAffectedRows() {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->getAffectedRows();
     }
     public function escape($value, $column = null) {
-        $db = $this->connection($this->environment);
+        $db = $this->connection();
         return $db->value($value, $column);
     }
 }
