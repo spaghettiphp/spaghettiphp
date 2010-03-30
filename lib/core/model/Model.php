@@ -1,21 +1,19 @@
 <?php
 
-require 'lib/core/model/datasources/Datasource.php';
-
 class Model extends Object {
     public $belongsTo = array();
     public $hasMany = array();
     public $hasOne = array();
-    public $id = null;
+    public $id;
     public $recursion = 0;
     public $schema = array();
-    public $table = null;
-    public $primaryKey = null;
-    public $displayField = null;
-    public $environment = null;
+    public $table;
+    public $primaryKey;
+    public $displayField;
+    public $connection;
     public $conditions = array();
-    public $order = null;
-    public $limit = null;
+    public $order;
+    public $limit;
     public $perPage = 20;
     public $validates = array();
     public $errors = array();
@@ -25,14 +23,15 @@ class Model extends Object {
         'hasOne' => array('primaryKey', 'foreignKey', 'conditions')
     );
     public $pagination = array();
+    protected $conn;
 
     public function __construct() {
-        if(is_null($this->environment)):
-            $this->environment = Config::read('App.environment');
+        if(!$this->connection):
+            $this->connection = Config::read('App.environment');
         endif;
         if(is_null($this->table)):
             $database = Config::read('database');
-            $this->table = $database[$this->environment]['prefix'] . Inflector::underscore(get_class($this));
+            $this->table = $database[$this->connection]['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
         ClassRegistry::addObject(get_class($this), $this);
@@ -51,15 +50,14 @@ class Model extends Object {
             return false;
         endif;
     }
-    public static function &getConnection($environment = null) {
-        static $instance = array();
-        if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = Connection::getDatasource($environment);
+    public function connection() {
+        if(!$this->conn):
+            $this->conn = Connection::get($this->connection);
         endif;
-        return $instance[0];
+        return $this->conn;
     }
     public function setSource($table) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         if($table):
             $this->table = $table;
             $sources = $db->listSources();
@@ -74,7 +72,7 @@ class Model extends Object {
         return true;
     }
     public function describe() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         $schema = $db->describe($this->table);
         if(is_null($this->primaryKey)):
             foreach($schema as $field => $describe):
@@ -141,27 +139,27 @@ class Model extends Object {
         return $association;
     }
     public function query($query) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->query($query);
     }
     public function fetch($query) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->fetchAll($query);
     }
     public function begin() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->begin();
     }
     public function commit() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->commit();
     }
     public function rollback() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->rollback();
     }
     public function all($params = array()) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         $params = array_merge(
             array(
                 'fields' => array_keys($this->schema),
@@ -223,7 +221,7 @@ class Model extends Object {
         return $results;
     }
     public function count($params = array()) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         $params = array_merge(
             array('fields' => '*', 'conditions' => $this->conditions),
             $params
@@ -281,11 +279,11 @@ class Model extends Object {
         return !empty($row);
     }
     public function insert($data) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->create($this->table, $data);
     }
     public function update($params, $data) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         $params = array_merge(
             array('conditions' => array(), 'order' => null, 'limit' => null),
             $params
@@ -380,7 +378,7 @@ class Model extends Object {
         return $created;
     }
     public function delete($id, $dependent = true) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         $params = array('conditions' => array($this->primaryKey => $id), 'limit' => 1);
         if($this->exists($id) && $this->deleteAll($params)):
             if($dependent):
@@ -401,7 +399,7 @@ class Model extends Object {
         return true;
     }
     public function deleteAll($params = array()) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         $params = array_merge(
             array('conditions' => $this->conditions, 'order' => $this->order, 'limit' => $this->limit),
             $params
@@ -409,15 +407,15 @@ class Model extends Object {
         return $db->delete($this->table, $params);
     }
     public function getInsertId() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->getInsertId();
     }
     public function getAffectedRows() {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->getAffectedRows();
     }
     public function escape($value, $column = null) {
-        $db =& self::getConnection($this->environment);
+        $db = $this->connection();
         return $db->value($value, $column);
     }
 }

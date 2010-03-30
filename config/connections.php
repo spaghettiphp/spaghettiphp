@@ -1,16 +1,16 @@
 <?php
 
-Config::write('database', array(
+Connection::add(array(
     'development' => array(
-        'driver' => 'mysql',
-        'host' => '',
-        'user' => '',
+        'driver' => 'MySql',
+        'host' => 'localhost',
+        'user' => 'root',
         'password' => '',
-        'database' => '',
+        'database' => 'test',
         'prefix' => ''
     ),
     'production' => array(
-        'driver' => '',
+        'driver' => 'MySql',
         'host' => '',
         'user' => '',
         'password' => '',

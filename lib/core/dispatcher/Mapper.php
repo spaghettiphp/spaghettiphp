@@ -3,9 +3,10 @@
 class Mapper extends Object {
     public $prefixes = array();
     public $routes = array();
-    private $here = null;
-    private $base = null;
+    protected $here = null;
+    protected $base = null;
     public $root = null;
+    protected static $instance;
 
     public function __construct() {
         if(!$this->base):
@@ -22,19 +23,19 @@ class Mapper extends Object {
             $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
         endif;
     }
-    public static function &getInstance() {
-        static $instance = array();
-        if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = new Mapper();
+    public static function instance() {
+        if(!isset(self::$instance)):
+            $c = __CLASS__;
+            self::$instance = new $c;
         endif;
-        return $instance[0];
+        return self::$instance;
     }
     public static function here() {
-        $self = self::getInstance();
+        $self = self::instance();
         return $self->here;
     }
     public static function base() {
-        $self = self::getInstance();
+        $self = self::instance();
         return $self->base;
     }
     public static function normalize($url) {
@@ -52,16 +53,16 @@ class Mapper extends Object {
         return $url;
     }
     public static function root($controller) {
-        $self = self::getInstance();
+        $self = self::instance();
         $self->root = $controller;
         return true;
     }
     public static function getRoot() {
-        $self = self::getInstance();
+        $self = self::instance();
         return $self->root;
     }
     public static function prefix($prefix) {
-        $self = self::getInstance();
+        $self = self::instance();
         if(is_array($prefix)) $prefixes = $prefix;
         else $prefixes = func_get_args();
         foreach($prefixes as $prefix):
@@ -70,12 +71,12 @@ class Mapper extends Object {
         return true;
     }
     public static function unsetPrefix($prefix) {
-        $self = self::getInstance();
+        $self = self::instance();
         unset($self->prefixes[$prefix]);
         return true;
     }
     public static function getPrefixes() {
-        $self = self::getInstance();
+        $self = self::instance();
         return $self->prefixes;
     }
     public static function connect($url = null, $route = null) {
@@ -84,14 +85,14 @@ class Mapper extends Object {
                 self::connect($key, $value);
             endforeach;
         elseif(!is_null($url)):
-            $self = self::getInstance();
+            $self = self::instance();
             $url = self::normalize($url);
             $self->routes[$url] = rtrim($route, '/');
         endif;
         return true;
     }
     public static function disconnect($url) {
-        $self = self::getInstance();
+        $self = self::instance();
         $url = rtrim($url, '/');
         unset($self->routes[$url]);
         return true;
@@ -104,7 +105,7 @@ class Mapper extends Object {
         return preg_match($check, $url);
     }
     public static function getRoute($url) {
-        $self = self::getInstance();
+        $self = self::instance();
         foreach($self->routes as $map => $route):
             if(self::match($map, $url)):
                 $map = '%^' . str_replace(array(':any', ':fragment', ':num'), array('(.+)', '([^\/]+)', '([0-9]+)'), $map) . '/?$%';

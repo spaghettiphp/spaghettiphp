@@ -2,16 +2,17 @@
 
 class ClassRegistry {
     public $objects = array();
+    protected static $instance;
 
-    public static function &getInstance() {
-        static $instance = array();
-        if (!$instance):
-            $instance[0] = new ClassRegistry();
+    public static function instance() {
+        if(!isset(self::$instance)):
+            $c = __CLASS__;
+            self::$instance = new $c;
         endif;
-        return $instance[0];
+        return self::$instance;
     }
     public static function &load($class, $type = 'Model') {
-        $self =& ClassRegistry::getInstance();
+        $self =& self::instance();
         if($object =& $self->duplicate($class, $class)):
             return $object;
         elseif(!class_exists($class)):
@@ -25,7 +26,7 @@ class ClassRegistry {
         return ${$class};
     }
     public static function addObject($key, &$object) {
-        $self =& ClassRegistry::getInstance();
+        $self =& self::instance();
         if(!array_key_exists($key, $self->objects)):
             $self->objects[$key] =& $object;
             return true;
@@ -33,7 +34,7 @@ class ClassRegistry {
         return false;
     }
     public static function &getObject($key) {
-        $self =& ClassRegistry::getInstance();
+        $self =& self::instance();
         $return = false;
         if(array_key_exists($key, $self->objects)):
             $return =& $self->objects[$key];
@@ -41,7 +42,7 @@ class ClassRegistry {
         return $return;
     }
     public static function &duplicate($key, $class) {
-        $self =& ClassRegistry::getInstance();
+        $self =& self::instance();
         $duplicate = false;
         if(array_key_exists($key, $self->objects)):
             $object =& self::getObject($key);
