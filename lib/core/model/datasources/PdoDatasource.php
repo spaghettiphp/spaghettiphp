@@ -30,17 +30,20 @@ class PdoDatasource extends Datasource {
     public function disconnect() {
         $this->connected = false;
         $this->connection = null;
+
         return true;
     }
     public function connection() {
         if(!$this->connected):
             $this->connect();
         endif;
+
         return $this->connection;
     }
     public function query($sql) {
         $query = $this->connection()->query($sql);
         $this->affectedRows = $query->rowCount();
+
         return $query;
     }
     public function fetchAll($sql) {
@@ -60,7 +63,6 @@ class PdoDatasource extends Datasource {
     }
     public function affectedRows() {
         return $this->affectedRows;
-        return mysql_affected_rows($this->connection());
     }
     public function alias($fields) {
         if(is_array($fields)):
