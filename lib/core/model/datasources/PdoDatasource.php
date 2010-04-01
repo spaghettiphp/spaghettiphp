@@ -1,6 +1,7 @@
 <?php
 
 class PdoDatasource extends Datasource {
+    protected $affectedRows;
     protected $connection;
     protected $connected;
     protected $config;
@@ -36,10 +37,28 @@ class PdoDatasource extends Datasource {
         return $this->connection;
     }
     public function query($sql) {
-        return $this->connection()->query($sql);
+        $query = $this->connection()->query($sql);
+        $this->affectedRows = $query->rowCount();
+        return $query;
     }
     public function fetchAll($sql) {
         return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function begin() {
+        return $this->connection()->beginTransaction();
+    }
+    public function commit() {
+        return $this->connection()->commit();
+    }
+    public function rollback() {
+        return $this->connection()->rollback();
+    }
+    public function insertId() {
+        return $this->connection()->lastInsertId();
+    }
+    public function affectedRows() {
+        return $this->affectedRows;
+        return mysql_affected_rows($this->connection());
     }
     public function alias($fields) {
         if(is_array($fields)):

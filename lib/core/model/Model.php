@@ -408,11 +408,11 @@ class Model extends Object {
     }
     public function getInsertId() {
         $db = $this->connection();
-        return $db->getInsertId();
+        return $db->insertId();
     }
     public function getAffectedRows() {
         $db = $this->connection();
-        return $db->getAffectedRows();
+        return $db->affectedRows();
     }
     public function escape($value, $column = null) {
         $db = $this->connection();
