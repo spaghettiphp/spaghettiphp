@@ -77,19 +77,13 @@ class MySqlDatasource extends PdoDatasource {
             $insertFields []= $field;
             $insertValues []= $this->value($value, $column);
         endforeach;
-        $query = $this->renderSql('insert', array(
+        $query = $this->renderInsert(array(
             'table' => $table,
             'fields' => join(',', $insertFields),
             'values' => join(',', $insertValues)
         ));
         
         return $this->query($query);
-    }
-    public function read($table, $params) {
-        $params['table'] = $table;
-        $query = $this->renderSelect($params);
-        
-        return $this->fetchAll($query);
     }
     public function update($table, $params) {
         $updateValues = array();
@@ -109,7 +103,7 @@ class MySqlDatasource extends PdoDatasource {
         return $this->query($query);
     }
     public function delete($table, $params = array()) {
-        $query = $this->renderSql('delete', array(
+        $query = $this->renderDelete(array(
             'table' => $table,
             'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
             'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
@@ -118,23 +112,13 @@ class MySqlDatasource extends PdoDatasource {
         
         return $this->query($query);
     }
-    public function count($table, $params) {
-        $params['table'] = $table;
+    public function count($params) {
         $params['fields'] = array(
             'count' => 'COUNT(' . $this->alias($params['fields']) . ')'
         );
-        $query = $this->renderSelect($params);
-        $results = $this->fetchAll($query);
+        $results = $this->read($params);
         
         return $results[0]['count'];
-    }
-    public function renderSql($type, $data = array()) {
-        switch($type):
-            case 'delete':
-                return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
-            case 'insert':
-                return "INSERT INTO {$data['table']}({$data['fields']}) VALUES({$data['values']})";
-        endswitch;
     }
 
     public function renderSelect($params) {
@@ -151,6 +135,7 @@ class MySqlDatasource extends PdoDatasource {
         
         if($params['conditions']):
             $sql .= ' WHERE ' . $this->sqlConditions($params['"table'], $params['conditions']);
+#            $sql .= ' WHERE ' . $params['conditions'][0];
         endif;
         
         if($params['groupBy']):
@@ -168,12 +153,23 @@ class MySqlDatasource extends PdoDatasource {
         if($params['offset'] || $params['limit']):
             $sql .= ' LIMIT ' . $this->limit($params['offset'], $params['limit']);
         endif;
-        
+
         return $sql;
     }
+    
+    
     public function renderUpdate($params) {
         return "UPDATE {$params['table']} SET {$params['values']} {$params['conditions']} {$params['order']} {$params['limit']}";
     }
+    
+    public function renderInsert($params) {
+        return "INSERT INTO {$params['table']}({$params['fields']}) VALUES({$params['values']})";
+    }
+
+    public function renderDelete($params) {
+        return "DELETE FROM {$params['table']} {$params['conditions']} {$params['order']} {$params['limit']}";
+    }
+    
     public function limit($offset, $limit) {
         if(!is_null($offset)):
             $limit = $offset . ',' . $limit;

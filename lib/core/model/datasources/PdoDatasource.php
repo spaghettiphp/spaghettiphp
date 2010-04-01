@@ -104,4 +104,9 @@ class PdoDatasource extends Datasource {
         
         return $order;
     }
+    public function read($params) {
+        $query = $this->renderSelect($params);
+
+        return $this->fetchAll($query);
+    }
 }

@@ -166,11 +166,12 @@ class Model extends Object {
                 'conditions' => isset($params['conditions']) ? array_merge($this->conditions, $params['conditions']) : $this->conditions,
                 'order' => $this->order,
                 'limit' => $this->limit,
-                'recursion' => $this->recursion
+                'recursion' => $this->recursion,
+                'table' => $this->table
             ),
             $params
         );
-        $results = $db->read($this->table, $params);
+        $results = $db->read($params);
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
         endif;
@@ -223,10 +224,14 @@ class Model extends Object {
     public function count($params = array()) {
         $db = $this->connection();
         $params = array_merge(
-            array('fields' => '*', 'conditions' => $this->conditions),
+            array(
+                'fields' => '*',
+                'conditions' => $this->conditions,
+                'table' => $this->table
+            ),
             $params
         );
-        return $db->count($this->table, $params);
+        return $db->count($params);
     }
     public function paginate($params = array()) {
         $params = array_merge(
