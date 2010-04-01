@@ -2,6 +2,8 @@
 
 class PdoDatasource extends Datasource {
     protected $affectedRows;
+    protected $schema = array();
+    protected $sources = array();
     protected $connection;
     protected $connected;
     protected $config;

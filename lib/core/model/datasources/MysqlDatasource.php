@@ -3,45 +3,48 @@
 require_once 'lib/core/model/datasources/PdoDatasource.php';
 
 class MySqlDatasource extends PdoDatasource {
-    protected $schema = array();
-    protected $sources = array();
-    protected $results;
-    protected $transactionStarted = false;
     protected $comparison = array('=', '<>', '!=', '<=', '<', '>=', '>', '<=>', 'LIKE', 'REGEXP');
     protected $logic = array('or', 'or not', '||', 'xor', 'and', 'and not', '&&', 'not');
+    protected $params = array(
+        'fields' => '*',
+        'joins' => array(),
+        'conditions' => null,
+        'groupBy' => null,
+        'having' => null,
+        'order' => null,
+        'offset' => null,
+        'limit' => null
+    );
 
     // @todo add missing DSN elements
     public function dsn() {
         return 'mysql:host=' . $this->config['host'] . ';dbname=' . $this->config['database'];
     }
-    public function fetch($sql = null) {
-        if(!is_null($sql) && !$this->query($sql)):
-            return false;
-        elseif($this->hasResult()):
-            return $this->fetchRow();
-        else:
-            return null;
+    public function listSources() {
+        if(empty($this->sources)):
+            $sources = $this->query('SHOW TABLES FROM ' . $this->config['database']);
+            foreach($sources as $source):
+                $this->sources []= $source[0];
+            endforeach;
         endif;
+        return $this->sources;
     }
-    public function fetchAll($sql = null) {
-        if(!is_null($sql) && !$this->query($sql)):
-            return false;
-        elseif($this->hasResult()):
-            $results = array();
-            while($result = $this->fetch()):
-                $results []= $result;
-            endwhile;
-            return $results;
-        else:
-            return null;
+    public function describe($table) {
+        if(!isset($this->schema[$table])):
+            $columns = $this->fetchAll('SHOW COLUMNS FROM ' . $table);
+            $schema = array();
+            foreach($columns as $column):
+                $schema[$column['Field']] = array(
+                    'type' => $this->column($column['Type']),
+                    'null' => $column['Null'] == 'YES' ? true : false,
+                    'default' => $column['Default'],
+                    'key' => $column['Key'],
+                    'extra' => $column['Extra']
+                );
+            endforeach;
+            $this->schema[$table] = $schema;
         endif;
-    }
-    public function fetchRow($results = null) {
-        $results = is_null($results) ? $this->results : $results;
-        return mysql_fetch_assoc($results);
-    }
-    public function hasResult() {
-        return is_resource($this->results);
+        return $this->schema[$table];
     }
     public function column($column) {
         preg_match('/([a-z]*)\(?([^\)]*)?\)?/', $column, $type);
@@ -64,44 +67,6 @@ class MySqlDatasource extends PdoDatasource {
             return $type . '(' . $limit . ')';
         endif;
     }
-    public function listSources() {
-        if(empty($this->sources)):
-            $sources = $this->query('SHOW TABLES FROM ' . $this->config['database']);
-            foreach($sources as $source):
-                $this->sources []= $source[0];
-            endforeach;
-        endif;
-        return $this->sources;
-    }
-    public function describe($table) {
-        if(!isset($this->schema[$table])):
-            if(!$this->query('SHOW COLUMNS FROM ' . $table)) return false;
-            $columns = $this->fetchAll();
-            $schema = array();
-            foreach($columns as $column):
-                $schema[$column['Field']] = array(
-                    'type' => $this->column($column['Type']),
-                    'null' => $column['Null'] == 'YES' ? true : false,
-                    'default' => $column['Default'],
-                    'key' => $column['Key'],
-                    'extra' => $column['Extra']
-                );
-            endforeach;
-            $this->schema[$table] = $schema;
-        endif;
-        return $this->schema[$table];
-    }
-    public function begin() {
-        return $this->transactionStarted = $this->query('START TRANSACTION');
-    }
-    public function commit() {
-        $this->transactionStarted = !$this->query('COMMIT');
-        return !$this->transactionStarted;
-    }
-    public function rollback() {
-        $this->transactionStarted = !$this->query('ROLLBACK');
-        return !$this->transactionStarted;
-    }
     public function create($table = null, $data = array()) {
         $insertFields = $insertValues = array();
         $schema = $this->describe($table);
@@ -117,15 +82,9 @@ class MySqlDatasource extends PdoDatasource {
         ));
         return $this->query($query);
     }
-    public function read($table = null, $params = array()) {
-        $query = $this->renderSql('select', array(
-            'table' => $table,
-            'fields' => is_array($f = $params['fields']) ? join(',', $f) : $f,
-            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
-            'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
-            'groupBy' => !isset($params['groupBy']) ? '' : 'GROUP BY ' . $params['groupBy'],
-            'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit']
-        ));
+    public function read($table, $params) {
+        $params["table"] = $table;
+        $query = $this->renderSelect($params);
         return $this->fetchAll($query);
     }
     public function update($table = null, $params = array()) {
@@ -164,8 +123,6 @@ class MySqlDatasource extends PdoDatasource {
     }
     public function renderSql($type, $data = array()) {
         switch($type):
-            case 'select':
-                return "SELECT {$data['fields']} FROM {$data['table']} {$data['conditions']} {$data['groupBy']} {$data['order']} {$data['limit']}";
             case 'delete':
                 return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
             case 'insert':
@@ -174,6 +131,51 @@ class MySqlDatasource extends PdoDatasource {
                 return "UPDATE {$data['table']} SET {$data['values']} {$data['conditions']} {$data['order']} {$data['limit']}";
         endswitch;
     }
+
+    public function renderSelect($params) {
+        $params += $this->params;
+        
+        $sql = 'SELECT ' . $this->alias($params['fields']);
+        $sql .= ' FROM ' . $this->alias($params['table']);
+        
+        if(!empty($params['joins'])):
+            foreach($params['joins'] as $join):
+                $sql .= ' ' . $this->join($join);
+            endforeach;
+        endif;
+        
+        if($params['conditions']):
+            $sql .= ' WHERE ' . $this->sqlConditions($params["table"], $params['conditions']);
+        endif;
+        
+        if($params['groupBy']):
+            $sql .= ' GROUP BY ' . $this->alias($params['groupBy']);
+        endif;
+        
+        if($params['having']):
+            $sql .= ' HAVING ' . $params['having'];
+        endif;
+
+        if($params['order']):
+            $sql .= ' ORDER BY ' . $this->order($params['order']);
+        endif;
+        
+        if($params['offset'] || $params['limit']):
+            $sql .= ' LIMIT ' . $this->limit($params['offset'], $params['limit']);
+        endif;
+        
+        return $sql;
+    }
+    public function limit($offset, $limit) {
+        if(!is_null($offset)):
+            $limit = $offset . ',' . $limit;
+        endif;
+        
+        return $limit;
+    }
+
+
+
     public function value($value, $column = null) {
         switch($column):
             case 'boolean':
@@ -242,11 +244,5 @@ class MySqlDatasource extends PdoDatasource {
             return $this->schema[$table][$field]['type'];
         endif;
         return null;
-    }
-    public function getInsertId() {
-        return mysql_insert_id($this->connection());
-    }
-    public function getAffectedRows() {
-        return mysql_affected_rows($this->connection());
     }
 }
