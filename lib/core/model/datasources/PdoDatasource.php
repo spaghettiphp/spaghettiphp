@@ -1,13 +1,13 @@
 <?php
 
 class PdoDatasource extends Datasource {
-    public $connection;
+    protected $connection;
+    protected $connected;
     protected $config;
     
     public function __construct($config) {
         $this->config = $config;
     }
-    // @todo should throw exception
     public function dsn() {
         return $this->config['dsn'];
     }
@@ -19,8 +19,20 @@ class PdoDatasource extends Datasource {
                 $password = $this->config['password'];
             endif;
             $this->connection = new PDO($dsn, $username, $password);
+            $this->connected = true;
         endif;
         
+        return $this->connection;
+    }
+    public function disconnect() {
+        $this->connected = false;
+        $this->connection = null;
+        return true;
+    }
+    public function connection() {
+        if(!$this->connected):
+            $this->connect();
+        endif;
         return $this->connection;
     }
     public function alias($fields) {
@@ -63,15 +75,11 @@ class PdoDatasource extends Datasource {
         
         return $order;
     }
+    public function query($sql = null) {
+        $this->results = $this->connection()->query($sql);
+        return $this->results;
+    }
     public function fetch($sql) {
         return $this->connection->query($sql);
     }
-}
-
-// @todo move to some utils file
-function is_hash($var) {
-    if(is_array($var)):
-        return array_keys($var) !== range(0, sizeof($var) - 1);
-    endif;
-    return false;
 }

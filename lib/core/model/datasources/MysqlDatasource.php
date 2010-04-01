@@ -1,40 +1,18 @@
 <?php
 
-class MySqlDatasource extends Datasource {
+require_once 'lib/core/model/datasources/PdoDatasource.php';
+
+class MySqlDatasource extends PdoDatasource {
     protected $schema = array();
     protected $sources = array();
-    protected $connection;
     protected $results;
     protected $transactionStarted = false;
     protected $comparison = array('=', '<>', '!=', '<=', '<', '>=', '>', '<=>', 'LIKE', 'REGEXP');
     protected $logic = array('or', 'or not', '||', 'xor', 'and', 'and not', '&&', 'not');
-    public $connected = false;
 
-    public function connect() {
-        $this->connection = @mysql_connect($this->config['host'], $this->config['user'], $this->config['password']);
-        if(@mysql_select_db($this->config['database'], $this->connection)):
-            $this->connected = true;
-        else:
-            $this->error('connectionError');
-        endif;
-        return $this->connection;
-    }
-    public function disconnect() {
-        if(mysql_close($this->connection)):
-            $this->connected = false;
-            $this->connection = null;
-        endif;
-        return !$this->connected;
-    }
-    public function &getConnection() {
-        if(!$this->connected):
-            $this->connect();
-        endif;
-        return $this->connection;
-    }
-    public function query($sql = null) {
-        $this->results = mysql_query($sql, $this->getConnection());
-        return $this->results;
+    // @todo add missing DSN elements
+    public function dsn() {
+        return 'mysql:host=' . $this->config['host'] . ';dbname=' . $this->config['database'];
     }
     public function fetch($sql = null) {
         if(!is_null($sql) && !$this->query($sql)):
@@ -89,9 +67,9 @@ class MySqlDatasource extends Datasource {
     public function listSources() {
         if(empty($this->sources)):
             $sources = $this->query('SHOW TABLES FROM ' . $this->config['database']);
-            while($source = mysql_fetch_array($sources)):
+            foreach($sources as $source):
                 $this->sources []= $source[0];
-            endwhile;
+            endforeach;
         endif;
         return $this->sources;
     }
@@ -266,9 +244,9 @@ class MySqlDatasource extends Datasource {
         return null;
     }
     public function getInsertId() {
-        return mysql_insert_id($this->getConnection());
+        return mysql_insert_id($this->connection());
     }
     public function getAffectedRows() {
-        return mysql_affected_rows($this->getConnection());
+        return mysql_affected_rows($this->connection());
     }
 }
