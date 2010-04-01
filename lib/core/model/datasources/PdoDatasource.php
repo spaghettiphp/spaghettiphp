@@ -35,6 +35,12 @@ class PdoDatasource extends Datasource {
         endif;
         return $this->connection;
     }
+    public function query($sql) {
+        return $this->connection()->query($sql);
+    }
+    public function fetchAll($sql) {
+        return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
     public function alias($fields) {
         if(is_array($fields)):
             if(is_hash($fields)):
@@ -74,12 +80,5 @@ class PdoDatasource extends Datasource {
         endif;
         
         return $order;
-    }
-    public function query($sql = null) {
-        $this->results = $this->connection()->query($sql);
-        return $this->results;
-    }
-    public function fetch($sql) {
-        return $this->connection->query($sql);
     }
 }
