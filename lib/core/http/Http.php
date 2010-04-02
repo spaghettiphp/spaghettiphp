@@ -104,17 +104,18 @@ class Http extends Object{
       endif;
       //Inicia a sessão curl
       $ch = curl_init($url);
+      //Traz o resultado como string, ao invés de jogá-lo diretamente na saída
+      $self->curlOptions[CURLOPT_RETURNTRANSFER] = true;
       //Coloca os arrays como opções do curl
       curl_setopt_array($ch, $self->curlOptions);
       //Executa
       $self->result = curl_exec($ch);
-      //Pega o código dee cabeçalho retornado
+      //Pega o código de cabeçalho retornado
       $self->statusCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
       //Tipo do conteúdo retornado.
-      //Verifica se retorna como algum inteiro, ou como um mime-type
       $self->contentType= curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
       //Fecha a sessão curl
-      curl_close($ch);      
+      curl_close($ch);
    }
    
    /**
