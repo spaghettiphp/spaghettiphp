@@ -5,7 +5,7 @@
   *  Exemplos de uso:
   *    - Postando no Twitter
   *    Http::auth('user', 'senha');
-  *    Http::post('http://api.twitter.com/1/statuses/update.json',
+  *    echo Http::post('http://api.twitter.com/1/statuses/update.json',
   *                array('status' => 'Testando o Core.Http'));
   *
   *    - Encurtando uma url com o bit.ly
@@ -14,7 +14,7 @@
   *      'apiKey'	  => 'R_2531c63fdc13b904d94fc084', //http://bit.ly/account/your_api_key
   *      'longUrl'  => 'http://google.com'
   *    );
-  *    Http::post('http://api.bit.ly/v3/shorten', $params);            
+  *    echo Http::post('http://api.bit.ly/v3/shorten', $params);            
   *
   *  
   */
@@ -87,6 +87,13 @@ class Http extends Object{
       $self->curlOptions[CURLOPT_USERPWD] = $self->user .':'. $self->password;
    }
    
+   /**
+     *   Centraliza o envio das requisições http
+     *   
+     *   @param string $url  A url  que receberá a requisição
+     *   @param string $method O tipo de requisição. Ex.: POST, GET, etc
+     *   @return mixed O resultado da requisição
+     */
    public static function request($url, $method){
       $self = self::instance();
       //Tipos de requisições e seus correspondentes no cURL
