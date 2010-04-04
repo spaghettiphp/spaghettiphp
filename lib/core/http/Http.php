@@ -116,6 +116,8 @@ class Http extends Object{
       $self->contentType= curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
       //Fecha a sessão curl
       curl_close($ch);
+      //Retorna
+     return $self->result;
    }
    
    /**
