@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
   *  Classe de requisições HTTP
   *
@@ -14,11 +14,33 @@
   *      'apiKey'	  => 'R_2531c63fdc13b904d94fc084', //http://bit.ly/account/your_api_key
   *      'longUrl'  => 'http://google.com'
   *    );
-  *    echo Http::post('http://api.bit.ly/v3/shorten', $params);            
+  *    echo Http::post('http://api.bit.ly/v3/shorten', $params);
   *
   *  
   */
 class Http extends Object{
+    /*
+     *  Lista de retornos possíveis.
+     *  Alguns servidores verificam esse cabeçalho para decidir qual o formato que os da-
+     *  dos serão retornados
+     */
+    public $accept = array(
+        'atom'=> 'application/atom+xml',
+        'css' => 'text/css',
+        'csv' => 'text/csv',
+        'gif' => 'image/gif',
+        'html'=> 'text/html',
+        'jpg' => 'image/jpeg',
+        'js'  => 'application/javascript',
+        'json'=> 'application/json',
+        'pdf' => 'application/pdf',
+        'png' => 'image/png',
+        'rss' => 'application/rss+xml',
+        'txt' => 'text/plain',
+        'yaml'=> 'text/yaml',
+        'xml' => 'application/xml',
+    );
+    
     /*
      *   O nome de usuário
      */
@@ -27,6 +49,7 @@ class Http extends Object{
      *   A senha do usuário
      */
     public $password;
+    
     /*
      *   O resultado da requisição
      */
@@ -68,7 +91,6 @@ class Http extends Object{
      *   
      *   @param string $user  O nome de usuário
      *   @param string $password A senha do usuário
-     *   @param bool  $basic Usar autenticação básica?
      *   @return void
      */
    public static function auth($user, $password = null, $basic = true){
@@ -81,7 +103,7 @@ class Http extends Object{
       
       $self->user = $user;
       $self->password = $password;
-      //definindo autenticação básica
+      //Definindo autenticação básica
       $self->curlOptions[CURLOPT_HTTPAUTH] = ($basic) ? CURLAUTH_BASIC : CURLAUTH_DIGEST;
       //Criando usuário e senha no formato do curl
       $self->curlOptions[CURLOPT_USERPWD] = $self->user .':'. $self->password;
@@ -94,39 +116,39 @@ class Http extends Object{
      *   @param string $method O tipo de requisição. Ex.: POST, GET, etc
      *   @return mixed O resultado da requisição
      */
-   public static function request($url, $method){
-      $self = self::instance();
-      //Tipos de requisições e seus correspondentes no cURL
-      $methods = array(
-         'GET' => CURLOPT_HTTPGET,
-         'POST'=> CURLOPT_POST,
-         'PUT' => CURLOPT_PUT,
-      );
-      //Existe no array $methods
-      if(array_key_exists($method, $methods)):
-         $self->curlOptions[$methods[$method]] = true;
-      //Não existe, envia uma requisição customizada
-      else:
-         $self->curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
-      endif;
-      //Inicia a sessão curl
-      $ch = curl_init($url);
-      //Traz o resultado como string, ao invés de jogá-lo diretamente na saída
-      $self->curlOptions[CURLOPT_RETURNTRANSFER] = true;
-      //Coloca os arrays como opções do curl
-      curl_setopt_array($ch, $self->curlOptions);
-      //Executa
-      $self->result = curl_exec($ch);
-      //Pega o código de cabeçalho retornado
-      $self->statusCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-      //Tipo do conteúdo retornado.
-      $self->contentType= curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-      //Fecha a sessão curl
-      curl_close($ch);
-      //Retorna
-     return $self->result;
+    public static function request($url, $method){
+        $self = self::instance();
+        //Tipos de requisições e seus correspondentes no cURL
+        $methods = array(
+            'GET' => CURLOPT_HTTPGET,
+            'POST'=> CURLOPT_POST,
+            'PUT' => CURLOPT_PUT,
+        );
+    //Existe no array $methods
+    if(array_key_exists($method, $methods)):
+        $self->curlOptions[$methods[$method]] = true;
+    //Não existe, envia uma requisição customizada
+    else:
+        $self->curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
+    endif;
+    //Inicia a sessão curl
+    $ch = curl_init($url);
+    //Traz o resultado como string, ao invés de jogá-lo diretamente na saída
+    $self->curlOptions[CURLOPT_RETURNTRANSFER] = true;
+    //Coloca os arrays como opções do curl
+    curl_setopt_array($ch, $self->curlOptions);
+    //Executa
+    $self->result = curl_exec($ch);
+    //Pega o código dee cabeçalho retornado
+    $self->statusCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    //Tipo do conteúdo retornado.
+    $self->contentType= curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+    //Fecha a sessão curl
+    curl_close($ch);
+    //Retorna
+    return $self->result;
    }
-   
+
    /**
      *   Envia uma requisição do tipo GET
      *
@@ -135,120 +157,139 @@ class Http extends Object{
      *      aqui infomados serão colocados na query string
      *   @return mixed  Os dados retornados pelo servidor
      */
-   public static function get($url, $params = array()){
-      $self = self::instance();
-      $url .= !empty($params) ? '?' . http_build_query($params) : '';
-      return $self->request($url, 'GET');      
-   }
-   /**
-     *   Envia uma requisição do tipo POST
-     *
-     *   @param  string $url   A url do servidor
-     *   @param  array  $params Parâmetros adicionais para serem enviados
-     *   @return mixed  Os dados retornados pelo servidor
-     */
-   public static function post($url, $params = array()){
-      $self = self::instance();
-      !empty($params) ?
-         $self->curlOptions[CURLOPT_POSTFIELDS] = http_build_query($params) : false;
-      return self::request($url, 'POST');      
+    public static function get($url, $params = array()){
+        $self = self::instance();
+        $url .= !empty($params) ? '?' . http_build_query($params) : '';
+        return $self->request($url, 'GET');      
+    }
+    /**
+      *   Envia uma requisição do tipo POST
+      *
+      *   @param  string $url   A url do servidor
+      *   @param  array  $params Parâmetros adicionais para serem enviados
+      *   @return mixed  Os dados retornados pelo servidor
+      */
+    public static function post($url, $params = array()){
+        $self = self::instance();
+
+        !empty($params) ?
+            $self->curlOptions[CURLOPT_POSTFIELDS] = http_build_query($params) : false;
+
+        return self::request($url, 'POST');      
    }
    
-   /**
-     *   Envia uma requisição do tipo PUT
-     *
-     *   @param  string $url   A url do servidor
-     *   @param  array  $params Parâmetros adicionais para serem enviados
-     *   @return mixed  Os dados retornados pelo servidor
-     */
-   public static function put($url, $params = array()){
-      $self = self::instance();
-      !empty($params) ?
-         $self->curlOptions[CURLOPT_POSTFIELDS] = http_build_query($params) : false;
-      return self::request($url, 'PUT');
-   }
-
-   /**
-     *   Envia uma requisição do tipo DELETE
-     *   O método delete não recebe parâmetros. Tudo deve ser passado diretamente
-     *   na url. Caso $params seja informado, será transformado em uma querystring
-     *
-     *   @param string $url A url do servidor
-     *   @param array  $parrams Os parâmetros
-     */
-   public static function delete($url, $params = array()){
-      $url .= !empty($params) ? '?' . http_build_query($params) : '';
-      return self::request($url, 'DELETE');
-   }
-
-   /**
-     * Define o tempo máximo de execução da conexão, em segundos.
-     *
-     * @param integer $timeout Tempo máximo de execução em segundos
-     */
-   public static function timeout($timeout){
-      $self = self::instance();
-      $self->curlOptions[CURLOPT_CONNECTTIMEOUT] = $timeout;
-      
-   }
-   /**
-    * Retorna o resultado da requisição
-    * 
-    * @return string
-    */
-   public static function result(){
-      $self = self::instance();
-      return $self->result;
-   }
-
-   /**
-     * Determina se a requisição foi feita com sucesso.
-     * 
-     * @return bool
-     */
-   public static function isSuccess(){
-      $self = self::instance();
-      return ($self->statusCode>=200 && $self->statusCode<300);
-   }
-
-   /**
-     * Pega o código do status HTTP da requisição
-     * 
-     * @return int
-     */
-   public static function getStatusCode(){
-      $self = self::instance();
-      return $self->statusCode;
-   }
-
-   /**
-     * Pega o tipo do retorno da requisição
-     * 
-     * @return string Tipo do retorno, no formato "application/json; charset=utf8"
-     */
-   public static function getContentType(){
-      $self = self::instance();
-      return $self->contentType;
-   }
-   /**
-     *  Adiciona opções à execução do cURL.
-     *
-     *  @param array $options    As opções que serão adicionadas às existentes.
-     */
-    public static function options($options = array()){
-      $self = self::instance();
-      $self->curlOptions = array_merge($self->curlOptions, $options);
-      return $self->curlOptions;
+    /**
+      *   Envia uma requisição do tipo PUT
+      *
+      *   @param  string $url   A url do servidor
+      *   @param  array  $params Parâmetros adicionais para serem enviados
+      *   @return mixed  Os dados retornados pelo servidor
+      */
+    public static function put($url, $params = array()){
+        $self = self::instance();
+        !empty($params) ?
+            $self->curlOptions[CURLOPT_POSTFIELDS] = http_build_query($params) : false;
+        return self::request($url, 'PUT');
     }
+
+    /**
+      *   Envia uma requisição do tipo DELETE
+      *   O método delete não recebe parâmetros. Tudo deve ser passado diretamente
+      *   na url. Caso $params seja informado, será transformado em uma querystring
+      *
+      *   @param string $url A url do servidor
+      *   @param array  $parrams Os parâmetros
+      */
+    public static function delete($url, $params = array()){
+        $url .= !empty($params) ? '?' . http_build_query($params) : '';
+        return self::request($url, 'DELETE');
+    }
+
+    /**
+      * Define um tipo de dados de retorno específico.
+      * Alguns servidores usam esse cabeçalho para retornar os dados no formato desejado.
+      *
+      * @param string $accept Tipo aceito. Se $accept for uma chave do array self::$accept
+      *     só é necessário passar essa chave. Se não for, então espera-se que $accpet seja
+      *     um cabeçalho mime-type no formato "application/json".
+      * @return string $accept
+      */
+    public static function accept($accept){
+        $self = self::instance();
+        $accept = in_array($accept, $self->accept) ? $self->accept[$accept] : $accept;
+        $self->curlOptions[CURLOPT_HTTPHEADER][] = "Accept: {$accept}";
+        return $self->accept;
+    }
+    /**
+      * Define o tempo máximo de execução da conexão, em segundos.
+      *
+      * @param  integer $timeout Tempo máximo de execução em segundos
+      * @return integer $timeout 
+      */
+    public static function timeout($timeout){
+        $self = self::instance();
+        return $self->curlOptions[CURLOPT_CONNECTTIMEOUT] = $timeout;
+    }
+
+    /**
+     * Retorna o resultado da requisição
+     * 
+     * @return string
+     */
+    public static function result(){
+        $self = self::instance();
+        return $self->result;
+    }
+
+    /**
+      * Determina se a requisição foi feita com sucesso.
+      * 
+      * @return bool
+      */
+    public static function isSuccess(){
+        $self = self::instance();
+        return ($self->statusCode>=200 && $self->statusCode<300);
+    }
+
+    /**
+      * Pega o código do status HTTP da requisição
+      * 
+      * @return int
+      */
+    public static function getStatusCode(){
+        $self = self::instance();
+        return $self->statusCode;
+    }
+
+    /**
+      * Pega o tipo do retorno da requisição
+      * 
+      * @return string Tipo do retorno, no formato "application/json; charset=utf8"
+      */
+    public static function getContentType(){
+        $self = self::instance();
+        return $self->contentType;
+    }
+    /**
+      *  Adiciona opções à execução do cURL.
+      *
+      *  @param array $options    As opções que serão adicionadas às existentes.
+      */
+     public static function options($options = array()){
+        $self = self::instance();
+        $self->curlOptions = array_merge($self->curlOptions, $options);
+        return $self->curlOptions;
+     }
     
     /**
-      * Limpa as oções previamente criadas
+      * Limpa as opções previamente criadas
       *
       * @return void
       */
     public static function clear(){
         $self = self::instance();
         $self->curlOptions = array();
+        $self->accept = null;
         $self->contentType = null;
         $self->statusCode = null;
         $self->password = null;
