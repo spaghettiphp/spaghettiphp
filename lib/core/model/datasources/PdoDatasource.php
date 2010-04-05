@@ -106,7 +106,10 @@ class PdoDatasource extends Datasource {
         
         return $order;
     }
-     public function query($sql, $values = array()) {
+    public function values($conditions) {
+        return array_slice($conditions, 1);
+    }
+    public function query($sql, $values = array()) {
         $this->lastQuery = $sql;
 
         $query = $this->connection()->prepare($sql);
@@ -122,7 +125,7 @@ class PdoDatasource extends Datasource {
     }
     public function read($params) {
         $params += $this->params;
-        $values = array_slice($params['conditions'], 1);
+        $values = $this->values($params['conditions']);
         $sql = $this->renderSelect($params);
         $query = $this->query($sql, $values);
 
