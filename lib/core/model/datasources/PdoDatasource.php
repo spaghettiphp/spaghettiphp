@@ -51,20 +51,6 @@ class PdoDatasource extends Datasource {
 
         return $this->connection;
     }
-    public function query($sql, $values = array()) {
-        $this->lastQuery = $sql;
-
-        $query = $this->connection()->prepare($sql);
-        $query->setFetchMode(PDO::FETCH_ASSOC);
-        $query->execute($values);
-
-        $this->affectedRows = $query->rowCount();
-
-        return $query;
-    }
-    public function fetchAll($sql) {
-        return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-    }
     public function begin() {
         return $this->connection()->beginTransaction();
     }
@@ -120,10 +106,23 @@ class PdoDatasource extends Datasource {
         
         return $order;
     }
+     public function query($sql, $values = array()) {
+        $this->lastQuery = $sql;
+
+        $query = $this->connection()->prepare($sql);
+        $query->setFetchMode(PDO::FETCH_ASSOC);
+        $query->execute($values);
+
+        $this->affectedRows = $query->rowCount();
+
+        return $query;
+    }
+    public function fetchAll($sql) {
+        return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
     public function read($params) {
         $params += $this->params;
         $values = array_slice($params['conditions'], 1);
-        
         $sql = $this->renderSelect($params);
         $query = $this->query($sql, $values);
 
@@ -133,5 +132,49 @@ class PdoDatasource extends Datasource {
         endwhile;
 
         return $results;
+    }
+
+    public function create($table = null, $data = array()) {
+        $insertFields = $insertValues = array();
+        $schema = $this->describe($table);
+        foreach($data as $field => $value):
+            $column = isset($schema[$field]) ? $schema[$field]['type'] : null;
+            $insertFields []= $field;
+            $insertValues []= $this->value($value, $column);
+        endforeach;
+        $query = $this->renderInsert(array(
+            'table' => $table,
+            'fields' => join(',', $insertFields),
+            'values' => join(',', $insertValues)
+        ));
+        
+        return $this->query($query);
+    }
+    public function update($table, $params) {
+        $updateValues = array();
+        $schema = $this->describe($table);
+        foreach($params['data'] as $field => $value):
+            $column = isset($schema[$field]) ? $schema[$field]['type'] : null;
+            $updateValues []= $field . '=' . $this->value($value, $column);
+        endforeach;
+        $query = $this->renderUpdate(array(
+            'table' => $table,
+            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
+            'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
+            'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit'],
+            'values' => join(',', $updateValues)
+        ));
+        
+        return $this->query($query);
+    }
+    public function delete($table, $params = array()) {
+        $query = $this->renderDelete(array(
+            'table' => $table,
+            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
+            'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
+            'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit']
+        ));
+        
+        return $this->query($query);
     }
 }
