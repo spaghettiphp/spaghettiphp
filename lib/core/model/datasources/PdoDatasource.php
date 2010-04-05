@@ -82,19 +82,23 @@ class PdoDatasource extends Datasource {
         return $fields;
     }
     public function join($params) {
-        $params += array(
-            'type' => null,
-            'on' => null
-        );
-        
-        $join = 'JOIN ' . $this->alias($params['table']);
-        
-        if($params['type']):
-            $join = strtoupper($params['type']) . ' ' . $join;
-        endif;
-        
-        if($params['on']):
-            $join .= ' ON ' . $params['on'];
+        if(is_array($params)):
+            $params += array(
+                'type' => null,
+                'on' => null
+            );
+            
+            $join = 'JOIN ' . $this->alias($params['table']);
+            
+            if($params['type']):
+                $join = strtoupper($params['type']) . ' ' . $join;
+            endif;
+            
+            if($params['on']):
+                $join .= ' ON ' . $params['on'];
+            endif;
+        else:
+            $join = $params;
         endif;
         
         return $join;
