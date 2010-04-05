@@ -21,6 +21,7 @@ class PdoDatasource extends Datasource {
     
     public function __construct($config) {
         $this->config = $config;
+        $this->connect();
     }
     public function dsn() {
         return $this->config['dsn'];
@@ -44,24 +45,17 @@ class PdoDatasource extends Datasource {
 
         return true;
     }
-    public function connection() {
-        if(!$this->connected):
-            $this->connect();
-        endif;
-
-        return $this->connection;
-    }
     public function begin() {
-        return $this->connection()->beginTransaction();
+        return $this->connection->beginTransaction();
     }
     public function commit() {
-        return $this->connection()->commit();
+        return $this->connection->commit();
     }
     public function rollback() {
-        return $this->connection()->rollBack();
+        return $this->connection->rollBack();
     }
     public function insertId() {
-        return $this->connection()->lastInsertId();
+        return $this->connection->lastInsertId();
     }
     public function affectedRows() {
         return $this->affectedRows;
@@ -116,7 +110,7 @@ class PdoDatasource extends Datasource {
     public function query($sql, $values = array()) {
         $this->lastQuery = $sql;
 
-        $query = $this->connection()->prepare($sql);
+        $query = $this->connection->prepare($sql);
         $query->setFetchMode(PDO::FETCH_ASSOC);
         $query->execute($values);
 
@@ -131,7 +125,7 @@ class PdoDatasource extends Datasource {
         if(is_null($value)):
             return 'NULL';
         else:
-            return $this->connection()->quote($value);
+            return $this->connection->quote($value);
         endif;
     }
     public function create($params) {
