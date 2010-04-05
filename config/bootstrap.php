@@ -18,6 +18,7 @@ require 'lib/core/dispatcher/Mapper.php';
 
 require 'lib/core/model/Model.php';
 require 'lib/core/model/Connection.php';
+require 'lib/core/model/ClassRegistry.php';
 
 require 'lib/core/controller/Controller.php';
 require 'lib/core/controller/Component.php';
@@ -31,7 +32,6 @@ require 'lib/core/storage/Session.php';
 require 'lib/core/security/Security.php';
 require 'lib/core/security/Sanitize.php';
 
-require 'lib/core/class_registry.php';
 
 require 'config/settings.php';
 require 'config/routes.php';
