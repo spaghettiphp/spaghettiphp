@@ -46,7 +46,7 @@ class Model extends Object {
                 )
             );
             if(isset($condition[1])):
-                $params = array_merge($params, $condition[1]);
+                $params += $condition[1];
             endif;
             return $this->{$match[1]}($params);
         else:
@@ -218,22 +218,16 @@ class Model extends Object {
     }
     public function count($params = array()) {
         $db = $this->connection();
-        $params = array_merge(
-            array(
-                'fields' => '*',
-                'table' => $this->table
-            ),
-            $params
+        $params += array(
+            'fields' => '*',
+            'table' => $this->table
         );
         return $db->count($params);
     }
     public function paginate($params = array()) {
-        $params = array_merge(
-            array(
-                'perPage' => $this->perPage,
-                'page' => 1
-            ),
-            $params
+        $params += array(
+            'perPage' => $this->perPage,
+            'page' => 1
         );
         $page = !$params['page'] ? 1 : $params['page'];
         $offset = ($page - 1) * $params['perPage'];
@@ -251,12 +245,9 @@ class Model extends Object {
         return $this->all($params);
     }
     public function toList($params = array()) {
-        $params = array_merge(
-            array(
-                'key' => $this->primaryKey,
-                'displayField' => $this->displayField
-            ),
-            $params
+        $params += array(
+            'key' => $this->primaryKey,
+            'displayField' => $this->displayField
         );
         $all = $this->all($params);
         $results = array();
@@ -282,7 +273,8 @@ class Model extends Object {
     }
     public function update($params, $data) {
         $db = $this->connection();
-        return $db->update($this->table, array_merge($params, compact('data')));
+        $params += compact('data');
+        return $db->update($this->table, $params);
     }
     public function save($data) {
         if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
@@ -336,7 +328,7 @@ class Model extends Object {
                 if(!is_array($rule)):
                     $rule = array('rule' => $rule);
                 endif;
-                $rule = array_merge($defaults, $rule);
+                $rule += $defaults;
                 if($rule['allowEmpty'] && empty($data[$field])):
                     continue;
                 endif;
