@@ -29,8 +29,8 @@ class Model extends Object {
             $this->connection = Config::read('App.environment');
         endif;
         if(is_null($this->table)):
-            $database = Config::read('database');
-            $this->table = $database[$this->connection]['prefix'] . Inflector::underscore(get_class($this));
+            $database = Connection::getConfig($this->connection);
+            $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
         ClassRegistry::addObject(get_class($this), $this);
