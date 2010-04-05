@@ -173,9 +173,8 @@ class Model extends Object {
         return $results;
     }
     public function first($params = array()) {
-        $params = array_merge(
-            array('limit' => 1),
-            $params
+        $params += array(
+            'limit' => 1
         );
         $results = $this->all($params);
         return empty($results) ? array() : $results[0];
@@ -376,8 +375,13 @@ class Model extends Object {
         return $created;
     }
     public function delete($id, $dependent = true) {
-        $db = $this->connection();
-        $params = array('conditions' => array($this->primaryKey => $id), 'limit' => 1);
+        $params = array(
+            'conditions' => array(
+                $this->primaryKey . '= :id',
+                ':id' => $id
+            ),
+            'limit' => 1
+        );
         if($this->exists($id) && $this->deleteAll($params)):
             if($dependent):
                 $this->deleteDependent($id);
@@ -398,11 +402,12 @@ class Model extends Object {
     }
     public function deleteAll($params = array()) {
         $db = $this->connection();
-        $params = array_merge(
-            array('conditions' => $this->conditions, 'order' => $this->order, 'limit' => $this->limit),
-            $params
+        $params += array(
+            'table' => $this->table,
+            'order' => $this->order,
+            'limit' => $this->limit
         );
-        return $db->delete($this->table, $params);
+        return $db->delete($params);
     }
     public function getInsertId() {
         $db = $this->connection();

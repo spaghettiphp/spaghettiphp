@@ -102,6 +102,23 @@ class MySqlDatasource extends PdoDatasource {
 
         return $sql;
     }
+    public function renderDelete($params) {
+        $sql = 'DELETE FROM ' . $this->alias($params['table']);
+        
+        if(!empty($params['conditions'])):
+            $sql .= ' WHERE ' . $params['conditions'][0];
+        endif;
+
+        if($params['order']):
+            $sql .= ' ORDER BY ' . $this->order($params['order']);
+        endif;
+        
+        if($params['offset'] || $params['limit']):
+            $sql .= ' LIMIT ' . $this->limit($params['offset'], $params['limit']);
+        endif;
+        
+        return $sql;
+    }
     
     
     public function renderUpdate($params) {
@@ -112,9 +129,6 @@ class MySqlDatasource extends PdoDatasource {
         return "INSERT INTO {$params['table']}({$params['fields']}) VALUES({$params['values']})";
     }
 
-    public function renderDelete($params) {
-        return "DELETE FROM {$params['table']} {$params['conditions']} {$params['order']} {$params['limit']}";
-    }
     
     public function limit($offset, $limit) {
         if(!is_null($offset)):

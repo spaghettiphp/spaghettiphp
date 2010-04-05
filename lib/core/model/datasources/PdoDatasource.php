@@ -133,6 +133,15 @@ class PdoDatasource extends Datasource {
 
         return $results;
     }
+    public function delete($params) {
+        $params += $this->params;
+        $values = $this->values($params['conditions']);
+        $sql = $this->renderDelete($params);
+        $query = $this->query($sql, $values);
+        
+        return $query;
+    }
+
 
     public function create($table = null, $data = array()) {
         $insertFields = $insertValues = array();
@@ -163,16 +172,6 @@ class PdoDatasource extends Datasource {
             'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
             'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit'],
             'values' => join(',', $updateValues)
-        ));
-        
-        return $this->query($query);
-    }
-    public function delete($table, $params = array()) {
-        $query = $this->renderDelete(array(
-            'table' => $table,
-            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
-            'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
-            'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit']
         ));
         
         return $this->query($query);
