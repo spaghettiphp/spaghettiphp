@@ -172,6 +172,7 @@ class Model extends Object {
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
         endif;
+        
         return $results;
     }
     public function first($params = array()) {
@@ -179,6 +180,7 @@ class Model extends Object {
             'limit' => 1
         );
         $results = $this->all($params);
+        
         return empty($results) ? array() : $results[0];
     }
     public function dependent($results, $recursion = 0) {
@@ -222,6 +224,7 @@ class Model extends Object {
             'fields' => '*',
             'table' => $this->table
         );
+        
         return $db->count($params);
     }
     public function paginate($params = array()) {
@@ -254,6 +257,7 @@ class Model extends Object {
         foreach($all as $result):
             $results[$result[$params['key']]] = $result[$params['displayField']];
         endforeach;
+        
         return $results;
     }
     public function exists($id) {
@@ -273,8 +277,12 @@ class Model extends Object {
     }
     public function update($params, $data) {
         $db = $this->connection();
-        $params += compact('data');
-        return $db->update($this->table, $params);
+        $params += array(
+            'values' => $data,
+            'table' => $this->table
+        );
+        
+        return $db->update($params);
     }
     public function save($data) {
         if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
@@ -299,8 +307,8 @@ class Model extends Object {
         if(!is_null($this->id) && $exists):
             $save = $this->update(array(
                 'conditions' => array(
-                    $this->primaryKey . ' = :id',
-                    ':id' => $this->id
+                    $this->primaryKey . ' = ?',
+                    $this->id
                 ),
                 'limit' => 1
             ), $data);

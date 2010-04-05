@@ -143,6 +143,18 @@ class PdoDatasource extends Datasource {
 
         return $results;
     }
+    public function update($params) {
+        $params += $this->params;
+        $values = array_merge(
+            array_values($params['values']),
+            $this->values($params['conditions'])
+        );
+        
+        $sql = $this->renderUpdate($params);
+        $query = $this->query($sql, $values);
+        
+        return $query;
+    }
     public function delete($params) {
         $params += $this->params;
         $values = $this->values($params['conditions']);
@@ -151,7 +163,6 @@ class PdoDatasource extends Datasource {
         
         return $query;
     }
-
 
     public function create($table = null, $data = array()) {
         $insertFields = $insertValues = array();
@@ -165,23 +176,6 @@ class PdoDatasource extends Datasource {
             'table' => $table,
             'fields' => join(',', $insertFields),
             'values' => join(',', $insertValues)
-        ));
-        
-        return $this->query($query);
-    }
-    public function update($table, $params) {
-        $updateValues = array();
-        $schema = $this->describe($table);
-        foreach($params['data'] as $field => $value):
-            $column = isset($schema[$field]) ? $schema[$field]['type'] : null;
-            $updateValues []= $field . '=' . $this->value($value, $column);
-        endforeach;
-        $query = $this->renderUpdate(array(
-            'table' => $table,
-            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
-            'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
-            'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit'],
-            'values' => join(',', $updateValues)
         ));
         
         return $this->query($query);
