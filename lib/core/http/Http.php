@@ -1,23 +1,23 @@
 <?php 
-/**
-  *  Classe de requisições HTTP
-  *
-  *  Exemplos de uso:
-  *    - Postando no Twitter
-  *    Http::auth('user', 'senha');
-  *    Http::post('http://api.twitter.com/1/statuses/update.json',
-  *                array('status' => 'Testando o Core.Http'));
-  *
-  *    - Encurtando uma url com o bit.ly
-  *    $params = array(
-  *      'login'	  => 'klawdyo', //Registro em http://bit.ly/account/register
-  *      'apiKey'	  => 'R_2531c63fdc13b904d94fc084', //http://bit.ly/account/your_api_key
-  *      'longUrl'  => 'http://google.com'
-  *    );
-  *    Http::post('http://api.bit.ly/v3/shorten', $params);            
-  *
-  *  
-  */
+/*
+ *  Classe de requisições HTTP
+ *
+ *  Exemplos de uso:
+ *    - Postando no Twitter
+ *    Http::auth('user', 'senha');
+ *    Http::post('http://api.twitter.com/1/statuses/update.json',
+ *                array('status' => 'Testando o Core.Http'));
+ *
+ *    - Encurtando uma url com o bit.ly
+ *    $params = array(
+ *      'login'	  => 'klawdyo', //Registro em http://bit.ly/account/register
+ *      'apiKey'	  => 'R_2531c63fdc13b904d94fc084', //http://bit.ly/account/your_api_key
+ *      'longUrl'  => 'http://google.com'
+ *    );
+ *    Http::post('http://api.bit.ly/v3/shorten', $params);            
+ *
+ *  
+ */
 class Http extends Object{
     /*
      *   O nome de usuário
@@ -38,11 +38,11 @@ class Http extends Object{
     /*
      *   Código HTTP do status da requisição. Ex.: 403
      */
-    public $statusCode;
+    public $headerCodeReturned;
     /*
      *   Tipo do retorno. Ex.: "application/json; charset=utf8"
      */
-    public $contentType;
+    public $contentTypeReturned;
     /*
      *   Instância do Objeto
      */
@@ -68,10 +68,9 @@ class Http extends Object{
      *   
      *   @param string $user  O nome de usuário
      *   @param string $password A senha do usuário
-     *   @param bool  $basic Usar autenticação básica?
      *   @return void
      */
-   public static function auth($user, $password = null, $basic = true){
+   public static function auth($user, $password = null){
       $self = self::instance();
 
       if($user === false):
@@ -82,7 +81,7 @@ class Http extends Object{
       $self->user = $user;
       $self->password = $password;
       //definindo autenticação básica
-      $self->curlOptions[CURLOPT_HTTPAUTH] = ($basic) ? CURLAUTH_BASIC : CURLAUTH_DIGEST;
+      $self->curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
       //Criando usuário e senha no formato do curl
       $self->curlOptions[CURLOPT_USERPWD] = $self->user .':'. $self->password;
    }
@@ -102,6 +101,7 @@ class Http extends Object{
       else:
          $self->curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
       endif;
+      pr($self->curlOptions);
       //Inicia a sessão curl
       $ch = curl_init($url);
       //Coloca os arrays como opções do curl
@@ -109,10 +109,10 @@ class Http extends Object{
       //Executa
       $self->result = curl_exec($ch);
       //Pega o código dee cabeçalho retornado
-      $self->statusCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+      $self->headerCodeReturned  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
       //Tipo do conteúdo retornado.
       //Verifica se retorna como algum inteiro, ou como um mime-type
-      $self->contentType= curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+      $self->contentTypeReturned = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
       //Fecha a sessão curl
       curl_close($ch);      
    }
@@ -198,7 +198,7 @@ class Http extends Object{
      */
    public static function isSuccess(){
       $self = self::instance();
-      return ($self->statusCode>=200 && $self->statusCode<300);
+      return ($self->headerCodeReturned>=200 && $self->headerCodeReturned<300);
    }
 
    /**
@@ -206,9 +206,9 @@ class Http extends Object{
      * 
      * @return int
      */
-   public static function getStatusCode(){
+   public static function resultCode(){
       $self = self::instance();
-      return $self->statusCode;
+      return $self->headerCodeReturned;
    }
 
    /**
@@ -216,9 +216,9 @@ class Http extends Object{
      * 
      * @return string Tipo do retorno, no formato "application/json; charset=utf8"
      */
-   public static function getContentType(){
+   public static function resultContentType(){
       $self = self::instance();
-      return $self->contentType;
+      return $self->contentTypeReturned;
    }
    /**
      *  Adiciona opções à execução do cURL.
@@ -239,12 +239,11 @@ class Http extends Object{
     public static function clear(){
         $self = self::instance();
         $self->curlOptions = array();
-        $self->contentType = null;
-        $self->statusCode = null;
+        $self->contentTypeReturned = null;
+        $self->headerCodeReturned = null;
         $self->password = null;
         $self->user = null;
         $self->result = null;
     }
 
 }
-?>
