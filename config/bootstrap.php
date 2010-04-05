@@ -31,6 +31,8 @@ require 'lib/core/storage/Session.php';
 require 'lib/core/security/Security.php';
 require 'lib/core/security/Sanitize.php';
 
+require 'lib/core/http/Http.php';
+
 require 'lib/core/class_registry.php';
 
 require 'config/settings.php';
