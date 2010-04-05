@@ -273,7 +273,11 @@ class Model extends Object {
     }
     public function insert($data) {
         $db = $this->connection();
-        return $db->create($this->table, $data);
+        $params = array(
+            'values' => $data,
+            'table' => $this->table
+        );
+        return $db->create($params);
     }
     public function update($params, $data) {
         $db = $this->connection();

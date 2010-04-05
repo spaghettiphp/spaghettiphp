@@ -130,6 +130,14 @@ class PdoDatasource extends Datasource {
             return $this->connection()->quote($value);
         endif;
     }
+    public function create($params) {
+        $params += $this->params;
+        $values = array_values($params['values']);
+        $sql = $this->renderInsert($params);
+        $query = $this->query($sql, $values);
+        
+        return $query;
+    }
     public function read($params) {
         $params += $this->params;
         $values = $this->values($params['conditions']);
@@ -162,22 +170,5 @@ class PdoDatasource extends Datasource {
         $query = $this->query($sql, $values);
         
         return $query;
-    }
-
-    public function create($table = null, $data = array()) {
-        $insertFields = $insertValues = array();
-        $schema = $this->describe($table);
-        foreach($data as $field => $value):
-            $column = isset($schema[$field]) ? $schema[$field]['type'] : null;
-            $insertFields []= $field;
-            $insertValues []= $this->value($value, $column);
-        endforeach;
-        $query = $this->renderInsert(array(
-            'table' => $table,
-            'fields' => join(',', $insertFields),
-            'values' => join(',', $insertValues)
-        ));
-        
-        return $this->query($query);
     }
 }

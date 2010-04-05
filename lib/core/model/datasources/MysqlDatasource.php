@@ -3,9 +3,6 @@
 require_once 'lib/core/model/datasources/PdoDatasource.php';
 
 class MySqlDatasource extends PdoDatasource {
-    protected $comparison = array('=', '<>', '!=', '<=', '<', '>=', '>', '<=>', 'LIKE', 'REGEXP');
-    protected $logic = array('or', 'or not', '||', 'xor', 'and', 'and not', '&&', 'not');
-
     // @todo add missing DSN elements
     public function dsn() {
         return 'mysql:host=' . $this->config['host'] . ';dbname=' . $this->config['database'];
@@ -61,6 +58,13 @@ class MySqlDatasource extends PdoDatasource {
             return $type . '(' . $limit . ')';
         endif;
     }
+    public function limit($offset, $limit) {
+        if(!is_null($offset)):
+            $limit = $offset . ',' . $limit;
+        endif;
+        
+        return $limit;
+    }
     public function count($params) {
         $params['fields'] = array(
             'count' => 'COUNT(' . $this->alias($params['fields']) . ')'
@@ -69,7 +73,17 @@ class MySqlDatasource extends PdoDatasource {
         
         return $results[0]['count'];
     }
-
+    public function renderInsert($params) {
+        $sql = 'INSERT INTO ' . $params['table'];
+        
+        $fields = array_keys($params['values']);
+        $sql .= '(' . join(',', $fields) . ')';
+        
+        $values = rtrim(str_repeat('?,', count($fields)), ',');
+        $sql .= ' VALUES(' . $values . ')';
+        
+        return $sql;
+    }
     public function renderSelect($params) {
         $sql = 'SELECT ' . $this->alias($params['fields']);
         $sql .= ' FROM ' . $this->alias($params['table']);
@@ -140,63 +154,6 @@ class MySqlDatasource extends PdoDatasource {
         
         if($params['offset'] || $params['limit']):
             $sql .= ' LIMIT ' . $this->limit($params['offset'], $params['limit']);
-        endif;
-        
-        return $sql;
-    }
-    
-    
-    public function renderInsert($params) {
-        return "INSERT INTO {$params['table']}({$params['fields']}) VALUES({$params['values']})";
-    }
-
-    
-    public function limit($offset, $limit) {
-        if(!is_null($offset)):
-            $limit = $offset . ',' . $limit;
-        endif;
-        
-        return $limit;
-    }
-
-
-
-    public function sqlConditions($table, $conditions, $logical = 'AND') {
-        if(is_array($conditions)):
-            $sql = array();
-            foreach($conditions as $key => $value):
-                if(is_numeric($key)):
-                    if(is_string($value)):
-                        $sql []= $value;
-                    else:
-                        $sql []= '(' . $this->sqlConditions($table, $value) . ')';
-                    endif;
-                else:
-                    if(in_array($key, $this->logic)):
-                        $sql []= '(' . $this->sqlConditions($table, $value, strtoupper($key)) . ')';
-                    elseif(is_array($value)):
-                        foreach($value as $k => $v):
-                            $value[$k] = $this->escape($v);
-                        endforeach;
-                        if(preg_match('/([\w_]+) (BETWEEN)/', $key, $regex)):
-                            $condition = $regex[1] . ' BETWEEN ' . join(' AND ', $value);
-                        else:
-                            $condition = $key . ' IN (' . join(',', $value) . ')';
-                        endif;
-                        $sql []= $condition;
-                    else:
-                        $comparison = '=';
-                        if(preg_match('/([\w_]+) (' . join('|', $this->comparison) . ')/', $key, $regex)):
-                            list($regex, $key, $comparison) = $regex;
-                        endif;
-                        $value = $this->escape($value);
-                        $sql []= $key . ' ' . $comparison . ' ' . $value;
-                    endif;
-                endif;
-            endforeach;
-            $sql = join(' ' . $logical . ' ', $sql);
-        else:
-            $sql = $conditions;
         endif;
         
         return $sql;
