@@ -11,7 +11,6 @@ class Model extends Object {
     public $primaryKey;
     public $displayField;
     public $connection;
-    public $conditions = array();
     public $order;
     public $limit;
     public $perPage = 20;
@@ -163,7 +162,6 @@ class Model extends Object {
         $params += array(
             'table' => $this->table,
             'fields' => array_keys($this->schema),
-            'conditions' => isset($params['conditions']) ? array_merge($this->conditions, $params['conditions']) : $this->conditions,
             'order' => $this->order,
             'limit' => $this->limit,
             'recursion' => $this->recursion
@@ -223,7 +221,6 @@ class Model extends Object {
         $params = array_merge(
             array(
                 'fields' => '*',
-                'conditions' => $this->conditions,
                 'table' => $this->table
             ),
             $params
@@ -269,15 +266,14 @@ class Model extends Object {
         return $results;
     }
     public function exists($id) {
-        $conditions = array_merge(
-            $this->conditions,
-            array(
-                'conditions' => array(
-                    $this->primaryKey => $id
-                )
+        $params = array(
+            'conditions' => array(
+                $this->primaryKey . ' = :id',
+                ':id' => $id
             )
         );
-        $row = $this->first($conditions);
+        $row = $this->first($params);
+
         return !empty($row);
     }
     public function insert($data) {
