@@ -17,9 +17,9 @@ class Model extends Object {
     public $validates = array();
     public $errors = array();
     public $associations = array(
-        'hasMany' => array('primaryKey', 'foreignKey', 'conditions', 'limit', 'order'),
-        'belongsTo' => array('primaryKey', 'foreignKey', 'conditions'),
-        'hasOne' => array('primaryKey', 'foreignKey', 'conditions')
+        'hasMany' => array('primaryKey', 'foreignKey', 'limit', 'order'),
+        'belongsTo' => array('primaryKey', 'foreignKey'),
+        'hasOne' => array('primaryKey', 'foreignKey')
     );
     public $pagination = array();
     protected $conn;
@@ -39,7 +39,12 @@ class Model extends Object {
     public function __call($method, $condition) {
         if(preg_match('/(all|first)By([\w]+)/', $method, $match)):
             $field = Inflector::underscore($match[2]);
-            $params = array('conditions' => array($field => $condition[0]));
+            $params = array(
+                'conditions' => array(
+                    $field . ' = :field',
+                    ':field' => $condition[0]
+                )
+            );
             if(isset($condition[1])):
                 $params = array_merge($params, $condition[1]);
             endif;
@@ -126,9 +131,6 @@ class Model extends Object {
                             $data = Inflector::underscore(get_class($this)) . '_' . $this->primaryKey;
                         endif;
                         break;
-                    case 'conditions':
-                        $data = array();
-                        break;
                     default:
                         $data = null;
                 endswitch;
@@ -189,15 +191,14 @@ class Model extends Object {
                     $params = array();
                     if($type == 'belongsTo'):
                         $params['conditions'] = array(
-                            $this->primaryKey => $result[$association['foreignKey']]
+                            $this->primaryKey . ' = :id',
+                            ':id' => $result[$association['foreignKey']]
                         );
                         $params['recursion'] = $recursion - 1;
                     else:
-                        $params['conditions'] = array_merge(
-                            $association['conditions'],
-                            array(
-                                $association['foreignKey'] => $result[$this->primaryKey]
-                            )
+                        $params['conditions'] += array(
+                            $association['foreignKey'] . ' = :fk',
+                            ':fk' => $result[$this->primaryKey]
                         );
                         $params['recursion'] = $recursion - 2;
                         if($type == 'hasMany'):
@@ -281,10 +282,6 @@ class Model extends Object {
     }
     public function update($params, $data) {
         $db = $this->connection();
-        $params = array_merge(
-            array('conditions' => array(), 'order' => null, 'limit' => null),
-            $params
-        );
         return $db->update($this->table, array_merge($params, compact('data')));
     }
     public function save($data) {
@@ -309,7 +306,10 @@ class Model extends Object {
         if(!($data = $this->beforeSave($data))) return false;
         if(!is_null($this->id) && $exists):
             $save = $this->update(array(
-                'conditions' => array($this->primaryKey => $this->id),
+                'conditions' => array(
+                    $this->primaryKey . ' = :id',
+                    ':id' => $this->id
+                ),
                 'limit' => 1
             ), $data);
             $created = false;
@@ -393,9 +393,12 @@ class Model extends Object {
     public function deleteDependent($id) {
         foreach(array('hasOne', 'hasMany') as $type):
             foreach($this->{$type} as $model => $assoc):
-                $this->{$assoc['className']}->deleteAll(array('conditions' => array(
-                    $assoc['foreignKey'] => $id
-                )));
+                $this->{$assoc['className']}->deleteAll(array(
+                    'conditions' => array(
+                        $assoc['foreignKey'] . ' = ?',
+                        $id
+                    )
+                ));
             endforeach;
         endforeach;
         return true;
