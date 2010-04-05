@@ -140,30 +140,6 @@ class MySqlDatasource extends PdoDatasource {
 
 
 
-    public function value($value, $column = null) {
-        switch($column):
-            case 'boolean':
-                if($value === true):
-                    return '1';
-                elseif($value === false):
-                    return '0';
-                else:
-                    return !empty($value) ? '1' : '0';
-                endif;
-            case 'integer':
-            case 'float':
-                if($value === '' or is_null($value)):
-                    return 'NULL';
-                elseif(is_numeric($value)):
-                    return $value;
-                endif;
-            default:
-                if(is_null($value)):
-                    return 'NULL';
-                endif;
-                return '\'' . mysql_real_escape_string($value, $this->connection) . '\'';
-        endswitch;
-    }
     public function sqlConditions($table, $conditions, $logical = 'AND') {
         if(is_array($conditions)):
             $sql = array();
@@ -179,7 +155,7 @@ class MySqlDatasource extends PdoDatasource {
                         $sql []= '(' . $this->sqlConditions($table, $value, strtoupper($key)) . ')';
                     elseif(is_array($value)):
                         foreach($value as $k => $v):
-                            $value[$k] = $this->value($v, null);
+                            $value[$k] = $this->escape($v);
                         endforeach;
                         if(preg_match('/([\w_]+) (BETWEEN)/', $key, $regex)):
                             $condition = $regex[1] . ' BETWEEN ' . join(' AND ', $value);
@@ -192,7 +168,7 @@ class MySqlDatasource extends PdoDatasource {
                         if(preg_match('/([\w_]+) (' . join('|', $this->comparison) . ')/', $key, $regex)):
                             list($regex, $key, $comparison) = $regex;
                         endif;
-                        $value = $this->value($value, $this->fieldType($table, $key));
+                        $value = $this->escape($value);
                         $sql []= $key . ' ' . $comparison . ' ' . $value;
                     endif;
                 endif;
@@ -203,11 +179,5 @@ class MySqlDatasource extends PdoDatasource {
         endif;
         
         return $sql;
-    }
-    public function fieldType($table, $field) {
-        if(isset($this->schema[$table]) && isset($this->schema[$table][$field])):
-            return $this->schema[$table][$field]['type'];
-        endif;
-        return null;
     }
 }

@@ -58,7 +58,7 @@ class PdoDatasource extends Datasource {
         return $this->connection()->commit();
     }
     public function rollback() {
-        return $this->connection()->rollback();
+        return $this->connection()->rollBack();
     }
     public function insertId() {
         return $this->connection()->lastInsertId();
@@ -122,6 +122,13 @@ class PdoDatasource extends Datasource {
     }
     public function fetchAll($sql) {
         return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+     public function escape($value) {
+        if(is_null($value)):
+            return 'NULL';
+        else:
+            return $this->connection()->quote($value);
+        endif;
     }
     public function read($params) {
         $params += $this->params;

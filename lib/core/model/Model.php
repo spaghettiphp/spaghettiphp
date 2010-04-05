@@ -417,8 +417,8 @@ class Model extends Object {
         $db = $this->connection();
         return $db->affectedRows();
     }
-    public function escape($value, $column = null) {
+    public function escape($value) {
         $db = $this->connection();
-        return $db->value($value, $column);
+        return $db->escape($value);
     }
 }
