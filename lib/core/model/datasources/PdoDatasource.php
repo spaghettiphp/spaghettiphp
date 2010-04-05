@@ -7,6 +7,17 @@ class PdoDatasource extends Datasource {
     protected $connection;
     protected $connected;
     protected $config;
+    protected $lastQuery;
+    protected $params = array(
+        'fields' => '*',
+        'joins' => array(),
+        'conditions' => array(),
+        'groupBy' => null,
+        'having' => null,
+        'order' => null,
+        'offset' => null,
+        'limit' => null
+    );
     
     public function __construct($config) {
         $this->config = $config;
@@ -40,8 +51,13 @@ class PdoDatasource extends Datasource {
 
         return $this->connection;
     }
-    public function query($sql) {
-        $query = $this->connection()->query($sql);
+    public function query($sql, $values = array()) {
+        $this->lastQuery = $sql;
+
+        $query = $this->connection()->prepare($sql);
+        $query->setFetchMode(PDO::FETCH_ASSOC);
+        $query->execute($values);
+
         $this->affectedRows = $query->rowCount();
 
         return $query;
@@ -105,8 +121,17 @@ class PdoDatasource extends Datasource {
         return $order;
     }
     public function read($params) {
-        $query = $this->renderSelect($params);
+        $params += $this->params;
+        $values = array_slice($params['conditions'], 1);
+        
+        $sql = $this->renderSelect($params);
+        $query = $this->query($sql, $values);
 
-        return $this->fetchAll($query);
+        $results = array();
+        while($row = $query->fetch()):
+            $results []= $row;
+        endwhile;
+
+        return $results;
     }
 }

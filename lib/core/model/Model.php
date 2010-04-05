@@ -160,16 +160,13 @@ class Model extends Object {
     }
     public function all($params = array()) {
         $db = $this->connection();
-        $params = array_merge(
-            array(
-                'fields' => array_keys($this->schema),
-                'conditions' => isset($params['conditions']) ? array_merge($this->conditions, $params['conditions']) : $this->conditions,
-                'order' => $this->order,
-                'limit' => $this->limit,
-                'recursion' => $this->recursion,
-                'table' => $this->table
-            ),
-            $params
+        $params += array(
+            'table' => $this->table,
+            'fields' => array_keys($this->schema),
+            'conditions' => isset($params['conditions']) ? array_merge($this->conditions, $params['conditions']) : $this->conditions,
+            'order' => $this->order,
+            'limit' => $this->limit,
+            'recursion' => $this->recursion
         );
         $results = $db->read($params);
         if($params['recursion'] >= 0):

@@ -5,16 +5,6 @@ require_once 'lib/core/model/datasources/PdoDatasource.php';
 class MySqlDatasource extends PdoDatasource {
     protected $comparison = array('=', '<>', '!=', '<=', '<', '>=', '>', '<=>', 'LIKE', 'REGEXP');
     protected $logic = array('or', 'or not', '||', 'xor', 'and', 'and not', '&&', 'not');
-    protected $params = array(
-        'fields' => '*',
-        'joins' => array(),
-        'conditions' => null,
-        'groupBy' => null,
-        'having' => null,
-        'order' => null,
-        'offset' => null,
-        'limit' => null
-    );
 
     // @todo add missing DSN elements
     public function dsn() {
@@ -22,10 +12,12 @@ class MySqlDatasource extends PdoDatasource {
     }
     public function listSources() {
         if(empty($this->sources)):
-            $sources = $this->query('SHOW TABLES FROM ' . $this->config['database']);
-            foreach($sources as $source):
+            $query = $this->connection()->prepare('SHOW TABLES FROM ' . $this->config['database']);
+            $query->setFetchMode(PDO::FETCH_NUM);
+            $sources = $query->execute();
+            while($source = $query->fetch()):
                 $this->sources []= $source[0];
-            endforeach;
+            endwhile;
         endif;
         
         return $this->sources;
@@ -122,8 +114,6 @@ class MySqlDatasource extends PdoDatasource {
     }
 
     public function renderSelect($params) {
-        $params += $this->params;
-        
         $sql = 'SELECT ' . $this->alias($params['fields']);
         $sql .= ' FROM ' . $this->alias($params['table']);
         
@@ -133,9 +123,8 @@ class MySqlDatasource extends PdoDatasource {
             endforeach;
         endif;
         
-        if($params['conditions']):
-            $sql .= ' WHERE ' . $this->sqlConditions($params['"table'], $params['conditions']);
-#            $sql .= ' WHERE ' . $params['conditions'][0];
+        if(!empty($params['conditions'])):
+            $sql .= ' WHERE ' . $params['conditions'][0];
         endif;
         
         if($params['groupBy']):
