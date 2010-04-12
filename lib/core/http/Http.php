@@ -1,6 +1,7 @@
 <?php
 /**
-  *  Classe de requisições HTTP
+  * Classe de requisições HTTP
+  * @version 0.05 - 07/04/2010
   *
   *  Exemplos de uso:
   *    - Postando no Twitter
@@ -49,7 +50,6 @@ class Http extends Object{
      *   A senha do usuário
      */
     public $password;
-    
     /*
      *   O resultado da requisição
      */
@@ -66,6 +66,10 @@ class Http extends Object{
      *   Tipo do retorno. Ex.: "application/json; charset=utf8"
      */
     public $contentType;
+    /*
+     *   Informações sobre a requisição
+     */
+    public $info;
     /*
      *   Instância do Objeto
      */
@@ -100,10 +104,10 @@ class Http extends Object{
          $self->curlOptions[CURLOPT_HTTPAUTH] = false;
          return false;
       endif;
-      
+      //Dados de autenticação
       $self->user = $user;
       $self->password = $password;
-      //Definindo autenticação básica
+      //Definindo o tipo da autenticação
       $self->curlOptions[CURLOPT_HTTPAUTH] = ($basic) ? CURLAUTH_BASIC : CURLAUTH_DIGEST;
       //Criando usuário e senha no formato do curl
       $self->curlOptions[CURLOPT_USERPWD] = $self->user .':'. $self->password;
@@ -122,7 +126,6 @@ class Http extends Object{
         $methods = array(
             'GET' => CURLOPT_HTTPGET,
             'POST'=> CURLOPT_POST,
-            'PUT' => CURLOPT_PUT,
         );
     //Existe no array $methods
     if(array_key_exists($method, $methods)):
@@ -143,20 +146,22 @@ class Http extends Object{
     $self->statusCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     //Tipo do conteúdo retornado.
     $self->contentType= curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+    //info
+    $self->info = curl_getinfo($ch);
     //Fecha a sessão curl
     curl_close($ch);
     //Retorna
     return $self->result;
    }
 
-   /**
-     *   Envia uma requisição do tipo GET
-     *
-     *   @param  string $url   A url do servidor
-     *   @param  array  $params Parâmetros adicionais para serem enviados. Os parâmetros
-     *      aqui infomados serão colocados na query string
-     *   @return mixed  Os dados retornados pelo servidor
-     */
+    /**
+      *   Envia uma requisição do tipo GET
+      *
+      *   @param  string $url   A url do servidor
+      *   @param  array  $params Parâmetros adicionais para serem enviados. Os parâmetros
+      *      aqui infomados serão colocados na query string
+      *   @return mixed  Os dados retornados pelo servidor
+      */
     public static function get($url, $params = array()){
         $self = self::instance();
         $url .= !empty($params) ? '?' . http_build_query($params) : '';
@@ -166,29 +171,33 @@ class Http extends Object{
       *   Envia uma requisição do tipo POST
       *
       *   @param  string $url   A url do servidor
-      *   @param  array  $params Parâmetros adicionais para serem enviados
+      *   @param  mixed  $params Parâmetros adicionais para serem enviados, no formato de
+      *     array associativo, ou no formato de querystring.
       *   @return mixed  Os dados retornados pelo servidor
       */
-    public static function post($url, $params = array()){
+    public static function post($url, $params = null){
         $self = self::instance();
 
-        !empty($params) ?
-            $self->curlOptions[CURLOPT_POSTFIELDS] = http_build_query($params) : false;
+        $self->curlOptions[CURLOPT_POSTFIELDS] = is_array($params) ?
+            http_build_query($params) : $params;
 
-        return self::request($url, 'POST');      
+        return self::request($url, 'POST');
    }
    
     /**
       *   Envia uma requisição do tipo PUT
       *
       *   @param  string $url   A url do servidor
-      *   @param  array  $params Parâmetros adicionais para serem enviados
+      *   @param  mixed  $params Parâmetros adicionais para serem enviados, no formato de
+      *     array associativo, ou no formato de querystring.
       *   @return mixed  Os dados retornados pelo servidor
       */
-    public static function put($url, $params = array()){
+    public static function put($url, $params = null){
         $self = self::instance();
-        !empty($params) ?
-            $self->curlOptions[CURLOPT_POSTFIELDS] = http_build_query($params) : false;
+        
+        $self->curlOptions[CURLOPT_POSTFIELDS] = is_array($params) ?
+            http_build_query($params) : $params;
+            
         return self::request($url, 'PUT');
     }
 
@@ -220,6 +229,7 @@ class Http extends Object{
         $self->curlOptions[CURLOPT_HTTPHEADER][] = "Accept: {$accept}";
         return $self->accept;
     }
+
     /**
       * Define o tempo máximo de execução da conexão, em segundos.
       *
@@ -270,10 +280,21 @@ class Http extends Object{
         $self = self::instance();
         return $self->contentType;
     }
+    
     /**
-      *  Adiciona opções à execução do cURL.
+      * Pega as informações sobre a requisição
+      * 
+      * @return array contendo as informações sobre a requisição
+      */
+    public static function getInfo(){
+        $self = self::instance();
+        return $self->info;
+    }
+    
+    /**
+      * Adiciona opções à execução do cURL.
       *
-      *  @param array $options    As opções que serão adicionadas às existentes.
+      * @param array $options    As opções que serão adicionadas às existentes.
       */
      public static function options($options = array()){
         $self = self::instance();
@@ -296,6 +317,5 @@ class Http extends Object{
         $self->user = null;
         $self->result = null;
     }
-
 }
 ?>
