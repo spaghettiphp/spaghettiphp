@@ -173,19 +173,15 @@ class Controller extends Object {
         endif;
         return false;
     }
-    public function param($key) {
+    public function param($key, $default = null) {
         if(isset($this->params['named'][$key])):
             return $this->params['named'][$key];
         elseif(in_array($key, array_keys($this->params))):
             return $this->params[$key];
         endif;
-        return null;
+        return $default;
     }
     public function page($param = 'page') {
-        $page = $this->param($param);
-        if(is_null($page) || empty($page)):
-            $page = 1;
-        endif;
-        return $page;
+        return $this->param($param, 1);
     }
 }
