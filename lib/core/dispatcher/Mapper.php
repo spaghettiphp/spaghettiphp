@@ -198,7 +198,7 @@ class Mapper extends Object {
             endif;
         endif;
         $url = self::normalize(self::base() . $url);
-        return $full ? self::base() . $url : $url;
+        return $full ? self::domain() . $url : $url;
     }
     public static function filterAction($action) {
         if(strpos($action, '_') !== false):
