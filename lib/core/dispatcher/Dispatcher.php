@@ -20,6 +20,7 @@ class Dispatcher extends Object {
             if(Loader::exists('View', $view_path)):
                 $controller =& Loader::instance('Controller', 'AppController');
             else:
+                $controller =& Loader::instance('Controller', 'AppController');
                 $controller->error('missingController', array(
                     'controller' => $path['controller']
                 ));
