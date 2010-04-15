@@ -1,42 +1,12 @@
 <?php
-/**
- *  UploadComponent facilita a tarefa de enviar arquivos do cliente para o servidor,
- *  provendo funções para mover e apagar o arquivo, validação, controle de erros,
- *  entre outros.
- *
- *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
- *
- */
 
-class UploadComponent extends Component {
-    /**
-     *  Tipos de arquivo permitidos, vazio para permitir qualquer arquivo.
-     */
+class Upload {
     public $allowedTypes = array();
-    /**
-     *  Tamanho máximo permitido (em MB).
-     */
     public $maxSize = 2;
-    /**
-     *  Caminho padrão dos arquivos enviados a partir de /webroot
-     */
     public $path = "/";
-    /**
-     *  Arquivos enviados pelo cliente.
-     */
     public $files = array();
-    /**
-     *  Erros gerados durante o upload.
-     */
     public $errors = array();
     
-    /**
-     *  Inicializa o componente, padronizando o componente de $_FILES.
-     *
-     *  @param object $controller Objeto controller
-     *  @return void
-     */
     public function initialize(&$controller) {
         foreach($_FILES as $file => $content):
             if(is_array($content["name"])):
@@ -55,12 +25,6 @@ class UploadComponent extends Component {
             endif;
         endforeach;
     }
-    /**
-     *  Valida determinado arquivo.
-     *
-     *  @param array $file Arquivo a ser validado
-     *  @return boolean Verdadeiro quando o arquivo é válido
-     */
     public function validates($file = array()) {
         if(empty($file) && !isset($file["name"])):
             return $this->error("InvalidParam");
@@ -76,15 +40,6 @@ class UploadComponent extends Component {
         endif;
         return true;
     }
-    /**
-     *  Move um arquivo enviado pelo cliente para determinado local na aplicação,
-     *  fazendo as validações necessárias.
-     *
-     *  @param array $file Arquivo a ser movido
-     *  @param string $path Caminho para enviar o arquivo
-     *  @param string $name Novo nome do arquivo
-     *  @return boolean Verdadeiro se o arquivo foi movido
-     */
     public function upload($file = array(), $path = null, $name = null) {
         $path = is_null($path) ? $this->path : $path;
         $name = is_null($name) ? $file["name"] : $name;
@@ -102,13 +57,6 @@ class UploadComponent extends Component {
             return false;
         endif;
     }
-    /**
-     *  Apaga um arquivo.
-     *
-     *  @param string $filename Nome do arquivo a ser apagado
-     *  @param string $path Caminho onde reside o arquivo
-     *  @return boolean Verdadeiro se o arquivo foi apagado.
-     */
     public function delete($filename = "", $path = null) {
         $path = is_null($path) ? $this->path : $path;
         $file = SPAGHETTI_APP . "/webroot" . $path . $filename;
@@ -122,41 +70,17 @@ class UploadComponent extends Component {
             return $this->error("CantFindFile");
         endif;
     }
-    /**
-     *  Retorna a extensão de um arquivo.
-     *
-     *  @param string $filename Nome do arquivo
-     *  @return string Extensão do arquivo
-     */
     public function ext($filename = "") {
         return strtolower(trim(substr($filename, strrpos($filename, ".") + 1, strlen($filename))));
     }
-    /**
-     *  Adiciona um novo erro ao componente.
-     *
-     *  @param string $type Mensagem de erro
-     *  @param array $details Detalhes do erro
-     *  @return false
-     */
     public function error($type = "", $details = array()) {
         $this->errors []= $type;
         return false;
     }
-    /**
-     *  Limpa os erros gerados pelo componente.
-     *
-     *  @return true
-     */
     public function clear() {
         $this->errors = array();
         return true;
     }
-    /**
-     *  Reconhece erros de upload através de $_FILES.
-     *
-     *  @param int $error Código de erro
-     *  @return mixed Mensagem de erro, ou falso caso não hajam erros.
-     */
     public function uploadError($error = 0) {
         $message = false;
         switch($error):
@@ -172,5 +96,3 @@ class UploadComponent extends Component {
         return $message;
     }
 }
-
-?>

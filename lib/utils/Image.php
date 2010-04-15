@@ -1,107 +1,126 @@
 <?php
-/**
- *  ImageComponent provê funcionalidades para a manipulação de imagens, como corte,
- *  redimensionamento, conversão entre formatos e geração de thumbnails.
- *
- *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
- *
- */
 
-class ImageComponent extends Component {
-    /**
-     *  Tipos de imagens suportados.
-     */
-    private $imageTypes = array("gif", "jpeg", "jpeg" => "jpg", "png");
-    /**
-     *  Parâmetros padrão para os métodos do componente.
-     */
-    private $params = array(
-        "height" => 0,
-        "width" => 0,
-        "x" => 0,
-        "y" => 0,
-        "constrain" => false,
-        "quality" => 80,
-        "filename" => false
+class Image {
+    protected $destiny = array(
+        'constrain' => false,
+        'height' => 0,
+        'quality' => 80,
+        'resize' => false,
+        'width' => 0,
+        'x' => 0,
+        'y' => 0
     );
-    /**
-     *  Redimensiona uma imagem.
-     *
-     *  @param string $filename Imagem a ser manipulada
-     *  @param array $params Parâmetros para a manipulação da imagem
-     *  @return mixed Imagem gerada pelo componente
-     */
-    public function resize($filename = null, $params = array()) {
-        $filename = $this->filePath($filename);
-        $params = array_merge($this->params, $params);
-        $inputExt = $this->ext($filename);
-        $outputExt = $this->ext($params["filename"] ? $params["filename"] : $filename);
-        $fnInput = "imagecreatefrom{$inputExt}";
-        $fnOutput = "image{$outputExt}";
-        list($width, $height) = getimagesize($filename);
-
-        if($params["height"] == 0 && $params["width"] == 0):
-            $params["height"] = $height;
-            $params["width"] = $width;
-        endif;
-
-        if($params["constrain"]):
-            $ratio = $width > $height ? $width / $params["width"] : $height / $params["height"];
-            $params["height"] = $height / $ratio;
-            $params["width"] = $width / $ratio;
-        endif;
-        
-        $input = $fnInput($filename);
-        $output = imagecreatetruecolor($params["width"], $params["height"]);
-        imagecopyresampled($output, $input, 0, 0, $params["x"], $params["y"], $params["width"], $params["height"], $width, $height);
-        
-        if($params["filename"]):
-            $filename = $this->filePath($params["filename"]);
-        endif;
-        
-        return $fnOutput($output, $filename, $params["quality"], PNG_ALL_FILTERS);
-    }
-    /**
-     *  Converte uma imagem de um formato para outro.
-     *
-     *  @param string $filename Imagem a ser convertida
-     *  @param array $params Parâmetros para a conversão da imagem
-     *  @return mixed Imagem convertida
-     */
-    public function convert($filename = null, $params = array()) {
-        $resize = $this->resize($filename, $params);
-        if(!$params["keep"]):
-            unlink($this->filePath($filename));
-        endif;
-        return $resize;
-    }
-    /**
-     *  Retorna a extensão do arquivo de uma imagem.
-     *
-     *  @param string $filename Nome da imagem
-     *  @return string Extensão do arquivo, falso caso não seja uma imagem válida.
-     */
-    public function ext($filename = "") {
-        $ext = strtolower(trim(substr($filename, strrpos($filename, ".") + 1, strlen($filename))));
-        if(in_array($ext, $this->imageTypes)):
-            $key = array_search($ext, $this->imageTypes);
-            if(is_string($key)):
-                $ext = $key;
+    protected $source = array(
+        'x' => 0,
+        'y' => 0
+    );
+    
+    public function resize($filename, $destiny = array()) {
+        $destiny += $this->destiny;
+        $size = $this->size($filename);
+        extract($size);
+        if($destiny['constrain']):
+            if(
+                $destiny['width'] && ($width > $height || !$destiny['height'])
+            ):
+                $ratio = $destiny['width'] / $width;
+                $destiny['height'] = floor($height * $ratio);
+            elseif(
+                $destiny['height'] && ($width < $height || !$destiny['width'])
+            ):
+                $ratio = $destiny['height'] / $height;
+                $destiny['width'] = floor($width * $ratio);
             endif;
-            return $ext;
         endif;
-        return false;
+        
+        return $this->image($filename, $size + $this->source, $destiny);
     }
-    /**
-     *  Retorna o caminho de um arquivo a partir de /app.
-     *
-     *  @param string $filename Nome do arquivo
-     *  @return string Caminho do arquivo
-     */
-    public function filePath($filename = "") {
-        return SPAGHETTI_APP . "/webroot/" . $filename;
+    public function scale($filename, $destiny = array()) {
+        $destiny += $this->destiny;
+        $size = $this->size($filename);
+        extract($size);
+        $destiny['width'] = $width * ($destiny['scale'] / 100);
+        $destiny['height'] = $height * ($destiny['scale'] / 100);
+
+        return $this->image($filename, $size + $this->source, $destiny);
+    }
+    public function crop($filename, $destiny = array()) {
+        $destiny += $this->destiny;
+        $size = $this->size($filename);        
+        $source = $this->cropSource($size, $destiny);
+        
+        return $this->image($filename, $source, $destiny);
+    }
+    public function size($filename) {
+        $filename = SPAGHETTI_APP . '/' . $filename;
+        
+        $size = getimagesize($filename);
+        return array(
+            'width' => $size[0],
+            'height' => $size[1],
+            'type' => $size[2]
+        );
+    }
+    public function imageType($filename) {
+        $ext = strtolower(substr($filename, strrpos($filename, '.') + 1));
+        switch($ext):
+            case 'jpeg':
+            case 'jpg':
+                return 'jpeg';
+            case 'gif':
+                return 'gif';
+            case 'png':
+                return 'png';
+            default:
+                return false;
+        endswitch;
+    }
+    protected function image($filename, $source, $destiny) {
+        $input_type = image_type_to_extension($source['type'], false);
+        $input_function = 'imagecreatefrom' . $input_type;
+        
+        if(!isset($destiny['filename'])):
+            $destiny['filename'] = $filename;
+        endif;
+        $output_type = $this->imageType($destiny['filename']);
+        $output_function = 'image' . $output_type;
+        
+        $filename = SPAGHETTI_APP . '/' . $filename;
+        $destiny['filename'] = SPAGHETTI_APP . '/' . $destiny['filename'];
+        
+        $input = $input_function($filename);
+        $output = imagecreatetruecolor($destiny['width'], $destiny['height']);
+        imagecopyresampled(
+            $output, $input,
+            $destiny['x'], $destiny['y'],
+            $source['x'], $source['y'],
+            $destiny['width'], $destiny['height'],
+            $source['width'], $source['height']
+        );
+        imagedestroy($input);
+
+        // @todo check for PNG quality
+        $output_image = $output_function($output, $destiny['filename'], $destiny['quality'], PNG_ALL_FILTERS);
+        imagedestroy($output);
+        
+        return $output_image;
+    }
+    protected function cropSource($source, $destiny) {
+        extract($source);
+        $source['width'] = $destiny['width'];
+        $source['height'] = $destiny['height'];
+        if($destiny['resize']):
+            if($width > $height && floor($height * $destiny['width'] / $destiny['height']) < $width):
+                $source['height'] = $height;
+                $source['width'] = floor($height * $destiny['width'] / $destiny['height']);
+            else:
+                $source['width'] = $width;
+                $source['height'] = floor($width * $destiny['height'] / $destiny['width']);
+            endif;
+        endif;
+        $source['x'] = floor(($width - $source['width']) / 2);
+        $source['y'] = floor(($height - $source['height']) / 2);
+        
+        return $source;
     }
 }
-
-?>
