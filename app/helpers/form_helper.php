@@ -142,6 +142,7 @@ class FormHelper extends HtmlHelper {
             $content .= $this->tag("input", null, $radioAttr, false);
             $content .= $this->tag("label", $value, $for);
         endforeach;
+        $content = $this->tag("fieldset", $content);
         return $content;
     }
     /**
