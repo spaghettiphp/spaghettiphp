@@ -7,24 +7,6 @@ class Upload {
     public $files = array();
     public $errors = array();
     
-    public function initialize(&$controller) {
-        foreach($_FILES as $file => $content):
-            if(is_array($content["name"])):
-                foreach($content["name"] as $name => $value):
-                    if($content["name"][$name] == "") continue;
-                    $this->files[$file][$name] = array(
-                        "name" => $content["name"][$name],
-                        "type" => $content["type"][$name],
-                        "tmp_name" => $content["tmp_name"][$name],
-                        "error" => $content["error"][$name],
-                        "size" => $content["size"][$name]
-                    );
-                endforeach;
-            else:
-                $this->files[$file] = $content;
-            endif;
-        endforeach;
-    }
     public function validates($file = array()) {
         if(empty($file) && !isset($file["name"])):
             return $this->error("InvalidParam");
@@ -44,7 +26,7 @@ class Upload {
         $path = is_null($path) ? $this->path : $path;
         $name = is_null($name) ? $file["name"] : $name;
         if($this->validates($file)):
-            $path = SPAGHETTI_APP . "/webroot" . $path;
+            $path = SPAGHETTI_ROOT . "/public" . $path;
             if(!is_dir($path)):
                 mkdir($path, 0777, true);
             endif;
@@ -59,7 +41,7 @@ class Upload {
     }
     public function delete($filename = "", $path = null) {
         $path = is_null($path) ? $this->path : $path;
-        $file = SPAGHETTI_APP . "/webroot" . $path . $filename;
+        $file = SPAGHETTI_ROOT . "/public" . $path . $filename;
         if(file_exists($file)):
             if(unlink($file)):
                 return true;

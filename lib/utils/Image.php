@@ -33,7 +33,7 @@ class Image {
             endif;
         endif;
         
-        return $this->image($filename, $size + $this->source, $destiny);
+        return $this->createImage($filename, $size + $this->source, $destiny);
     }
     public function scale($filename, $destiny = array()) {
         $destiny += $this->destiny;
@@ -42,17 +42,17 @@ class Image {
         $destiny['width'] = $width * ($destiny['scale'] / 100);
         $destiny['height'] = $height * ($destiny['scale'] / 100);
 
-        return $this->image($filename, $size + $this->source, $destiny);
+        return $this->createImage($filename, $size + $this->source, $destiny);
     }
     public function crop($filename, $destiny = array()) {
         $destiny += $this->destiny;
-        $size = $this->size($filename);        
+        $size = $this->size($filename);
         $source = $this->cropSource($size, $destiny);
         
-        return $this->image($filename, $source, $destiny);
+        return $this->createImage($filename, $source, $destiny);
     }
     public function size($filename) {
-        $filename = SPAGHETTI_APP . '/' . $filename;
+        $filename = SPAGHETTI_ROOT . '/public/' . $filename;
         
         $size = getimagesize($filename);
         return array(
@@ -75,7 +75,7 @@ class Image {
                 return false;
         endswitch;
     }
-    protected function image($filename, $source, $destiny) {
+    protected function createImage($filename, $source, $destiny) {
         $input_type = image_type_to_extension($source['type'], false);
         $input_function = 'imagecreatefrom' . $input_type;
         
@@ -85,8 +85,8 @@ class Image {
         $output_type = $this->imageType($destiny['filename']);
         $output_function = 'image' . $output_type;
         
-        $filename = SPAGHETTI_APP . '/' . $filename;
-        $destiny['filename'] = SPAGHETTI_APP . '/' . $destiny['filename'];
+        $filename = SPAGHETTI_ROOT . '/public/' . $filename;
+        $destiny['filename'] = SPAGHETTI_ROOT . '/public/' . $destiny['filename'];
         
         $input = $input_function($filename);
         $output = imagecreatetruecolor($destiny['width'], $destiny['height']);
