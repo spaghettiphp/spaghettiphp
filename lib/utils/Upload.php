@@ -22,7 +22,7 @@ class Upload {
         endif;
         return true;
     }
-    public function upload($file = array(), $path = null, $name = null) {
+    public function uploadFile($file = array(), $path = null, $name = null) {
         $path = is_null($path) ? $this->path : $path;
         $name = is_null($name) ? $file["name"] : $name;
         if($this->validates($file)):
@@ -41,7 +41,7 @@ class Upload {
     }
     public function delete($filename = "", $path = null) {
         $path = is_null($path) ? $this->path : $path;
-        $file = SPAGHETTI_ROOT . "/public" . $path . $filename;
+        $file = SPAGHETTI_ROOT . "/public" . $path . "/" . $filename;
         if(file_exists($file)):
             if(unlink($file)):
                 return true;
