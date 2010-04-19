@@ -16,11 +16,13 @@ class Mapper extends Object {
                 $this->base = '/';
             endif;
         endif;
-
-        $start = strlen($this->base);
-        $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
-
-        $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
+        
+        if(array_key_exists('REQUEST_URI', $_SERVER)):
+            $start = strlen($this->base);
+            $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
+    
+            $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
+        endif;
     }
     public static function instance() {
         if(!isset(self::$instance)):
