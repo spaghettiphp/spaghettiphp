@@ -2,13 +2,13 @@
 
 class Date extends Object{
     public static $convert = array(
-        'seconds' => 1,
-        'minutes' => 60,
-        'hours' => 3600,
-        'days' => 86400,
-        'weeks' => 604800,
+        'years' => 217728000,
         'months' => 18144000,
-        'years' => 217728000
+        'weeks' => 604800,
+        'days' => 86400,
+        'hours' => 3600,
+        'minutes' => 60,
+        'seconds' => 1
     );
     public static $holidays = array(
         '01/01', '21/04', '01/05', '07/09', '12/10',
@@ -17,14 +17,14 @@ class Date extends Object{
     public static $format = 'Y-m-d';
     
     public static function diff($date, $otherDate = null, $unit = 'days') {
-		if(is_null($otherDate)):
-			$otherDate = time();
-		else:
-			$otherDate = strtotime($otherDate);
-		endif;
+        if(is_null($otherDate)):
+            $otherDate = time();
+        else:
+            $otherDate = strtotime($otherDate);
+        endif;
         $date = strtotime($date);
         $time = abs($date - $otherDate);
-		
+        
         return ceil($time / self::$convert[$unit]);
     }
     public static function add($date, $num, $unit = 'days', $format = null) {
@@ -74,7 +74,36 @@ class Date extends Object{
         
         return date($format, $date);
     }
-    public static function addHoliday($date) {
+    public static function timeAgo($date = null) {
+        if(is_null($date)):
+            $date = time();
+        else:
+            $date = strtotime($date);
+        endif;
+        $now = time();
+        $since = $now - $date;
+
+        $times = array_values(self::$convert);
+        $names = array_keys(self::$convert);
+        foreach($times as $i => $seconds):
+            if(($count = floor($since / $seconds))):
+                break;
+            endif;
+        endforeach;
+        $name = preg_replace('/s$/', '', $names[$i]);
+        $ago = ($count == 1) ? '1 ' . $name : $count . ' ' . $name . 's';
+
+        if($i + 1 < count(self::$convert)):
+            $name = preg_replace('/s$/', '', $names[$i + 1]);
+            $seconds2 = $times[$i + 1];
+            if(($count = floor(($since - ($seconds * $count)) / $seconds2))):
+                $ago .= ', ' . (($count == 1) ? '1 ' . $name : $count . ' ' . $name . 's');
+            endif;
+        endif;
+        
+        return $ago;
+    }
+   public static function addHoliday($date) {
         self::$holidays []= $date;
     }
     public static function setDefaultFormat($format) {
