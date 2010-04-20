@@ -1,0 +1,9 @@
+Description:
+    Stubs out a new model. Pass the model name, either CamelCased or
+    under_scored.
+
+Examples:
+    `script/generate model account`
+
+        Creates a model
+            Model:      app/models/account.php
