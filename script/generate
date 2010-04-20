@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#! /usr/bin/php
 <?php
 
 require dirname(__FILE__) . '/generate.php';
