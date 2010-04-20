@@ -1,0 +1,11 @@
+Description:
+    Stubs out a new controller and its views. Pass the controller name, either
+    CamelCased or under_scored, and a list of views as arguments.
+
+    This generates a controller class in app/controllers.
+
+Example:
+    `script/generate controller credit_card open debit credit close`
+
+    Credit card controller with URLs like /credit_card/debit.
+        Controller:      app/controllers/credit_card_controller.php
