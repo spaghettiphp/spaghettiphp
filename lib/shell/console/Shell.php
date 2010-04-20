@@ -1078,5 +1078,3 @@ function __shell_readline_complete($str, $pos) {
     # printf("%s ... %s\n", $str, $pos);
     return $m;
 }
-
-
