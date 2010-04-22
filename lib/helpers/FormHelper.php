@@ -7,7 +7,7 @@
  *
  */
 
-require_once 'app/helpers/html_helper.php';
+require_once 'lib/helpers/HtmlHelper.php';
 
 class FormHelper extends HtmlHelper {
     /**
