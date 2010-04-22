@@ -17,7 +17,7 @@ class FileUpload {
         endif;
     }
     public function upload($file, $name = null, $path = '') {
-        $path = Filesystem::path($path);
+        $path = Filesystem::path('public/' . $path);
         if(is_null($name)):
             $name = $file['name'];
         endif;
