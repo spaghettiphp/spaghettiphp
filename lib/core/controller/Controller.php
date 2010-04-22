@@ -9,36 +9,30 @@ class Controller extends Object {
     public $params = array();
     public $uses = null;
     public $view = array();
-    public $methods = array();
     public $viewClass = 'View';
 
     public function __construct() {
-        if(is_null($this->name) && preg_match('/(.*)Controller/', get_class($this), $name)):
-            if($name[1] && $name[1] != 'App'):
-                $this->name = $name[1];
-            elseif(is_null($this->uses)):
+        if(is_null($this->name)):
+            $classname = get_class($this);
+            $lenght = strpos($classname, 'Controller');
+            $this->name = substr($classname, 0, $lenght);
+
+            if(is_null($this->uses) && $this->name != 'App'):
                 $this->uses = array();
             endif;
         endif;
+        
         if(is_null($this->uses)):
             $this->uses = array($this->name);
         endif;
         
-        $this->methods = $this->getMethods();
         $this->data = array_merge_recursive($_POST, $_FILES);
         $this->loadComponents();
         $this->loadModels();
     }
-    public function __get($class){
-        if(!isset($this->{$class})):
-            $pattern = '(^[A-Z]+([a-z]+(Component)?))';
-            if(preg_match($pattern, $class, $out)):
-                $type = (isset($out[2])) ? 'Component' : 'Model';
-                $this->{$class} = ClassRegistry::load($class, $type);
-                if($type == 'Component') $this->{$class}->initialize($this);
-                return $this->{$class};
-            endif;
-        endif;
+    public function isAction($action) {
+        $methods = $this->getMethods();
+        return in_array($action, $methods) && can_call_method($this, $action);
     }
     public function getMethods() {
         $child = get_class_methods($this);
@@ -100,7 +94,7 @@ class Controller extends Object {
 
         $this->autoRender = false;
 
-        return $view->render($action, $this->view);
+        return $view->render($action, $this->view, $this->layout);
     }
     public function redirect($url, $status = null, $exit = true) {
         $this->autoRender = false;

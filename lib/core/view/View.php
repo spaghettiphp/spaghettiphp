@@ -1,7 +1,6 @@
 <?php
 
 class View extends Object {
-    public $layout;
     public $extension = 'htm';
     public $contentForLayout;
     public $scriptsForLayout;
@@ -23,12 +22,12 @@ class View extends Object {
         if(is_array($helper)):
             return array_walk($helper, array($this, 'loadHelper'));
         endif;
-        
+
         $helper_class = Inflector::camelize($helper) . 'Helper';
         require_once 'lib/helpers/' . $helper_class . '.php';
         $this->loadedHelpers[$helper] = new $helper_class($this);
     }
-    public function render($action, $data = array()) {
+    public function render($action, $data = array(), $layout = false) {
         $filename = explode('.', $action);
         $action = $filename[0];
         if(array_key_exists(1, $filename)):
@@ -40,8 +39,8 @@ class View extends Object {
         
         if(file_exists($view_file)):
             $output = $this->renderView($view_file, $data);
-            if($this->layout):
-                $output = $this->renderLayout($this->layout, $output, $data);
+            if($layout):
+                $output = $this->renderLayout($layout, $output, $data);
             endif;
             return $output;
         else:
