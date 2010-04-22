@@ -5,7 +5,7 @@ class View extends Object {
     public $contentForLayout;
     public $scriptsForLayout;
     public $stylesForLayout;
-    public $helpers = array('html', 'form', 'pagination');
+    public $helpers = array('html', 'form');
     protected $loadedHelpers = array();
 
     public function __construct() {
