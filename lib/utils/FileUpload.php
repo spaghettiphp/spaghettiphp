@@ -2,7 +2,7 @@
 
 require_once 'lib/core/filesystem/Filesystem.php';
 
-class Upload {
+class FileUpload {
     public $allowedTypes = array();
     public $maxSize = 2;
     public $path = '/';
