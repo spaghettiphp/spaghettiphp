@@ -1,5 +1,7 @@
 <?php
 
+require_once 'lib/core/filesystem/Filesystem.php';
+
 class ImageResize {
     protected $destiny = array(
         'constrain' => false,
