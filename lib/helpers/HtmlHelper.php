@@ -15,6 +15,7 @@ class HtmlHelper extends Helper {
             $html .= ' ' . $attr;
         endif;
         $html .= ($empty ? ' /' : '') . '>';
+        
         return $html;
     }
     public function closeTag($tag) {
@@ -25,6 +26,7 @@ class HtmlHelper extends Helper {
         if(!$empty):
             $html .= $content . $this->closeTag($tag);
         endif;
+        
         return $html;
     }
     public function attr($attr) {
@@ -37,75 +39,73 @@ class HtmlHelper extends Helper {
             endif;
             $attributes []= $name . '="' . $value . '"';
         endforeach;
+        
         return join(' ', $attributes);
     }
     public function link($text, $url = null, $attr = array(), $full = false) {
         if(is_null($url)):
             $url = $text;
         endif;
+        
         $attr['href'] = Mapper::url($url, $full);
+        
         return $this->tag('a', $text, $attr);
     }
-    public function image($src, $attr = array(), $full = false) {
+    public function image($src, $attr = array()) {
         $attr += array(
             'alt' => '',
             'title' => isset($attr['alt']) ? $attr['alt'] : ''
         );
-        if(!$this->external($src)):
-            $src = Mapper::url('/images/' . $src, $full);
-        endif;
-        $attr['src'] = $src;
+
+        $attr['src'] = $this->assets->image($src);
+
         return $this->tag('img', null, $attr, true);
     }
     public function imagelink($src, $url, $img_attr = array(), $attr = array(), $full = false) {
-        $image = $this->image($src, $img_attr, $full);
+        $image = $this->image($src, $img_attr);
         return $this->link($image, $url, $attr, $full);
     }
-    public function stylesheet($href, $attr = array(), $inline = true, $full = false) {
+    public function stylesheet($href, $attr = array(), $inline = true) {
         if(is_array($href)):
             $output = '';
             foreach($href as $tag):
-                $output .= $this->stylesheet($tag, $attr, true, $full) . PHP_EOL;
+                $output .= $this->stylesheet($tag, $attr, true) . PHP_EOL;
             endforeach;
         else:
-            if(!$this->external($href)):
-                $href = Mapper::url('/styles/' . $this->extension($href, 'css'), $full);
-            endif;
             $attr += array(
-                'href' => $href,
+                'href' => $this->assets->stylesheet($href),
                 'rel' => 'stylesheet',
                 'type' => 'text/css'
             );
             $output = $this->tag('link', null, $attr, true);
         endif;
+        
         if($inline):
             return $output;
         else:
             $this->view->stylesForLayout .= $output;
-            return true;
+            return null;
         endif;
     }
-    public function script($src, $attr = array(), $inline = true, $full = false) {
+    public function script($src, $attr = array(), $inline = true) {
         if(is_array($src)):
             $output = '';
             foreach($src as $tag):
-                $output .= $this->script($tag, $attr, true, $full) . PHP_EOL;
+                $output .= $this->script($tag, $attr, true) . PHP_EOL;
             endforeach;
         else:
-            if(!$this->external($src)):
-                $src = Mapper::url('/scripts/' . $this->extension($src, 'js'), $full);
-            endif;
             $attr += array(
-                'src' => $src,
+                'src' => $this->assets->script($src),
                 'type' => 'text/javascript'
             );
             $output = $this->tag('script', null, $attr);
         endif;
+        
         if($inline):
             return $output;
         else:
             $this->view->scriptsForLayout .= $output;
-            return true;
+            return null;
         endif;
     }
     public function nestedList($list, $attr = array(), $type = 'ul') {
@@ -119,31 +119,26 @@ class HtmlHelper extends Helper {
             endif;
             $content .= $this->tag('li', $li) . PHP_EOL;
         endforeach;
+        
         return $this->tag($type, $content, $attr);
     }
     public function div($content, $attr = array()) {
         if(!is_array($attr)):
             $attr = array('class' => $attr);
         endif;
+        
         return $this->tag('div', $content, $attr);
     }
     public function charset($charset = null) {
+        if(is_null($charset)):
+            $charset = Config::read('App.encoding');
+        endif;
+        
         $attr = array(
             'http-equiv' => 'Content-type',
             'content' => 'text/html; charset=' . $charset
         );
-        return $this->tag('meta', null, $attr);
-    }
-    public function external($url) {
-        return preg_match('/^[a-z]+:/', $url);
-    }
-    public function extension($file, $extension) {
-        if(strpos($file, '?') === false):
-            if(strpos($file, '.' . $extension) === false):
-                $file .= '.' . $extension;
-            endif;
-        endif;
         
-        return $file;
+        return $this->tag('meta', null, $attr, true);
     }
 }

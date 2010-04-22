@@ -3,10 +3,6 @@
 class PaginationHelper extends Helper {
     protected $model;
 
-    public function __construct($view) {
-        parent::__construct($view);
-        $this->html = $this->view->html;
-    }
     public function model($model) {
         $this->model = ClassRegistry::load($model);
         return $this;

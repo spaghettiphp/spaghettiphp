@@ -1,10 +1,6 @@
 <?php
 
 class FormHelper extends Helper {
-    public function __construct($view) {
-        parent::__construct($view);
-        $this->html = $this->view->html;
-    }
     public function create($action = null, $options = array()) {
         $options += array(
             'method' => 'post',
@@ -36,9 +32,7 @@ class FormHelper extends Helper {
             case 'image':
                 $attributes['alt'] = $text;
                 $attributes['type'] = 'image';
-                if(!$this->html->external($attributes['src'])):
-                    $attributes['src'] = Mapper::url('/images/' . $attributes['src']);
-                endif;
+                $attributes['src'] = $this->assets->image($attributes['src']);
             case 'input':
                 $attributes['value'] = $text;
                 return $this->html->tag('input', null, $attributes, false);
