@@ -5,22 +5,20 @@ class AssetsHelper extends Helper {
         parent::__construct($view);
     }
     public function image($url) {
-        if(!$this->external($url)):
-            $src = Mapper::url('/images/' . $url);
-        endif;
-        
-        return $url;
+        return $this->asset($url, 'images');
     }
     public function script($url) {
-        if(!$this->external($url)):
-            $url = Mapper::url('/scripts/' . $this->extension($url, 'js'));
-        endif;
-        
-        return $url;
+        return $this->asset($url, 'scripts', 'js');
     }
     public function stylesheet($url) {
+        return $this->asset($url, 'styles', 'css');
+    }
+    protected function asset($url, $type, $extension = null) {
         if(!$this->external($url)):
-            $url = Mapper::url('/styles/' . $this->extension($url, 'css'));
+            if(!is_null($extension)):
+                $url = $this->extension($url, $extension);
+            endif;
+            $url = Mapper::url('/' . $type . '/' . $url);
         endif;
         
         return $url;
