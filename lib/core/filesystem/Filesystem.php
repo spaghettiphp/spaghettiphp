@@ -80,7 +80,7 @@ class Filesystem extends Object{
             endif;
         endif;
     }
-    public static function createDir($dir, $mode = 0655) {
+    public static function createDir($dir, $mode = 0644) {
         $dir = self::path($dir);
         if(!self::exists($dir)):
             return mkdir($dir, $mode, true);

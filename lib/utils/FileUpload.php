@@ -4,52 +4,64 @@ require_once 'lib/core/filesystem/Filesystem.php';
 
 class FileUpload {
     public $allowedTypes = array();
-    public $maxSize = 2;
+    public $maxSize = false;
     public $path = '/';
     public $files = array();
     public $errors = array();
     
-    public function validates($file = array()) {
-        if(empty($file) && !isset($file['name'])):
-            return $this->error('InvalidParam');
+    public function __construct($files = null) {
+        if(is_null($files)):
+            $this->files = $_FILES;
+        else:
+            $this->files = $files;
         endif;
-        if($file['size'] > $this->maxSize * 1024 * 1024):
-            return $this->error('FileSizeExceeded');
-        endif;
-        if(!empty($this->allowedTypes) && !in_array(Filesystem::extension($file['name']), $this->allowedTypes)):
-            return $this->error('FileTypeNotAllowed');
-        endif;
-        if($uploadError = $this->uploadError($file['error'])):
-            return $this->error($uploadError);
-        endif;
-        return true;
     }
-    public function uploadFile($file = array(), $path = null, $name = null) {
-        $path = is_null($path) ? $this->path : $path;
-        $name = is_null($name) ? $file['name'] : $name;
+    public function upload($file, $name = null, $path = '') {
+        $path = Filesystem::path($path);
+        if(is_null($name)):
+            $name = $file['name'];
+        endif;
+
         if($this->validates($file)):
-            $path = SPAGHETTI_ROOT . '/public' . $path;
             if(!is_dir($path)):
-                mkdir($path, 0777, true);
+                Filesystem::createDir($path);
             endif;
             if(move_uploaded_file($file['tmp_name'], $path . '/' . $name)):
                 return true;
             else:
                 return $this->error('CantMoveFile');
             endif;
-        else:
-            return false;
         endif;
+
+        return false;
+    }
+    public function validates($file) {
+        $this->errors = array();
+        
+        if(empty($file) && !isset($file['name'])):
+            return $this->error('InvalidParam');
+        endif;
+
+        if($this->maxSize && filesize($file['tmp_name']) > $this->maxSize * 1024 * 1024):
+            return $this->error('FileSizeExceeded');
+        endif;
+
+        $ext = Filesystem::extension($file['name']);
+        if(!empty($this->allowedTypes) && !in_array($ext, $this->allowedTypes)):
+            return $this->error('FileTypeNotAllowed');
+        endif;
+
+        if($uploadError = $this->uploadError($file['error'])):
+            return $this->error($uploadError);
+        endif;
+
+        return true;
     }
     public function error($type, $details = array()) {
         $this->errors []= $type;
         return false;
     }
-    public function clear() {
-        $this->errors = array();
-        return true;
-    }
-    public function uploadError($error = 0) {
+    protected function uploadError($error = 0) {
         switch($error):
             case UPLOAD_ERR_OK:
                 return false;
