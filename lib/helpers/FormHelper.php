@@ -100,7 +100,7 @@ class FormHelper extends Helper {
                 $radio_attr['checked'] = true;
             endif;
             $for = array('for' => $radio_attr['id']);
-            $content .= $this->html->tag('input', null, $radio_attr, true);
+            $content .= $this->html->tag('input', '', $radio_attr, true);
             $content .= $this->html->tag('label', $value, $for);
         endforeach;
         
@@ -162,6 +162,7 @@ class FormHelper extends Helper {
             'div' => true,
             'value' => ''
         );
+        
         $label = array_unset($options, 'label');
         $div = array_unset($options, 'div');
         $type = $options['type'];
@@ -192,7 +193,7 @@ class FormHelper extends Helper {
                     $options['type'] = 'password';
                 endif;
                 $options['value'] = Sanitize::html($options['value']);
-                $input = $this->html->tag('input', null, $options, true);
+                $input = $this->html->tag('input', '', $options, true);
         endswitch;
 
         if($label):
@@ -201,19 +202,18 @@ class FormHelper extends Helper {
         endif;
 
         if($div):
-            if($div === true):
-                $div = 'input ' . $type;
-            elseif(is_array($div)):
-                $div += array('class' => 'input ' . $options['type']);
-            endif;
-            $input = $this->div($input, $div);
+            $input = $this->div($div, $input, $type);
         endif;
 
         return $input;
     }
-    public function div($content, $attr = array()) {
-        if(!is_array($attr)):
-            $attr = array('class' => $attr);
+    protected function div($class, $content, $type) {
+        $attr = array(
+            'class' => 'input ' . $type
+        );
+        
+        if(is_array($class)):
+            $attr = $class + $attr;
         endif;
         
         return $this->html->tag('div', $content, $attr);

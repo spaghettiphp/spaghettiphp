@@ -1,24 +1,30 @@
 <?php
 
 class AssetsHelper extends Helper {
+    protected static $assets = array(
+        'image' => '/images/',
+        'style' => '/styles/',
+        'script' => '/scripts/'
+    );
+    
     public function __construct($view) {
         parent::__construct($view);
     }
     public function image($url) {
-        return $this->asset($url, 'images');
+        return $this->asset($url, 'image');
     }
     public function script($url) {
-        return $this->asset($url, 'scripts', 'js');
+        return $this->asset($url, 'script', 'js');
     }
     public function stylesheet($url) {
-        return $this->asset($url, 'styles', 'css');
+        return $this->asset($url, 'style', 'css');
     }
-    protected function asset($url, $type, $extension = null) {
+    public function asset($url, $type, $extension = null) {
         if(!$this->external($url)):
             if(!is_null($extension)):
                 $url = $this->extension($url, $extension);
             endif;
-            $url = Mapper::url('/' . $type . '/' . $url);
+            $url = Mapper::url(self::$assets[$type] . $url);
         endif;
         
         return $url;
