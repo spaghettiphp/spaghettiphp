@@ -35,7 +35,7 @@ class FormHelper extends Helper {
                 $attributes['src'] = $this->assets->image($attributes['src']);
             case 'input':
                 $attributes['value'] = $text;
-                return $this->html->tag('input', null, $attributes, false);
+                return $this->html->tag('input', '', $attributes, true);
             default:
                 return $this->html->tag('button', $text, $attributes);
         endswitch;
@@ -82,13 +82,13 @@ class FormHelper extends Helper {
             'value' => null,
             'legend' => Inflector::camelize($name)
         );
-        $content = '';
         $radio_options = array_unset($options, 'options');
-        $radioValue = array_unset($options, 'value');
+        $radio_value = array_unset($options, 'value');
         if($legend = array_unset($options, 'legend')):
             $content = $this->html->tag('legend', $legend);
         endif;
         
+        $content = '';
         foreach($radio_options as $key => $value):
             $radio_attr = array(
                 'type' => 'radio',
@@ -96,26 +96,25 @@ class FormHelper extends Helper {
                 'id' => Inflector::camelize($name . '_' . $key),
                 'name' => $name
             );
-            if((string) $key === (string) $radioValue):
+            if((string) $key === (string) $radio_value):
                 $radio_attr['checked'] = true;
             endif;
             $for = array('for' => $radio_attr['id']);
-            $content .= $this->html->tag('input', null, $radio_attr, false);
+            $content .= $this->html->tag('input', null, $radio_attr, true);
             $content .= $this->html->tag('label', $value, $for);
         endforeach;
         
         return $this->html->tag('fieldset', $content);
     }
     public function date($name, $options = array()) {
-        if(!is_null($options['value'])):
-            if(is_array($options['value'])):
-                $v = $options['value'];
-                $options['value'] = $v['y'] . '-' . $v['m'] . '-' . $v['d'];
-            endif;
+        if(is_array($options['value'])):
+            $date = mktime(0, 0, 0, $v['m'], $v['d'], $v['y']);
+        elseif(!is_null($options['value'])):
             $date = strtotime($options['value']);
         else:
             $date = time();
         endif;
+
         $options += array(
             'value' => null,
             'startYear' => 1980,
@@ -125,6 +124,7 @@ class FormHelper extends Helper {
             'currentYear' => date('Y', $date),
             'format' => 'dmy'
         );
+
         $days = array_range(1, 31);
         $months = array_range(1, 12);
         $years = array_range($options['startYear'], $options['endYear']);
@@ -165,6 +165,7 @@ class FormHelper extends Helper {
         $label = array_unset($options, 'label');
         $div = array_unset($options, 'div');
         $type = $options['type'];
+
         switch($options['type']):
             case 'select':
                 unset($options['type']);
@@ -191,20 +192,30 @@ class FormHelper extends Helper {
                     $options['type'] = 'password';
                 endif;
                 $options['value'] = Sanitize::html($options['value']);
-                $input = $this->html->tag('input', null, $options, false);
+                $input = $this->html->tag('input', null, $options, true);
         endswitch;
+
         if($label):
             $for = array('for' => $options['id']);
             $input = $this->html->tag('label', $label, $for) . $input;
         endif;
+
         if($div):
             if($div === true):
                 $div = 'input ' . $type;
             elseif(is_array($div)):
                 $div += array('class' => 'input ' . $options['type']);
             endif;
-            $input = $this->html->div($input, $div);
+            $input = $this->div($input, $div);
         endif;
+
         return $input;
+    }
+    public function div($content, $attr = array()) {
+        if(!is_array($attr)):
+            $attr = array('class' => $attr);
+        endif;
+        
+        return $this->html->tag('div', $content, $attr);
     }
 }

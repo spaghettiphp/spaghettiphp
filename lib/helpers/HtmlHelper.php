@@ -54,7 +54,7 @@ class HtmlHelper extends Helper {
     public function image($src, $attr = array()) {
         $attr += array(
             'alt' => '',
-            'title' => isset($attr['alt']) ? $attr['alt'] : ''
+            'title' => array_key_exists('alt', $attr) ? $attr['alt'] : ''
         );
 
         $attr['src'] = $this->assets->image($src);
@@ -65,14 +65,14 @@ class HtmlHelper extends Helper {
         $image = $this->image($src, $img_attr);
         return $this->link($image, $url, $attr, $full);
     }
-    public function stylesheet($href, $attr = array(), $inline = true) {
+    public function stylesheet($href, $inline = true) {
         if(is_array($href)):
             $output = '';
             foreach($href as $tag):
-                $output .= $this->stylesheet($tag, $attr, true) . PHP_EOL;
+                $output .= $this->stylesheet($tag, true) . PHP_EOL;
             endforeach;
         else:
-            $attr += array(
+            $attr = array(
                 'href' => $this->assets->stylesheet($href),
                 'rel' => 'stylesheet',
                 'type' => 'text/css'
@@ -87,14 +87,14 @@ class HtmlHelper extends Helper {
             return null;
         endif;
     }
-    public function script($src, $attr = array(), $inline = true) {
+    public function script($src, $inline = true) {
         if(is_array($src)):
             $output = '';
             foreach($src as $tag):
-                $output .= $this->script($tag, $attr, true) . PHP_EOL;
+                $output .= $this->script($tag, true) . PHP_EOL;
             endforeach;
         else:
-            $attr += array(
+            $attr = array(
                 'src' => $this->assets->script($src),
                 'type' => 'text/javascript'
             );
@@ -121,13 +121,6 @@ class HtmlHelper extends Helper {
         endforeach;
         
         return $this->tag($type, $content, $attr);
-    }
-    public function div($content, $attr = array()) {
-        if(!is_array($attr)):
-            $attr = array('class' => $attr);
-        endif;
-        
-        return $this->tag('div', $content, $attr);
     }
     public function charset($charset = null) {
         if(is_null($charset)):
