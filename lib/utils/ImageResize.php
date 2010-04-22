@@ -1,6 +1,6 @@
 <?php
 
-class Image {
+class ImageResize {
     protected $destiny = array(
         'constrain' => false,
         'height' => 0,
