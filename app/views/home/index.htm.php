@@ -34,7 +34,7 @@
     </div>
     <div>
         <h2>Documentação</h2>
-        <p>O Spaghetti* possui uma <?php echo $html->link("documentação", "http://spaghettiphp.org/docs/developer-guide") ?> bem compreensiva, e poderá ajudar você na maioria dos casos em que você precisar de ajuda. Além disso, você também pode aprender algumas técnicas e truques novos lendo o nosso guia.</p
+        <p>O Spaghetti* possui uma <?php echo $this->html->link("documentação", "http://spaghettiphp.org/docs/developer-guide") ?> bem compreensiva, e poderá ajudar você na maioria dos casos em que você precisar de ajuda. Além disso, você também pode aprender algumas técnicas e truques novos lendo o nosso guia.</p
     </div>
     <hr class="clear" />
 </section>
@@ -42,11 +42,11 @@
 <section class="features">
     <div>
         <h2>Suporte</h2>
-        <p>Se você precisar de ajuda, no Spaghetti* você tem onde procurar! Além da nossa <?php echo $html->link("documentação", "http://spaghettiphp.org/docs/developer-guide") ?>, você também pode contar com uma comunidade amigável em nosso <?php echo $html->link("fórum", "http://forum.spaghettiphp.org/") ?>, nossos <?php echo $html->link("tutoriais", "http://forum.spaghettiphp.org/tutorials") ?> ou nossos <?php echo $html->link("screencasts", "http://spaghettiphp.org/screencasts") ?>.</p>
+        <p>Se você precisar de ajuda, no Spaghetti* você tem onde procurar! Além da nossa <?php echo $this->html->link("documentação", "http://spaghettiphp.org/docs/developer-guide") ?>, você também pode contar com uma comunidade amigável em nosso <?php echo $this->html->link("fórum", "http://forum.spaghettiphp.org/") ?>, nossos <?php echo $this->html->link("tutoriais", "http://forum.spaghettiphp.org/tutorials") ?> ou nossos <?php echo $this->html->link("screencasts", "http://spaghettiphp.org/screencasts") ?>.</p>
     </div>
     <div>
         <h2>Componentes e Helpers</h2>
-        <p>É muito fácil estender sua aplicação usando funcionalidades já prontas do Spaghetti*, através de <?php echo $html->link("componentes e helpers", "http://spaghettiphp.org/downloads/components") ?> disponíveis. Basta copiá-los para suas respectivas pastas e importá-los, e estão prontos para usar!</p>
+        <p>É muito fácil estender sua aplicação usando funcionalidades já prontas do Spaghetti*, através de <?php echo $this->html->link("componentes e helpers", "http://spaghettiphp.org/downloads/components") ?> disponíveis. Basta copiá-los para suas respectivas pastas e importá-los, e estão prontos para usar!</p>
     </div>
     <hr class="clear" />
 </section>

@@ -1,91 +1,79 @@
 <?php
 
 class View extends Object {
-    public $autoLayout;
-    public $data = array();
-    public $helpers = array('Html');
-    public $loadedHelpers = null;
     public $layout;
-    public $pageTitle;
-    public $params = array();
-    
-    public function loadHelpers() {
-        $this->loadedHelpers = array();
-        foreach($this->helpers as $helper):
-            $class = $helper . 'Helper';
-            $helper = Inflector::underscore($helper);
-            $file = $helper . '_helper';
-            if(!class_exists($class)):
-                if(Loader::exists('Helper', $file)):
-                    require_once Loader::path('Helper', $file);
-                else:
-                    $this->error('missingHelper', array('helper' => $class));
-                    return false;
-                endif;
-            endif;
-            $this->loadedHelpers[$helper] = new $class($this);
-        endforeach;
-        return $this->loadedHelpers;
+    public $extension = 'htm';
+    public $contentForLayout;
+    public $scriptsForLayout;
+    public $stylesForLayout;
+    public $helpers = array('html', 'form', 'pagination');
+    protected $loadedHelpers = array();
+
+    public function __construct() {
+        $this->loadHelper($this->helpers);
     }
-    public function renderView($filename, $data = array()) {
-        if(is_null($this->loadedHelpers)):
-            $this->loadHelpers();
+    public function __get($name) {
+        if(!array_key_exists($name, $this->loadedHelpers)):
+            $this->loadHelper($name);
         endif;
-        extract($data, EXTR_OVERWRITE);
-        extract($this->loadedHelpers, EXTR_PREFIX_SAME, 'helper_');
-        ob_start();
-        require $filename;
-        $output = ob_get_clean();
-        return $output;
+        
+        return $this->loadedHelpers[$name];
     }
-    public function render($action = null, $layout = null) {
-        if(is_null($action)):
-            $controller = $this->params['controller'];
-            $action = $this->params['action'];
-            $ext = $this->params['extension'];
-            $layout = $this->layout;
+    public function loadHelper($helper) {
+        if(is_array($helper)):
+            return array_walk($helper, array($this, 'loadHelper'));
+        endif;
+        
+        $helper_class = Inflector::camelize($helper) . 'Helper';
+        require_once 'lib/helpers/' . $helper_class . '.php';
+        $this->loadedHelpers[$helper] = new $helper_class($this);
+    }
+    public function render($action, $data = array()) {
+        $filename = explode('.', $action);
+        $action = $filename[0];
+        if(array_key_exists(1, $filename)):
+            $extension = $filename[1];
         else:
-            $filename = explode('.', $action);
-            $controller = null;
-            $action = $filename[0];
-            $ext = $filename[1] ? $filename[1] : $this->params['extension'];
+            $extension = $this->extension;
         endif;
-        if(Loader::exists('View', $controller . '/' . $action . '.' . $ext)):
-            $file = Loader::path('View', $controller . '/' . $action . '.' . $ext);
-            $output = $this->renderView($file, $this->data);
-            $layout = is_null($layout) ? $this->layout : $layout;
-            if($this->autoLayout && $layout):
-                $output = $this->renderLayout($output, $layout, $ext);
+        $view_file = Loader::path('View', $action . '.' . $extension);
+        
+        if(file_exists($view_file)):
+            $output = $this->renderView($view_file, $data);
+            if($this->layout):
+                $output = $this->renderLayout($this->layout, $output, $data);
             endif;
             return $output;
         else:
             $this->error('missingView', array(
-                'controller' => $controller,
                 'view' => $action,
-                'extension' => $ext)
-            );
+                'extension' => $extension
+            ));
             return false;
         endif;
     }
-    public function renderLayout($content, $layout, $ext = null) {
-        if(is_null($ext)):
-            $ext = $this->params['extension'];
-        endif;
-        if(Loader::exists('Layout', $layout . '.' . $ext)):
-            $file = Loader::path('Layout', $layout . '.' . $ext);
+    public function renderLayout($layout, $content, $data) {
+        $layout_file = Loader::path('Layout', $layout . '.' . $this->extension);
+        if(file_exists($layout_file)):
             $this->contentForLayout = $content;
-            return $this->renderView($file, $this->data);
+            return $this->renderView($layout_file, $data);
         else:
             $this->error('missingLayout', array(
-                'layout' => $layout,
-                'extension' => $ext
+                'layout' => $layout
             ));
             return false;
         endif;        
     }
-    public function element($element, $params = array()) {
+    public function element($element, $data = array()) {
         $element = dirname($element) . '/_' . basename($element);
-        $ext = $this->params['extension'] ? $this->params['extension'] : Config::read('App.defaultExtension');
-        return $this->renderView(Loader::path('View', $element . '.' . $ext), $params);
+        $element_path = Loader::path('View', $element . '.' . $this->extension);
+        return $this->renderView($element_path, $data);
+    }
+    protected function renderView($filename, $data = array()) {
+        extract($data, EXTR_OVERWRITE);
+        ob_start();
+        require $filename;
+        $output = ob_get_clean();
+        return $output;
     }
 }

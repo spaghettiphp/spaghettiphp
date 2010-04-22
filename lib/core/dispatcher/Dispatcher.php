@@ -31,16 +31,17 @@ class Dispatcher extends Object {
         $controller->componentEvent('initialize');
         $controller->beforeFilter();
         $controller->componentEvent('startup');
+        
         if(in_array($path['action'], $controller->methods) && can_call_method($controller, $path['action'])):
             $params = $path['params'];
             if(!is_null($path['id'])) $params = array_merge(array($path['id']), $params);
             call_user_func_array(array(&$controller, $path['action']), $params);
         endif;
         if($controller->autoRender):
-            $controller->render();
+            $controller->beforeRender();
+            $output = $controller->render();
         endif;
         $controller->componentEvent('shutdown');
-        $output = $controller->output;
         $controller->afterFilter();
         return $output;
     }

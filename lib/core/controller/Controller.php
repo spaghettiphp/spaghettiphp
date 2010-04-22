@@ -1,18 +1,16 @@
 <?php
 
 class Controller extends Object {
-    public $autoLayout = true;
     public $autoRender = true;
     public $components = array();
-    public $helpers = array('Html', 'Form', 'Pagination');
     public $data = array();
     public $layout = 'default';
     public $name = null;
-    public $output = '';
     public $params = array();
     public $uses = null;
     public $view = array();
     public $methods = array();
+    public $viewClass = 'View';
 
     public function __construct() {
         if(is_null($this->name) && preg_match('/(.*)Controller/', get_class($this), $name)):
@@ -89,24 +87,20 @@ class Controller extends Object {
     public function setAction($action) {
         $this->params['action'] = $action;
         $args = func_get_args();
-        unset($args[0]);
+        array_shift($args);
         return call_user_func_array(array(&$this, $action), $args);
     }
-    public function render($action = null, $layout = null) {
-        $this->beforeRender();
-        $view = new View;
-        $view->autoLayout = $this->autoLayout;
-        $view->helpers = $this->helpers;
-        $view->params = $this->params;
+    public function render($action = null) {
+        $view = new $this->viewClass;
         $view->layout = $this->layout;
-        $view->data = $this->view;
+        
+        if(is_null($action)):
+            $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
+        endif;
+
         $this->autoRender = false;
 
-        return $this->output .= $view->render($action, $layout);
-    }
-    public function clear() {
-        $this->output = '';
-        return true;
+        return $view->render($action, $this->view);
     }
     public function redirect($url, $status = null, $exit = true) {
         $this->autoRender = false;
@@ -163,22 +157,25 @@ class Controller extends Object {
                 $this->set($key, $value);
             endforeach;
         elseif(!is_null($value)):
-            return $this->view[$var] = $value;
+            $this->view[$var] = $value;
         endif;
+        
         return $this;
     }
     public function get($var) {
         if(isset($this->view[$var])):
             return $this->view[$var];
         endif;
-        return false;
+        
+        return null;
     }
     public function param($key, $default = null) {
-        if(isset($this->params['named'][$key])):
+        if(array_key_exists($key, $this->params['named'])):
             return $this->params['named'][$key];
         elseif(in_array($key, array_keys($this->params))):
             return $this->params[$key];
         endif;
+        
         return $default;
     }
     public function page($param = 'page') {
