@@ -5,7 +5,7 @@ class ModelGenerator extends Generator {
         $args = func_get_args();
         $model = Inflector::underscore(array_shift($args));
         
-        $template_dir = SPAGHETTI_ROOT . '/lib/generators/model/templates';
+        $template_dir = 'lib/generators/model/templates';
         $model_template = $template_dir . '/model.php';
         $destination = 'app/models/' . $model . '.php';
         
