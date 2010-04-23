@@ -4,9 +4,9 @@ class Generator extends Object {
     public static function exists($type) {
         $type = Inflector::underscore($type);
         $class = Inflector::camelize($type) . 'Generator';
-        $path = SPAGHETTI_ROOT . '/lib/generators/' . $type;
+        $path = 'lib/generators/' . $type;
         $file = $path . '/' . $class . '.php';
-        if(file_exists($file)):
+        if(Filesystem::exists($file)):
             require_once $file;
             return $class;
         endif;
@@ -28,15 +28,13 @@ class Generator extends Object {
     }
     public static function printUsage($type) {
         $type = Inflector::underscore($type);
-        $usage_file = SPAGHETTI_ROOT . '/lib/generators/' . $type . '/USAGE';
-        echo file_get_contents($usage_file);
+        echo Filesystem::read('/lib/generators/' . $type . '/USAGE');
     }
     public function renderTemplate($source, $destination, $data = array()) {
-        $app_destination = SPAGHETTI_ROOT . '/' . $destination;
-        if(!file_exists($app_destination)):
+        if(!Filesystem::exists($destination)):
             $view = new View();
-            $content = $view->renderView($source, $data);
-            file_put_contents($app_destination, $content);
+            $content = $view->renderView(Filesystem::path($source), $data);
+            Filesystem::write($destination, $content);
 
             $this->log('created', $destination);
         else:
@@ -44,11 +42,10 @@ class Generator extends Object {
         endif;
     }
     public function createDir($destination) {
-        $path = SPAGHETTI_ROOT . '/' . $destination;
-        if(is_dir($path)):
+        if(Filesystem::isDir($destination)):
             $this->log('exists', $destination);
         else:
-            mkdir($path, 0644, true);
+            Filesystem::createDir($destination);
             $this->log('created', $destination);
         endif;
     }

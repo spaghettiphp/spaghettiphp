@@ -5,7 +5,7 @@ class ControllerGenerator extends Generator {
         $args = func_get_args();
         $controller = Inflector::underscore(array_shift($args));
         
-        $template_dir = SPAGHETTI_ROOT . '/lib/generators/controller/templates';
+        $template_dir = 'lib/generators/controller/templates';
         $controller_template = $template_dir . '/controller.php';
         $view_template = $template_dir . '/view.php';
         $destination = 'app/controllers/' . $controller . '_controller.php';

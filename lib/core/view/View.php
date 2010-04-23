@@ -68,7 +68,7 @@ class View extends Object {
         $element_path = Loader::path('View', $element . '.' . $this->extension);
         return $this->renderView($element_path, $data);
     }
-    protected function renderView($filename, $data = array()) {
+    public function renderView($filename, $data = array()) {
         extract($data, EXTR_OVERWRITE);
         ob_start();
         require $filename;

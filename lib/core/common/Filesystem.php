@@ -93,6 +93,9 @@ class Filesystem extends Object{
         endif;
         return false;
     }
+    public function isDir($path) {
+        return is_dir(self::path($path));
+    }
     public static function exists($file) {
         return file_exists(self::path($file));
     }
