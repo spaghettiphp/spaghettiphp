@@ -102,7 +102,11 @@ class Filesystem extends Object{
         return true;
     }
     public static function extension($file) {
-        return strtolower(end(explode('.', $file)));
+        $explode = explode('.', $file);
+        if(($count = count($arr)) > 1):
+            return strtolower($explode[$count - 1]);
+        endif;
+        return null;
     }
     public static function path($path, $absolute = true) {
         if(strpos($path, SPAGHETTI_ROOT) === 0):

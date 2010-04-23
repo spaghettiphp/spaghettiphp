@@ -1,7 +1,6 @@
 <?php
 
 class View extends Object {
-    public $extension = 'htm';
     public $contentForLayout;
     public $scriptsForLayout;
     public $stylesForLayout;
@@ -28,14 +27,7 @@ class View extends Object {
         $this->loadedHelpers[$helper] = new $helper_class($this);
     }
     public function render($action, $data = array(), $layout = false) {
-        $filename = explode('.', $action);
-        $action = $filename[0];
-        if(array_key_exists(1, $filename)):
-            $extension = $filename[1];
-        else:
-            $extension = $this->extension;
-        endif;
-        $view_file = Loader::path('View', $action . '.' . $extension);
+        $view_file = Loader::path('View', $this->filename($action));
         
         if(file_exists($view_file)):
             $output = $this->renderView($view_file, $data);
@@ -45,14 +37,14 @@ class View extends Object {
             return $output;
         else:
             $this->error('missingView', array(
-                'view' => $action,
-                'extension' => $extension
+                'view' => $action
             ));
             return false;
         endif;
     }
     public function renderLayout($layout, $content, $data) {
-        $layout_file = Loader::path('Layout', $layout . '.' . $this->extension);
+        $layout_file = Loader::path('Layout', $this->filename($layout));
+
         if(file_exists($layout_file)):
             $this->contentForLayout = $content;
             return $this->renderView($layout_file, $data);
@@ -64,15 +56,21 @@ class View extends Object {
         endif;        
     }
     public function element($element, $data = array()) {
-        $element = dirname($element) . '/_' . basename($element);
-        $element_path = Loader::path('View', $element . '.' . $this->extension);
+        $element = dirname($element) . '/_' . $this->filename(basename($element));
+        $element_path = Loader::path('View', $element);
         return $this->renderView($element_path, $data);
     }
-    protected function renderView($filename, $data = array()) {
-        extract($data, EXTR_OVERWRITE);
+    public function renderView($filename, $data = array()) {
+        extract($data);
         ob_start();
         require $filename;
-        $output = ob_get_clean();
-        return $output;
+        return ob_get_clean();
+    }
+    public function filename($filename) {
+        if(is_null(Filesystem::extension($filename))):
+            $filename .= '.htm';
+        endif;
+
+        return $filename;
     }
 }

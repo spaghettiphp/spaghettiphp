@@ -132,16 +132,8 @@
     <body>
         <header>
             <a href="http://spaghettiphp.org" id="logo">Spaghetti<span>*</span></a>
-            <?php if(Config::read("App.environment") == "development"): ?>
-            <a href="#" id="info" onclick="return Environment.toggle()">informações sobre o ambiente</a>
-            <?php endif ?>
         </header>
 
-        <?php if(Config::read("App.environment") == "development"): ?>
-        <section id="environment">
-            <?php echo $this->element("environment"); ?>
-        </section>
-        <?php endif ?>
         
         <section id="error">
             <?php echo $this->contentForLayout ?>
@@ -151,23 +143,5 @@
             <p>Obrigado por usar Spaghetti* :)</p>
         </footer>
 
-        <script type="text/javascript">
-            var Environment = {
-                container: document.getElementById("environment"),
-                link: document.getElementById("info"),
-                open: function() {
-                    this.container.style.display = "block"
-                    this.link.className = "on"
-                },
-                close: function() {
-                    this.container.style.display = "none"
-                    this.link.className = ""
-                },
-                toggle: function() {
-                    this.container.style.display == "block" ? this.close() : this.open()
-                    return false
-                }
-            }
-        </script>
     </body>
 </html>
