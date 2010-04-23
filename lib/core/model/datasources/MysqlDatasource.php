@@ -95,7 +95,7 @@ class MySqlDatasource extends PdoDatasource {
         endif;
         
         if(!empty($params['conditions'])):
-            $sql .= ' WHERE ' . $params['conditions'][0];
+            $sql .= ' WHERE ' . $params['conditions'];
         endif;
         
         if($params['groupBy']):

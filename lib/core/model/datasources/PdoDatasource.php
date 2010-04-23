@@ -1,5 +1,7 @@
 <?php
 
+require 'lib/core/model/QueryBuilder.php';
+
 class PdoDatasource extends Datasource {
     protected $affectedRows;
     protected $schema = array();
@@ -138,8 +140,11 @@ class PdoDatasource extends Datasource {
     }
     public function read($params) {
         $params += $this->params;
-        $values = $this->values($params['conditions']);
-        $sql = $this->renderSelect($params);
+        
+        $query = new QueryBuilder($this);
+        $sql = $query->buildQuery('select', $params);
+        $values = $query->values();
+
         $query = $this->query($sql, $values);
 
         $results = array();
