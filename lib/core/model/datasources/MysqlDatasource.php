@@ -9,7 +9,7 @@ class MySqlDatasource extends PdoDatasource {
     }
     public function listSources() {
         if(empty($this->sources)):
-            $query = $this->connection()->prepare('SHOW TABLES FROM ' . $this->config['database']);
+            $query = $this->connection->prepare('SHOW TABLES FROM ' . $this->config['database']);
             $query->setFetchMode(PDO::FETCH_NUM);
             $sources = $query->execute();
             while($source = $query->fetch()):
