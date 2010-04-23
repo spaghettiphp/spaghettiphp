@@ -1,6 +1,8 @@
 <?php
 
-class Image {
+require_once 'lib/core/filesystem/Filesystem.php';
+
+class ImageResize {
     protected $destiny = array(
         'constrain' => false,
         'height' => 0,
@@ -52,7 +54,7 @@ class Image {
         return $this->createImage($filename, $source, $destiny);
     }
     public function size($filename) {
-        $filename = SPAGHETTI_ROOT . '/public/' . $filename;
+        $filename = Filesystem::path('public/' . $filename);
         
         $size = getimagesize($filename);
         return array(
@@ -85,8 +87,8 @@ class Image {
         $output_type = $this->imageType($destiny['filename']);
         $output_function = 'image' . $output_type;
         
-        $filename = SPAGHETTI_ROOT . '/public/' . $filename;
-        $destiny['filename'] = SPAGHETTI_ROOT . '/public/' . $destiny['filename'];
+        $filename = Filesystem::path('public/' . $filename);
+        $destiny['filename'] = Filesystem('public/' . $destiny['filename']);
         
         $input = $input_function($filename);
         $output = imagecreatetruecolor($destiny['width'], $destiny['height']);

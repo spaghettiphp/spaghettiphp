@@ -1,46 +1,38 @@
 <?php
 
 class Controller extends Object {
-    public $autoLayout = true;
     public $autoRender = true;
     public $components = array();
-    public $helpers = array('Html', 'Form', 'Pagination');
     public $data = array();
     public $layout = 'default';
     public $name = null;
-    public $output = '';
     public $params = array();
     public $uses = null;
     public $view = array();
-    public $methods = array();
+    public $viewClass = 'View';
 
     public function __construct() {
-        if(is_null($this->name) && preg_match('/(.*)Controller/', get_class($this), $name)):
-            if($name[1] && $name[1] != 'App'):
-                $this->name = $name[1];
-            elseif(is_null($this->uses)):
+        if(is_null($this->name)):
+            $classname = get_class($this);
+            $lenght = strpos($classname, 'Controller');
+            $this->name = substr($classname, 0, $lenght);
+
+            if(is_null($this->uses) && $this->name != 'App'):
                 $this->uses = array();
             endif;
         endif;
+        
         if(is_null($this->uses)):
             $this->uses = array($this->name);
         endif;
         
-        $this->methods = $this->getMethods();
         $this->data = array_merge_recursive($_POST, $_FILES);
         $this->loadComponents();
         $this->loadModels();
     }
-    public function __get($class){
-        if(!isset($this->{$class})):
-            $pattern = '(^[A-Z]+([a-z]+(Component)?))';
-            if(preg_match($pattern, $class, $out)):
-                $type = (isset($out[2])) ? 'Component' : 'Model';
-                $this->{$class} = ClassRegistry::load($class, $type);
-                if($type == 'Component') $this->{$class}->initialize($this);
-                return $this->{$class};
-            endif;
-        endif;
+    public function isAction($action) {
+        $methods = $this->getMethods();
+        return in_array($action, $methods) && can_call_method($this, $action);
     }
     public function getMethods() {
         $child = get_class_methods($this);
@@ -89,24 +81,20 @@ class Controller extends Object {
     public function setAction($action) {
         $this->params['action'] = $action;
         $args = func_get_args();
-        unset($args[0]);
+        array_shift($args);
         return call_user_func_array(array(&$this, $action), $args);
     }
-    public function render($action = null, $layout = null) {
-        $this->beforeRender();
-        $view = new View;
-        $view->autoLayout = $this->autoLayout;
-        $view->helpers = $this->helpers;
-        $view->params = $this->params;
+    public function render($action = null) {
+        $view = new $this->viewClass;
         $view->layout = $this->layout;
-        $view->data = $this->view;
+        
+        if(is_null($action)):
+            $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
+        endif;
+
         $this->autoRender = false;
 
-        return $this->output .= $view->render($action, $layout);
-    }
-    public function clear() {
-        $this->output = '';
-        return true;
+        return $view->render($action, $this->view, $this->layout);
     }
     public function redirect($url, $status = null, $exit = true) {
         $this->autoRender = false;
@@ -163,22 +151,25 @@ class Controller extends Object {
                 $this->set($key, $value);
             endforeach;
         elseif(!is_null($value)):
-            return $this->view[$var] = $value;
+            $this->view[$var] = $value;
         endif;
+        
         return $this;
     }
     public function get($var) {
         if(isset($this->view[$var])):
             return $this->view[$var];
         endif;
-        return false;
+        
+        return null;
     }
     public function param($key, $default = null) {
-        if(isset($this->params['named'][$key])):
+        if(array_key_exists($key, $this->params['named'])):
             return $this->params['named'][$key];
         elseif(in_array($key, array_keys($this->params))):
             return $this->params[$key];
         endif;
+        
         return $default;
     }
     public function page($param = 'page') {
