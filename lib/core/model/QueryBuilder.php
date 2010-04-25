@@ -7,6 +7,9 @@ class QueryBuilder extends Object {
         '=', '<>', '!=', '<=', '<', '>=', '>', '<=>', 'LIKE', 'REGEXP',
         '\(\)', 'BETWEEN'
     );
+    protected static $logical = array(
+        'and', 'and not', 'or', 'or not', 'xor', 'not'
+    );
 
     public function __construct($connection) {
         $this->connection = $connection;
@@ -32,7 +35,7 @@ class QueryBuilder extends Object {
     public function values() {
         return $this->values;
     }
-    protected function evaluate($params) {
+    protected function evaluate($params, $logical = 'and') {
         $return = array(
             'values' => array(),
             'sql' => array()
@@ -41,18 +44,29 @@ class QueryBuilder extends Object {
         foreach($params as $k => $param):
             if(!is_numeric($k)):
                 list($field, $fn, $operator) = $this->field($k);
-                if(!is_array($param)):
+                if(in_array($k, self::$logical)):
+                    $result = $this->evaluate($param, $k);
+                    $return['sql'] []= '(' . $result['sql'] . ')';
+                    $return['values'] += $result['values'];
+                elseif(!is_array($param)):
                     $return['sql'] []= $field . ' '. $operator . ' ?';
                     $return['values'] []= $param;
                 else:
-                    $repeat = rtrim(str_repeat('?,', count($param)), ',');
-                    $return['sql'] []= $field . ' ' . $fn . '(' . $repeat . ')';
+                    if($fn == 'BETWEEN'):
+                        $return['sql'] []= $field . ' BETWEEN ? AND ?';
+                    else:
+                        $repeat = rtrim(str_repeat('?,', count($param)), ',');
+                        $return['sql'] []= $field . ' ' . $fn . '(' . $repeat . ')';
+                    endif;
                     $return['values'] += array_values($param);
                 endif;
+            else:
+                $return['sql'] []= $param;
             endif;
         endforeach;
         
-        $return['sql'] = implode(' AND ', $return['sql']);
+        $logical = ' ' . strtolower($logical) . ' ';
+        $return['sql'] = implode($logical, $return['sql']);
        
         return $return;
     }
