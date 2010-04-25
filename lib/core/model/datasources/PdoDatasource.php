@@ -1,5 +1,7 @@
 <?php
 
+require 'lib/core/model/QueryBuilder.php';
+
 class PdoDatasource extends Datasource {
     protected $affectedRows;
     protected $schema = array();
@@ -130,16 +132,21 @@ class PdoDatasource extends Datasource {
     }
     public function create($params) {
         $params += $this->params;
+        
         $values = array_values($params['values']);
         $sql = $this->renderInsert($params);
+        
         $query = $this->query($sql, $values);
         
         return $query;
     }
     public function read($params) {
         $params += $this->params;
-        $values = $this->values($params['conditions']);
-        $sql = $this->renderSelect($params);
+        
+        $query = new QueryBuilder($this);
+        $sql = $query->buildQuery('select', $params);
+        $values = $query->values();
+
         $query = $this->query($sql, $values);
 
         $results = array();
@@ -151,20 +158,23 @@ class PdoDatasource extends Datasource {
     }
     public function update($params) {
         $params += $this->params;
-        $values = array_merge(
-            array_values($params['values']),
-            $this->values($params['conditions'])
-        );
+
+        $query = new QueryBuilder($this);
+        $sql = $query->buildQuery('update', $params);
+
+        $values = array_values($params['values']) + $query->values();
         
-        $sql = $this->renderUpdate($params);
         $query = $this->query($sql, $values);
         
         return $query;
     }
     public function delete($params) {
         $params += $this->params;
-        $values = $this->values($params['conditions']);
-        $sql = $this->renderDelete($params);
+
+        $query = new QueryBuilder($this);
+        $sql = $query->buildQuery('delete', $params);
+        $values = $query->values();
+
         $query = $this->query($sql, $values);
         
         return $query;

@@ -41,8 +41,7 @@ class Model extends Object {
             $field = Inflector::underscore($match[2]);
             $params = array(
                 'conditions' => array(
-                    $field . ' = :field',
-                    ':field' => $condition[0]
+                    $field = $condition[0]
                 )
             );
             if(isset($condition[1])):
@@ -193,14 +192,12 @@ class Model extends Object {
                     $params = array();
                     if($type == 'belongsTo'):
                         $params['conditions'] = array(
-                            $this->primaryKey . ' = :id',
-                            ':id' => $result[$association['foreignKey']]
+                            $this->primaryKey => $result[$association['foreignKey']]
                         );
                         $params['recursion'] = $recursion - 1;
                     else:
                         $params['conditions'] += array(
-                            $association['foreignKey'] . ' = :fk',
-                            ':fk' => $result[$this->primaryKey]
+                            $association['foreignKey'] => $result[$this->primaryKey]
                         );
                         $params['recursion'] = $recursion - 2;
                         if($type == 'hasMany'):
@@ -263,8 +260,7 @@ class Model extends Object {
     public function exists($id) {
         $params = array(
             'conditions' => array(
-                $this->primaryKey . ' = :id',
-                ':id' => $id
+                $this->primaryKey => $id
             )
         );
         $row = $this->first($params);
@@ -311,8 +307,7 @@ class Model extends Object {
         if(!is_null($this->id) && $exists):
             $save = $this->update(array(
                 'conditions' => array(
-                    $this->primaryKey . ' = ?',
-                    $this->id
+                    $this->primaryKey => $this->id
                 ),
                 'limit' => 1
             ), $data);
@@ -381,8 +376,7 @@ class Model extends Object {
     public function delete($id, $dependent = true) {
         $params = array(
             'conditions' => array(
-                $this->primaryKey . '= :id',
-                ':id' => $id
+                $this->primaryKey => $id
             ),
             'limit' => 1
         );
@@ -399,8 +393,7 @@ class Model extends Object {
             foreach($this->{$type} as $model => $assoc):
                 $this->{$assoc['className']}->deleteAll(array(
                     'conditions' => array(
-                        $assoc['foreignKey'] . ' = ?',
-                        $id
+                        $assoc['foreignKey'] => $id
                     )
                 ));
             endforeach;
