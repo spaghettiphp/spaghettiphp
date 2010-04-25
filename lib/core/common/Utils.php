@@ -32,3 +32,10 @@ function array_range($min, $max) {
     endfor;
     return $result;
 }
+
+function is_hash($var) {
+    if(is_array($var)):
+        return array_keys($var) !== range(0, sizeof($var) - 1);
+    endif;
+    return false;
+}

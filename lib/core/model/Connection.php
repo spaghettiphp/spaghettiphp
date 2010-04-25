@@ -12,6 +12,7 @@ class Connection extends Object {
             $c = __CLASS__;
             self::$instance = new $c;
         endif;
+        
         return self::$instance;
     }
     public static function add($name, $connection = null) {
@@ -21,6 +22,10 @@ class Connection extends Object {
         else:
             $self->config[$name] = $connection;
         endif;
+    }
+    public static function getConfig($name) {
+        $self = self::instance();
+        return $self->config[$name];
     }
     public static function get($connection) {
         $self = self::instance();
@@ -40,6 +45,7 @@ class Connection extends Object {
         if(!class_exists($datasource)):
             require 'lib/core/model/datasources/' . $datasource . '.php';
         endif;
+        
         return new $datasource($config);
     }
 }
