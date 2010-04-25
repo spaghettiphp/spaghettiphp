@@ -17,7 +17,7 @@ class Controller extends Object {
             $lenght = strpos($classname, 'Controller');
             $this->name = substr($classname, 0, $lenght);
 
-            if(is_null($this->uses) && $this->name != 'App'):
+            if(is_null($this->uses) && $this->name == 'App'):
                 $this->uses = array();
             endif;
         endif;

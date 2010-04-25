@@ -15,7 +15,7 @@ class FormHelper extends Helper {
         return $this->html->openTag('form', $options);
     }
     public function close($submit = null, $attributes = array()) {
-        $form = $this->closeTag('form');
+        $form = $this->html->closeTag('form');
 
         if(!is_null($submit)):
             $form = $this->submit($submit, $attributes) . $form;

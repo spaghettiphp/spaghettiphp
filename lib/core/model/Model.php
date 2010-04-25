@@ -196,7 +196,7 @@ class Model extends Object {
                         );
                         $params['recursion'] = $recursion - 1;
                     else:
-                        $params['conditions'] += array(
+                        $params['conditions'] = array(
                             $association['foreignKey'] => $result[$this->primaryKey]
                         );
                         $params['recursion'] = $recursion - 2;
