@@ -21,14 +21,11 @@ class QueryBuilder extends Object {
         return $this->connection->$method($params);
     }
     public function extractValues(&$params) {
-        $iterate = array('conditions');
         $values = array();
         
-        foreach($iterate as $key):
-            $result = $this->evaluate($params[$key]);
-            $params[$key] = $result['sql'];
-            $values += $result['values'];
-        endforeach;
+        $result = $this->evaluate($params['conditions']);
+        $params['conditions'] = $result['sql'];
+        $values += $result['values'];
         
         return $values;
     }

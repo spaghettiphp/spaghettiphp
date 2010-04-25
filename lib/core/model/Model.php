@@ -307,8 +307,7 @@ class Model extends Object {
         if(!is_null($this->id) && $exists):
             $save = $this->update(array(
                 'conditions' => array(
-                    $this->primaryKey . ' = ?',
-                    $this->id
+                    $this->primaryKey => $this->id
                 ),
                 'limit' => 1
             ), $data);

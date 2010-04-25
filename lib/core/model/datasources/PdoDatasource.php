@@ -132,8 +132,10 @@ class PdoDatasource extends Datasource {
     }
     public function create($params) {
         $params += $this->params;
+        
         $values = array_values($params['values']);
         $sql = $this->renderInsert($params);
+        
         $query = $this->query($sql, $values);
         
         return $query;
@@ -156,20 +158,23 @@ class PdoDatasource extends Datasource {
     }
     public function update($params) {
         $params += $this->params;
-        $values = array_merge(
-            array_values($params['values']),
-            $this->values($params['conditions'])
-        );
+
+        $query = new QueryBuilder($this);
+        $sql = $query->buildQuery('update', $params);
+
+        $values = array_values($params['values']) + $query->values();
         
-        $sql = $this->renderUpdate($params);
         $query = $this->query($sql, $values);
         
         return $query;
     }
     public function delete($params) {
         $params += $this->params;
-        $values = $this->values($params['conditions']);
-        $sql = $this->renderDelete($params);
+
+        $query = new QueryBuilder($this);
+        $sql = $query->buildQuery('delete', $params);
+        $values = $query->values();
+
         $query = $this->query($sql, $values);
         
         return $query;

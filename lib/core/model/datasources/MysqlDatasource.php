@@ -128,7 +128,7 @@ class MySqlDatasource extends PdoDatasource {
         $sql .= join(', ', $update_fields);
 
         if(!empty($params['conditions'])):
-            $sql .= ' WHERE ' . $params['conditions'][0];
+            $sql .= ' WHERE ' . $params['conditions'];
         endif;
 
         if($params['order']):
@@ -145,7 +145,7 @@ class MySqlDatasource extends PdoDatasource {
         $sql = 'DELETE FROM ' . $this->alias($params['table']);
         
         if(!empty($params['conditions'])):
-            $sql .= ' WHERE ' . $params['conditions'][0];
+            $sql .= ' WHERE ' . $params['conditions'];
         endif;
 
         if($params['order']):
