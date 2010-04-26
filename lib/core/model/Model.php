@@ -53,12 +53,18 @@ class Model extends Object {
             return false;
         endif;
     }
+    /**
+     * @todo use static vars
+     */
     public function connection() {
         if(!$this->conn):
             $this->conn = Connection::get($this->connection);
         endif;
         return $this->conn;
     }
+    /**
+     * @todo refactor
+     */
     public function setSource($table) {
         $db = $this->connection();
         if($table):
@@ -74,6 +80,9 @@ class Model extends Object {
         endif;
         return true;
     }
+    /**
+     * @todo refactor
+     */
     public function describe() {
         $db = $this->connection();
         $schema = $db->describe($this->table);
@@ -234,6 +243,7 @@ class Model extends Object {
         );
         $page = !$params['page'] ? 1 : $params['page'];
         $offset = ($page - 1) * $params['perPage'];
+        // @todo do we really need limits and offsets together here?
         $params['limit'] = $offset . ',' . $params['perPage'];
 
         $totalRecords = $this->count($params);
@@ -247,6 +257,9 @@ class Model extends Object {
 
         return $this->all($params);
     }
+    /**
+     * @todo refactor. check for fields
+     */
     public function toList($params = array()) {
         $params += array(
             'key' => $this->primaryKey,
@@ -287,6 +300,9 @@ class Model extends Object {
         
         return $db->update($params);
     }
+    /**
+     * @todo refactor
+     */
     public function save($data) {
         if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
             $this->id = $data[$this->primaryKey];
@@ -323,6 +339,9 @@ class Model extends Object {
         $this->afterSave($created);
         return $save;
     }
+    /**
+     * @todo refactor
+     */
     public function validate($data) {
         $this->errors = array();
         $defaults = array(
@@ -356,6 +375,9 @@ class Model extends Object {
         endforeach;
         return empty($this->errors);
     }
+    /**
+     * @todo refactor
+     */
     public function callValidationMethod($params, $value) {
         $method = is_array($params) ? $params[0] : $params;
         $class = method_exists($this, $method) ? $this : 'Validation';
