@@ -96,9 +96,20 @@ class Filesystem extends Object{
     public static function exists($file) {
         return file_exists(self::path($file));
     }
-    //  @todo
     public static function hasPermission($file, $permission = array('execute', 'read', 'write')) {
         $file = self::path($file);
+        $functions = array(
+            'execute' => 'is_executable',
+            'read' => 'is_readable',
+            'write' => 'is_writeable',
+        );
+
+        foreach($permission as $action):
+            if(!$functions[$action]($file)):
+                return false;
+            endif;
+        endforeach;
+
         return true;
     }
     public static function extension($file) {
