@@ -123,6 +123,9 @@ class Model extends Object {
             if(!isset($association[$key])):
                 $data = null;
                 switch($key):
+                    case 'primaryKey':
+                        $data = $this->primaryKey;
+                        break;
                     case 'foreignKey':
                         if($type == 'belongsTo'):
                             $data = Inflector::underscore($association['className'] . 'Id');
@@ -192,12 +195,12 @@ class Model extends Object {
                     $params = array();
                     if($type == 'belongsTo'):
                         $params['conditions'] = array(
-                            $this->primaryKey => $result[$association['foreignKey']]
+                            $association["primaryKey"] => $result[$association['foreignKey']]
                         );
                         $params['recursion'] = $recursion - 1;
                     else:
                         $params['conditions'] = array(
-                            $association['foreignKey'] => $result[$this->primaryKey]
+                            $association['foreignKey'] => $result[$association["primaryKey"]]
                         );
                         $params['recursion'] = $recursion - 2;
                         if($type == 'hasMany'):
