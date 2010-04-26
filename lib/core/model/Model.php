@@ -23,6 +23,7 @@ class Model extends Object {
     );
     public $pagination = array();
     protected $conn;
+    protected static $instances = array();
 
     public function __construct() {
         if(!$this->connection):
@@ -33,7 +34,7 @@ class Model extends Object {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        ClassRegistry::addObject(get_class($this), $this);
+        Model::$instances[get_class($this)] = $this;
         $this->createLinks();
     }
     public function __call($method, $condition) {
@@ -97,15 +98,11 @@ class Model extends Object {
         return $this->schema = $schema;
     }
     public function loadModel($model) {
-        if(!isset($this->{$model})):
-            if($class =& ClassRegistry::load($model)):
-                $this->{$model} = $class;
-            else:
-                $this->error('missingModel', array('model' => $model));
-                return false;
-            endif;
+        // @todo check for errors here!
+        if(!array_key_exists($model, Model::$instances)):
+            Model::$instances[$model] = Loader::instance('Model', $model);
         endif;
-        return true;
+        $this->{$model} = Model::$instances[$model];
     }
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
@@ -121,7 +118,12 @@ class Model extends Object {
                 elseif(!isset($properties['className'])):
                     $associations[$key]['className'] = $key;
                 endif;
-                $this->loadModel($associations[$key]['className']);
+                
+                $model = $associations[$key]['className'];
+                if(!isset($this->{$model})):
+                    $this->loadModel($model);
+                endif;
+                
                 $associations[$key] = $this->generateAssociation($type, $associations[$key]);
             endforeach;
         endforeach;

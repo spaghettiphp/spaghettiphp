@@ -19,7 +19,6 @@ require 'lib/core/dispatcher/Mapper.php';
 
 require 'lib/core/model/Model.php';
 require 'lib/core/model/Connection.php';
-require 'lib/core/model/ClassRegistry.php';
 
 require 'lib/core/controller/Controller.php';
 require 'lib/core/controller/Component.php';

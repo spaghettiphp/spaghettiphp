@@ -62,10 +62,8 @@ class Controller extends Object {
     }
     public function loadModels() {
         foreach($this->uses as $model):
-            if(!$this->{$model} = ClassRegistry::load($model)):
-                $this->error('missingModel', array('model' => $model));
-                return false;
-            endif;
+            // @todo check for errors here!
+            $this->{$model} = Loader::instance('Model', $model);
         endforeach;
         return true;
     }
