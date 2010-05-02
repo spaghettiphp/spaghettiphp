@@ -164,7 +164,11 @@ class Http extends Object{
       */
     public static function get($url, $params = array()){
         $self = self::instance();
-        $url .= !empty($params) ? '?' . http_build_query($params) : '';
+
+        if(!empty($params)):
+            $url .= '?' . http_build_query($params);
+        endif;
+        
         return $self->request($url, 'GET');      
     }
     /**
@@ -178,8 +182,10 @@ class Http extends Object{
     public static function post($url, $params = null){
         $self = self::instance();
 
-        $self->curlOptions[CURLOPT_POSTFIELDS] = is_array($params) ?
-            http_build_query($params) : $params;
+        if(is_array($params)):
+            $params = http_build_query($params);
+        endif;
+        $self->curlOptions[CURLOPT_POSTFIELDS] = $params;
 
         return self::request($url, 'POST');
    }
@@ -195,8 +201,10 @@ class Http extends Object{
     public static function put($url, $params = null){
         $self = self::instance();
         
-        $self->curlOptions[CURLOPT_POSTFIELDS] = is_array($params) ?
-            http_build_query($params) : $params;
+        if(is_array($params)):
+            $params = http_build_query($params);
+        endif;
+        $self->curlOptions[CURLOPT_POSTFIELDS] = $params;
             
         return self::request($url, 'PUT');
     }
@@ -210,7 +218,9 @@ class Http extends Object{
       *   @param array  $parrams Os parâmetros
       */
     public static function delete($url, $params = array()){
-        $url .= !empty($params) ? '?' . http_build_query($params) : '';
+        if(!empty($params)):
+            $url .= '?' . http_build_query($params);
+        endif;
         return self::request($url, 'DELETE');
     }
 
