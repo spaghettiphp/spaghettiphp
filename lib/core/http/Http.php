@@ -19,26 +19,26 @@
   *
   *  
   */
-class Http extends Object{
+class Http extends Object {
     /*
      *  Lista de retornos possíveis.
      *  Alguns servidores verificam esse cabeçalho para decidir qual o formato que os da-
      *  dos serão retornados
      */
     public $accept = array(
-        'atom'=> 'application/atom+xml',
+        'atom' => 'application/atom+xml',
         'css' => 'text/css',
         'csv' => 'text/csv',
         'gif' => 'image/gif',
-        'html'=> 'text/html',
+        'html' => 'text/html',
         'jpg' => 'image/jpeg',
         'js'  => 'application/javascript',
-        'json'=> 'application/json',
+        'json' => 'application/json',
         'pdf' => 'application/pdf',
         'png' => 'image/png',
         'rss' => 'application/rss+xml',
         'txt' => 'text/plain',
-        'yaml'=> 'text/yaml',
+        'yaml' => 'text/yaml',
         'xml' => 'application/xml',
     );
     
@@ -97,7 +97,7 @@ class Http extends Object{
      *   @param string $password A senha do usuário
      *   @return void
      */
-   public static function auth($user, $password = null, $basic = true){
+   public static function auth($user, $password = null, $basic = true) {
       $self = self::instance();
 
       if($user === false):
@@ -108,9 +108,13 @@ class Http extends Object{
       $self->user = $user;
       $self->password = $password;
       //Definindo o tipo da autenticação
-      $self->curlOptions[CURLOPT_HTTPAUTH] = ($basic) ? CURLAUTH_BASIC : CURLAUTH_DIGEST;
+      if($basic):
+          $self->curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+      else:
+          $self->curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_DIGEST;
+      endif;
       //Criando usuário e senha no formato do curl
-      $self->curlOptions[CURLOPT_USERPWD] = $self->user .':'. $self->password;
+      $self->curlOptions[CURLOPT_USERPWD] = $self->user . ':' . $self->password;
    }
    
    /**
@@ -120,7 +124,7 @@ class Http extends Object{
      *   @param string $method O tipo de requisição. Ex.: POST, GET, etc
      *   @return mixed O resultado da requisição
      */
-    public static function request($url, $method){
+    public static function request($url, $method) {
         $self = self::instance();
         //Tipos de requisições e seus correspondentes no cURL
         $methods = array(
@@ -142,7 +146,7 @@ class Http extends Object{
     curl_setopt_array($ch, $self->curlOptions);
     //Executa
     $self->result = curl_exec($ch);
-    //Pega o código dee cabeçalho retornado
+    //Pega o código de cabeçalho retornado
     $self->statusCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     //Tipo do conteúdo retornado.
     $self->contentType= curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -162,7 +166,7 @@ class Http extends Object{
       *      aqui infomados serão colocados na query string
       *   @return mixed  Os dados retornados pelo servidor
       */
-    public static function get($url, $params = array()){
+    public static function get($url, $params = array()) {
         $self = self::instance();
 
         if(!empty($params)):
@@ -179,7 +183,7 @@ class Http extends Object{
       *     array associativo, ou no formato de querystring.
       *   @return mixed  Os dados retornados pelo servidor
       */
-    public static function post($url, $params = null){
+    public static function post($url, $params = null) {
         $self = self::instance();
 
         if(is_array($params)):
@@ -198,7 +202,7 @@ class Http extends Object{
       *     array associativo, ou no formato de querystring.
       *   @return mixed  Os dados retornados pelo servidor
       */
-    public static function put($url, $params = null){
+    public static function put($url, $params = null) {
         $self = self::instance();
         
         if(is_array($params)):
@@ -217,7 +221,7 @@ class Http extends Object{
       *   @param string $url A url do servidor
       *   @param array  $parrams Os parâmetros
       */
-    public static function delete($url, $params = array()){
+    public static function delete($url, $params = array()) {
         if(!empty($params)):
             $url .= '?' . http_build_query($params);
         endif;
@@ -233,7 +237,7 @@ class Http extends Object{
       *     um cabeçalho mime-type no formato "application/json".
       * @return string $accept
       */
-    public static function accept($accept){
+    public static function accept($accept) {
         $self = self::instance();
         if(array_key_exists($accept, $self->accept)):
             $accept = $self->accept[$accept];
@@ -268,9 +272,9 @@ class Http extends Object{
       * 
       * @return bool
       */
-    public static function isSuccess(){
+    public static function isSuccess() {
         $self = self::instance();
-        return ($self->statusCode>=200 && $self->statusCode<300);
+        return ($self->statusCode >= 200 && $self->statusCode < 300);
     }
 
     /**
@@ -278,7 +282,7 @@ class Http extends Object{
       * 
       * @return int
       */
-    public static function getStatusCode(){
+    public static function getStatusCode() {
         $self = self::instance();
         return $self->statusCode;
     }
@@ -288,7 +292,7 @@ class Http extends Object{
       * 
       * @return string Tipo do retorno, no formato "application/json; charset=utf8"
       */
-    public static function getContentType(){
+    public static function getContentType() {
         $self = self::instance();
         return $self->contentType;
     }
@@ -298,7 +302,7 @@ class Http extends Object{
       * 
       * @return array contendo as informações sobre a requisição
       */
-    public static function getInfo(){
+    public static function getInfo() {
         $self = self::instance();
         return $self->info;
     }
@@ -308,7 +312,7 @@ class Http extends Object{
       *
       * @param array $options    As opções que serão adicionadas às existentes.
       */
-     public static function options($options = array()){
+     public static function options($options = array()) {
         $self = self::instance();
         $self->curlOptions = array_merge($self->curlOptions, $options);
         return $self->curlOptions;
@@ -319,7 +323,7 @@ class Http extends Object{
       *
       * @return void
       */
-    public static function clear(){
+    public static function clear() {
         $self = self::instance();
         $self->curlOptions = array();
         $self->accept = null;
