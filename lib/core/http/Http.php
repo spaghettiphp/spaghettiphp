@@ -1,7 +1,7 @@
 <?php
 /**
   * Classe de requisições HTTP
-  * @version 0.05 - 07/04/2010
+  * @version 0.06 - 02/05/2010
   *
   *  Exemplos de uso:
   *    - Postando no Twitter
@@ -225,7 +225,9 @@ class Http extends Object{
       */
     public static function accept($accept){
         $self = self::instance();
-        $accept = in_array($accept, $self->accept) ? $self->accept[$accept] : $accept;
+        if(array_key_exists($accept, $self->accept)):
+            $accept = $self->accept[$accept];
+        endif;
         $self->curlOptions[CURLOPT_HTTPHEADER][] = "Accept: {$accept}";
         return $self->accept;
     }
