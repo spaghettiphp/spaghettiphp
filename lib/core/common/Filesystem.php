@@ -50,6 +50,9 @@ class Filesystem extends Object{
         endif;
         return false;
     }
+    public function isDir($path) {
+        return is_dir(self::path($path));
+    }
     public static function isUploaded($file) {
         return is_uploaded_file(self::path($file));
     }
@@ -59,7 +62,7 @@ class Filesystem extends Object{
         endif;
         $file = self::path($file);
         
-        if(!is_dir($file)):
+        if(!self::isDir($file)):
             return unlink($file);
         else:
             $dir = rtrim($file, DIRECTORY_SEPARATOR) . '/';
