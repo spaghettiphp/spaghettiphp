@@ -175,4 +175,10 @@ class Controller extends Object {
     public function page($param = 'page') {
         return $this->param($param, 1);
     }
+    public function isXhr() {
+        if(array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)):
+            return $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+        endif;
+        return false;
+    }
 }
