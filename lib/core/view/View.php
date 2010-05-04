@@ -6,6 +6,7 @@ class View extends Object {
     public $scriptsForLayout;
     public $stylesForLayout;
     public $helpers = array('html', 'form');
+    public $controller;
     protected $loadedHelpers = array();
     protected $blocks = array();
     protected $lastBlock;

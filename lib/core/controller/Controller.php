@@ -87,6 +87,7 @@ class Controller extends Object {
     public function render($action = null) {
         $view = new $this->viewClass;
         $view->layout = $this->layout;
+        $view->controller = $this;
         
         if(is_null($action)):
             $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
