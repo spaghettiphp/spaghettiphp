@@ -43,7 +43,7 @@ class QueryBuilder extends Object {
                 if(in_array($k, self::$logical)):
                     $result = $this->evaluate($param, $k);
                     $return['sql'] []= '(' . $result['sql'] . ')';
-                    $return['values'] += $result['values'];
+                    $return['values'] = array_merge($return['values'], $result['values']);
                 elseif(!is_array($param)):
                     $return['sql'] []= $field . ' '. $operator . ' ?';
                     $return['values'] []= $param;
@@ -61,7 +61,7 @@ class QueryBuilder extends Object {
             endif;
         endforeach;
         
-        $logical = ' ' . strtolower($logical) . ' ';
+        $logical = ' ' . strtoupper($logical) . ' ';
         $return['sql'] = implode($logical, $return['sql']);
        
         return $return;
