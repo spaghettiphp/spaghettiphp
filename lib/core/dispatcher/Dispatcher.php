@@ -36,7 +36,7 @@ class Dispatcher extends Object {
         if($controller->isAction($path['action'])):
             $params = $path['params'];
             if(!is_null($path['id'])):
-                $params = array_unshift($path['id']);
+                array_unshift($params, $path['id']);
             endif;
             call_user_func_array(array(&$controller, $path['action']), $params);
         endif;
