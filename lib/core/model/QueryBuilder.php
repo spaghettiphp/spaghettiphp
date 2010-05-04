@@ -37,7 +37,6 @@ class QueryBuilder extends Object {
             'values' => array(),
             'sql' => array()
         );
-        
         foreach($params as $k => $param):
             if(!is_numeric($k)):
                 list($field, $fn, $operator) = $this->field($k);
@@ -68,10 +67,10 @@ class QueryBuilder extends Object {
         return $return;
     }
     protected function field($field) {
-        $regex = '/^([\w_]+)\s?(\w+)?(' . join('|', self::$operators) . ')?$/';
+        $regex = '/^([\w_]+)\s?(\w*?)?(' . join('|', self::$operators) . ')?$/';
         preg_match($regex, $field, $result);
         array_shift($result);
-        if(empty($result[2])):
+        if(!isset($result[2])):
             $result[2] = '=';
         endif;
         
