@@ -11,13 +11,13 @@ class ClassRegistry {
         endif;
         return self::$instance;
     }
-    public static function load($class, $type = 'Model') {
+    public static function load($class) {
         $self = self::instance();
         if($object = $self->duplicate($class, $class)):
             return $object;
         elseif(!class_exists($class)):
-            if(Loader::exists($type, Inflector::underscore($class))):
-                require_once Loader::path($type, $class);
+            if(Loader::exists('Model', Inflector::underscore($class))):
+                require_once Loader::path('Model', $class);
             endif;
         endif;
         if(class_exists($class)):

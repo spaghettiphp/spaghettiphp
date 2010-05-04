@@ -1,7 +1,6 @@
 <?php
 
 define('SPAGHETTI_ROOT', dirname(dirname(__FILE__)));
-define('SPAGHETTI_APP', SPAGHETTI_ROOT . '/app');
 
 set_include_path(SPAGHETTI_ROOT . PATH_SEPARATOR . get_include_path());
 

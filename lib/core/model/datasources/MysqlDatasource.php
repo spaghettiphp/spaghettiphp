@@ -1,69 +1,41 @@
 <?php
 
-class MySqlDatasource extends Datasource {
-    protected $schema = array();
-    protected $sources = array();
-    protected $connection;
-    protected $results;
-    protected $transactionStarted = false;
-    protected $comparison = array('=', '<>', '!=', '<=', '<', '>=', '>', '<=>', 'LIKE', 'REGEXP');
-    protected $logic = array('or', 'or not', '||', 'xor', 'and', 'and not', '&&', 'not');
-    public $connected = false;
+require_once 'lib/core/model/datasources/PdoDatasource.php';
 
-    public function connect() {
-        $this->connection = @mysql_connect($this->config['host'], $this->config['user'], $this->config['password']);
-        if(@mysql_select_db($this->config['database'], $this->connection)):
-            $this->connected = true;
-        else:
-            $this->error('connectionError');
-        endif;
-        return $this->connection;
+class MySqlDatasource extends PdoDatasource {
+    // @todo add missing DSN elements
+    public function dsn() {
+        return 'mysql:host=' . $this->config['host'] . ';dbname=' . $this->config['database'];
     }
-    public function disconnect() {
-        if(mysql_close($this->connection)):
-            $this->connected = false;
-            $this->connection = null;
-        endif;
-        return !$this->connected;
-    }
-    public function &getConnection() {
-        if(!$this->connected):
-            $this->connect();
-        endif;
-        return $this->connection;
-    }
-    public function query($sql = null) {
-        $this->results = mysql_query($sql, $this->getConnection());
-        return $this->results;
-    }
-    public function fetch($sql = null) {
-        if(!is_null($sql) && !$this->query($sql)):
-            return false;
-        elseif($this->hasResult()):
-            return $this->fetchRow();
-        else:
-            return null;
-        endif;
-    }
-    public function fetchAll($sql = null) {
-        if(!is_null($sql) && !$this->query($sql)):
-            return false;
-        elseif($this->hasResult()):
-            $results = array();
-            while($result = $this->fetch()):
-                $results []= $result;
+    public function listSources() {
+        if(empty($this->sources)):
+            $query = $this->connection->prepare('SHOW TABLES FROM ' . $this->config['database']);
+            $query->setFetchMode(PDO::FETCH_NUM);
+            $sources = $query->execute();
+            while($source = $query->fetch()):
+                $this->sources []= $source[0];
             endwhile;
-            return $results;
-        else:
-            return null;
         endif;
+        
+        return $this->sources;
     }
-    public function fetchRow($results = null) {
-        $results = is_null($results) ? $this->results : $results;
-        return mysql_fetch_assoc($results);
-    }
-    public function hasResult() {
-        return is_resource($this->results);
+    public function describe($table) {
+        if(!isset($this->schema[$table])):
+            $columns = $this->fetchAll('SHOW COLUMNS FROM ' . $table);
+            $schema = array();
+            foreach($columns as $column):
+                $schema[$column['Field']] = array(
+                    'type' => $this->column($column['Type']),
+                    'null' => $column['Null'] == 'YES' ? true : false,
+                    'default' => $column['Default'],
+                    'key' => $column['Key'],
+                    'extra' => $column['Extra']
+                );
+            endforeach;
+            $this->schema[$table] = $schema;
+        endif;
+        
+        return $this->schema[$table];
     }
     public function column($column) {
         preg_match('/([a-z]*)\(?([^\)]*)?\)?/', $column, $type);
@@ -86,189 +58,104 @@ class MySqlDatasource extends Datasource {
             return $type . '(' . $limit . ')';
         endif;
     }
-    public function listSources() {
-        if(empty($this->sources)):
-            $sources = $this->query('SHOW TABLES FROM ' . $this->config['database']);
-            while($source = mysql_fetch_array($sources)):
-                $this->sources []= $source[0];
-            endwhile;
+    public function limit($offset, $limit) {
+        if(!is_null($offset)):
+            $limit = $offset . ',' . $limit;
         endif;
-        return $this->sources;
+        
+        return $limit;
     }
-    public function describe($table) {
-        if(!isset($this->schema[$table])):
-            if(!$this->query('SHOW COLUMNS FROM ' . $table)) return false;
-            $columns = $this->fetchAll();
-            $schema = array();
-            foreach($columns as $column):
-                $schema[$column['Field']] = array(
-                    'type' => $this->column($column['Type']),
-                    'null' => $column['Null'] == 'YES' ? true : false,
-                    'default' => $column['Default'],
-                    'key' => $column['Key'],
-                    'extra' => $column['Extra']
-                );
-            endforeach;
-            $this->schema[$table] = $schema;
-        endif;
-        return $this->schema[$table];
-    }
-    public function begin() {
-        return $this->transactionStarted = $this->query('START TRANSACTION');
-    }
-    public function commit() {
-        $this->transactionStarted = !$this->query('COMMIT');
-        return !$this->transactionStarted;
-    }
-    public function rollback() {
-        $this->transactionStarted = !$this->query('ROLLBACK');
-        return !$this->transactionStarted;
-    }
-    public function create($table = null, $data = array()) {
-        $insertFields = $insertValues = array();
-        $schema = $this->describe($table);
-        foreach($data as $field => $value):
-            $column = isset($schema[$field]) ? $schema[$field]['type'] : null;
-            $insertFields []= $field;
-            $insertValues []= $this->value($value, $column);
-        endforeach;
-        $query = $this->renderSql('insert', array(
-            'table' => $table,
-            'fields' => join(',', $insertFields),
-            'values' => join(',', $insertValues)
-        ));
-        return $this->query($query);
-    }
-    public function read($table = null, $params = array()) {
-        $query = $this->renderSql('select', array(
-            'table' => $table,
-            'fields' => is_array($f = $params['fields']) ? join(',', $f) : $f,
-            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
-            'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
-            'groupBy' => !isset($params['groupBy']) ? '' : 'GROUP BY ' . $params['groupBy'],
-            'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit']
-        ));
-        return $this->fetchAll($query);
-    }
-    public function update($table = null, $params = array()) {
-        $updateValues = array();
-        $schema = $this->describe($table);
-        foreach($params['data'] as $field => $value):
-            $column = isset($schema[$field]) ? $schema[$field]['type'] : null;
-            $updateValues []= $field . '=' . $this->value($value, $column);
-        endforeach;
-        $query = $this->renderSql('update', array(
-            'table' => $table,
-            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
-            'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
-            'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit'],
-            'values' => join(',', $updateValues)
-        ));
-        return $this->query($query);
-    }
-    public function delete($table = null, $params = array()) {
-        $query = $this->renderSql('delete', array(
-            'table' => $table,
-            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
-            'order' => is_null($params['order']) ? '' : 'ORDER BY ' . $params['order'],
-            'limit' => is_null($params['limit']) ? '' : 'LIMIT ' . $params['limit']
-        ));
-        return $this->query($query);
-    }
-    public function count($table = null, $params) {
-        $query = $this->renderSql('select', array(
-            'table' => $table,
-            'conditions' => ($c = $this->sqlConditions($table, $params['conditions'])) ? 'WHERE ' . $c : '',
-            'fields' => 'COUNT(' . (is_array($f = $params['fields']) ? join(',', $f) : $f) . ') AS count'
-        ));
-        $results = $this->fetchAll($query);
+    public function count($params) {
+        $params['fields'] = array(
+            'count' => 'COUNT(' . $this->alias($params['fields']) . ')'
+        );
+        $results = $this->read($params);
+        
         return $results[0]['count'];
     }
-    public function renderSql($type, $data = array()) {
-        switch($type):
-            case 'select':
-                return "SELECT {$data['fields']} FROM {$data['table']} {$data['conditions']} {$data['groupBy']} {$data['order']} {$data['limit']}";
-            case 'delete':
-                return "DELETE FROM {$data['table']} {$data['conditions']} {$data['order']} {$data['limit']}";
-            case 'insert':
-                return "INSERT INTO {$data['table']}({$data['fields']}) VALUES({$data['values']})";
-            case 'update':
-                return "UPDATE {$data['table']} SET {$data['values']} {$data['conditions']} {$data['order']} {$data['limit']}";
-        endswitch;
-    }
-    public function value($value, $column = null) {
-        switch($column):
-            case 'boolean':
-                if($value === true):
-                    return '1';
-                elseif($value === false):
-                    return '0';
-                else:
-                    return !empty($value) ? '1' : '0';
-                endif;
-            case 'integer':
-            case 'float':
-                if($value === '' or is_null($value)):
-                    return 'NULL';
-                elseif(is_numeric($value)):
-                    return $value;
-                endif;
-            default:
-                if(is_null($value)):
-                    return 'NULL';
-                endif;
-                return '\'' . mysql_real_escape_string($value, $this->connection) . '\'';
-        endswitch;
-    }
-    public function sqlConditions($table, $conditions, $logical = 'AND') {
-        if(is_array($conditions)):
-            $sql = array();
-            foreach($conditions as $key => $value):
-                if(is_numeric($key)):
-                    if(is_string($value)):
-                        $sql []= $value;
-                    else:
-                        $sql []= '(' . $this->sqlConditions($table, $value) . ')';
-                    endif;
-                else:
-                    if(in_array($key, $this->logic)):
-                        $sql []= '(' . $this->sqlConditions($table, $value, strtoupper($key)) . ')';
-                    elseif(is_array($value)):
-                        foreach($value as $k => $v):
-                            $value[$k] = $this->value($v, null);
-                        endforeach;
-                        if(preg_match('/([\w_]+) (BETWEEN)/', $key, $regex)):
-                            $condition = $regex[1] . ' BETWEEN ' . join(' AND ', $value);
-                        else:
-                            $condition = $key . ' IN (' . join(',', $value) . ')';
-                        endif;
-                        $sql []= $condition;
-                    else:
-                        $comparison = '=';
-                        if(preg_match('/([\w_]+) (' . join('|', $this->comparison) . ')/', $key, $regex)):
-                            list($regex, $key, $comparison) = $regex;
-                        endif;
-                        $value = $this->value($value, $this->fieldType($table, $key));
-                        $sql []= $key . ' ' . $comparison . ' ' . $value;
-                    endif;
-                endif;
-            endforeach;
-            $sql = join(' ' . $logical . ' ', $sql);
-        else:
-            $sql = $conditions;
-        endif;
+    public function renderInsert($params) {
+        $sql = 'INSERT INTO ' . $params['table'];
+        
+        $fields = array_keys($params['values']);
+        $sql .= '(' . join(',', $fields) . ')';
+        
+        $values = rtrim(str_repeat('?,', count($fields)), ',');
+        $sql .= ' VALUES(' . $values . ')';
+        
         return $sql;
     }
-    public function fieldType($table, $field) {
-        if(isset($this->schema[$table]) && isset($this->schema[$table][$field])):
-            return $this->schema[$table][$field]['type'];
+    public function renderSelect($params) {
+        $sql = 'SELECT ' . $this->alias($params['fields']);
+        $sql .= ' FROM ' . $this->alias($params['table']);
+        
+        if(!empty($params['joins'])):
+            foreach($params['joins'] as $join):
+                $sql .= ' ' . $this->join($join);
+            endforeach;
         endif;
-        return null;
+        
+        if(!empty($params['conditions'])):
+            $sql .= ' WHERE ' . $params['conditions'];
+        endif;
+        
+        if($params['groupBy']):
+            $sql .= ' GROUP BY ' . $this->alias($params['groupBy']);
+        endif;
+        
+        if($params['having']):
+            $sql .= ' HAVING ' . $params['having'];
+        endif;
+
+        if($params['order']):
+            $sql .= ' ORDER BY ' . $this->order($params['order']);
+        endif;
+        
+        if($params['offset'] || $params['limit']):
+            $sql .= ' LIMIT ' . $this->limit($params['offset'], $params['limit']);
+        endif;
+
+        return $sql;
     }
-    public function getInsertId() {
-        return mysql_insert_id($this->getConnection());
+    public function renderUpdate($params) {
+        $params += $this->params;
+        $sql = 'UPDATE ' . $this->alias($params['table']) . ' SET ';
+        
+        $fields = array_keys($params['values']);
+        $update_fields = array();
+        foreach($fields as $field):
+            $update_fields []= $field . ' = ?';
+        endforeach;
+        $sql .= join(', ', $update_fields);
+
+        if(!empty($params['conditions'])):
+            $sql .= ' WHERE ' . $params['conditions'];
+        endif;
+
+        if($params['order']):
+            $sql .= ' ORDER BY ' . $this->order($params['order']);
+        endif;
+        
+        if($params['offset'] || $params['limit']):
+            $sql .= ' LIMIT ' . $this->limit($params['offset'], $params['limit']);
+        endif;
+        
+        return $sql;
     }
-    public function getAffectedRows() {
-        return mysql_affected_rows($this->getConnection());
+    public function renderDelete($params) {
+        $sql = 'DELETE FROM ' . $this->alias($params['table']);
+        
+        if(!empty($params['conditions'])):
+            $sql .= ' WHERE ' . $params['conditions'];
+        endif;
+
+        if($params['order']):
+            $sql .= ' ORDER BY ' . $this->order($params['order']);
+        endif;
+        
+        if($params['offset'] || $params['limit']):
+            $sql .= ' LIMIT ' . $this->limit($params['offset'], $params['limit']);
+        endif;
+        
+        return $sql;
     }
 }

@@ -50,6 +50,9 @@ class Filesystem extends Object{
         endif;
         return false;
     }
+    public function isDir($path) {
+        return is_dir(self::path($path));
+    }
     public static function isUploaded($file) {
         return is_uploaded_file(self::path($file));
     }
@@ -59,7 +62,7 @@ class Filesystem extends Object{
         endif;
         $file = self::path($file);
         
-        if(!is_dir($file)):
+        if(!self::isDir($file)):
             return unlink($file);
         else:
             $dir = rtrim($file, DIRECTORY_SEPARATOR) . '/';
@@ -99,13 +102,28 @@ class Filesystem extends Object{
     public static function exists($file) {
         return file_exists(self::path($file));
     }
-    //  @todo
     public static function hasPermission($file, $permission = array('execute', 'read', 'write')) {
         $file = self::path($file);
+        $functions = array(
+            'execute' => 'is_executable',
+            'read' => 'is_readable',
+            'write' => 'is_writeable',
+        );
+
+        foreach($permission as $action):
+            if(!$functions[$action]($file)):
+                return false;
+            endif;
+        endforeach;
+
         return true;
     }
     public static function extension($file) {
-        return strtolower(end(explode('.', $file)));
+        $explode = explode('.', $file);
+        if(($count = count($arr)) > 1):
+            return strtolower($explode[$count - 1]);
+        endif;
+        return null;
     }
     public static function path($path, $absolute = true) {
         if(strpos($path, SPAGHETTI_ROOT) === 0):
