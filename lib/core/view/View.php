@@ -7,6 +7,8 @@ class View extends Object {
     public $stylesForLayout;
     public $helpers = array('html', 'form');
     protected $loadedHelpers = array();
+    protected $blocks = array();
+    protected $lastBlock;
 
     public function __construct() {
         $this->loadHelper($this->helpers);
@@ -74,5 +76,17 @@ class View extends Object {
         require $filename;
         $output = ob_get_clean();
         return $output;
+    }
+    
+    // @todo under testing
+    public function startBlock($name) {
+        $this->lastBlock = $name;
+        ob_start();
+    }
+    public function endBlock() {
+        return $this->blocks[$this->lastBlock] = ob_get_clean();
+    }
+    public function block($name) {
+        return $this->blocks[$name];
     }
 }
