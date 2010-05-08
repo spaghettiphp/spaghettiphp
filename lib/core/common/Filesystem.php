@@ -127,14 +127,14 @@ class Filesystem extends Object{
         endif;
         return null;
     }
-    public static function path($path, $absolute = true) {
+    public static function path($path, $returnAbsolute = true) {
          if(strpos($path, SPAGHETTI_ROOT) === false && !preg_match('(^[a-z]+:)i', $path, $out)):
             if($returnAbsolute):
                 $path = SPAGHETTI_ROOT . '/' . $path;
             endif;
         endif;
-        $pattern = '(([^:])[/\\\]+|\\\)'; // v.4.3    
 
+        $pattern = '(([^:])[/\\\]+|\\\)'; // v.4.3    
         return preg_replace($pattern, '$1/', $path);
     }
 }
