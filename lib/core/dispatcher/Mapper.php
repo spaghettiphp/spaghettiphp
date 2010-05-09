@@ -42,7 +42,7 @@ class Mapper extends Object {
         return $self->domain;
     }
     public static function normalize($url) {
-        if(!preg_match('/^[a-z]+:/', $url)):
+        if(!preg_match('/^[a-z]+:/i', $url)):
             $url = '/' . $url;
             while(strpos($url, '//') !== false):
                 $url = str_replace('//', '/', $url);
