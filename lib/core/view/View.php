@@ -1,6 +1,7 @@
 <?php
 
 class View extends Object {
+    public $pageTitle = '';
     public $contentForLayout;
     public $scriptsForLayout;
     public $stylesForLayout;
