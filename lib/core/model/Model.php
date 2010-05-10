@@ -41,7 +41,7 @@ class Model extends Object {
             $field = Inflector::underscore($match[2]);
             $params = array(
                 'conditions' => array(
-                    $field = $condition[0]
+                    $field => $condition[0]
                 )
             );
             if(isset($condition[1])):
