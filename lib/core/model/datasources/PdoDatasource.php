@@ -111,7 +111,6 @@ class PdoDatasource extends Datasource {
     }
     public function query($sql, $values = array()) {
         $this->lastQuery = $sql;
-
         $query = $this->connection->prepare($sql);
         $query->setFetchMode(PDO::FETCH_ASSOC);
         $query->execute($values);
@@ -162,7 +161,7 @@ class PdoDatasource extends Datasource {
         $query = new QueryBuilder($this);
         $sql = $query->buildQuery('update', $params);
 
-        $values = array_values($params['values']) + $query->values();
+        $values = array_merge(array_values($params['values']), $query->values());
         
         $query = $this->query($sql, $values);
         
