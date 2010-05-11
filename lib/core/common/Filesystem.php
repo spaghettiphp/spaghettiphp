@@ -122,7 +122,7 @@ class Filesystem extends Object{
     }
     public static function extension($file) {
         $explode = explode('.', $file);
-        if(($count = count($arr)) > 1):
+        if(($count = count($explode)) > 1):
             return strtolower($explode[$count - 1]);
         endif;
         return null;
