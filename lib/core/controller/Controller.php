@@ -5,6 +5,7 @@ class Controller extends Object {
     public $components = array();
     public $data = array();
     public $layout = 'default';
+    public $autoLayout = true;
     public $name = null;
     public $params = array();
     public $uses = null;
@@ -86,15 +87,15 @@ class Controller extends Object {
     }
     public function render($action = null) {
         $view = new $this->viewClass;
-        $view->layout = $this->layout;
+        $view->controller = $this;
+        $layout = $this->autoLayout ? $this->layout : false;
         
         if(is_null($action)):
             $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
         endif;
 
         $this->autoRender = false;
-
-        return $view->render($action, $this->view, $this->layout);
+        return $view->render($action, $this->view, $layout);
     }
     public function redirect($url, $status = null, $exit = true) {
         $this->autoRender = false;

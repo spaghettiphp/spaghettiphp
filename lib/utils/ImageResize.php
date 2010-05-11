@@ -86,7 +86,7 @@ class ImageResize {
         $output_function = 'image' . $output_type;
         
         $filename = Filesystem::path('public/' . $filename);
-        $destiny['filename'] = Filesystem('public/' . $destiny['filename']);
+        $destiny['filename'] = Filesystem::path('public/' . $destiny['filename']);
         
         $input = $input_function($filename);
         $output = imagecreatetruecolor($destiny['width'], $destiny['height']);
