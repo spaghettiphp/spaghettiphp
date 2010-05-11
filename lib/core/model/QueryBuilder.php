@@ -67,7 +67,7 @@ class QueryBuilder extends Object {
         return $return;
     }
     protected function field($field) {
-        $regex = '/^([\w_]+)\s?(\w*?)?(' . join('|', self::$operators) . ')?$/';
+        $regex = '/^([\w_.]+)\s?(\w*?)?(' . join('|', self::$operators) . ')?$/';
         preg_match($regex, $field, $result);
         array_shift($result);
         if(!isset($result[2])):

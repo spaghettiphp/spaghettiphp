@@ -88,10 +88,12 @@ class MySqlDatasource extends PdoDatasource {
         $sql = 'SELECT ' . $this->alias($params['fields']);
         $sql .= ' FROM ' . $this->alias($params['table']);
         
-        if(!empty($params['joins'])):
+        if(is_array($params['joins']) && !empty($params['joins'])):
             foreach($params['joins'] as $join):
                 $sql .= ' ' . $this->join($join);
             endforeach;
+        elseif(is_string($params['joins'])):
+            $sql .= ' ' . $params['joins'];
         endif;
         
         if(!empty($params['conditions'])):
