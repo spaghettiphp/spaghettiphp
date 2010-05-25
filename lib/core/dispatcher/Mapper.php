@@ -3,8 +3,9 @@
 class Mapper extends Object {
     protected $prefixes = array();
     protected $routes = array();
-    protected $here;
     protected $base;
+    protected $here = '/';
+    protected $domain = 'http://localhost';
     protected $root;
     protected static $instance;
 
@@ -17,10 +18,11 @@ class Mapper extends Object {
             endif;
         endif;
 
-        $start = strlen($this->base);
-        $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
-
-        $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
+        if(array_key_exists('REQUEST_URI', $_SERVER) && array_key_exists('HTTP_HOST', $_SERVER)):
+            $start = strlen($this->base);
+            $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
+            $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
+        endif;
     }
     public static function instance() {
         if(!isset(self::$instance)):
