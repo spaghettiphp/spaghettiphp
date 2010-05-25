@@ -2,24 +2,26 @@
 
 class Validation extends Object {
     public static function alphanumeric($value) {
-        return preg_match('/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu', $value);
+        return (bool) preg_match('/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu', $value);
     }
     public static function between($value, $min, $max) {
         if(!is_numeric($value)):
             $value = strlen($value);
         endif;
+
         return filter_var($value, FILTER_VALIDATE_INT, array(
             'options' => array(
                 'min_range' => $min,
                 'max_range' => $max,
             )
-        ));
+        )) !== false;
     }
     public static function blank($value) {
         return !preg_match('/[^\s]/', $value);
     }
     public static function boolean($value) {
         $boolean = array(0, 1, '0', '1', true, false);
+
         return in_array($value, $boolean, true);
     }
     public static function creditCard($value) {
@@ -46,14 +48,16 @@ class Validation extends Object {
             case 'notequal':
                 return $value1 != $value2;
         endswitch;
+
         return false;
     }
     public function regex($value, $regex) {
         return preg_match($regex, $value);
     }
     public static function date($value) {
-        $regex = '%^(?:(?:31(\\/|-|\\.|\\x20)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.|\\x20)(?:0?[1,3-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.|\\x20)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.|\\x20)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$%';
-        return preg_match($regex, $value);
+        $regex = '%^(?:(?:31(/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(/|-|\\.)(?:0?[1,3-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$%';
+
+        return (bool) preg_match($regex, $value);
     }
     public static function decimal($value, $places = null) {
         if(is_null($places)):
@@ -61,30 +65,27 @@ class Validation extends Object {
         else:
             $regex = '/^[+-]?[\d]+\.[\d]{' . $places . '}$/';
         endif;
-        return preg_match($regex, $value);
+
+        return (bool) preg_match($regex, $value);
     }
-    public static function email($value, $checkHost = false) {
-        $match = filter_var($value, FILTER_VALIDATE_EMAIL);
-        if($match && $checkHost):
-            preg_match('/@((?:[a-z0-9][-a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,4}|museum|travel))$/i', $value, $reg);
-            $host = gethostbynamel($reg[1]);
-            return is_array($host);
-        endif;
-        return $match;
+    public static function email($value) {
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
     public static function equal($value, $compare) {
         return $value === $compare;
     }
     public static function ip($value) {
-        return filter_var($value, FILTER_VALIDATE_IP);
+        return filter_var($value, FILTER_VALIDATE_IP) !== false;
     }
     public static function minLength($value, $length) {
-        $valueLength = strlen($value);
-        return $valueLength >= $length;
+        $value_length = strlen($value);
+
+        return $value_length >= $length;
     }
     public static function maxLength($value, $length) {
-        $valueLength = strlen($value);
-        return $valueLength <= $length;
+        $value_length = strlen($value);
+
+        return $value_length <= $length;
     }
     public static function multiple($values, $list, $min = null, $max = null) {
         $values = array_filter($values);
@@ -101,6 +102,7 @@ class Validation extends Object {
                 endif;
             endforeach;
         endif;
+
         return true;
     }
     public static function inList($value, $list) {
@@ -110,31 +112,33 @@ class Validation extends Object {
         return is_numeric($value);
     }
     public static function notEmpty($value) {
-        return preg_match('/[^\s]+/m', $value);
+        return (bool) preg_match('/[^\s]+/m', $value);
     }
     public static function range($value, $lower = null, $upper = null) {
         if(is_numeric($value)):
             if(!is_null($lower) || !is_null($upper)):
-                $checkLower = $checkUpper = true;
+                $check_lower = $check_upper = true;
                 if(!is_null($lower)):
-                    $checkLower = $value > $lower;
+                    $check_lower = $value > $lower;
                 endif;
                 if(!is_null($upper)):
-                    $checkUpper = $value < $upper;
+                    $check_upper = $value < $upper;
                 endif;
             else:
                 return is_finite($value);
             endif;
-            return $checkLower && $checkUpper;
+            return $check_lower && $check_upper;
         endif;
+
         return false;
     }
     public static function time($value) {
         $regex = '/^([01]\d|2[0-3])(:[0-5]\d){1,2}$'
                . '|^(0?[1-9]|1[0-2])(:[0-5]\d){1,2}\s?[AaPp]m$/';
-        return preg_match($regex, $value);
+
+        return (bool) preg_match($regex, $value);
     }
     public static function url($value) {
-        return filter_var($value, FILTER_VALIDATE_URL);
+        return filter_var($value, FILTER_VALIDATE_URL) !== false;
     }
 }
