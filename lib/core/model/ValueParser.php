@@ -11,65 +11,49 @@ class ValueParser extends Object {
     );
 
     public function __construct($conditions) {
-        $this->conditions = $conditions;
+        list($this->values, $this->conditions) = $this->evaluate($conditions);
     }
     public function conditions() {
-        if(is_null($this->values)):
-            list($this->values, $this->conditions) = $this->extractValues();
-        endif;
-
         return $this->conditions;
     }
     public function values() {
-        if(is_null($this->values)):
-            list($this->values, $this->conditions) = $this->extractValues();
-        endif;
-
         return $this->values;
     }
-    protected function extractValues() {
-        $result = $this->evaluate($this->conditions);
-
-        return array($result['values'], $result['sql']);
-    }
     protected function evaluate($params, $logical = 'and') {
-        $return = array(
-            'values' => array(),
-            'sql' => array()
-        );
+        $values = $sql = array();
         foreach($params as $k => $param):
             if(!is_numeric($k)):
                 if(in_array($k, self::$logical)):
                     $result = $this->evaluate($param, $k);
-                    $return['sql'] []= '(' . $result['sql'] . ')';
-                    $return['values'] = array_merge($return['values'], $result['values']);
+                    $sql []= '(' . $result[1] . ')';
+                    $values = array_merge($values, $result[0]);
                 else:
                     $field = $this->field($k);
                     if(is_null($field)):
-                        $return['sql'] []= $k;
-                        $return['values'] += array_values($param);
+                        $sql []= $k;
+                        $values += array_values($param);
                         continue;
                     endif;
 
                     list($field, $operator) = $field;
                     if(!is_array($param)):
-                        $return['sql'] []= $field . ' '. $operator . ' ?';
-                        $return['values'] []= $param;
+                        $sql []= $field . ' '. $operator . ' ?';
+                        $values []= $param;
                     else:
                         $repeat = rtrim(str_repeat('?,', count($param)), ',');
-                        $return['sql'] []= $field . ' IN(' . $repeat . ')';
-                        $return['values'] += array_values($param);
+                        $sql []= $field . ' IN(' . $repeat . ')';
+                        $values += array_values($param);
                     endif;
                 endif;
             else:
-                $return['sql'] []= $param;
+                $sql []= $param;
             endif;
         endforeach;
         
         $logical = ' ' . strtoupper($logical) . ' ';
-        $return['sql'] = implode($logical, $return['sql']);
+        $sql = implode($logical, $sql);
        
-        return $return;
+        return array($values, $sql);
     }
     protected function field($field) {
         $regex = '/^([\S]+)(?:\s?(' . join('|', self::$operators) . '))?$/';
