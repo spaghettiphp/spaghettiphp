@@ -1,6 +1,6 @@
 <?php
 
-class Security extends Object {
+class Security {
     public static function cipher($text, $key) {
         if(empty($key)):
             trigger_error('You cannot use an empty key for Security::cipher()', E_USER_WARNING);

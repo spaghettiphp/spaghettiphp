@@ -1,6 +1,6 @@
 <?php
 
-class Dispatcher extends Object {
+class Dispatcher {
     public static function dispatch() {
         $path = Mapper::parse();
         $path['controller'] = Inflector::hyphenToUnderscore($path['controller']);

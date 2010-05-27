@@ -1,6 +1,6 @@
 <?php 
 
-class Date extends Object{
+class Date{
     public static $convert = array(
         'years' => 217728000,
         'months' => 18144000,

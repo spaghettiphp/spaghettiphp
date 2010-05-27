@@ -1,6 +1,6 @@
 <?php
 
-abstract class Helper extends Object {
+abstract class Helper {
     protected $view;
     
     public function __construct($view) {

@@ -1,6 +1,6 @@
 <?php
 
-class Mapper extends Object {
+class Mapper {
     protected $prefixes = array();
     protected $routes = array();
     protected $base;

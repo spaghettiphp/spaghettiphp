@@ -1,6 +1,6 @@
 <?php
 
-class Session extends Object {
+class Session {
     public static function start() {
         return session_start();
     }

@@ -1,6 +1,6 @@
 <?php
 
-class ValueParser extends Object {
+class ValueParser {
     protected $conditions;
     protected $values;
     protected static $operators = array(

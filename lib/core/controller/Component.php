@@ -1,6 +1,6 @@
 <?php
 
-abstract class Component extends Object {
+abstract class Component {
     public function initialize(&$controller) {
         return true;
     }

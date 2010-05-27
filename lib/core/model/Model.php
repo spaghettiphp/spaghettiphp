@@ -1,6 +1,6 @@
 <?php
 
-class Model extends Object {
+class Model {
     public $belongsTo = array();
     public $hasMany = array();
     public $hasOne = array();
@@ -423,5 +423,8 @@ class Model extends Object {
     public function escape($value) {
         $db = $this->connection();
         return $db->escape($value);
+    }
+    protected function error($type, $details = array()) {
+        new Error($type, $details);
     }
 }

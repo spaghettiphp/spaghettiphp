@@ -1,6 +1,6 @@
 <?php
  
-class Config extends Object {
+class Config {
     protected static $config = array();
     
     public static function read($key) {

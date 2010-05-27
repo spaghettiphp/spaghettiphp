@@ -1,6 +1,6 @@
 <?php
 
-class Controller extends Object {
+class Controller {
     public $autoRender = true;
     public $components = array();
     public $data = array();
@@ -181,5 +181,11 @@ class Controller extends Object {
             return $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
         endif;
         return false;
+    }
+    public function stop() {
+        exit(0);
+    }
+    protected function error($type, $details = array()) {
+        new Error($type, $details);
     }
 }

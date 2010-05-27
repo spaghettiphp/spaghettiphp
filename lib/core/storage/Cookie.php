@@ -1,6 +1,6 @@
 <?php
 
-class Cookie extends Object {
+class Cookie {
     public $expires;
     public $path = '/';
     public $domain = '';

@@ -1,6 +1,6 @@
 <?php
 
-class Filesystem extends Object{
+class Filesystem{
     public static $rewrite = array(
         'Gb' => 1073741824,
         'Mb' => 1048576,

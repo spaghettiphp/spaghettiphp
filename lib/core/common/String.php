@@ -1,6 +1,6 @@
 <?php
 
-class String extends Object {
+class String {
     public static function insert($string, $data) {
         foreach($data as $key => $value):
             $regex = '%(:' . $key . ')%';

@@ -4,7 +4,6 @@ define('SPAGHETTI_ROOT', dirname(dirname(__FILE__)));
 
 set_include_path(SPAGHETTI_ROOT . PATH_SEPARATOR . get_include_path());
 
-require 'lib/core/common/Object.php';
 require 'lib/core/common/Loader.php';
 require 'lib/core/common/Config.php';
 require 'lib/core/common/Inflector.php';

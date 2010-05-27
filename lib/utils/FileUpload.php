@@ -55,7 +55,7 @@ class FileUpload {
 
         return true;
     }
-    public function error($type, $details = array()) {
+    public function error($type) {
         $this->errors []= $type;
         return false;
     }
