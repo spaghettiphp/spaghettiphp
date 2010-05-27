@@ -8,9 +8,9 @@ This repository is for Spaghetti* developers. All users should download Spaghett
 
 h2. How to help
 
-* Find bugs
-* Write documentation
-* Write tests
+* Find and "report bugs":http://github.com/spaghettiphp/spaghettiphp/issues
 * Fork our repository and start writing code!
+* Write tests
+* Write documentation
 
 See "our wiki":http://wiki.github.com/spaghettiphp/spaghettiphp/ for more information on development.
