@@ -2,4 +2,15 @@ h1. "Spaghetti* Framework":http://spaghettiphp.org/
 
 h2. About
 
+Spaghetti* is a PHP framework for small to medium web applications. It's as simple and concise as possible, trying to stand out of your way.
+
+This repository is for Spaghetti* developers. All users should download Spaghetti* from our "official site":http://spaghettiphp.org/.
+
 h2. How to help
+
+* Find bugs
+* Write documentation
+* Write tests
+* Fork our repository and start writing code!
+
+See "our wiki":http://wiki.github.com/spaghettiphp/spaghettiphp/ for more information on development.
