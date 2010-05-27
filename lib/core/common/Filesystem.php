@@ -1,6 +1,6 @@
 <?php
 
-class Filesystem extends Object{
+class Filesystem{
     public static $rewrite = array(
         'Gb' => 1073741824,
         'Mb' => 1048576,
@@ -32,7 +32,12 @@ class Filesystem extends Object{
         return glob($path . $pattern);
     }
     public static function size($file, $rewrite = true) {
+        if(!self::exists($file)):
+            return false;
+        endif;
+
         $size = filesize(self::path($file));
+
         if($rewrite):
             foreach(self::$rewrite as $key => $value):
                 if($size >= $value):
@@ -50,6 +55,9 @@ class Filesystem extends Object{
         endif;
         return false;
     }
+    public function isDir($path) {
+        return is_dir(self::path($path));
+    }
     public static function isUploaded($file) {
         return is_uploaded_file(self::path($file));
     }
@@ -59,7 +67,7 @@ class Filesystem extends Object{
         endif;
         $file = self::path($file);
         
-        if(!is_dir($file)):
+        if(!self::isDir($file)):
             return unlink($file);
         else:
             $dir = rtrim($file, DIRECTORY_SEPARATOR) . '/';
@@ -114,20 +122,19 @@ class Filesystem extends Object{
     }
     public static function extension($file) {
         $explode = explode('.', $file);
-        if(($count = count($arr)) > 1):
+        if(($count = count($explode)) > 1):
             return strtolower($explode[$count - 1]);
         endif;
         return null;
     }
-    public static function path($path, $absolute = true) {
-        if(strpos($path, SPAGHETTI_ROOT) === 0):
-            return $path;
+    public static function path($path, $returnAbsolute = true) {
+         if(strpos($path, SPAGHETTI_ROOT) === false && !preg_match('(^[a-z]+:)i', $path, $out)):
+            if($returnAbsolute):
+                $path = SPAGHETTI_ROOT . '/' . $path;
+            endif;
         endif;
-        
-        if($absolute):
-            $path = SPAGHETTI_ROOT . '/' . $path;
-        endif;
-        
-        return preg_replace('([/\\\]+)', DIRECTORY_SEPARATOR, $path);
+
+        $pattern = '(([^:])[/\\\]+|\\\)'; // v.4.3    
+        return preg_replace($pattern, '$1/', $path);
     }
 }

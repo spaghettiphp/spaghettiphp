@@ -1,13 +1,13 @@
 <?php
 
-abstract class Component extends Object {
-    public function initialize(&$controller) {
+abstract class Component {
+    public function initialize($controller) {
         return true;
     }
-    public function startup(&$controller) {
+    public function startup($controller) {
         return true;
     }
-    public function shutdown(&$controller) {
+    public function shutdown($controller) {
         return true;
     }
 }

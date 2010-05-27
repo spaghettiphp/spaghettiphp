@@ -1,6 +1,7 @@
 <?php
 
-class View extends Object {
+class View {
+    public $pageTitle = '';
     public $contentForLayout;
     public $scriptsForLayout;
     public $stylesForLayout;
@@ -72,5 +73,8 @@ class View extends Object {
         endif;
 
         return $filename;
+    }
+    protected function error($type, $details = array()) {
+        new Error($type, $details);
     }
 }

@@ -1,7 +1,8 @@
 <?php
 
-class String extends Object {
+class String {
     public static function insert($string, $data) {
+        asort($data);
         foreach($data as $key => $value):
             $regex = '%(:' . $key . ')%';
             $string = preg_replace($regex, $value, $string);

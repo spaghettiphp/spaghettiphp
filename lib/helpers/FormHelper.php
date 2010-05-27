@@ -214,6 +214,8 @@ class FormHelper extends Helper {
         
         if(is_array($class)):
             $attr = $class + $attr;
+        else:
+            $attr['class'] .= ' ' . $class;
         endif;
         
         return $this->html->tag('div', $content, $attr);
