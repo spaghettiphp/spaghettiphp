@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <?php echo $this->html->charset() ?>
         <title>Spaghetti* Framework</title>
         
         <style type="text/css">
@@ -196,9 +196,6 @@
                     text-align: center;
                 }
         </style>
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.3/mootools-yui-compressed.js"></script>
-        <script type="text/javascript">
-        </script>
     </head>
     
     <body>

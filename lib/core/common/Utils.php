@@ -1,6 +1,6 @@
 <?php
 
-function array_unset(&$array = array(), $index) {
+function array_unset(&$array, $index) {
     if(array_key_exists($index, $array)):
         $item = $array[$index];
         unset($array[$index]);
@@ -9,7 +9,7 @@ function array_unset(&$array = array(), $index) {
     return null;
 }
 
-function can_call_method(&$object, $method) {
+function can_call_method($object, $method) {
     if(method_exists($object, $method)):
         $method = new ReflectionMethod($object, $method);
         return $method->isPublic();
@@ -23,4 +23,11 @@ function array_range($min, $max) {
         $result[$i] = $i;
     endfor;
     return $result;
+}
+
+function is_hash($var) {
+    if(is_array($var)):
+        return array_keys($var) !== range(0, sizeof($var) - 1);
+    endif;
+    return false;
 }

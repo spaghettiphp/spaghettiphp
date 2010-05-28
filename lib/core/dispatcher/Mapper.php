@@ -1,26 +1,27 @@
 <?php
 
-class Mapper extends Object {
-    public $prefixes = array();
-    public $routes = array();
-    protected $here = null;
-    protected $base = null;
-    public $root = null;
+class Mapper {
+    protected $prefixes = array();
+    protected $routes = array();
+    protected $base;
+    protected $here = '/';
+    protected $domain = 'http://localhost';
+    protected $root;
     protected static $instance;
 
     public function __construct() {
-        if(!$this->base):
-            $this->base = dirname($_SERVER['PHP_SELF']);
-            if(basename($this->base) == 'public'):
-                $this->base = dirname($this->base);
-                if($this->base == DIRECTORY_SEPARATOR || $this->base == '.'):
-                    $this->base = '/';
-                endif;
+        $this->base = dirname($_SERVER['PHP_SELF']);
+        if(basename($this->base) == 'public'):
+            $this->base = dirname($this->base);
+            if($this->base == DIRECTORY_SEPARATOR || $this->base == '.'):
+                $this->base = '/';
             endif;
         endif;
-        if(!$this->here):
+
+        if(array_key_exists('REQUEST_URI', $_SERVER) && array_key_exists('HTTP_HOST', $_SERVER)):
             $start = strlen($this->base);
             $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
+            $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
         endif;
     }
     public static function instance() {
@@ -38,18 +39,22 @@ class Mapper extends Object {
         $self = self::instance();
         return $self->base;
     }
+    public static function domain() {
+        $self = self::instance();
+        return $self->domain;
+    }
     public static function normalize($url) {
-        if(preg_match('/^[a-z]+:/', $url)):
-            return $url;
+        if(!preg_match('/^[a-z]+:/i', $url)):
+            $url = '/' . $url;
+            while(strpos($url, '//') !== false):
+                $url = str_replace('//', '/', $url);
+            endwhile;
+            $url = rtrim($url, '/');
+            if(empty($url)):
+                $url = '/';
+            endif;
         endif;
-        $url = '/' . $url;
-        while(strpos($url, '//') !== false):
-            $url = str_replace('//', '/', $url);
-        endwhile;
-        $url = rtrim($url, '/');
-        if(empty($url)):
-            $url = '/';
-        endif;
+
         return $url;
     }
     public static function root($controller) {
@@ -195,7 +200,7 @@ class Mapper extends Object {
             endif;
         endif;
         $url = self::normalize(self::base() . $url);
-        return $full ? BASE_URL . $url : $url;
+        return $full ? self::domain() . $url : $url;
     }
     public static function filterAction($action) {
         if(strpos($action, '_') !== false):

@@ -1,16 +1,14 @@
 <?php
 
-class Error extends Object {
-    public function __construct($type = '', $details = array()) {
-        $view = new View;
+class Error {
+    public function __construct($type, $details = array()) {
         $filename = Inflector::underscore($type);
         if(!Loader::exists('View', 'errors/' . $filename . '.htm')):
-            $filename = 'missing_error.htm';
+            $filename = 'missing_error';
             $details = array('error' => $type);
         endif;
-        $viewFile = Loader::path('View', 'errors/' . $filename . '.htm');
-        $content = $view->renderView($viewFile, array('details' => $details));
-        echo $view->renderLayout($content, 'error', 'htm');
-        $this->stop();
+        $view = new View;
+        echo $view->render('errors/' . $filename, array('details' => $details), 'error');
+        exit(0);
     }
 }

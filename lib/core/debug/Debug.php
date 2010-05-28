@@ -1,6 +1,6 @@
 <?php
 
-class Debug extends Object {
+class Debug {
     public static function reportErrors($level) {
         switch($level):
             case 3:

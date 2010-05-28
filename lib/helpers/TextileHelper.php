@@ -1,15 +1,5 @@
 <?php
-/**
- *  TextileHelper é um parser que transforma textos escritos com a linguagem de
- *  marcação Textile (http://textile.thresholdstate.com/) em marcação HTML.
- *
- *  @author    Dean Allen <dean@textism.com>
- *  @license   http://www.opensource.org/licenses/bsd-license.php The BSD License
- *  @copyright Copyright 2003-2004, Dean Allen <dean@textism.com>
- *
- */
 
-// define these before including this file to override the standard glyphs
 @define('txt_quote_single_open',  '&#8216;');
 @define('txt_quote_single_close', '&#8217;');
 @define('txt_quote_double_open',  '&#8220;');
@@ -701,30 +691,6 @@ class TextileHelper extends Helper {
         return $text;
     }
 
-// -------------------------------------------------------------
-// NOTE: deprecated
-    function incomingEntities($text)
-    {
-        return preg_replace("/&(?![#a-z0-9]+;)/i", "x%x%", $text);
-    }
-
-// -------------------------------------------------------------
-// NOTE: deprecated
-    function encodeEntities($text)
-    {
-        return (function_exists('mb_encode_numericentity'))
-        ?    $this->encode_high($text)
-        :    htmlentities($text, ENT_NOQUOTES, "utf-8");
-    }
-
-// -------------------------------------------------------------
-// NOTE: deprecated
-    function fixEntities($text)
-    {
-        /*  de-entify any remaining angle brackets or ampersands */
-        return str_replace(array("&gt;", "&lt;", "&amp;"),
-            array(">", "<", "&"), $text);
-    }
 
 // -------------------------------------------------------------
     function cleanWhiteSpace($text)
@@ -869,29 +835,6 @@ class TextileHelper extends Helper {
         return (isset($vals[$in])) ? $vals[$in] : '';
     }
 
-// -------------------------------------------------------------
-// NOTE: deprecated
-    function encode_high($text, $charset = "UTF-8")
-    {
-        return mb_encode_numericentity($text, $this->cmap(), $charset);
-    }
-
-// -------------------------------------------------------------
-// NOTE: deprecated
-    function decode_high($text, $charset = "UTF-8")
-    {
-        return mb_decode_numericentity($text, $this->cmap(), $charset);
-    }
-
-// -------------------------------------------------------------
-// NOTE: deprecated
-    function cmap()
-    {
-        $f = 0xffff;
-        $cmap = array(
-            0x0080, 0xffff, 0, $f);
-        return $cmap;
-    }
 
 // -------------------------------------------------------------
     function encode_html($str, $quotes=1)
@@ -918,39 +861,10 @@ class TextileHelper extends Helper {
     }
 
 // -------------------------------------------------------------
-// NOTE: deprecated
-    function txtgps($thing)
-    {
-        if (isset($_POST[$thing])) {
-            if (get_magic_quotes_gpc()) {
-                return stripslashes($_POST[$thing]);
-            }
-            else {
-                return $_POST[$thing];
-            }
-        }
-        else {
-            return '';
-        }
-    }
-
-// -------------------------------------------------------------
-// NOTE: deprecated
-    function dump()
-    {
-        foreach (func_get_args() as $a)
-            echo "\n<pre>",(is_array($a)) ? print_r($a) : $a, "</pre>\n";
-    }
-
-// -------------------------------------------------------------
 
     function blockLite($text)
     {
         $this->btag = array('bq', 'p');
         return $this->block($text."\n\n");
     }
-
-
-} // end class
-
-?>
+}
