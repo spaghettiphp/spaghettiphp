@@ -1,11 +1,11 @@
 <?php
 
 class Controller {
+    public $autoLayout = true;
     public $autoRender = true;
     public $components = array();
     public $data = array();
     public $layout = 'default';
-    public $autoLayout = true;
     public $name = null;
     public $params = array();
     public $uses = null;

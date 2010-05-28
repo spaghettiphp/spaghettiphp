@@ -8,7 +8,7 @@ function dump($data) {
     pr(var_export($data, true));
 }
 
-function array_unset(&$array = array(), $index) {
+function array_unset(&$array, $index) {
     if(array_key_exists($index, $array)):
         $item = $array[$index];
         unset($array[$index]);
@@ -17,7 +17,7 @@ function array_unset(&$array = array(), $index) {
     return null;
 }
 
-function can_call_method(&$object, $method) {
+function can_call_method($object, $method) {
     if(method_exists($object, $method)):
         $method = new ReflectionMethod($object, $method);
         return $method->isPublic();
