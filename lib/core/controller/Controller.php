@@ -87,6 +87,7 @@ class Controller {
         $view = new $this->viewClass;
         $view->controller = $this;
         $layout = $this->autoLayout ? $this->layout : false;
+        $view->controller = $this;
         
         if(is_null($action)):
             $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
