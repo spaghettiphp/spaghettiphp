@@ -78,8 +78,6 @@ class View extends Object {
         $output = ob_get_clean();
         return $output;
     }
-    
-    // @todo under testing
     public function startBlock($name) {
         $this->lastBlock = $name;
         ob_start();
