@@ -231,11 +231,11 @@ class Model {
     }
     public function count($params = array()) {
         $db = $this->connection();
-        $params += array(
+        $params = array_merge($params, array(
             'fields' => '*',
-            'table' => $this->table
-        );
-        
+            'table' => $this->table,
+            'limit' => null
+        ));
         return $db->count($params);
     }
     public function paginate($params = array()) {
