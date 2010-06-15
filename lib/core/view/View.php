@@ -6,7 +6,10 @@ class View {
     public $scriptsForLayout;
     public $stylesForLayout;
     public $helpers = array('html', 'form');
+    public $controller;
     protected $loadedHelpers = array();
+    protected $blocks = array();
+    protected $lastBlock;
 
     public function __construct() {
         $this->loadHelper($this->helpers);
@@ -76,5 +79,15 @@ class View {
     }
     protected function error($type, $details = array()) {
         new Error($type, $details);
+    }
+    public function startBlock($name) {
+        $this->lastBlock = $name;
+        ob_start();
+    }
+    public function endBlock() {
+        return $this->blocks[$this->lastBlock] = ob_get_clean();
+    }
+    public function block($name) {
+        return $this->blocks[$name];
     }
 }
