@@ -16,7 +16,9 @@ class SpaghettiException {
         ob_end_clean();
         if(Filesystem::exists('app/views/layouts/error.htm.php')):
             $view = new View();
-            return  $view->renderView('app/views/layouts/error.htm.php', array('exception' => $this->exception));
+            return  $view->renderView('app/views/layouts/error.htm.php', array(
+                'exception' => $this->exception
+            ));
         else:
             echo '<pre>';
             throw new Exception('error layout was not found');

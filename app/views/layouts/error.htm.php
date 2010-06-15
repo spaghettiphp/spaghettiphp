@@ -120,7 +120,7 @@
 
         <section id="error">
             <h1>Oops, ocorreu um erro!</h1>
-            <p>Alguma coisa deu errado. É, pois é...</p>
+            <p><?php echo $exception->getMessage() ?></p>
         </section>
 
         <footer>
