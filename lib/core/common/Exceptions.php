@@ -1,20 +1,10 @@
 <?php
 
-class PhpErrorException extends Exception {
-    public function __construct($message, $code, $file, $line) {
-        parent::__construct($message, $code);
-        $this->file = $file;
-        $this->line = $line;
-    }
-}
-
 class SpaghettiException extends Exception {
-    protected $exception;
-    protected $status;
+    protected $status = 500;
     
-    public function __construct($exception, $status = 500) {
-        $this->exception = $exception;
-        $this->status = $status;
+    public function __construct($message, $code) {
+        parent::__construct($message, $code);
     }
     function header($status) {
         $codes = array(
@@ -66,7 +56,7 @@ class SpaghettiException extends Exception {
         if(Filesystem::exists('app/views/layouts/error.htm.php')):
             $view = new View();
             return  $view->renderView('app/views/layouts/error.htm.php', array(
-                'exception' => $this->exception
+                'exception' => $this
             ));
         else:
             echo '<pre>';

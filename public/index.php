@@ -6,8 +6,7 @@ try {
 }
 catch(Exception $e) {
     if(!($e instanceof SpaghettiException)):
-        $e = new SpaghettiException($e);
+        $e = new SpaghettiException($e->getMessage(), $e->getCode());
     endif;
-    
     echo $e;
 }
