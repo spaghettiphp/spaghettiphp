@@ -74,3 +74,10 @@ class SpaghettiException extends Exception {
         endif;
     }
 }
+
+class MissingControllerException extends Exception {}
+class MissingActionException extends Exception {}
+class MissingComponentException extends Exception {}
+class MissingTableException extends Exception {}
+class MissingViewException extends Exception {}
+class MissingLayoutException extends Exception {}

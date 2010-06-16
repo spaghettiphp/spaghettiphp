@@ -46,7 +46,8 @@ class Controller {
             if(Loader::exists('Component', $component)):
                 $this->{$component} = Loader::instance('Component', $component);
             else:
-                $this->error('missingComponent', array('component' => $component));
+                throw new MissingComponentException();
+                // $this->error('missingComponent', array('component' => $component));
             endif;
         endforeach;
         return true;
@@ -183,8 +184,5 @@ class Controller {
     }
     public function stop() {
         exit(0);
-    }
-    protected function error($type, $details = array()) {
-        new Error($type, $details);
     }
 }

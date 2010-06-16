@@ -40,10 +40,11 @@ class View {
             endif;
             return $output;
         else:
-            $this->error('missingView', array(
-                'view' => $action
-            ));
-            return false;
+            throw new MissingViewException();
+            // $this->error('missingView', array(
+            //     'view' => $action
+            // ));
+            // return false;
         endif;
     }
     public function renderLayout($layout, $content, $data) {
@@ -53,10 +54,11 @@ class View {
             $this->contentForLayout = $content;
             return $this->renderView($layout_file, $data);
         else:
-            $this->error('missingLayout', array(
-                'layout' => $layout
-            ));
-            return false;
+            throw new MissingLayoutException();
+            // $this->error('missingLayout', array(
+            //     'layout' => $layout
+            // ));
+            // return false;
         endif;        
     }
     public function element($element, $data = array()) {
@@ -76,9 +78,6 @@ class View {
         endif;
 
         return $filename;
-    }
-    protected function error($type, $details = array()) {
-        new Error($type, $details);
     }
     public function startBlock($name) {
         $this->lastBlock = $name;

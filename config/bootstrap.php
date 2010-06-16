@@ -11,7 +11,6 @@ set_include_path(SPAGHETTI_ROOT . PATH_SEPARATOR . get_include_path());
 require 'lib/core/common/Loader.php';
 require 'lib/core/common/Config.php';
 require 'lib/core/common/Inflector.php';
-require 'lib/core/common/Error.php';
 require 'lib/core/common/Utils.php';
 require 'lib/core/common/Exceptions.php';
 require 'lib/core/common/String.php';

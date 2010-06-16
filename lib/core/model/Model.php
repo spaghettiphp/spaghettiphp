@@ -72,7 +72,8 @@ class Model {
             $this->table = $table;
             $sources = $db->listSources();
             if(!in_array($this->table, $sources)):
-                $this->error('missingTable', array('model' => get_class($this), 'table' => $this->table));
+                throw new MissingTableException();
+                // $this->error('missingTable', array('model' => get_class($this), 'table' => $this->table));
                 return false;
             endif;
             if(empty($this->schema)):
@@ -447,8 +448,5 @@ class Model {
     public function escape($value) {
         $db = $this->connection();
         return $db->escape($value);
-    }
-    protected function error($type, $details = array()) {
-        new Error($type, $details);
     }
 }
