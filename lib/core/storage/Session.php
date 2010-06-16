@@ -23,7 +23,11 @@ class Session {
     public static function writeFlash($key, $value) {
         self::write('Flash.' . $key, $value);
     }
-    public static function flash($key) {
+    public static function flash($key, $value = null) {
+        if(!is_null($value)):
+            return self::writeFlash($key, $value);
+        endif;
+        
         $value = self::read('Flash.' . $key);
         self::delete('Flash.' . $key);
         return $value;
