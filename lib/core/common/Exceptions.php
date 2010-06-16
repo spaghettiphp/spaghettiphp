@@ -65,9 +65,18 @@ class SpaghettiException extends Exception {
     }
 }
 
-class MissingControllerException extends Exception {}
-class MissingActionException extends Exception {}
-class MissingComponentException extends Exception {}
-class MissingTableException extends Exception {}
-class MissingViewException extends Exception {}
-class MissingLayoutException extends Exception {}
+class MissingException extends SpaghettiException {
+    protected $status = 404;
+    protected $message;
+    
+    public function __construct() {
+        parent::__construct(get_class($this), 0);
+    }
+}
+
+class MissingControllerException extends MissingException {}
+class MissingActionException extends MissingException {}
+class MissingComponentException extends MissingException {}
+class MissingTableException extends MissingException {}
+class MissingViewException extends MissingException {}
+class MissingLayoutException extends MissingException {}

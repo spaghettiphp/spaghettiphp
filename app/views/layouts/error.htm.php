@@ -2,7 +2,7 @@
 <html>
     <head>
         <?php echo $this->html->charset() ?>
-        <title>Erro - Spaghetti* Framework</title>
+        <title><?php echo $exception->getMessage() ?> - Spaghetti* Framework</title>
         <style type="text/css">
             * {
                 margin:0;
@@ -119,12 +119,12 @@
         </header>
 
         <section id="error">
-            <h1>Oops, ocorreu um erro!</h1>
-            <p><?php echo $exception->getMessage() ?></p>
+            <h1><?php echo $exception->getMessage() ?></h1>
+            <p><pre>Stack Trace: <?php echo PHP_EOL . $exception->getTraceAsString() ?></pre></p>
         </section>
 
         <footer>
-            <p>Obrigado por usar Spaghetti* :)</p>
+            <p>Thanks for using Spaghetti* :)</p>
         </footer>
 
     </body>
