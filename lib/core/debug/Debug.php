@@ -23,8 +23,8 @@ class Debug {
         endif;
         set_error_handler($handler);
     }
-    public static function handleError($code, $message, $file, $line, $context) {
-        throw new PhpErrorException($message, $code, $file, $line, $context);
+    public static function handleError($code, $message, $file, $line) {
+        throw new PhpErrorException($message, $code, $file, $line);
     }
     public static function pr($data) {
         echo '<pre>' . print_r($data, true) . '</pre>';
