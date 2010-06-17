@@ -3,25 +3,23 @@
 class Dispatcher {
     public static function dispatch($request = null) {
         $request = self::normalize($request);
-        $controller_name = Inflector::camelize($request['controller']) . 'Controller';
+        $class = $controller_name = Inflector::camelize($request['controller']) . 'Controller';
         
-        if(Loader::exists('Controller', $controller_name)):
-            $controller = Loader::instance('Controller', $controller_name);
-            
-            if($controller->hasAction($request['action']) || self::hasView($request)):
-                return $controller->callAction($request);
-            else:
-                throw new MissingActionException(array(
-                    'controller' => $controller_name,
-                    'action' => $request['action']
-                ));
-            endif;
-        elseif(self::hasView($request)):
-            $controller = Loader::instance('Controller', 'AppController');
+        if(!Loader::exists('Controller', $controller_name)):
+            $class = 'AppController';
+        endif;
+        $controller = Loader::instance('Controller', $class);
+        
+        if($controller->hasAction($request['action']) || self::hasView($request)):
             return $controller->callAction($request);
-        else:
+        elseif(get_class($controller) == 'AppController'):
             throw new MissingControllerException(array(
                 'controller' => $controller_name
+            ));
+        else:
+            throw new MissingActionException(array(
+                'controller' => $controller_name,
+                'action' => $request['action']
             ));
         endif;
     }
