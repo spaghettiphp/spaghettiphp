@@ -8,13 +8,13 @@ class HomeController extends Controller {
     public $uses = array();
     public function index() {}
     protected function secret_method() {}
-    public function beforeFilter() {
+    protected function beforeFilter() {
         $this->controllerEvents []= 'beforeFilter';
     }
-    public function beforeRender() {
+    protected function beforeRender() {
         $this->controllerEvents []= 'beforeRender';
     }
-    public function afterFilter() {
+    protected function afterFilter() {
         $this->controllerEvents []= 'afterFilter';
     }
 }

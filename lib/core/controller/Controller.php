@@ -14,10 +14,9 @@ class Controller {
 
     public function __construct() {
         if(is_null($this->name)):
-            $classname = get_class($this);
-            $lenght = strpos($classname, 'Controller');
-            $this->name = substr($classname, 0, $lenght);
-
+            $this->name = $this->name();
+            
+            // prevent models from being loaded in AppController
             if(is_null($this->uses) && $this->name == 'App'):
                 $this->uses = array();
             endif;
@@ -30,8 +29,12 @@ class Controller {
         array_map(array($this, 'loadModel'), $this->uses);
         array_map(array($this, 'loadComponent'), $this->components);
         $this->data = array_merge_recursive($_POST, $_FILES);
-        // $this->loadComponents();
-        // $this->loadModels();
+    }
+    public function name() {
+        $classname = get_class($this);
+        $lenght = strpos($classname, 'Controller');
+        
+        return substr($classname, 0, $lenght);
     }
     public function hasAction($action) {
         $methods = $this->getMethods();
@@ -69,7 +72,7 @@ class Controller {
         return $output;
     }
     protected function loadModel($model) {
-        $model = Inflector::camelize($model) . 'Model';
+        $model = Inflector::camelize($model);
         if(Loader::exists('Model', $model)):
             $this->{$model} = Loader::instance('Model', $model);
         else:
@@ -94,19 +97,19 @@ class Controller {
             if(can_call_method($this->$className, $event)):
                 $this->$className->{$event}($this);
             else:
+                // @todo should throw exception
                 trigger_error('Can\'t call method ' . $event . ' in ' . $className, E_USER_WARNING);
             endif;
         endforeach;
     }
-    
-    public function beforeFilter() { }
-    public function beforeRender() { }
-    public function afterFilter() { }
+    protected function beforeFilter() { }
+    protected function beforeRender() { }
+    protected function afterFilter() { }
     public function setAction($action) {
         $this->params['action'] = $action;
         $args = func_get_args();
         array_shift($args);
-        return call_user_func_array(array(&$this, $action), $args);
+        return call_user_func_array(array($this, $action), $args);
     }
     public function render($action = null) {
         $view = new $this->viewClass;
@@ -175,14 +178,11 @@ class Controller {
             foreach($var as $key => $value):
                 $this->set($key, $value);
             endforeach;
-        elseif(!is_null($value)):
-            $this->view[$var] = $value;
         endif;
-        
-        return $this;
+        $this->view[$var] = $value;
     }
     public function get($var) {
-        if(isset($this->view[$var])):
+        if(array_key_exists($var, $this->view)):
             return $this->view[$var];
         endif;
         
