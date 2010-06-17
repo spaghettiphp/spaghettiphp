@@ -90,7 +90,22 @@ class MissingActionException extends MissingException {
     }
 }
 
-class MissingComponentException extends MissingException {}
+class MissingComponentException extends MissingException {
+    public function __construct($details = array()) {
+        $message = 'Missing Component';
+        $details = 'The component <code>' . $details['component'] . '</code> could not be found.';
+        parent::__construct($message, 0, $details);
+    }
+}
+
+class MissingModelException extends MissingException {
+    public function __construct($details = array()) {
+        $message = 'Missing Model';
+        $details = 'The model <code>' . $details['model'] . '</code> could not be found.';
+        parent::__construct($message, 0, $details);
+    }
+}
+
 class MissingTableException extends MissingException {}
 class MissingViewException extends MissingException {}
 class MissingLayoutException extends MissingException {}

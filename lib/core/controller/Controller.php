@@ -27,9 +27,11 @@ class Controller {
             $this->uses = array($this->name);
         endif;
         
+        array_map(array($this, 'loadModel'), $this->uses);
+        array_map(array($this, 'loadComponent'), $this->components);
         $this->data = array_merge_recursive($_POST, $_FILES);
-        $this->loadComponents();
-        $this->loadModels();
+        // $this->loadComponents();
+        // $this->loadModels();
     }
     public function hasAction($action) {
         $methods = $this->getMethods();
@@ -66,21 +68,25 @@ class Controller {
         
         return $output;
     }
-    protected function loadModels() {
-        foreach($this->uses as $model):
-            // @todo check for errors here!
+    protected function loadModel($model) {
+        $model = Inflector::camelize($model) . 'Model';
+        if(Loader::exists('Model', $model)):
             $this->{$model} = Loader::instance('Model', $model);
-        endforeach;
+        else:
+            throw new MissingModelException(array(
+                'model' => $model
+            ));
+        endif;
     }
-    protected function loadComponents() {
-        foreach($this->components as $component):
-            $component = $component . 'Component';
-            if(Loader::exists('Component', $component)):
-                $this->{$component} = Loader::instance('Component', $component);
-            else:
-                throw new MissingComponentException();
-            endif;
-        endforeach;
+    protected function loadComponent($component) {
+        $component = Inflector::camelize($component) . 'Component';
+        if(Loader::exists('Component', $component)):
+            $this->{$component} = Loader::instance('Component', $component);
+        else:
+            throw new MissingComponentException(array(
+                'component' => $component
+            ));
+        endif;
     }
     protected function componentEvent($event) {
         foreach($this->components as $component):
