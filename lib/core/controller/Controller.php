@@ -31,28 +31,58 @@ class Controller {
         $this->loadComponents();
         $this->loadModels();
     }
-    public function isAction($action) {
+    public function hasAction($action) {
         $methods = $this->getMethods();
         return in_array($action, $methods) && can_call_method($this, $action);
     }
-    public function getMethods() {
+    protected function getMethods() {
         $child = get_class_methods($this);
         $parent = get_class_methods('Controller');
+
         return array_diff($child, $parent);
     }
-    public function loadComponents() {
+    public function callAction($request) {
+        $this->params = $request;
+        $this->componentEvent('initialize');
+        $this->beforeFilter();
+        $this->componentEvent('startup');
+        
+        if($this->hasAction($request['action'])):
+            $params = $request['params'];
+            if(!is_null($request['id'])):
+                array_unshift($params, $request['id']);
+            endif;
+            call_user_func_array(array($this, $request['action']), $params);
+        endif;
+
+        $output = '';
+        if($this->autoRender):
+            $this->beforeRender();
+            $output = $this->render($request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
+        endif;
+
+        $this->componentEvent('shutdown');
+        $this->afterFilter();
+        
+        return $output;
+    }
+    protected function loadModels() {
+        foreach($this->uses as $model):
+            // @todo check for errors here!
+            $this->{$model} = Loader::instance('Model', $model);
+        endforeach;
+    }
+    protected function loadComponents() {
         foreach($this->components as $component):
             $component = $component . 'Component';
             if(Loader::exists('Component', $component)):
                 $this->{$component} = Loader::instance('Component', $component);
             else:
                 throw new MissingComponentException();
-                // $this->error('missingComponent', array('component' => $component));
             endif;
         endforeach;
-        return true;
     }
-    public function componentEvent($event) {
+    protected function componentEvent($event) {
         foreach($this->components as $component):
             $className = $component . 'Component';
             if(can_call_method($this->$className, $event)):
@@ -62,22 +92,10 @@ class Controller {
             endif;
         endforeach;
     }
-    public function loadModels() {
-        foreach($this->uses as $model):
-            // @todo check for errors here!
-            $this->{$model} = Loader::instance('Model', $model);
-        endforeach;
-        return true;
-    }
-    public function beforeFilter() {
-        return true;
-    }
-    public function beforeRender() {
-        return true;
-    }
-    public function afterFilter() {
-        return true;
-    }
+    
+    public function beforeFilter() { }
+    public function beforeRender() { }
+    public function afterFilter() { }
     public function setAction($action) {
         $this->params['action'] = $action;
         $args = func_get_args();

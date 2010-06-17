@@ -1,52 +1,41 @@
 <?php
 
 class Dispatcher {
-    public static function dispatch() {
-        $path = Mapper::parse();
-        $path['controller'] = Inflector::hyphenToUnderscore($path['controller']);
-        $path['action'] = Inflector::hyphenToUnderscore($path['action']);
-        $controller_name = Inflector::camelize($path['controller']) . 'Controller';
-        $view_path = $path['controller'] . '/' . $path['action'] . '.' . $path['extension'];
-        $view_exists = Loader::exists('View', $view_path);
+    public static function dispatch($request = null) {
+        $request = self::normalize($request);
+        $controller_name = Inflector::camelize($request['controller']) . 'Controller';
         
         if(Loader::exists('Controller', $controller_name)):
             $controller = Loader::instance('Controller', $controller_name);
-            if(!$controller->isAction($path['action']) && !$view_exists):
+            
+            if($controller->hasAction($request['action']) || self::hasView($request)):
+                return $controller->callAction($request);
+            else:
                 throw new MissingActionException(array(
                     'controller' => $controller_name,
-                    'action' => $path['action']
+                    'action' => $request['action']
                 ));
             endif;
-        else:
+        elseif(self::hasView($request)):
             $controller = Loader::instance('Controller', 'AppController');
-            if(!$view_exists):
-                throw new MissingControllerException(array(
-                    'controller' => $controller_name
-                ));
-            endif;
+            return $controller->callAction($request);
+        else:
+            throw new MissingControllerException(array(
+                'controller' => $controller_name
+            ));
         endif;
-
-        $controller->params = $path;
-        $controller->componentEvent('initialize');
-        $controller->beforeFilter();
-        $controller->componentEvent('startup');
-
-        if($controller->isAction($path['action'])):
-            $params = $path['params'];
-            if(!is_null($path['id'])):
-                array_unshift($params, $path['id']);
-            endif;
-            call_user_func_array(array(&$controller, $path['action']), $params);
+    }
+    protected static function normalize($request) {
+        if(is_null($request)):
+            $request = Mapper::parse();
         endif;
-
-        if($controller->autoRender):
-            $controller->beforeRender();
-            $output = $controller->render();
-        endif;
-
-        $controller->componentEvent('shutdown');
-        $controller->afterFilter();
-
-        return $output;
+        $request['controller'] = Inflector::hyphenToUnderscore($request['controller']);
+        $request['action'] = Inflector::hyphenToUnderscore($request['action']);
+        
+        return $request;
+    }
+    // @todo this should not be in the Dispatcher
+    protected static function hasView($request) {
+        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
     }
 }

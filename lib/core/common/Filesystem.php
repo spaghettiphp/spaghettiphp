@@ -55,7 +55,7 @@ class Filesystem{
         endif;
         return false;
     }
-    public function isDir($path) {
+    public static function isDir($path) {
         return is_dir(self::path($path));
     }
     public static function isUploaded($file) {
