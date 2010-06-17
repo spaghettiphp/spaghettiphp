@@ -10,7 +10,8 @@
             dt { color: #9c0; }
             dd { background: #322D2B; color: #fff; margin: 5px 0 15px; padding: 20px; }
             dd, dl, pre { -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; }
-            pre { color: #fff; font: 12px Monaco, Consolas, 'Courier New', monospace; background: #322D2B; margin: 0; overflow: auto; }
+            pre, code { color: #fff; font: 12px Monaco, Consolas, 'Courier New', monospace; background: #322D2B; margin: 0; overflow: auto; }
+            code { margin: 0px 4px; }
         </style>
     </head>
     
@@ -18,11 +19,9 @@
         <h1><?php echo $exception->getMessage() ?></h1>
         <dl>
             <dt>Details:</dt>
-            <dd><?php echo $exception->getMessage() ?></dd>
-            <dt>File:</dt>
-            <dd><pre><?php echo $exception->getFile() . ':' . $exception->getLine() ?></pre></dd>
+            <dd><?php echo $exception->getDetails() ?></dd>
             <dt>Stack Trace:</dt>
-            <dd><pre><?php echo $exception->getTraceAsString() ?></pre></dd>
+            <dd><pre><?php echo $exception ?></pre></dd>
         </dl>
     </body>
 </html>

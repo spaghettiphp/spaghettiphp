@@ -12,21 +12,17 @@ class Dispatcher {
         if(Loader::exists('Controller', $controller_name)):
             $controller = Loader::instance('Controller', $controller_name);
             if(!$controller->isAction($path['action']) && !$view_exists):
-                throw new MissingActionException('action not found');
-                // $controller->error('missingAction', array(
-                //     'controller' => $path['controller'],
-                //     'action' => $path['action']
-                // ));
-                // return false;
+                throw new MissingActionException(array(
+                    'controller' => $controller_name,
+                    'action' => $path['action']
+                ));
             endif;
         else:
             $controller = Loader::instance('Controller', 'AppController');
             if(!$view_exists):
-                throw new MissingControllerException('controller not found');
-                // $controller->error('missingController', array(
-                //     'controller' => $path['controller']
-                // ));
-                // return false;
+                throw new MissingControllerException(array(
+                    'controller' => $controller_name
+                ));
             endif;
         endif;
 

@@ -2,11 +2,13 @@
 
 class SpaghettiException extends Exception {
     protected $status = 500;
+    protected $details;
     
-    public function __construct($message, $code) {
-        parent::__construct($message, $code);
+    public function __construct($message, $code, $details = null, Exception $previous = null) {
+        parent::__construct($message, $code, $previous);
+        $this->details = $details;
     }
-    function header($status) {
+    public function header($status) {
         $codes = array(
             100 => 'Continue',
             101 => 'Switching Protocols',
@@ -50,7 +52,10 @@ class SpaghettiException extends Exception {
         );
         header('HTTP/1.1 ' . $status . ' ' . $codes[$status]);
     }
-    public function __toString() {
+    public function getDetails() {
+        return $this->details;
+    }
+    public function toString() {
         ob_end_clean();
         $this->header($this->status);
         if(Filesystem::exists('app/views/layouts/error.htm.php')):
@@ -67,15 +72,24 @@ class SpaghettiException extends Exception {
 
 class MissingException extends SpaghettiException {
     protected $status = 404;
-    protected $message;
-    
-    public function __construct() {
-        parent::__construct(get_class($this), 0);
+}
+
+class MissingControllerException extends MissingException {
+    public function __construct($details = array()) {
+        $message = 'Missing Controller';
+        $details = 'The controller <code>' .  $details['controller']. '</code> could not be found.';
+        parent::__construct($message, 0, $details);
     }
 }
 
-class MissingControllerException extends MissingException {}
-class MissingActionException extends MissingException {}
+class MissingActionException extends MissingException {
+    public function __construct($details = array()) {
+        $message = 'Missing Action';
+        $details = 'The action <code>' . $details['controller'] . '::' .  $details['action']. '()</code> could not be found.';
+        parent::__construct($message, 0, $details);
+    }
+}
+
 class MissingComponentException extends MissingException {}
 class MissingTableException extends MissingException {}
 class MissingViewException extends MissingException {}
