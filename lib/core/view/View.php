@@ -40,11 +40,7 @@ class View {
             endif;
             return $output;
         else:
-            throw new MissingViewException();
-            // $this->error('missingView', array(
-            //     'view' => $action
-            // ));
-            // return false;
+            throw new MissingViewException('missing view', 0);
         endif;
     }
     public function renderLayout($layout, $content, $data) {
@@ -55,10 +51,6 @@ class View {
             return $this->renderView($layout_file, $data);
         else:
             throw new MissingLayoutException();
-            // $this->error('missingLayout', array(
-            //     'layout' => $layout
-            // ));
-            // return false;
         endif;        
     }
     public function element($element, $data = array()) {

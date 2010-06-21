@@ -21,7 +21,13 @@ class Model {
         'belongsTo' => array('primaryKey', 'foreignKey'),
         'hasOne' => array('primaryKey', 'foreignKey')
     );
-    public $pagination = array();
+    public $pagination = array(
+        'totalRecords' => 0,
+        'totalPages' => 0,
+        'perPage' => 0,
+        'offset' => 0,
+        'page' => 0
+    );
     protected $conn;
     protected static $instances = array();
 

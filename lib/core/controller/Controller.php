@@ -174,7 +174,7 @@ class Controller {
         if($exit) $this->stop();
     }
     public function set($var, $value = null) {
-        if(is_null($value)):
+        if(is_array($var)):
             foreach($var as $key => $value):
                 $this->set($key, $value);
             endforeach;
