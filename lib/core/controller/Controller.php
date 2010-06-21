@@ -174,12 +174,13 @@ class Controller {
         if($exit) $this->stop();
     }
     public function set($var, $value = null) {
-        if(is_array($var)):
+        if(is_null($value)):
             foreach($var as $key => $value):
                 $this->set($key, $value);
             endforeach;
+        else:
+            $this->view[$var] = $value;            
         endif;
-        $this->view[$var] = $value;
     }
     public function get($var) {
         if(array_key_exists($var, $this->view)):

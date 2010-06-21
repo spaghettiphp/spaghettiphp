@@ -52,13 +52,13 @@ class AccessControlComponent extends Component {
       *  @param object $controller Objeto Controller
       *  @return void
       */
-    public function initialize(&$controller) {
+    public function initialize($controller) {
         if(!isset($controller->AuthComponent)):
             trigger_error("Controller::AuthComponent not found", E_USER_ERROR);
         endif;
         $this->controller = $controller;
         $this->auth = $controller->AuthComponent;
-        $this->auth->recursion = 2;
+        $this->auth->recursion = 1;
         $this->auth->deny();
     }
     /**
@@ -67,7 +67,7 @@ class AccessControlComponent extends Component {
       *  @param object $controller Objeto Controller
       *  @return void
       */
-    public function startup(&$controller) {
+    public function startup($controller) {
         if($this->autoCheck):
             $this->check();
         endif;

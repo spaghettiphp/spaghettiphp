@@ -109,7 +109,7 @@ class AuthComponent extends Component {
       *  @param object $controller Objeto Controller
       *  @return void
       */
-    public function initialize(&$controller) {
+    public function initialize($controller) {
         $this->controller = $controller;
     }
     /**
@@ -118,7 +118,7 @@ class AuthComponent extends Component {
       *  @param object $controller Objeto Controller
       *  @return void
       */
-    public function startup(&$controller) {
+    public function startup($controller) {
         $this->allow($this->loginAction);
         if($this->autoCheck):
             $this->check();
@@ -133,7 +133,7 @@ class AuthComponent extends Component {
       *  @param object $controller Objeto Controller
       *  @return void
       */
-    public function shutdown(&$controller) {
+    public function shutdown($controller) {
         if(Mapper::match($this->loginAction)):
             $this->loginRedirect();
         endif;
@@ -230,7 +230,7 @@ class AuthComponent extends Component {
       *  @return array Dados do usuário
       */
     public function identify($conditions) {
-        $userModel = ClassRegistry::load($this->userModel);
+        $userModel = Loader::instance("Model", $this->userModel);
         if(!$userModel):
             $this->error("missingModel", array("model" => $this->userModel));
             return false;
@@ -352,7 +352,7 @@ class AuthComponent extends Component {
       *  @param array $details Detalhes do erro
       *  @return void
       */
-    public function error($type) {
+    public function error($type, $details = array()) {
         Session::writeFlash("Auth.error", $type);
     }
 }
