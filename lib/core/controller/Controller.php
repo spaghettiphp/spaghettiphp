@@ -63,7 +63,11 @@ class Controller {
         $output = '';
         if($this->autoRender):
             $this->beforeRender();
-            $output = $this->render($request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
+            $action = null;
+            if($this->name == 'App'):
+                $action = $request['controller'] . '/' . $request['action'] . '.' . $request['extension'];
+            endif;
+            $output = $this->render($action);
         endif;
 
         $this->componentEvent('shutdown');
