@@ -1,5 +1,7 @@
 <?php
 
+require 'lib/core/view/Exceptions.php';
+
 class View {
     public $pageTitle;
     public $contentForLayout;

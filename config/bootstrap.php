@@ -19,7 +19,12 @@ require 'lib/core/common/Validation.php';
 
 // includes and initializes core.debug
 require 'lib/core/debug/Debug.php';
-Debug::errorHandler();
+
+/**
+ * Debug::errorHandler() can cause some trouble, so it's disabled by default.
+ * Uncomment the following line if you want your errors to throw exceptions.
+ */
+// Debug::errorHandler();
 
 // includes core.dispatcher
 require 'lib/core/dispatcher/Dispatcher.php';

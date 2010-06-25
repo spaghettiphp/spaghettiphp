@@ -1,5 +1,7 @@
 <?php
 
+require 'lib/core/controller/Exceptions.php';
+
 class Controller {
     public $autoLayout = true;
     public $autoRender = true;
