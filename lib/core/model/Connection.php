@@ -2,7 +2,7 @@
 
 require 'lib/core/model/datasources/Datasource.php';
 
-class Connection extends Object {
+class Connection {
     protected $config = array();
     protected $connections = array();
     protected static $instance;

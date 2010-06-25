@@ -1,97 +1,36 @@
 <?php
-/**
- *  AccessControlComponent é um componente responsável pela autorização de usuários,
- *  através de permissões dadas a grupos ou usuários.
- *
- *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
- *
- */
 
 class AccessControlComponent extends Component {
-    /**
-      *  Instância do controller.
-      */
     public $controller;
-    /**
-      *  Instância do AuthComponent.
-      */
     public $auth;
-    /**
-      *  Define se AuthComponent::check() será chamado automaticamente.
-      */
     public $autoCheck = true;
-    /**
-      *  Nome do modelo a ser utilizado para grupos.
-      */
     public $roleModel = "Roles";
-    /**
-      *  Nome do modelo a ser utilizado para relacionar grupos e usuários.
-      */
     public $userRoleModel = "UsersRoles";
-    /**
-     *  Lista de permissões de grupo.
-     */
     public $permissions = array();
-    /**
-      *  Lista de permissões de usuários.
-      */
     public $userPermissions = array();
-    /**
-      *  Define se o componente checará permissões de grupo.
-      */
     public $checkGroupPermissions = true;
-    /**
-      *  Define se o componente checará permissões específicas para usuários.
-      */
     public $checkUserPermissions = false;
     
-    /**
-      *  Inicializa o componente.
-      *
-      *  @param object $controller Objeto Controller
-      *  @return void
-      */
-    public function initialize(&$controller) {
+    public function initialize($controller) {
         if(!isset($controller->AuthComponent)):
             trigger_error("Controller::AuthComponent not found", E_USER_ERROR);
         endif;
         $this->controller = $controller;
         $this->auth = $controller->AuthComponent;
-        $this->auth->recursion = 2;
+        $this->auth->recursion = 1;
         $this->auth->deny();
     }
-    /**
-      *  Faz as operações necessárias após a inicialização do componente.
-      *
-      *  @param object $controller Objeto Controller
-      *  @return void
-      */
-    public function startup(&$controller) {
+    public function startup($controller) {
         if($this->autoCheck):
             $this->check();
         endif;
     }
-    /**
-      *  Permite acesso a um grupo de usuários.
-      *
-      *  @param string $role Grupo a receber a permissão
-      *  @param array $permissions Permissões a serem dadas ao grupo
-      *  @return void
-      */
     public function allow($role, $permissions) {
         if(isset($this->permissions[$role])):
             $permissions = array_merge($this->permissions[$role], $permissions);
         endif;
         $this->permissions[$role] = $permissions;
     }
-    /**
-      *  Permite acesso a um usuário específico.
-      *
-      *  @param string $user Usuário a receber a permissão
-      *  @param array $permissions Permissões a serem dadas ao usuário
-      *  @return void
-      */
     public function allowUser($user, $permissions) {
         $this->checkUserPermissions = true;
         if(isset($this->permissions[$user])):
@@ -99,11 +38,6 @@ class AccessControlComponent extends Component {
         endif;
         $this->userPermissions[$user] = $permissions;
     }
-    /**
-     *  Verifica se o usuário esta autorizado ou não para acessar a URL atual.
-     *
-     *  @return boolean Verdadeiro caso o usuário esteja autorizado
-     */
     public function authorized() {
         if($this->auth->loggedIn):
             if($this->auth->isPublic()):
@@ -118,12 +52,6 @@ class AccessControlComponent extends Component {
             return $this->auth->authorized();
         endif;
     }
-    /**
-      *  Verifica se um usuário está autorizado a acessar uma URL através de permissões
-      *  de grupo.
-      *
-      *  @return boolean Verdadeiro se o usuário está autorizado
-      */
     public function authorizedGroup() {
         $here = Mapper::here();
         $roles = $this->getRoles();
@@ -136,12 +64,6 @@ class AccessControlComponent extends Component {
         endforeach;
         return false;
     }
-    /**
-      *  Verifica se um usuário está autorizado a acessar uma URL através de permissões
-      *  específicas do usuário.
-      *
-      *  @return boolean Verdadeiro se o usuário está autorizado
-      */
     public function authorizedUser() {
         $here = Mapper::here();
         $user = $this->auth->user($this->auth->fields["username"]);
@@ -152,12 +74,6 @@ class AccessControlComponent extends Component {
         endforeach;
         return false;
     }
-    /**
-      *  Verifica se o usuário está autorizado a acessar a URL atual, tomando as
-      *  ações necessárias no caso contrário.
-      *
-      *  @return boolean Verdadeiro caso o usuário esteja autorizado
-      */
     public function check() {
         if(!$this->authorized()):
             $this->auth->setAction(Mapper::here());
@@ -167,11 +83,6 @@ class AccessControlComponent extends Component {
         endif;
         return true;
     }
-    /**
-      *  Retorna os grupos ao qual o usuário atual pertence.
-      *
-      *  @return array Grupos ao qual o usuário pertence
-      */
     public function getRoles() {
         $user = $this->auth->user();
         $userRoleModel = Inflector::underscore($this->userRoleModel);
@@ -186,5 +97,3 @@ class AccessControlComponent extends Component {
         return $roles;
     }
 }
-
-?>

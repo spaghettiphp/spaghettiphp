@@ -1,10 +1,11 @@
 <?php
 
-class Mapper extends Object {
+class Mapper {
     protected $prefixes = array();
     protected $routes = array();
-    protected $here;
     protected $base;
+    protected $here = '/';
+    protected $domain = 'http://localhost';
     protected $root;
     protected static $instance;
 
@@ -16,11 +17,10 @@ class Mapper extends Object {
                 $this->base = '/';
             endif;
         endif;
-        
-        if(array_key_exists('REQUEST_URI', $_SERVER)):
+    
+        if(array_key_exists('REQUEST_URI', $_SERVER) && array_key_exists('HTTP_HOST', $_SERVER)):
             $start = strlen($this->base);
             $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
-    
             $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
         endif;
     }
@@ -44,7 +44,7 @@ class Mapper extends Object {
         return $self->domain;
     }
     public static function normalize($url) {
-        if(!preg_match('/^[a-z]+:/', $url)):
+        if(!preg_match('/^[a-z]+:/i', $url)):
             $url = '/' . $url;
             while(strpos($url, '//') !== false):
                 $url = str_replace('//', '/', $url);

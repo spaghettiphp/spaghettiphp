@@ -1,7 +1,5 @@
 <?php
 
-require_once 'lib/core/filesystem/Filesystem.php';
-
 class FileUpload {
     public $allowedTypes = array();
     public $maxSize = false;
@@ -57,7 +55,7 @@ class FileUpload {
 
         return true;
     }
-    public function error($type, $details = array()) {
+    public function error($type) {
         $this->errors []= $type;
         return false;
     }

@@ -1,6 +1,8 @@
 <?php
 
-class Model extends Object {
+require 'lib/core/model/Exceptions.php';
+
+class Model {
     public $belongsTo = array();
     public $hasMany = array();
     public $hasOne = array();
@@ -21,8 +23,15 @@ class Model extends Object {
         'belongsTo' => array('primaryKey', 'foreignKey'),
         'hasOne' => array('primaryKey', 'foreignKey')
     );
-    public $pagination = array();
+    public $pagination = array(
+        'totalRecords' => 0,
+        'totalPages' => 0,
+        'perPage' => 0,
+        'offset' => 0,
+        'page' => 0
+    );
     protected $conn;
+    protected static $instances = array();
 
     public function __construct() {
         if(!$this->connection):
@@ -33,7 +42,7 @@ class Model extends Object {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        ClassRegistry::addObject(get_class($this), $this);
+        Model::$instances[get_class($this)] = $this;
         $this->createLinks();
     }
     public function __call($method, $condition) {
@@ -41,7 +50,7 @@ class Model extends Object {
             $field = Inflector::underscore($match[2]);
             $params = array(
                 'conditions' => array(
-                    $field = $condition[0]
+                    $field => $condition[0]
                 )
             );
             if(isset($condition[1])):
@@ -53,19 +62,27 @@ class Model extends Object {
             return false;
         endif;
     }
+    /**
+     * @todo use static vars
+     */
     public function connection() {
         if(!$this->conn):
             $this->conn = Connection::get($this->connection);
         endif;
         return $this->conn;
     }
+    /**
+     * @todo refactor
+     */
     public function setSource($table) {
         $db = $this->connection();
         if($table):
             $this->table = $table;
             $sources = $db->listSources();
             if(!in_array($this->table, $sources)):
-                $this->error('missingTable', array('model' => get_class($this), 'table' => $this->table));
+                throw new MissingTableException(array(
+                    'table' => $this->table
+                ));
                 return false;
             endif;
             if(empty($this->schema)):
@@ -74,6 +91,9 @@ class Model extends Object {
         endif;
         return true;
     }
+    /**
+     * @todo refactor
+     */
     public function describe() {
         $db = $this->connection();
         $schema = $db->describe($this->table);
@@ -88,15 +108,11 @@ class Model extends Object {
         return $this->schema = $schema;
     }
     public function loadModel($model) {
-        if(!isset($this->{$model})):
-            if($class =& ClassRegistry::load($model)):
-                $this->{$model} = $class;
-            else:
-                $this->error('missingModel', array('model' => $model));
-                return false;
-            endif;
+        // @todo check for errors here!
+        if(!array_key_exists($model, Model::$instances)):
+            Model::$instances[$model] = Loader::instance('Model', $model);
         endif;
-        return true;
+        $this->{$model} = Model::$instances[$model];
     }
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
@@ -112,7 +128,12 @@ class Model extends Object {
                 elseif(!isset($properties['className'])):
                     $associations[$key]['className'] = $key;
                 endif;
-                $this->loadModel($associations[$key]['className']);
+                
+                $model = $associations[$key]['className'];
+                if(!isset($this->{$model})):
+                    $this->loadModel($model);
+                endif;
+                
                 $associations[$key] = $this->generateAssociation($type, $associations[$key]);
             endforeach;
         endforeach;
@@ -220,11 +241,11 @@ class Model extends Object {
     }
     public function count($params = array()) {
         $db = $this->connection();
-        $params += array(
+        $params = array_merge($params, array(
             'fields' => '*',
-            'table' => $this->table
-        );
-        
+            'table' => $this->table,
+            'limit' => null
+        ));
         return $db->count($params);
     }
     public function paginate($params = array()) {
@@ -234,6 +255,7 @@ class Model extends Object {
         );
         $page = !$params['page'] ? 1 : $params['page'];
         $offset = ($page - 1) * $params['perPage'];
+        // @todo do we really need limits and offsets together here?
         $params['limit'] = $offset . ',' . $params['perPage'];
 
         $totalRecords = $this->count($params);
@@ -247,6 +269,9 @@ class Model extends Object {
 
         return $this->all($params);
     }
+    /**
+     * @todo refactor. check for fields
+     */
     public function toList($params = array()) {
         $params += array(
             'key' => $this->primaryKey,
@@ -287,6 +312,9 @@ class Model extends Object {
         
         return $db->update($params);
     }
+    /**
+     * @todo refactor
+     */
     public function save($data) {
         if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
             $this->id = $data[$this->primaryKey];
@@ -323,6 +351,9 @@ class Model extends Object {
         $this->afterSave($created);
         return $save;
     }
+    /**
+     * @todo refactor
+     */
     public function validate($data) {
         $this->errors = array();
         $defaults = array(
@@ -356,6 +387,9 @@ class Model extends Object {
         endforeach;
         return empty($this->errors);
     }
+    /**
+     * @todo refactor
+     */
     public function callValidationMethod($params, $value) {
         $method = is_array($params) ? $params[0] : $params;
         $class = method_exists($this, $method) ? $this : 'Validation';

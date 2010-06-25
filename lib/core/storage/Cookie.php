@@ -1,6 +1,6 @@
 <?php
 
-class Cookie extends Object {
+class Cookie {
     public $expires;
     public $path = '/';
     public $domain = '';
@@ -41,7 +41,10 @@ class Cookie extends Object {
     }
     public static function read($name) {
         $self = self::getInstance();
-        return self::decrypt($_COOKIE[$self->name][$name]);
+        if(array_key_exists($self->name, $_COOKIE)):
+            return self::decrypt($_COOKIE[$self->name][$name]);
+        endif;
+        return null;
     }
     public static function write($name, $value, $expires = null) {
         $self = self::getInstance();

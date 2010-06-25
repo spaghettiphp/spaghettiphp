@@ -1,6 +1,6 @@
 <?php
 
-require 'lib/core/model/QueryBuilder.php';
+require 'lib/core/model/ValueParser.php';
 
 class PdoDatasource extends Datasource {
     protected $affectedRows;
@@ -28,14 +28,12 @@ class PdoDatasource extends Datasource {
     public function dsn() {
         return $this->config['dsn'];
     }
-    public function connect($dsn = null, $username = null, $password = null) {
+    public function connect($dsn = null) {
         if(!$this->connection):
             if(is_null($dsn)):
                 $dsn = $this->dsn();
-                $username = $this->config['user'];
-                $password = $this->config['password'];
             endif;
-            $this->connection = new PDO($dsn, $username, $password);
+            $this->connection = new PDO($dsn);
             $this->connected = true;
         endif;
         
@@ -106,12 +104,11 @@ class PdoDatasource extends Datasource {
         
         return $order;
     }
-    public function values($conditions) {
-        return array_slice($conditions, 1);
+    public function logQuery($sql) {
+        return $this->lastQuery = $sql;
     }
     public function query($sql, $values = array()) {
-        $this->lastQuery = $sql;
-
+        $this->logQuery($sql);
         $query = $this->connection->prepare($sql);
         $query->setFetchMode(PDO::FETCH_ASSOC);
         $query->execute($values);
@@ -123,7 +120,7 @@ class PdoDatasource extends Datasource {
     public function fetchAll($sql) {
         return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
-     public function escape($value) {
+    public function escape($value) {
         if(is_null($value)):
             return 'NULL';
         else:
@@ -143,10 +140,11 @@ class PdoDatasource extends Datasource {
     public function read($params) {
         $params += $this->params;
         
-        $query = new QueryBuilder($this);
-        $sql = $query->buildQuery('select', $params);
+        $query = new ValueParser($params['conditions']);
+        $params['conditions'] = $query->conditions();
         $values = $query->values();
 
+        $sql = $this->renderSelect($params);
         $query = $this->query($sql, $values);
 
         $results = array();
@@ -159,11 +157,11 @@ class PdoDatasource extends Datasource {
     public function update($params) {
         $params += $this->params;
 
-        $query = new QueryBuilder($this);
-        $sql = $query->buildQuery('update', $params);
-
-        $values = array_values($params['values']) + $query->values();
+        $query = new ValueParser($params['conditions']);
+        $params['conditions'] = $query->conditions();
+        $values = array_merge(array_values($params['values']), $query->values());
         
+        $sql = $this->renderUpdate($params);
         $query = $this->query($sql, $values);
         
         return $query;
@@ -171,10 +169,11 @@ class PdoDatasource extends Datasource {
     public function delete($params) {
         $params += $this->params;
 
-        $query = new QueryBuilder($this);
-        $sql = $query->buildQuery('delete', $params);
+        $query = new ValueParser($params['conditions']);
+        $params['conditions'] = $query->conditions();
         $values = $query->values();
 
+        $sql = $this->renderDelete($params);
         $query = $this->query($sql, $values);
         
         return $query;

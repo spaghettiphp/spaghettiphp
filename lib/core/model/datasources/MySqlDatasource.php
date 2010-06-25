@@ -3,6 +3,19 @@
 require_once 'lib/core/model/datasources/PdoDatasource.php';
 
 class MySqlDatasource extends PdoDatasource {
+    public function connect($dsn = null, $username = null, $password = null) {
+        if(!$this->connection):
+            if(is_null($dsn)):
+                $dsn = $this->dsn();
+                $username = $this->config['user'];
+                $password = $this->config['password'];
+            endif;
+            $this->connection = new PDO($dsn, $username, $password);
+            $this->connected = true;
+        endif;
+        
+        return $this->connection;
+    }
     // @todo add missing DSN elements
     public function dsn() {
         return 'mysql:host=' . $this->config['host'] . ';dbname=' . $this->config['database'];
@@ -37,7 +50,7 @@ class MySqlDatasource extends PdoDatasource {
         
         return $this->schema[$table];
     }
-    public function column($column) {
+    protected function column($column) {
         preg_match('/([a-z]*)\(?([^\)]*)?\)?/', $column, $type);
         list($column, $type, $limit) = $type;
         if(in_array($type, array('date', 'time', 'datetime', 'timestamp'))):
@@ -88,10 +101,12 @@ class MySqlDatasource extends PdoDatasource {
         $sql = 'SELECT ' . $this->alias($params['fields']);
         $sql .= ' FROM ' . $this->alias($params['table']);
         
-        if(!empty($params['joins'])):
+        if(is_array($params['joins']) && !empty($params['joins'])):
             foreach($params['joins'] as $join):
                 $sql .= ' ' . $this->join($join);
             endforeach;
+        elseif(is_string($params['joins'])):
+            $sql .= ' ' . $params['joins'];
         endif;
         
         if(!empty($params['conditions'])):

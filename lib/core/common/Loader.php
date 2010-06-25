@@ -14,7 +14,7 @@ class Loader {
         return SPAGHETTI_ROOT . '/app/' . $paths[$type] . Inflector::underscore($class) . '.' . $ext;
     }
     public static function exists($type, $class) {
-        return file_exists(self::path($type, $class));
+        return class_exists($class) || file_exists(self::path($type, $class));
     }
     public static function instance($type, $class) {
         if(!class_exists($class)):

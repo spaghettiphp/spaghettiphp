@@ -1,6 +1,6 @@
 <?php
 
-class Inflector extends Object {
+class Inflector {
     public static function camelize($string) {
         return str_replace(' ', '', ucwords(str_replace(array('_', '-'), ' ', $string)));
     }

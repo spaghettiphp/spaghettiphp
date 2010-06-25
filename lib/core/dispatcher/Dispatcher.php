@@ -1,54 +1,39 @@
 <?php
 
-class Dispatcher extends Object {
-    public static function dispatch() {
-        $path = Mapper::parse();
-        $path['controller'] = Inflector::hyphenToUnderscore($path['controller']);
-        $path['action'] = Inflector::hyphenToUnderscore($path['action']);
-        $controller_name = Inflector::camelize($path['controller']) . 'Controller';
-        $view_path = $path['controller'] . '/' . $path['action'] . '.' . $path['extension'];
-        $view_exists = Loader::exists('View', $view_path);
+class Dispatcher {
+    public static function dispatch($request = null) {
+        $request = self::normalize($request);
+        $class = $controller_name = Inflector::camelize($request['controller']) . 'Controller';
         
-        if(Loader::exists('Controller', $controller_name)):
-            $controller =& Loader::instance('Controller', $controller_name);
-            if(!$controller->isAction($path['action']) && !$view_exists):
-                $controller->error('missingAction', array(
-                    'controller' => $path['controller'],
-                    'action' => $path['action']
-                ));
-                return false;
-            endif;
+        if(!Loader::exists('Controller', $controller_name)):
+            $class = 'AppController';
+        endif;
+        $controller = Loader::instance('Controller', $class);
+        
+        if($controller->hasAction($request['action']) || self::hasView($request)):
+            return $controller->callAction($request);
+        elseif(get_class($controller) == 'AppController'):
+            throw new MissingControllerException(array(
+                'controller' => $controller_name
+            ));
         else:
-            $controller =& Loader::instance('Controller', 'AppController');
-            if(!$view_exists):
-                $controller->error('missingController', array(
-                    'controller' => $path['controller']
-                ));
-                return false;
-            endif;
+            throw new MissingActionException(array(
+                'controller' => $controller_name,
+                'action' => $request['action']
+            ));
         endif;
-
-        $controller->params = $path;
-        $controller->componentEvent('initialize');
-        $controller->beforeFilter();
-        $controller->componentEvent('startup');
-
-        if($controller->isAction($path['action'])):
-            $params = $path['params'];
-            if(!is_null($path['id'])):
-                $params = array_unshift($path['id']);
-            endif;
-            call_user_func_array(array(&$controller, $path['action']), $params);
+    }
+    protected static function normalize($request) {
+        if(is_null($request)):
+            $request = Mapper::parse();
         endif;
-
-        if($controller->autoRender):
-            $controller->beforeRender();
-            $output = $controller->render();
-        endif;
-
-        $controller->componentEvent('shutdown');
-        $controller->afterFilter();
-
-        return $output;
+        $request['controller'] = Inflector::hyphenToUnderscore($request['controller']);
+        $request['action'] = Inflector::hyphenToUnderscore($request['action']);
+        
+        return $request;
+    }
+    // @todo this should not be in the Dispatcher
+    protected static function hasView($request) {
+        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
     }
 }
