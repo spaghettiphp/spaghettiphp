@@ -1,6 +1,6 @@
 <?php
 
-class Generator extends Object {
+class Generator {
     public static function exists($type) {
         $type = Inflector::underscore($type);
         $class = Inflector::camelize($type) . 'Generator';
