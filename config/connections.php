@@ -13,7 +13,7 @@ Connection::add(array(
     /*
     'sqlite_dev' => array(
         'driver' => 'SQLite',
-        'path' => '/data/teste.sqlite3', //relative to SPAGHETTI_ROOT
+        'path' => '/path/to/database.sqlite', //relative to SPAGHETTI_ROOT
         'database' => 'data',
         'prefix' => ''
     ),/**/
