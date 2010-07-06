@@ -88,9 +88,12 @@ class Controller {
         endif;
     }
     protected function loadComponent($component) {
+        // @todo refactor in method
         $component = Inflector::camelize($component) . 'Component';
-        if(Filesystem::exists('lib/components/' . $component . '.php')):
-            require 'lib/components/' . $component . '.php';
+        if(!class_exists($component) && Filesystem::exists('lib/components/' . $component . '.php')):
+            require_once 'lib/components/' . $component . '.php';
+        endif;
+        if(class_exists($component)):
             $this->{$component} = new $component();
         else:
             throw new MissingComponentException(array(
