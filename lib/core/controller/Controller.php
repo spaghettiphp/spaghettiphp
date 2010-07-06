@@ -103,12 +103,12 @@ class Controller {
     protected function componentEvent($event) {
         foreach($this->components as $component):
             $className = $component . 'Component';
-            if(can_call_method($this->$className, $event)):
+            //if(can_call_method($this->$className, $event)):
                 $this->$className->{$event}($this);
-            else:
+            //else:
                 // @todo should throw exception
-                trigger_error('Can\'t call method ' . $event . ' in ' . $className, E_USER_WARNING);
-            endif;
+            //    trigger_error('Can\'t call method ' . $event . ' in ' . $className, E_USER_WARNING);
+            //endif;
         endforeach;
     }
     protected function beforeFilter() { }
