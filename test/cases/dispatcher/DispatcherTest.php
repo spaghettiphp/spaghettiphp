@@ -15,6 +15,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
         'action' => 'index',
         'extension' => 'htm',
         'params' => array(),
+        'named' => array(),
         'id' => null
     );
 
