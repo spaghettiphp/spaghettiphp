@@ -10,7 +10,7 @@ Connection::add(array(
         'prefix' => ''
     ),
 
-    /*
+    //*
     'sqlite_dev' => array(
         'driver' => 'SQLite',
         'path' => '/path/to/database.sqlite', //relative to SPAGHETTI_ROOT
@@ -18,7 +18,7 @@ Connection::add(array(
         'prefix' => ''
     ),/**/
     
-    /*
+    //*
     'postgres_dev' => array(
         'driver' => 'PostgreSql',
         'host' => 'localhost',
