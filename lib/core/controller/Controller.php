@@ -3,16 +3,16 @@
 require 'lib/core/controller/Exceptions.php';
 
 class Controller {
-    public $autoLayout = true;
-    public $autoRender = true;
-    public $components = array();
-    public $data = array();
-    public $layout = 'default';
-    public $name = null;
-    public $params = array();
-    public $uses = null;
-    public $view = array();
-    public $viewClass = 'View';
+    protected $autoLayout = true;
+    protected $autoRender = true;
+    protected $components = array();
+    protected $data = array();
+    protected $layout = 'default';
+    protected $name = null;
+    protected $params = array();
+    protected $uses = null;
+    protected $view = array();
+    protected $viewClass = 'View';
 
     public function __construct() {
         if(is_null($this->name)):
