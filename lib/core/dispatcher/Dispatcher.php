@@ -17,6 +17,7 @@ class Dispatcher {
                 'controller' => $controller_name
             ));
         else:
+            // @todo maybe MissingActionException should be thrown by Controller
             throw new MissingActionException(array(
                 'controller' => $controller_name,
                 'action' => $request['action']

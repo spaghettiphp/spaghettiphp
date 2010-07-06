@@ -9,14 +9,6 @@ function array_unset(&$array, $index) {
     return null;
 }
 
-function can_call_method($object, $method) {
-    if(method_exists($object, $method)):
-        $method = new ReflectionMethod($object, $method);
-        return $method->isPublic();
-    endif;
-    return false;
-}
-
 function array_range($min, $max) {
     $result = array();
     for($i = $min; $i < $max + 1; $i++):

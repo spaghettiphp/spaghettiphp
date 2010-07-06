@@ -39,14 +39,13 @@ class Controller {
         return substr($classname, 0, $lenght);
     }
     public function hasAction($action) {
-        $methods = $this->getMethods();
-        return in_array($action, $methods) && can_call_method($this, $action);
-    }
-    protected function getMethods() {
-        $child = get_class_methods($this);
-        $parent = get_class_methods('Controller');
-
-        return array_diff($child, $parent);
+        $class = new ReflectionClass(get_class($this));
+        if($class->hasMethod($action)):
+            $method = $class->getMethod($action);
+            return $method->class != 'Controller' && $method->isPublic();
+        endif;
+        
+        return false;
     }
     public function callAction($request) {
         $this->params = $request;
