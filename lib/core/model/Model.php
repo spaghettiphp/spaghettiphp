@@ -45,20 +45,32 @@ class Model {
         Model::$instances[get_class($this)] = $this;
         $this->createLinks();
     }
-    public function __call($method, $condition) {
-        if(preg_match('/(all|first)By([\w]+)/', $method, $match)):
-            $field = Inflector::underscore($match[2]);
-            $params = array(
-                'conditions' => array(
-                    $field => $condition[0]
-                )
-            );
-            if(isset($condition[1])):
-                $params += $condition[1];
+    public function __call($method, $args){
+        $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
+        if(preg_match($regex, $method, $output)):
+            $complement = Inflector::underscore($output['complement']);
+            $conditions = explode('_and_', $complement);
+            $params = array();
+
+            if($output['method'] == 'get'):
+                if(is_array($args[0])): 
+                    $params['conditions'] = $args[0];
+                elseif(is_numeric($args[0])):
+                    $params['conditions']['id'] = $args[0];
+                endif;
+                
+                $params['fields'][] = $conditions[0];
+                $result =  $this->first($params);
+                
+                return $result[$conditions[0]];
+            else:
+                $params['conditions'] = array_combine($conditions, $args);
+
+                return $this->$output['method']($params);
             endif;
-            return $this->{$match[1]}($params);
+            
         else:
-            trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
+            //trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
             return false;
         endif;
     }
