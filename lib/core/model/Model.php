@@ -124,7 +124,7 @@ class Model {
         if(!array_key_exists($model, Model::$instances)):
             Model::$instances[$model] = Loader::instance('Model', $model);
         endif;
-        $this->{$model} = Model::$instances[$model];
+        return $this->{$model} = Model::$instances[$model];
     }
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
