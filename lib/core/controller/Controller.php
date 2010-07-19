@@ -1,5 +1,6 @@
 <?php
 
+require 'lib/core/controller/Component.php';
 require 'lib/core/controller/Exceptions.php';
 
 class Controller {
@@ -12,20 +13,18 @@ class Controller {
     protected $params = array();
     protected $uses = null;
     protected $view = array();
-    protected $viewClass = 'View';
 
     public function __construct() {
         if(is_null($this->name)):
             $this->name = $this->name();
-            
-            // prevent models from being loaded in AppController
-            if(is_null($this->uses) && $this->name == 'App'):
-                $this->uses = array();
-            endif;
         endif;
-        
+
         if(is_null($this->uses)):
-            $this->uses = array($this->name);
+            if($this->name == 'App'):
+                $this->uses = array();
+            else:
+                $this->uses = array($this->name);
+            endif;
         endif;
         
         array_map(array($this, 'loadModel'), $this->uses);
@@ -38,21 +37,31 @@ class Controller {
         
         return substr($classname, 0, $lenght);
     }
+    public function callAction($request) {
+        if($this->hasAction($request['action']) || Controller::hasViewForAction($request)):
+            return $this->dispatch($request);
+        else:
+            throw new MissingActionException(array(
+                'controller' => $request['controller'],
+                'action' => $request['action']
+            ));
+        endif;
+    }
     public function hasAction($action) {
         $class = new ReflectionClass(get_class($this));
         if($class->hasMethod($action)):
             $method = $class->getMethod($action);
             return $method->class != 'Controller' && $method->isPublic();
+        else:
+            return false;
         endif;
-        
-        return false;
     }
-    public function callAction($request) {
+    protected function dispatch($request) {
         $this->params = $request;
         $this->componentEvent('initialize');
         $this->beforeFilter();
         $this->componentEvent('startup');
-        
+    
         if($this->hasAction($request['action'])):
             $params = $request['params'];
             if(!is_null($request['id'])):
@@ -64,17 +73,16 @@ class Controller {
         $output = '';
         if($this->autoRender):
             $this->beforeRender();
-            $action = null;
-            if($this->name == 'App'):
-                $action = $request['controller'] . '/' . $request['action'] . '.' . $request['extension'];
-            endif;
-            $output = $this->render($action);
+            $output = $this->render();
         endif;
 
         $this->componentEvent('shutdown');
         $this->afterFilter();
-        
+    
         return $output;
+    }
+    public static function hasViewForAction($request) {
+        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
     }
     protected function loadModel($model) {
         $model = Inflector::camelize($model);
@@ -93,7 +101,7 @@ class Controller {
             require_once 'lib/components/' . $component . '.php';
         endif;
         if(class_exists($component)):
-            $this->{$component} = new $component();
+            return $this->{$component} = new $component();
         else:
             throw new MissingComponentException(array(
                 'component' => $component
@@ -103,34 +111,28 @@ class Controller {
     protected function componentEvent($event) {
         foreach($this->components as $component):
             $className = $component . 'Component';
-            //if(can_call_method($this->$className, $event)):
-                $this->$className->{$event}($this);
-            //else:
-                // @todo should throw exception
-            //    trigger_error('Can\'t call method ' . $event . ' in ' . $className, E_USER_WARNING);
-            //endif;
+            $this->$className->{$event}($this);
         endforeach;
     }
     protected function beforeFilter() { }
     protected function beforeRender() { }
     protected function afterFilter() { }
     public function setAction($action) {
-        $this->params['action'] = $action;
         $args = func_get_args();
-        array_shift($args);
+        $this->params['action'] = array_shift($args);
+        
         return call_user_func_array(array($this, $action), $args);
     }
     public function render($action = null) {
-        $view = new $this->viewClass;
-        $view->controller = $this;
+        $view = new View;
         $layout = $this->autoLayout ? $this->layout : false;
         $view->controller = $this;
+        $this->autoRender = false;
         
         if(is_null($action)):
             $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
         endif;
 
-        $this->autoRender = false;
         return $view->render($action, $this->view, $layout);
     }
     public function redirect($url, $status = null, $exit = true) {
@@ -194,18 +196,20 @@ class Controller {
     public function get($var) {
         if(array_key_exists($var, $this->view)):
             return $this->view[$var];
+        else:
+            return null;
         endif;
-        
-        return null;
     }
     public function param($key, $default = null) {
         if(array_key_exists($key, $this->params['named'])):
             return $this->params['named'][$key];
+            
         elseif(in_array($key, array_keys($this->params))):
             return $this->params[$key];
+            
+        else:
+            return $default;
         endif;
-        
-        return $default;
     }
     public function page($param = 'page') {
         return $this->param($param, 1);

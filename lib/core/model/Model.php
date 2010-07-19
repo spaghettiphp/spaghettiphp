@@ -1,5 +1,6 @@
 <?php
 
+require 'lib/core/model/Connection.php';
 require 'lib/core/model/Exceptions.php';
 require 'lib/core/model/Behavior.php';
 

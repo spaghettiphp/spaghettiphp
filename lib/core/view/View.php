@@ -1,5 +1,6 @@
 <?php
 
+require 'lib/core/view/Helper.php';
 require 'lib/core/view/Exceptions.php';
 
 class View {
@@ -14,7 +15,7 @@ class View {
     protected $lastBlock;
 
     public function __construct() {
-        $this->loadHelper($this->helpers);
+        array_map(array($this, 'loadHelper'), $this->helpers);
     }
     public function __get($name) {
         if(!array_key_exists($name, $this->loadedHelpers)):
@@ -24,17 +25,15 @@ class View {
         return $this->loadedHelpers[$name];
     }
     public function loadHelper($helper) {
-        if(is_array($helper)):
-            return array_walk($helper, array($this, 'loadHelper'));
-        endif;
-
+        // @todo refactor in method
         $helper_class = Inflector::camelize($helper) . 'Helper';
-        
-        if(Filesystem::exists('lib/helpers/' . $helper_class . '.php')):
+        if(!class_exists($helper_class) && Filesystem::exists('lib/helpers/' . $helper_class . '.php')):
             require_once 'lib/helpers/' . $helper_class . '.php';
-            $this->loadedHelpers[$helper] = new $helper_class($this);
+        endif;
+        if(class_exists($helper_class)):
+            return $this->loadedHelpers[$helper] = new $helper_class($this);
         else:
-            throw new MissingHelperException(array(
+            throw new MissingComponentException(array(
                 'helper' => $helper_class
             ));
         endif;
@@ -102,5 +101,8 @@ class View {
     }
     public function block($name) {
         return $this->blocks[$name];
+    }
+    public static function path($request) {
+        return $request['controller'] . '/' . $request['action'] . '.' . $request['extension'];
     }
 }
