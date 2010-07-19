@@ -1,6 +1,7 @@
 <?php
 
 require 'lib/core/model/Exceptions.php';
+require 'lib/core/model/Behavior.php';
 
 class Model {
     public $belongsTo = array();
@@ -44,8 +45,9 @@ class Model {
         $this->setSource($this->table);
         Model::$instances[get_class($this)] = $this;
         $this->createLinks();
+        array_map(array($this, 'loadBehavior'), $this->behaviors);
     }
-    public function __call($method, $args){
+    public function __call($method, $args) {
         $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
         if(preg_match($regex, $method, $output)):
             $complement = Inflector::underscore($output['complement']);
@@ -87,8 +89,8 @@ class Model {
      * @todo refactor
      */
     public function setSource($table) {
-        $db = $this->connection();
         if($table):
+            $db = $this->connection();
             $this->table = $table;
             $sources = $db->listSources();
             if(!in_array($this->table, $sources)):
@@ -174,6 +176,29 @@ class Model {
         endforeach;
         return $association;
     }
+    
+    protected function loadBehavior($behavior) {
+        // @todo refactor in method
+        $behavior = Inflector::camelize($behavior);
+        if(!class_exists($behavior) && Filesystem::exists('lib/behaviors/' . $behavior . '.php')):
+            require_once 'lib/behaviors/' . $behavior . '.php';
+        endif;
+        if(class_exists($behavior)):
+            $this->{$behavior} = new $behavior($this);
+        else:
+            // @todo create exception
+            throw new MissingBehaviorException(array(
+                'behavior' => $behavior
+            ));
+        endif;
+    }
+    public function registerHook($name, $fn) {
+        $this->hooks[$name] = $fn;
+    }
+    public function fireHook($name) {
+        call_user_func_array($this->hooks[$name], array());
+    }
+    
     public function query($query) {
         $db = $this->connection();
         return $db->query($query);
