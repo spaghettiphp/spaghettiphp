@@ -73,7 +73,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
     public function testDispatchShouldRenderOutputWhenViewExists() {
         // create a test view
         Filesystem::createDir('app/views/missing', 0777);
-        Filesystem::write('app/views/missing/test.htm.php', '');
+        Filesystem::write('app/views/missing/test.htm.php', 'working');
         
         $output = Dispatcher::dispatch(array(
             'controller' => 'missing',

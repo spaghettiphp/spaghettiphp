@@ -67,4 +67,19 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
         $actual = $this->controller->controllerEvents;
         $this->assertEquals($expected, $actual);
     }
+
+    /**
+     * @testdox set should work with arrays
+     */
+    public function testSetShouldWorkWithArrays() {
+        $this->controller->set(array('key' => 'value'));
+        $this->assertEquals('value', $this->controller->get('key'));
+    }
+
+    /**
+     * @testdox get should return null for undefined keys
+     */
+    public function testGetShouldReturnNullForUndefinedKeys() {
+        $this->assertNull($this->controller->get('undefined'));
+    }
 }
