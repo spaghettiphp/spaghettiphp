@@ -240,24 +240,19 @@ class Model {
     }
     
     public function query($query) {
-        $db = $this->connection();
-        return $db->query($query);
+        return $this->connection()->query($query);
     }
     public function fetch($query) {
-        $db = $this->connection();
-        return $db->fetchAll($query);
+        return $this->connection()->fetchAll($query);
     }
     public function begin() {
-        $db = $this->connection();
-        return $db->begin();
+        return $this->connection()->begin();
     }
     public function commit() {
-        $db = $this->connection();
-        return $db->commit();
+        return $this->connection()->commit();
     }
     public function rollback() {
-        $db = $this->connection();
-        return $db->rollback();
+        return $this->connection()->rollback();
     }
     public function all($params = array()) {
         $db = $this->connection();
@@ -376,6 +371,7 @@ class Model {
             'values' => $data,
             'table' => $this->table
         );
+        
         return $db->create($params);
     }
     public function update($params, $data) {
@@ -384,46 +380,59 @@ class Model {
             'values' => $data,
             'table' => $this->table
         );
-        
+
         return $db->update($params);
     }
     /**
      * @todo refactor
      */
     public function save($data) {
-        if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
-            $this->id = $data[$this->primaryKey];
-        elseif(!is_null($this->id)):
+        if(!is_null($this->id)):
             $data[$this->primaryKey] = $this->id;
         endif;
-        foreach($data as $field => $value):
-            if(!isset($this->schema[$field])):
-                unset($data[$field]);
-            endif;
-        endforeach;
+
+        // apply modified timestamp
         $date = date('Y-m-d H:i:s');
-        if(isset($this->schema['modified']) && !isset($data['modified'])):
+        if(!array_key_exists('modified', $data)):
             $data['modified'] = $date;
         endif;
-        $exists = $this->exists(array($this->primaryKey => $this->id));
-        if(!$exists && isset($this->schema['created']) && !isset($data['created'])):
+        
+        // verify if the record exists
+        $exists = $this->exists(array(
+            $this->primaryKey => $this->id
+        ));
+        
+        // apply created timestamp
+        if(!$exists && !array_key_exists('created', $data)):
             $data['created'] = $date;
         endif;
-        if(!($data = $this->fireFilter('beforeSave', $data))) return false;
-        if(!is_null($this->id) && $exists):
+        
+        // apply beforeSave filter
+        $data = $this->fireFilter('beforeSave', $data);
+        if(!$data):
+            return false;
+        endif;
+
+        // filter fields that are not in the schema
+        $data = array_intersect_key($data, $this->schema);
+        
+        // update a record if it already exists...
+        if($exists):
             $save = $this->update(array(
                 'conditions' => array(
                     $this->primaryKey => $this->id
                 ),
                 'limit' => 1
             ), $data);
-            $created = false;
+        // or insert a new one if it doesn't
         else:
             $save = $this->insert($data);
-            $created = true;
             $this->id = $this->getInsertId();
         endif;
-        $this->afterSave($created);
+        
+        // fire afterSave action
+        $this->fireAction('afterSave');
+        
         return $save;
     }
     /**
@@ -489,7 +498,7 @@ class Model {
             ),
             'limit' => 1
         );
-        if($this->exists($id) && $this->deleteAll($params)):
+        if($this->exists(array($this->primaryKey => $id)) && $this->deleteAll($params)):
             if($dependent):
                 $this->deleteDependent($id);
             endif;
@@ -519,15 +528,12 @@ class Model {
         return $db->delete($params);
     }
     public function getInsertId() {
-        $db = $this->connection();
-        return $db->insertId();
+        return $this->connection()->insertId();
     }
     public function getAffectedRows() {
-        $db = $this->connection();
-        return $db->affectedRows();
+        return $this->connection()->affectedRows();
     }
     public function escape($value) {
-        $db = $this->connection();
-        return $db->escape($value);
+        return $this->connection()->escape($value);
     }
 }
