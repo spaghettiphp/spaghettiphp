@@ -2,11 +2,13 @@
 
 class Behavior {
     protected $model;
-    protected $hooks = array();
+    protected $actions = array();
+    protected $filters = array();
     
     public function __construct($model) {
         $this->model = $model;
-        $this->registerHook($this->hooks);
+        $this->registerAction($this->actions);
+        $this->registerFilter($this->filters);
     }
     public function hasMethod($method) {
         $class = new ReflectionClass(get_class($this));
@@ -17,17 +19,23 @@ class Behavior {
             return false;
         endif;
     }
-    public function registerHook($name, $method = null) {
+    protected function register($type, $name, $method = null) {
         if(is_array($name)):
             foreach($name as $hook => $method):
-                $this->registerHook($hook, $method);
+                $this->register($type, $hook, $method);
             endforeach;
         elseif(is_array($method)):
             foreach($method as $m):
-                $this->registerHook($name, $m);
+                $this->register($type, $name, $m);
             endforeach;
         else:
-            $this->model->registerHook($name, array($this, $method));
+            $this->model->register($type, $name, array($this, $method));
         endif;
+    }
+    public function registerAction($name, $method = null) {
+        $this->register('actions', $name, $method);
+    }
+    public function registerFilter($name, $method = null) {
+        $this->register('filters', $name, $method);
     }
 }

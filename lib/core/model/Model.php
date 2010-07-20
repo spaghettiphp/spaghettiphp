@@ -34,7 +34,8 @@ class Model {
     );
     protected $conn;
     protected static $instances = array();
-    protected $hooks = array();
+    protected $actions = array();
+    protected $filters = array();
 
     public function __construct() {
         if(!$this->connection):
@@ -195,15 +196,15 @@ class Model {
         endif;
     }
     
-    public function registerHook($hook, $method) {
-        if(!array_key_exists($hook, $this->hooks)):
-            $this->hooks[$hook] = array();
+    public function register($type, $hook, $method) {
+        if(!array_key_exists($hook, $this->{$type})):
+            $this->{$type}[$hook] = array();
         endif;
-        $this->hooks[$hook] []= $method;
+        $this->{$type}[$hook] []= $method;
     }
-    public function fireHook($hook, $params = array()) {
-        if(array_key_exists($hook, $this->hooks)):
-            foreach($this->hooks[$hook] as $method):
+    public function fireAction($hook, $params = array()) {
+        if(array_key_exists($hook, $this->actions)):
+            foreach($this->actions[$hook] as $method):
                 if($method[0]->hasMethod($method[1])):
                     call_user_func_array($method, $params);
                 else:

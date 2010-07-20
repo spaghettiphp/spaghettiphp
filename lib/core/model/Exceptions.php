@@ -16,6 +16,8 @@ class MissingTableException extends InternalErrorException {
     }
 }
 
+// @todo MissingBehaviorException
+
 class MissingBehaviorMethodException extends InternalErrorException {
     public function __construct($details = array()) {
         $message = 'Missing Behavior Method';
