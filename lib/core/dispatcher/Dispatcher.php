@@ -3,21 +3,20 @@
 class Dispatcher {
     public static function dispatch($request = null) {
         $request = self::normalize($request);
-        $class = Inflector::camelize($request['controller']) . 'Controller';
         
-        if(Loader::exists('Controller', $class)):
-            $controller = Loader::instance('Controller', $class);
+        try {
+            $class = Inflector::camelize($request['controller']) . 'Controller';
+            $controller = Controller::load($class, true);
             return $controller->callAction($request);
-            
-        elseif(Controller::hasViewForAction($request)):
-            $controller = Loader::instance('Controller', 'AppController');
-            return $controller->render(View::path($request));
-
-        else:
-            throw new MissingControllerException(array(
-                'controller' => $class
-            ));
-        endif;
+        }
+        catch(MissingControllerException $e) {
+            if(Controller::hasViewForAction($request)):
+                $controller = new AppController();
+                return $controller->render(View::path($request));
+            else:
+                throw $e;
+            endif;
+        }
     }
     protected static function normalize($request) {
         if(is_null($request)):

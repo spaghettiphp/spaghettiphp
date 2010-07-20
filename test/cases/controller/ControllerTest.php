@@ -3,7 +3,7 @@
 require_once 'PHPUnit/Framework.php';
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/bootstrap.php';
 
-class HomeController extends Controller {
+class HomeController extends AppController {
     public $controllerEvents = array();
     public $uses = array();
     public function index() {}
@@ -17,6 +17,10 @@ class HomeController extends Controller {
     protected function afterFilter() {
         $this->controllerEvents []= 'afterFilter';
     }
+}
+
+class MissingModelController extends AppController {
+    public $uses = array('Missing');
 }
 
 class ControllerTest extends PHPUnit_Framework_TestCase {
@@ -66,6 +70,14 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
         $this->controller->callAction(self::$defaults);
         $actual = $this->controller->controllerEvents;
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox loadModel should throw exception if model doesn't exist
+     * @expectedException MissingModelException
+     */
+    public function testLoadModelShouldThrowExceptionIfModelDoesntExist() {
+        $controller = Controller::load('MissingModelController', true);
     }
 
     /**

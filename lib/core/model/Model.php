@@ -469,4 +469,22 @@ class Model {
         $db = $this->connection();
         return $db->escape($value);
     }
+    
+    
+    public static function load($name, $instance = false) {
+        if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
+            require_once 'app/models/' . Inflector::underscore($name) . '.php';
+        endif;
+        if(class_exists($name)):
+            if($instance):
+                return new $name();
+            else:
+                return true;
+            endif;
+        else:
+            throw new MissingModelException(array(
+                'model' => $name
+            ));
+        endif;
+    }
 }
