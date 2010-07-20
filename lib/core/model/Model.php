@@ -47,7 +47,7 @@ class Model {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        $this->createLinks();
+        //$this->createLinks();
         
         $this->loadBehaviors($this->behaviors);
     }
@@ -541,6 +541,8 @@ class Model {
             endif;
             if(class_exists($name)):
                 Model::$instances[$name] = new $name();
+                // @todo remove this
+                Model::$instances[$name]->createLinks();
             else:
                 throw new MissingModelException(array(
                     'model' => $name
