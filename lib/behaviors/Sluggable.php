@@ -10,14 +10,17 @@ class Sluggable extends Behavior {
         return $data;
     }
     protected function getSlug($title, $number = null) {
-        $slug = Inflector::slug(preg_replace("/[\d]+/", "", $title));
-        // if(is_null($number)):
-        //     $number = 1;
-        // else:
-        //     $slug = $slug . "-" . $number;
-        // endif;
-        // 
-        // return $this->isUnique($slug, "slug") ? $slug : $this->getSlug($title, ++$number);
-        return $slug;
+        $slug = Inflector::slug($title);
+        if(is_null($number)):
+            $number = 1;
+        else:
+            $slug = $slug . "-" . $number;
+        endif;
+        
+        if($this->model->exists(array('slug' => $slug))):
+            return $this->getSlug($title, $number + 1);
+        else:
+            return $slug;
+        endif;
     }
 }
