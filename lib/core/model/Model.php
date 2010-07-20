@@ -33,10 +33,10 @@ class Model {
         'page' => 0
     );
     protected $conn;
-    protected static $instances = array();
     protected $behaviors = array();
     protected $actions = array();
     protected $filters = array();
+    protected static $instances = array();
 
     public function __construct() {
         if(!$this->connection):
@@ -47,7 +47,6 @@ class Model {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        //$this->createLinks();
         
         $this->loadBehaviors($this->behaviors);
     }
@@ -79,6 +78,24 @@ class Model {
             //trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
             return false;
         endif;
+    }
+    public static function load($name) {
+        if(!array_key_exists($name, Model::$instances)):
+            if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
+                require_once 'app/models/' . Inflector::underscore($name) . '.php';
+            endif;
+            if(class_exists($name)):
+                Model::$instances[$name] = new $name();
+                // @todo remove this
+                Model::$instances[$name]->createLinks();
+            else:
+                throw new MissingModelException(array(
+                    'model' => $name
+                ));
+            endif;
+        endif;
+        
+        return Model::$instances[$name];
     }
     /**
      * @todo use static vars
@@ -531,25 +548,5 @@ class Model {
     }
     public function escape($value) {
         return $this->connection()->escape($value);
-    }
-    
-    
-    public static function load($name) {
-        if(!array_key_exists($name, Model::$instances)):
-            if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
-                require_once 'app/models/' . Inflector::underscore($name) . '.php';
-            endif;
-            if(class_exists($name)):
-                Model::$instances[$name] = new $name();
-                // @todo remove this
-                Model::$instances[$name]->createLinks();
-            else:
-                throw new MissingModelException(array(
-                    'model' => $name
-                ));
-            endif;
-        endif;
-        
-        return Model::$instances[$name];
     }
 }

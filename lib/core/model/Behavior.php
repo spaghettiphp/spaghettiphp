@@ -12,6 +12,16 @@ class Behavior {
         $this->registerAction($this->actions);
         $this->registerFilter($this->filters);
     }
+    public static function load($name) {
+        if(!class_exists($name) && Filesystem::exists('lib/behaviors/' . $name . '.php')):
+            require_once 'lib/behaviors/' . $name . '.php';
+        endif;
+        if(!class_exists($name)):
+            throw new MissingBehaviorException(array(
+                'behavior' => $name
+            ));
+        endif;        
+    }
     public function hasMethod($method) {
         $class = new ReflectionClass(get_class($this));
         if($class->hasMethod($method)):
@@ -39,15 +49,5 @@ class Behavior {
     }
     public function registerFilter($name, $method = null) {
         $this->register('filters', $name, $method);
-    }
-    public static function load($name) {
-        if(!class_exists($name) && Filesystem::exists('lib/behaviors/' . $name . '.php')):
-            require_once 'lib/behaviors/' . $name . '.php';
-        endif;
-        if(!class_exists($name)):
-            throw new MissingBehaviorException(array(
-                'behavior' => $name
-            ));
-        endif;        
     }
 }

@@ -31,6 +31,25 @@ class Controller {
         array_map(array($this, 'loadComponent'), $this->components);
         $this->data = array_merge_recursive($_POST, $_FILES);
     }
+    public static function load($name, $instance = false) {
+        if(!class_exists($name) && Filesystem::exists('app/controllers/' . Inflector::underscore($name) . '.php')):
+            require_once 'app/controllers/' . Inflector::underscore($name) . '.php';
+        endif;
+        if(class_exists($name)):
+            if($instance):
+                return new $name();
+            else:
+                return true;
+            endif;
+        else:
+            throw new MissingControllerException(array(
+                'controller' => $name
+            ));
+        endif;
+    }
+    public static function hasViewForAction($request) {
+        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
+    }
     public function name() {
         $classname = get_class($this);
         $lenght = strpos($classname, 'Controller');
@@ -80,9 +99,6 @@ class Controller {
         $this->afterFilter();
     
         return $output;
-    }
-    public static function hasViewForAction($request) {
-        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
     }
     protected function loadModel($model) {
         $model = Inflector::camelize($model);
@@ -208,20 +224,4 @@ class Controller {
         exit(0);
     }
 
-    public static function load($name, $instance = false) {
-        if(!class_exists($name) && Filesystem::exists('app/controllers/' . Inflector::underscore($name) . '.php')):
-            require_once 'app/controllers/' . Inflector::underscore($name) . '.php';
-        endif;
-        if(class_exists($name)):
-            if($instance):
-                return new $name();
-            else:
-                return true;
-            endif;
-        else:
-            throw new MissingControllerException(array(
-                'controller' => $name
-            ));
-        endif;
-    }
 }
