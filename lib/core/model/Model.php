@@ -34,6 +34,7 @@ class Model {
     );
     protected $conn;
     protected static $instances = array();
+    protected $hooks = array();
 
     public function __construct() {
         if(!$this->connection):
@@ -193,11 +194,27 @@ class Model {
             ));
         endif;
     }
-    public function registerHook($name, $fn) {
-        $this->hooks[$name] = $fn;
+    
+    public function registerHook($hook, $method) {
+        if(!array_key_exists($hook, $this->hooks)):
+            $this->hooks[$hook] = array();
+        endif;
+        $this->hooks[$hook] []= $method;
     }
-    public function fireHook($name) {
-        call_user_func_array($this->hooks[$name], array());
+    public function fireHook($hook, $params = array()) {
+        if(array_key_exists($hook, $this->hooks)):
+            foreach($this->hooks[$hook] as $method):
+                if($method[0]->hasMethod($method[1])):
+                    call_user_func_array($method, $params);
+                else:
+                    throw new MissingBehaviorMethodException(array(
+                        'hook' => $hook,
+                        'method' => $method[1],
+                        'behavior' => get_class($method[0])
+                    ));
+                endif;
+            endforeach;
+        endif;
     }
     
     public function query($query) {

@@ -11,13 +11,31 @@ class MyModel extends AppModel {
 class MyBehavior extends Behavior {
     public $initialized = false;
     public $hooked = false;
+    public $hookedFirst = false;
+    public $hookedSecond = false;
+    public $param = false;
+    protected $hooks = array(
+        'dummy' => 'dummy',
+        'double' => array('first', 'second'),
+        'parameter' => 'parameter',
+        'exception' => 'exception'
+    );
     
     public function __construct($model) {
+        parent::__construct($model);
         $this->initialized = true;
-        $model->registerHook('dummy', array($this, 'dummyHook'));
     }
-    public function dummyHook() {
+    public function dummy() {
         $this->hooked = true;
+    }
+    public function first() {
+        $this->hookedFirst = true;
+    }
+    public function second() {
+        $this->hookedSecond = true;
+    }
+    public function parameter($param) {
+        $this->param = $param;
     }
 }
 
@@ -42,5 +60,38 @@ class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
     public function testBehaviorShouldRegisterHookInModel() {
         $this->model->fireHook('dummy');
         $this->assertTrue($this->model->MyBehavior->hooked);
+    }
+
+    /**
+     * @testdox Model should fire more than one hook if available
+     */
+    public function testModelShouldFireMoreThanOneHookIfAvailable() {
+        $this->model->fireHook('double');
+        $this->assertTrue($this->model->MyBehavior->hookedSecond);
+        $this->assertTrue($this->model->MyBehavior->hookedFirst);
+    }
+
+    /**
+     * @testdox fireHook should not fire missing hooks
+     */
+    public function testFireHookShouldNotFireMissingHooks() {
+        // @todo how could we assert this?
+        $this->model->fireHook('missing');
+    }
+
+    /**
+     * @testdox fireHook should throw exception when firing missing methods
+     * @expectedException MissingBehaviorMethodException
+     */
+    public function testFireHookShouldThrowExceptionWhenFiringMissingMethods() {
+        $this->model->fireHook('exception');
+    }
+
+    /**
+     * @testdox fireHook should accept parameters
+     */
+    public function testFireHookShouldAcceptParameter() {
+        $this->model->fireHook('parameter', array(true));
+        $this->assertTrue($this->model->MyBehavior->param);
     }
 }
