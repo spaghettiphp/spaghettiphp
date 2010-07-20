@@ -20,6 +20,10 @@ class MyBehavior extends Behavior {
         'parameter' => 'parameter',
         'exception' => 'exception'
     );
+    protected $filters = array(
+        'propagate' => 'propagate',
+        'stop' => array('propagate', 'stop', 'true')
+    );
     
     public function __construct($model) {
         parent::__construct($model);
@@ -36,6 +40,15 @@ class MyBehavior extends Behavior {
     }
     public function parameter($param) {
         $this->param = $param;
+    }
+    public function propagate($param) {
+        return $param;
+    }
+    public function stop($param) {
+        return false;
+    }
+    public function true($param) {
+        return true;
     }
 }
 
@@ -72,26 +85,42 @@ class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @testdox fireHook should not fire missing actions
+     * @testdox fireAction should not fire missing actions
      */
-    public function testFireHookShouldNotFireMissingActions() {
+    public function testFireActionShouldNotFireMissingActions() {
         // @todo how could we assert this?
         $this->model->fireAction('missing');
     }
 
     /**
-     * @testdox fireHook should throw exception when firing missing methods
+     * @testdox fireAction should throw exception when firing missing methods
      * @expectedException MissingBehaviorMethodException
      */
-    public function testFireHookShouldThrowExceptionWhenFiringMissingMethods() {
+    public function testFireActionShouldThrowExceptionWhenFiringMissingMethods() {
         $this->model->fireAction('exception');
     }
 
     /**
-     * @testdox fireHook should accept parameters
+     * @testdox fireAction should accept parameters
      */
     public function testFireActionShouldAcceptParameter() {
         $this->model->fireAction('parameter', array(true));
         $this->assertTrue($this->model->MyBehavior->param);
+    }
+    
+    /**
+     * @testdox fireFilter should propagate parameters
+     */
+    public function testFireFilterShouldPropagateParameters() {
+        $actual = $this->model->fireFilter('propagate', true);
+        $this->assertTrue($actual);
+    }
+
+    /**
+     * @testdox fireFilter should stop if filter returns false
+     */
+    public function testFireFilterShouldStopIfFilterReturnsFalse() {
+        $actual = $this->model->fireFilter('stop', true);
+        $this->assertFalse($actual);
     }
 }

@@ -217,6 +217,26 @@ class Model {
             endforeach;
         endif;
     }
+    public function fireFilter($hook, $param) {
+        if(array_key_exists($hook, $this->filters)):
+            foreach($this->filters[$hook] as $method):
+                if($method[0]->hasMethod($method[1])):
+                    $param = call_user_func($method, $param);
+                    if(!$param):
+                        break;
+                    endif;
+                else:
+                    throw new MissingBehaviorMethodException(array(
+                        'hook' => $hook,
+                        'method' => $method[1],
+                        'behavior' => get_class($method[0])
+                    ));
+                endif;
+            endforeach;
+        endif;
+        
+        return $param;
+    }
     
     public function query($query) {
         $db = $this->connection();
