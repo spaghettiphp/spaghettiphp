@@ -2,13 +2,13 @@
 
 class Behavior {
     protected $model;
-    protected $options;
+    protected $options = array();
     protected $actions = array();
     protected $filters = array();
     
     public function __construct($model, $options = array()) {
         $this->model = $model;
-        $this->options = $options;
+        $this->options = array_merge($this->options, $options);
         $this->registerAction($this->actions);
         $this->registerFilter($this->filters);
     }

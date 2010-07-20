@@ -4,7 +4,13 @@ require_once 'PHPUnit/Framework.php';
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/bootstrap.php';
 
 class MyModel extends AppModel {
-    public $behaviors = array('MyBehavior', 'MyParamBehavior' => true);
+    public $behaviors = array(
+        'MyBehavior',
+        'MyParamBehavior' => array(
+            'option' => true,
+            'overwrite' => true
+        )
+    );
     public $table = false;
 }
 
@@ -53,7 +59,10 @@ class MyBehavior extends Behavior {
     }
 }
 class MyParamBehavior extends Behavior {
-    public $options;
+    public $options = array(
+        'default' => true,
+        'overwrite' => false
+    );
 }
 
 class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
@@ -132,6 +141,20 @@ class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
      * @testdox loadBehavior should pass parameters
      */
     public function testLoadBehaviorShouldPassParameters() {
-        $this->assertTrue($this->model->MyParamBehavior->options);
+        $this->assertTrue($this->model->MyParamBehavior->options['option']);
+    }
+
+    /**
+     * @testdox loadBehavior should keep default options when new options aren't provided
+     */
+    public function testLoadBehaviorShouldKeepDefaultOptions() {
+        $this->assertTrue($this->model->MyParamBehavior->options['default']);
+    }
+
+    /**
+     * @testdox loadBehavior should overwrite default options when provided
+     */
+    public function testLoadBehaviorShouldOverwriteOptionsWhenProvided() {
+        $this->assertTrue($this->model->MyParamBehavior->options['overwrite']);
     }
 }
