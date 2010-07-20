@@ -53,12 +53,7 @@ class MyBehavior extends Behavior {
     }
 }
 class MyParamBehavior extends Behavior {
-    public $options = array();
-
-    public function __construct($model, $options = array()) {
-        parent::__construct($model);
-        $this->options = $options;
-    }
+    public $options;
 }
 
 class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {

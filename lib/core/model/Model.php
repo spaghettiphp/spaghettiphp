@@ -50,13 +50,7 @@ class Model {
         Model::$instances[get_class($this)] = $this;
         $this->createLinks();
         
-        foreach($this->behaviors as $key => $value):
-            if(is_numeric($key)):
-                $this->loadBehavior($value);
-            else:
-                $this->loadBehavior($key, $value);
-            endif;
-        endforeach;
+        $this->loadBehaviors($this->behaviors);
     }
     public function __call($method, $args) {
         $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
@@ -188,6 +182,16 @@ class Model {
         return $association;
     }
     
+    protected function loadBehaviors($behaviors) {
+        foreach($this->behaviors as $key => $behavior):
+            $options = array();
+            if(!is_numeric($key)):
+                $options = $behavior;
+                $behavior = $key;
+            endif;
+            $this->loadBehavior($behavior, $options);
+        endforeach;
+    }
     protected function loadBehavior($behavior, $options = array()) {
         // @todo refactor in method
         $behavior = Inflector::camelize($behavior);

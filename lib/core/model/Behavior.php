@@ -2,11 +2,13 @@
 
 class Behavior {
     protected $model;
+    protected $options;
     protected $actions = array();
     protected $filters = array();
     
-    public function __construct($model) {
+    public function __construct($model, $options = array()) {
         $this->model = $model;
+        $this->options = $options;
         $this->registerAction($this->actions);
         $this->registerFilter($this->filters);
     }
