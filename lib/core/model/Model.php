@@ -193,19 +193,9 @@ class Model {
         endforeach;
     }
     protected function loadBehavior($behavior, $options = array()) {
-        // @todo refactor in method
         $behavior = Inflector::camelize($behavior);
-        if(!class_exists($behavior) && Filesystem::exists('lib/behaviors/' . $behavior . '.php')):
-            require_once 'lib/behaviors/' . $behavior . '.php';
-        endif;
-        if(class_exists($behavior)):
-            $this->{$behavior} = new $behavior($this, $options);
-        else:
-            // @todo create exception
-            throw new MissingBehaviorException(array(
-                'behavior' => $behavior
-            ));
-        endif;
+        Behavior::load($behavior);
+        return $this->{$behavior} = new $behavior($this, $options);
     }
     
     public function register($type, $hook, $method) {
