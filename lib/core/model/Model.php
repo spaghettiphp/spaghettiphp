@@ -362,11 +362,9 @@ class Model {
         
         return $results;
     }
-    public function exists($id) {
+    public function exists($conditions) {
         $params = array(
-            'conditions' => array(
-                $this->primaryKey => $id
-            )
+            'conditions' => $conditions
         );
         $row = $this->first($params);
 
@@ -407,7 +405,7 @@ class Model {
         if(isset($this->schema['modified']) && !isset($data['modified'])):
             $data['modified'] = $date;
         endif;
-        $exists = $this->exists($this->id);
+        $exists = $this->exists(array($this->primaryKey => $this->id));
         if(!$exists && isset($this->schema['created']) && !isset($data['created'])):
             $data['created'] = $date;
         endif;

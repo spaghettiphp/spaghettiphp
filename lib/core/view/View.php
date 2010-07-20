@@ -6,8 +6,6 @@ require 'lib/core/view/Exceptions.php';
 class View {
     public $pageTitle;
     public $contentForLayout;
-    public $scriptsForLayout;
-    public $stylesForLayout;
     public $helpers = array('html', 'form');
     public $controller;
     protected $loadedHelpers = array();
