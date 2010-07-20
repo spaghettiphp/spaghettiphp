@@ -99,7 +99,7 @@ class AuthComponent extends Component {
         return $this->loggedIn;
     }
     public function identify($conditions) {
-        $userModel = Loader::instance("Model", $this->userModel);
+        $userModel = Model::load($this->userModel);
         if(!$userModel):
             $this->error("missingModel", array("model" => $this->userModel));
             return false;

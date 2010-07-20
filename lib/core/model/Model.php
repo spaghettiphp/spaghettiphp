@@ -47,7 +47,6 @@ class Model {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        Model::$instances[get_class($this)] = $this;
         $this->createLinks();
         
         $this->loadBehaviors($this->behaviors);
@@ -127,11 +126,7 @@ class Model {
         return $this->schema = $schema;
     }
     public function loadModel($model) {
-        // @todo check for errors here!
-        if(!array_key_exists($model, Model::$instances)):
-            Model::$instances[$model] = Loader::instance('Model', $model);
-        endif;
-        return $this->{$model} = Model::$instances[$model];
+        return $this->{$model} = Model::load($model);
     }
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
@@ -539,20 +534,20 @@ class Model {
     }
     
     
-    public static function load($name, $instance = false) {
-        if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
-            require_once 'app/models/' . Inflector::underscore($name) . '.php';
-        endif;
-        if(class_exists($name)):
-            if($instance):
-                return new $name();
-            else:
-                return true;
+    public static function load($name) {
+        if(!array_key_exists($name, Model::$instances)):
+            if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
+                require_once 'app/models/' . Inflector::underscore($name) . '.php';
             endif;
-        else:
-            throw new MissingModelException(array(
-                'model' => $name
-            ));
+            if(class_exists($name)):
+                Model::$instances[$name] = new $name();
+            else:
+                throw new MissingModelException(array(
+                    'model' => $name
+                ));
+            endif;
         endif;
+        
+        return Model::$instances[$name];
     }
 }
