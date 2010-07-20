@@ -4,7 +4,7 @@ require_once 'PHPUnit/Framework.php';
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/bootstrap.php';
 
 class MyModel extends AppModel {
-    public $behaviors = array('MyBehavior');
+    public $behaviors = array('MyBehavior', 'MyParamBehavior' => true);
     public $table = false;
 }
 
@@ -25,9 +25,10 @@ class MyBehavior extends Behavior {
         'stop' => array('propagate', 'stop', 'true')
     );
     
-    public function __construct($model) {
+    public function __construct($model, $options = array()) {
         parent::__construct($model);
         $this->initialized = true;
+        $this->options = $options;
     }
     public function dummy() {
         $this->hooked = true;
@@ -49,6 +50,14 @@ class MyBehavior extends Behavior {
     }
     public function true($param) {
         return true;
+    }
+}
+class MyParamBehavior extends Behavior {
+    public $options = array();
+
+    public function __construct($model, $options = array()) {
+        parent::__construct($model);
+        $this->options = $options;
     }
 }
 
@@ -122,5 +131,12 @@ class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
     public function testFireFilterShouldStopIfFilterReturnsFalse() {
         $actual = $this->model->fireFilter('stop', true);
         $this->assertFalse($actual);
+    }
+
+    /**
+     * @testdox loadBehavior should pass parameters
+     */
+    public function testLoadBehaviorShouldPassParameters() {
+        $this->assertTrue($this->model->MyParamBehavior->options);
     }
 }

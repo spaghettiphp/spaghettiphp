@@ -49,7 +49,14 @@ class Model {
         $this->setSource($this->table);
         Model::$instances[get_class($this)] = $this;
         $this->createLinks();
-        array_map(array($this, 'loadBehavior'), $this->behaviors);
+        
+        foreach($this->behaviors as $key => $value):
+            if(is_numeric($key)):
+                $this->loadBehavior($value);
+            else:
+                $this->loadBehavior($key, $value);
+            endif;
+        endforeach;
     }
     public function __call($method, $args) {
         $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
@@ -181,14 +188,14 @@ class Model {
         return $association;
     }
     
-    protected function loadBehavior($behavior) {
+    protected function loadBehavior($behavior, $options = array()) {
         // @todo refactor in method
         $behavior = Inflector::camelize($behavior);
         if(!class_exists($behavior) && Filesystem::exists('lib/behaviors/' . $behavior . '.php')):
             require_once 'lib/behaviors/' . $behavior . '.php';
         endif;
         if(class_exists($behavior)):
-            $this->{$behavior} = new $behavior($this);
+            $this->{$behavior} = new $behavior($this, $options);
         else:
             // @todo create exception
             throw new MissingBehaviorException(array(
