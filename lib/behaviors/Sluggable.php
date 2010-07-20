@@ -1,7 +1,7 @@
 <?php
 
 class Sluggable extends Behavior {
-    public $filters = array(
+    protected $filters = array(
         'beforeSave' => 'slug'
     );
     

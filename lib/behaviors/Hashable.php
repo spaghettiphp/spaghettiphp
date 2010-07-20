@@ -1,15 +1,18 @@
 <?php
 
 class Hashable extends Behavior {
-    public $filters = array(
+    protected $filters = array(
         'beforeSave' => 'hash'
     );
-    
+
     public function hash($data) {
-        $password = array_unset($data, "password");
-        if(!empty($password)):
-            $data["password"] = Security::hash($password, "sha1", true);
+        if(array_key_exists('password', $data)):
+            $password = array_unset($data, "password");
+            if(!empty($password)):
+                $data['password'] = Security::hash($password, 'sha1');
+            endif;
         endif;
+
         return $data;
     }
 }
