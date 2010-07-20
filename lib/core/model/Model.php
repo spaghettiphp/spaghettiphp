@@ -34,6 +34,7 @@ class Model {
     );
     protected $conn;
     protected static $instances = array();
+    protected $behaviors = array();
     protected $actions = array();
     protected $filters = array();
 
