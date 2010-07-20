@@ -411,7 +411,7 @@ class Model {
         if(!$exists && isset($this->schema['created']) && !isset($data['created'])):
             $data['created'] = $date;
         endif;
-        if(!($data = $this->beforeSave($data))) return false;
+        if(!($data = $this->fireFilter('beforeSave', $data))) return false;
         if(!is_null($this->id) && $exists):
             $save = $this->update(array(
                 'conditions' => array(
@@ -480,9 +480,6 @@ class Model {
                 return $this->$params($value);
             endif;
         endif;
-    }
-    public function beforeSave($data) {
-        return $data;
     }
     public function afterSave($created) {
         return $created;
