@@ -214,7 +214,7 @@ class FormHelper extends Helper {
         
         if(is_array($class)):
             $attr = $class + $attr;
-        else:
+        elseif(is_string($class)):
             $attr['class'] .= ' ' . $class;
         endif;
         
