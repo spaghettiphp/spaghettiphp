@@ -117,10 +117,10 @@ class AuthComponent extends Component {
         return Security::hash($password, $this->hash, $this->useSalt);
     }
     public function login() {
-        if(!empty($this->controller->data)):
-            $password = $this->hash($this->controller->data[$this->fields["password"]]);
+        if(!is_null($this->controller->get($this->fields["password"]))):
+            $password = $this->hash($this->controller->get($this->fields["password"]));
             $user = $this->identify(array(
-                $this->fields["username"] => $this->controller->data[$this->fields["username"]],
+                $this->fields["username"] => $this->controller->get($this->fields["username"]),
                 $this->fields["password"] => $password
             ));
             if(!empty($user)):
