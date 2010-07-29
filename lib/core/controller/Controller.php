@@ -130,7 +130,7 @@ class Controller {
         $this->autoRender = false;
         
         if(is_null($action)):
-            $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
+            $action = Inflector::underscore($this->name) . '/' . $this->params['action'] . '.' . $this->params['extension'];
         endif;
 
         return $view->render($action, $this->view, $layout);
