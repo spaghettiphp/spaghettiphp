@@ -63,8 +63,7 @@ class Controller {
         $this->componentEvent('startup');
     
         if($this->hasAction($request['action'])):
-            $params = $request['params'];
-            call_user_func_array(array($this, $request['action']), $params);
+            call_user_func_array(array($this, $request['action']), $request['params']);
         endif;
 
         $output = '';

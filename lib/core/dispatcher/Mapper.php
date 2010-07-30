@@ -128,13 +128,14 @@ class Mapper {
         $path = array();
         $parts = array('here', 'prefix', 'controller', 'action', 'extension', 'params', 'queryString');
         preg_match('/^\/(?:(' . $prefixes . ')(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i', $url, $reg);
+
         foreach($parts as $k => $key):
             $path[$key] = isset($reg[$k]) ? $reg[$k] : null;
         endforeach;
         
         $path['named'] = $path['params'] = array();
-        if(isset($reg[6])):
-            foreach(explode('/', $reg[6]) as $param):
+        if(isset($reg[5])):
+            foreach(explode('/', $reg[5]) as $param):
                 if(preg_match('/([^:]*):([^:]*)/', $param, $reg)):
                     $path['named'][$reg[1]] = urldecode($reg[2]);
                 elseif($param != ''):
