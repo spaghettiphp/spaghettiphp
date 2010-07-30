@@ -23,18 +23,9 @@ class View {
         return $this->loadedHelpers[$name];
     }
     public function loadHelper($helper) {
-        // @todo refactor in method
         $helper_class = Inflector::camelize($helper) . 'Helper';
-        if(!class_exists($helper_class) && Filesystem::exists('lib/helpers/' . $helper_class . '.php')):
-            require_once 'lib/helpers/' . $helper_class . '.php';
-        endif;
-        if(class_exists($helper_class)):
-            return $this->loadedHelpers[$helper] = new $helper_class($this);
-        else:
-            throw new MissingComponentException(array(
-                'helper' => $helper_class
-            ));
-        endif;
+        Helper::load($helper_class);
+        return $this->loadedHelpers[$helper] = new $helper_class($this);
     }
     public function render($action, $data = array(), $layout = false) {
         $view_file = Loader::path('View', $this->filename($action));

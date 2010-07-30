@@ -2,6 +2,7 @@
 
 require 'lib/core/model/Connection.php';
 require 'lib/core/model/Exceptions.php';
+require 'lib/core/model/Behavior.php';
 
 class Model {
     public $belongsTo = array();
@@ -32,6 +33,9 @@ class Model {
         'page' => 0
     );
     protected $conn;
+    protected $behaviors = array();
+    protected $actions = array();
+    protected $filters = array();
     protected static $instances = array();
 
     public function __construct() {
@@ -43,10 +47,10 @@ class Model {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        Model::$instances[get_class($this)] = $this;
-        $this->createLinks();
+        
+        $this->loadBehaviors($this->behaviors);
     }
-    public function __call($method, $args){
+    public function __call($method, $args) {
         $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
         if(preg_match($regex, $method, $output)):
             $complement = Inflector::underscore($output['complement']);
@@ -75,6 +79,24 @@ class Model {
             return false;
         endif;
     }
+    public static function load($name) {
+        if(!array_key_exists($name, Model::$instances)):
+            if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
+                require_once 'app/models/' . Inflector::underscore($name) . '.php';
+            endif;
+            if(class_exists($name)):
+                Model::$instances[$name] = new $name();
+                // @todo remove this
+                Model::$instances[$name]->createLinks();
+            else:
+                throw new MissingModelException(array(
+                    'model' => $name
+                ));
+            endif;
+        endif;
+        
+        return Model::$instances[$name];
+    }
     /**
      * @todo use static vars
      */
@@ -88,8 +110,8 @@ class Model {
      * @todo refactor
      */
     public function setSource($table) {
-        $db = $this->connection();
         if($table):
+            $db = $this->connection();
             $this->table = $table;
             $sources = $db->listSources();
             if(!in_array($this->table, $sources)):
@@ -121,11 +143,7 @@ class Model {
         return $this->schema = $schema;
     }
     public function loadModel($model) {
-        // @todo check for errors here!
-        if(!array_key_exists($model, Model::$instances)):
-            Model::$instances[$model] = Loader::instance('Model', $model);
-        endif;
-        return $this->{$model} = Model::$instances[$model];
+        return $this->{$model} = Model::load($model);
     }
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
@@ -175,25 +193,79 @@ class Model {
         endforeach;
         return $association;
     }
+    
+    protected function loadBehaviors($behaviors) {
+        foreach($this->behaviors as $key => $behavior):
+            $options = array();
+            if(!is_numeric($key)):
+                $options = $behavior;
+                $behavior = $key;
+            endif;
+            $this->loadBehavior($behavior, $options);
+        endforeach;
+    }
+    protected function loadBehavior($behavior, $options = array()) {
+        $behavior = Inflector::camelize($behavior);
+        Behavior::load($behavior);
+        return $this->{$behavior} = new $behavior($this, $options);
+    }
+    
+    public function register($type, $hook, $method) {
+        if(!array_key_exists($hook, $this->{$type})):
+            $this->{$type}[$hook] = array();
+        endif;
+        $this->{$type}[$hook] []= $method;
+    }
+    public function fireAction($hook, $params = array()) {
+        if(array_key_exists($hook, $this->actions)):
+            foreach($this->actions[$hook] as $method):
+                if($method[0]->hasMethod($method[1])):
+                    call_user_func_array($method, $params);
+                else:
+                    throw new MissingBehaviorMethodException(array(
+                        'hook' => $hook,
+                        'method' => $method[1],
+                        'behavior' => get_class($method[0])
+                    ));
+                endif;
+            endforeach;
+        endif;
+    }
+    public function fireFilter($hook, $param) {
+        if(array_key_exists($hook, $this->filters)):
+            foreach($this->filters[$hook] as $method):
+                if($method[0]->hasMethod($method[1])):
+                    $param = call_user_func($method, $param);
+                    if(!$param):
+                        break;
+                    endif;
+                else:
+                    throw new MissingBehaviorMethodException(array(
+                        'hook' => $hook,
+                        'method' => $method[1],
+                        'behavior' => get_class($method[0])
+                    ));
+                endif;
+            endforeach;
+        endif;
+        
+        return $param;
+    }
+    
     public function query($query) {
-        $db = $this->connection();
-        return $db->query($query);
+        return $this->connection()->query($query);
     }
     public function fetch($query) {
-        $db = $this->connection();
-        return $db->fetchAll($query);
+        return $this->connection()->fetchAll($query);
     }
     public function begin() {
-        $db = $this->connection();
-        return $db->begin();
+        return $this->connection()->begin();
     }
     public function commit() {
-        $db = $this->connection();
-        return $db->commit();
+        return $this->connection()->commit();
     }
     public function rollback() {
-        $db = $this->connection();
-        return $db->rollback();
+        return $this->connection()->rollback();
     }
     public function all($params = array()) {
         $db = $this->connection();
@@ -312,6 +384,7 @@ class Model {
             'values' => $data,
             'table' => $this->table
         );
+        
         return $db->create($params);
     }
     public function update($params, $data) {
@@ -320,46 +393,59 @@ class Model {
             'values' => $data,
             'table' => $this->table
         );
-        
+
         return $db->update($params);
     }
     /**
      * @todo refactor
      */
     public function save($data) {
-        if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
-            $this->id = $data[$this->primaryKey];
-        elseif(!is_null($this->id)):
+        if(!is_null($this->id)):
             $data[$this->primaryKey] = $this->id;
         endif;
-        foreach($data as $field => $value):
-            if(!isset($this->schema[$field])):
-                unset($data[$field]);
-            endif;
-        endforeach;
+
+        // apply modified timestamp
         $date = date('Y-m-d H:i:s');
-        if(isset($this->schema['modified']) && !isset($data['modified'])):
+        if(!array_key_exists('modified', $data)):
             $data['modified'] = $date;
         endif;
-        $exists = $this->exists(array($this->primaryKey => $this->id));
-        if(!$exists && isset($this->schema['created']) && !isset($data['created'])):
+        
+        // verify if the record exists
+        $exists = $this->exists(array(
+            $this->primaryKey => $this->id
+        ));
+        
+        // apply created timestamp
+        if(!$exists && !array_key_exists('created', $data)):
             $data['created'] = $date;
         endif;
-        if(!($data = $this->beforeSave($data))) return false;
-        if(!is_null($this->id) && $exists):
+        
+        // apply beforeSave filter
+        $data = $this->fireFilter('beforeSave', $data);
+        if(!$data):
+            return false;
+        endif;
+
+        // filter fields that are not in the schema
+        $data = array_intersect_key($data, $this->schema);
+        
+        // update a record if it already exists...
+        if($exists):
             $save = $this->update(array(
                 'conditions' => array(
                     $this->primaryKey => $this->id
                 ),
                 'limit' => 1
             ), $data);
-            $created = false;
+        // or insert a new one if it doesn't
         else:
             $save = $this->insert($data);
-            $created = true;
             $this->id = $this->getInsertId();
         endif;
-        $this->afterSave($created);
+        
+        // fire afterSave action
+        $this->fireAction('afterSave');
+        
         return $save;
     }
     /**
@@ -415,9 +501,6 @@ class Model {
             endif;
         endif;
     }
-    public function beforeSave($data) {
-        return $data;
-    }
     public function afterSave($created) {
         return $created;
     }
@@ -428,7 +511,7 @@ class Model {
             ),
             'limit' => 1
         );
-        if($this->exists($id) && $this->deleteAll($params)):
+        if($this->exists(array($this->primaryKey => $id)) && $this->deleteAll($params)):
             if($dependent):
                 $this->deleteDependent($id);
             endif;
@@ -458,15 +541,12 @@ class Model {
         return $db->delete($params);
     }
     public function getInsertId() {
-        $db = $this->connection();
-        return $db->insertId();
+        return $this->connection()->insertId();
     }
     public function getAffectedRows() {
-        $db = $this->connection();
-        return $db->affectedRows();
+        return $this->connection()->affectedRows();
     }
     public function escape($value) {
-        $db = $this->connection();
-        return $db->escape($value);
+        return $this->connection()->escape($value);
     }
 }

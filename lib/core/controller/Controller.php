@@ -31,6 +31,25 @@ class Controller {
         array_map(array($this, 'loadComponent'), $this->components);
         $this->data = array_merge_recursive($_POST, $_FILES);
     }
+    public static function load($name, $instance = false) {
+        if(!class_exists($name) && Filesystem::exists('app/controllers/' . Inflector::underscore($name) . '.php')):
+            require_once 'app/controllers/' . Inflector::underscore($name) . '.php';
+        endif;
+        if(class_exists($name)):
+            if($instance):
+                return new $name();
+            else:
+                return true;
+            endif;
+        else:
+            throw new MissingControllerException(array(
+                'controller' => $name
+            ));
+        endif;
+    }
+    public static function hasViewForAction($request) {
+        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
+    }
     public function name() {
         $classname = get_class($this);
         $lenght = strpos($classname, 'Controller');
@@ -77,32 +96,13 @@ class Controller {
     
         return $output;
     }
-    public static function hasViewForAction($request) {
-        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
-    }
     protected function loadModel($model) {
         $model = Inflector::camelize($model);
-        if(Loader::exists('Model', $model)):
-            $this->{$model} = Loader::instance('Model', $model);
-        else:
-            throw new MissingModelException(array(
-                'model' => $model
-            ));
-        endif;
+        return $this->{$model} = Model::load($model);
     }
     protected function loadComponent($component) {
-        // @todo refactor in method
         $component = Inflector::camelize($component) . 'Component';
-        if(!class_exists($component) && Filesystem::exists('lib/components/' . $component . '.php')):
-            require_once 'lib/components/' . $component . '.php';
-        endif;
-        if(class_exists($component)):
-            return $this->{$component} = new $component();
-        else:
-            throw new MissingComponentException(array(
-                'component' => $component
-            ));
-        endif;
+        return $this->{$component} = Component::load($component, true);
     }
     protected function componentEvent($event) {
         foreach($this->components as $component):
