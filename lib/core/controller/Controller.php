@@ -64,9 +64,6 @@ class Controller {
     
         if($this->hasAction($request['action'])):
             $params = $request['params'];
-            if(!is_null($request['id'])):
-                array_unshift($params, $request['id']);
-            endif;
             call_user_func_array(array($this, $request['action']), $params);
         endif;
 

@@ -126,8 +126,8 @@ class Mapper {
         $prefixes = join('|', self::getPrefixes());
         
         $path = array();
-        $parts = array('here', 'prefix', 'controller', 'action', 'id', 'extension', 'params', 'queryString');
-        preg_match('/^\/(?:(' . $prefixes . ')(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i', $url, $reg);
+        $parts = array('here', 'prefix', 'controller', 'action', 'extension', 'params', 'queryString');
+        preg_match('/^\/(?:(' . $prefixes . ')(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i', $url, $reg);
         foreach($parts as $k => $key):
             $path[$key] = isset($reg[$k]) ? $reg[$k] : null;
         endforeach;
@@ -170,10 +170,9 @@ class Mapper {
                 'prefix' => $here['prefix'],
                 'controller' => $here['controller'],
                 'action' => $here['action'],
-                'id' => $here['id'],
                 'params' => $here['params']
             ), $params, $path);
-            $nonParams = array('prefix', 'controller', 'action', 'id', 'params');
+            $nonParams = array('prefix', 'controller', 'action', 'params');
             $url = '';
             foreach($path as $key => $value):
                 if(!in_array($key, $nonParams)):
