@@ -3,19 +3,33 @@
 require_once 'PHPUnit/Framework.php';
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/bootstrap.php';
 require_once 'lib/behaviors/Hashable.php';
-
-class MyDummyModel extends AppModel {
-    public $table = false;
-}
+require_once 'test/classes/models/Users.php';
 
 class HashableTest extends PHPUnit_Framework_TestCase {
+    public static function setUpBeforeClass() {
+        Connection::add('test', array(
+            'driver' => 'MySql',
+            'host' => 'localhost',
+            'user' => 'root',
+            'password' => '',
+            'database' => 'spaghetti',
+            'prefix' => ''
+        ));
+        $connection = Connection::get('test');
+        $connection->query(Filesystem::read('test/sql/users_up.sql'));
+    }
+    public static function tearDownAfterClass() {
+        $connection = Connection::get('test');
+        $connection->query(Filesystem::read('test/sql/users_down.sql'));
+    }
     public function setUp() {
-        $this->behavior = new Hashable(new MyModel());
+        $this->model = new Users();
+        $this->behavior = new Hashable($this->model);
     }
     public function tearDown() {
         $this->behavior = null;
     }
-    
+
     /**
      * @testdox hash should leave password alone if it isn't provided
      */
@@ -23,6 +37,7 @@ class HashableTest extends PHPUnit_Framework_TestCase {
         $data = $this->behavior->hash(array());
         $this->assertFalse(array_key_exists('password', $data));
     }
+
     /**
      * @testdox hash should remove password if it is blank
      */
@@ -41,5 +56,17 @@ class HashableTest extends PHPUnit_Framework_TestCase {
             'password' => '123456'
         ));
         $this->assertEquals(Security::hash('123456'), $data['password']);
+    }
+
+    /**
+     * @testdox model should save hashed password
+     */
+    public function testModelShouldSaveHashedPassword() {
+        $this->model->save(array(
+            'username' => 'spaghettiphp',
+            'password' => '123456'
+        ));
+        $record = $this->model->firstById($this->model->id);
+        $this->assertEquals(Security::hash('123456'), $record['password']);
     }
 }
