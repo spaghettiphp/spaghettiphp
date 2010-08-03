@@ -14,7 +14,7 @@ class Model extends Hookable {
     public $table;
     public $primaryKey;
     public $displayField;
-    public $connection;
+    public $connection = 'default';
     public $order;
     public $limit;
     public $perPage = 20;
@@ -37,9 +37,6 @@ class Model extends Hookable {
     protected static $instances = array();
 
     public function __construct() {
-        if(!$this->connection):
-            $this->connection = Config::read('App.environment');
-        endif;
         if(is_null($this->table)):
             $database = Connection::getConfig($this->connection);
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));

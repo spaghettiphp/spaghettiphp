@@ -30,8 +30,7 @@ class Connection {
     public static function get($connection) {
         $self = self::instance();
         if(!array_key_exists($connection, $self->config)):
-            trigger_error('Can\'t find database configuration. Check /config/connections.php', E_USER_ERROR);
-            return false;
+            throw new RuntimeException('Can\'t find "' . $connection . '" database configuration.');
         endif;
         $config = $self->config[$connection];
         if(!array_key_exists($connection, $self->connections)):

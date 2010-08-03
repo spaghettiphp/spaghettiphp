@@ -1,20 +1,12 @@
 <?php
 
 require_once 'PHPUnit/Framework.php';
-require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/bootstrap.php';
+require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/test.php';
 require_once 'lib/behaviors/Hashable.php';
 require_once 'test/classes/models/Users.php';
 
 class HashableTest extends PHPUnit_Framework_TestCase {
     public static function setUpBeforeClass() {
-        Connection::add('test', array(
-            'driver' => 'MySql',
-            'host' => 'localhost',
-            'user' => 'root',
-            'password' => '',
-            'database' => 'spaghetti',
-            'prefix' => ''
-        ));
         $connection = Connection::get('test');
         $connection->query(Filesystem::read('test/sql/users_up.sql'));
     }
