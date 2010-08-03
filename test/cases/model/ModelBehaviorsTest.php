@@ -12,6 +12,13 @@ class MyModel extends AppModel {
         )
     );
     public $table = false;
+    public $filters = array(
+        'own' => array('ownFilter')
+    );
+
+    public function ownFilter($param) {
+        return $param;
+    }
 }
 
 class MyBehavior extends Behavior {
@@ -30,7 +37,7 @@ class MyBehavior extends Behavior {
         'propagate' => 'propagate',
         'stop' => array('propagate', 'stop', 'true')
     );
-    
+
     public function __construct($model, $options = array()) {
         parent::__construct($model);
         $this->initialized = true;
@@ -72,14 +79,14 @@ class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
     public function tearDown() {
         $this->model = null;
     }
-    
+
     /**
      * @testdox Model should initialize behaviors
      */
     public function testModelShouldInitializeBehaviors() {
         $this->assertTrue($this->model->MyBehavior->initialized);
     }
-    
+
     /**
      * @testdox Behavior should register action in Model
      */
@@ -98,29 +105,13 @@ class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @testdox fireAction should not fire missing actions
-     */
-    public function testFireActionShouldNotFireMissingActions() {
-        // @todo how could we assert this?
-        $this->model->fireAction('missing');
-    }
-
-    /**
-     * @testdox fireAction should throw exception when firing missing methods
-     * @expectedException MissingBehaviorMethodException
-     */
-    public function testFireActionShouldThrowExceptionWhenFiringMissingMethods() {
-        $this->model->fireAction('exception');
-    }
-
-    /**
      * @testdox fireAction should accept parameters
      */
     public function testFireActionShouldAcceptParameter() {
         $this->model->fireAction('parameter', array(true));
         $this->assertTrue($this->model->MyBehavior->param);
     }
-    
+
     /**
      * @testdox fireFilter should propagate parameters
      */
@@ -156,5 +147,12 @@ class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
      */
     public function testLoadBehaviorShouldOverwriteOptionsWhenProvided() {
         $this->assertTrue($this->model->MyParamBehavior->options['overwrite']);
+    }
+
+    /**
+     * @testdox fireFilter should call class methods if filter is not callable
+     */
+    public function testFireFilterShouldCallClassMethodsIfFilterIsNotCallable() {
+        $this->assertTrue($this->model->fireFilter('own', true));
     }
 }

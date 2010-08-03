@@ -14,6 +14,7 @@ require 'lib/core/common/Utils.php';
 require 'lib/core/common/Exceptions.php';
 require 'lib/core/common/String.php';
 require 'lib/core/common/Filesystem.php';
+require 'lib/core/common/Hookable.php';
 require 'lib/core/common/Validation.php';
 
 // includes and initializes core.debug

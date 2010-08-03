@@ -4,7 +4,7 @@ require 'lib/core/model/Connection.php';
 require 'lib/core/model/Exceptions.php';
 require 'lib/core/model/Behavior.php';
 
-class Model {
+class Model extends Hookable {
     public $belongsTo = array();
     public $hasMany = array();
     public $hasOne = array();
@@ -34,8 +34,6 @@ class Model {
     );
     protected $conn;
     protected $behaviors = array();
-    protected $actions = array();
-    protected $filters = array();
     protected static $instances = array();
 
     public function __construct() {
@@ -209,49 +207,6 @@ class Model {
         Behavior::load($behavior);
         return $this->{$behavior} = new $behavior($this, $options);
     }
-
-    public function register($type, $hook, $method) {
-        if(!array_key_exists($hook, $this->{$type})):
-            $this->{$type}[$hook] = array();
-        endif;
-        $this->{$type}[$hook] []= $method;
-    }
-    public function fireAction($hook, $params = array()) {
-        if(array_key_exists($hook, $this->actions)):
-            foreach($this->actions[$hook] as $method):
-                if($method[0]->hasMethod($method[1])):
-                    call_user_func_array($method, $params);
-                else:
-                    throw new MissingBehaviorMethodException(array(
-                        'hook' => $hook,
-                        'method' => $method[1],
-                        'behavior' => get_class($method[0])
-                    ));
-                endif;
-            endforeach;
-        endif;
-    }
-    public function fireFilter($hook, $param) {
-        if(array_key_exists($hook, $this->filters)):
-            foreach($this->filters[$hook] as $method):
-                if($method[0]->hasMethod($method[1])):
-                    $param = call_user_func($method, $param);
-                    if(!$param):
-                        break;
-                    endif;
-                else:
-                    throw new MissingBehaviorMethodException(array(
-                        'hook' => $hook,
-                        'method' => $method[1],
-                        'behavior' => get_class($method[0])
-                    ));
-                endif;
-            endforeach;
-        endif;
-
-        return $param;
-    }
-
     public function query($query) {
         return $this->connection()->query($query);
     }
