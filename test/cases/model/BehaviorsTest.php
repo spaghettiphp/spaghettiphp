@@ -72,7 +72,7 @@ class MyParamBehavior extends Behavior {
     );
 }
 
-class ModelBehaviorsTest extends PHPUnit_Framework_TestCase {
+class BehaviorTest extends PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->model = new MyModel();
     }
