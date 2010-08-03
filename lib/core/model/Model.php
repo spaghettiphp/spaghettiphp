@@ -47,7 +47,7 @@ class Model {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        
+
         $this->loadBehaviors($this->behaviors);
     }
     public function __call($method, $args) {
@@ -58,22 +58,22 @@ class Model {
             $params = array();
 
             if($output['method'] == 'get'):
-                if(is_array($args[0])): 
+                if(is_array($args[0])):
                     $params['conditions'] = $args[0];
                 elseif(is_numeric($args[0])):
                     $params['conditions']['id'] = $args[0];
                 endif;
-                
+
                 $params['fields'][] = $conditions[0];
                 $result =  $this->first($params);
-                
+
                 return $result[$conditions[0]];
             else:
                 $params['conditions'] = array_combine($conditions, $args);
 
                 return $this->$output['method']($params);
             endif;
-            
+
         else:
             //trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
             return false;
@@ -94,7 +94,7 @@ class Model {
                 ));
             endif;
         endif;
-        
+
         return Model::$instances[$name];
     }
     /**
@@ -159,12 +159,12 @@ class Model {
                 elseif(!isset($properties['className'])):
                     $associations[$key]['className'] = $key;
                 endif;
-                
+
                 $model = $associations[$key]['className'];
                 if(!isset($this->{$model})):
                     $this->loadModel($model);
                 endif;
-                
+
                 $associations[$key] = $this->generateAssociation($type, $associations[$key]);
             endforeach;
         endforeach;
@@ -193,7 +193,7 @@ class Model {
         endforeach;
         return $association;
     }
-    
+
     protected function loadBehaviors($behaviors) {
         foreach($this->behaviors as $key => $behavior):
             $options = array();
@@ -209,7 +209,7 @@ class Model {
         Behavior::load($behavior);
         return $this->{$behavior} = new $behavior($this, $options);
     }
-    
+
     public function register($type, $hook, $method) {
         if(!array_key_exists($hook, $this->{$type})):
             $this->{$type}[$hook] = array();
@@ -248,10 +248,10 @@ class Model {
                 endif;
             endforeach;
         endif;
-        
+
         return $param;
     }
-    
+
     public function query($query) {
         return $this->connection()->query($query);
     }
@@ -280,7 +280,7 @@ class Model {
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
         endif;
-        
+
         return $results;
     }
     public function first($params = array()) {
@@ -288,7 +288,7 @@ class Model {
             'limit' => 1
         );
         $results = $this->all($params);
-        
+
         return empty($results) ? array() : $results[0];
     }
     public function dependent($results, $recursion = 0) {
@@ -367,7 +367,7 @@ class Model {
         foreach($all as $result):
             $results[$result[$params['key']]] = $result[$params['displayField']];
         endforeach;
-        
+
         return $results;
     }
     public function exists($conditions) {
@@ -384,7 +384,7 @@ class Model {
             'values' => $data,
             'table' => $this->table
         );
-        
+
         return $db->create($params);
     }
     public function update($params, $data) {
@@ -409,17 +409,17 @@ class Model {
         if(!array_key_exists('modified', $data)):
             $data['modified'] = $date;
         endif;
-        
+
         // verify if the record exists
         $exists = $this->exists(array(
             $this->primaryKey => $this->id
         ));
-        
+
         // apply created timestamp
         if(!$exists && !array_key_exists('created', $data)):
             $data['created'] = $date;
         endif;
-        
+
         // apply beforeSave filter
         $data = $this->fireFilter('beforeSave', $data);
         if(!$data):
@@ -428,7 +428,7 @@ class Model {
 
         // filter fields that are not in the schema
         $data = array_intersect_key($data, $this->schema);
-        
+
         // update a record if it already exists...
         if($exists):
             $save = $this->update(array(
@@ -442,10 +442,10 @@ class Model {
             $save = $this->insert($data);
             $this->id = $this->getInsertId();
         endif;
-        
+
         // fire afterSave action
         $this->fireAction('afterSave');
-        
+
         return $save;
     }
     /**
@@ -500,9 +500,6 @@ class Model {
                 return $this->$params($value);
             endif;
         endif;
-    }
-    public function afterSave($created) {
-        return $created;
     }
     public function delete($id, $dependent = true) {
         $params = array(
