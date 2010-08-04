@@ -290,11 +290,9 @@ class Model extends Hookable {
             'perPage' => $this->perPage,
             'page' => 1
         );
-        $page = !$params['page'] ? 1 : $params['page'];
         $offset = ($page - 1) * $params['perPage'];
-        // @todo do we really need limits and offsets together here?
-        $params['limit'] = $offset . ',' . $params['perPage'];
-
+        $params['offset'] = $offset;
+        $params['limit'] = $params['perPage'];
         $totalRecords = $this->count($params);
         $this->pagination = array(
             'totalRecords' => $totalRecords,
