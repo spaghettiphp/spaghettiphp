@@ -223,7 +223,7 @@ class Model extends Hookable {
         $db = $this->connection();
         $params += array(
             'table' => $this->table,
-            'fields' => array_keys($this->schema),
+            'fields' => '*',
             'order' => $this->order,
             'limit' => $this->limit,
             'recursion' => $this->recursion
@@ -304,15 +304,17 @@ class Model extends Hookable {
 
         return $this->all($params);
     }
-    /**
-     * @todo refactor. check for fields
-     */
     public function toList($params = array()) {
+        $db = $this->connection();
         $params += array(
             'key' => $this->primaryKey,
-            'displayField' => $this->displayField
+            'displayField' => $this->displayField,
+            'table' => $this->table,
+            'order' => $this->order,
+            'limit' => $this->limit
         );
-        $all = $this->all($params);
+        $params['fields'] = array($params['key'], $params['displayField']);
+        $all = $db->read($params);
         $results = array();
         foreach($all as $result):
             $results[$result[$params['key']]] = $result[$params['displayField']];
