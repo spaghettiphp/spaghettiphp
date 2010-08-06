@@ -11,23 +11,32 @@ class Hookable {
         $this->{$type}[$hook] []= $method;
     }
     public function fireAction($hook, $params = array()) {
-        if(array_key_exists($hook, $this->actions)):
-            foreach($this->actions[$hook] as $method):
-                $this->callHook($method, $params);
-            endforeach;
-        endif;
+        $hook = $this->getHook($hook, 'actions');
+        foreach($hook as $method):
+            $this->callHook($method, $params);
+        endforeach;
     }
     public function fireFilter($hook, $param) {
-        if(array_key_exists($hook, $this->filters)):
-            foreach($this->filters[$hook] as $method):
-                $param = $this->callHook($method, array($param));
-                if(!$param):
-                    break;
-                endif;
-            endforeach;
-        endif;
+        $hook = $this->getHook($hook, 'filters');
+        foreach($hook as $method):
+            $param = $this->callHook($method, array($param));
+            if(!$param):
+                break;
+            endif;
+        endforeach;
 
         return $param;
+    }
+    protected function getHook($hook, $type) {
+        if(is_string($hook)):
+            if(array_key_exists($hook, $this->{$type})):
+                $hook = $this->{$type}[$hook];
+            else:
+                $hook = array();
+            endif;
+        endif;
+        
+        return $hook;
     }
     protected function callHook($method, $params) {
         if(!is_callable($method)):
