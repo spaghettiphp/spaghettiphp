@@ -4,7 +4,7 @@ class PaginationHelper extends Helper {
     protected $model;
 
     public function model($model) {
-        $this->model = Loader::instance("Model", $model);
+        $this->model = Model::load($model);
         return $this;
     }
     public function numbers($options = array()) {

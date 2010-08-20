@@ -1,12 +1,12 @@
 <?php
 
 class HtmlHelper extends Helper {
+    public $scriptsForLayout = '';
+    public $stylesForLayout = '';
     protected $view;
     
     public function __construct($view) {
         parent::__construct($view);
-        $this->view->stylesForLayout = '';
-        $this->view->scriptsForLayout = '';
     }
     public function openTag($tag, $attr = array(), $empty = false) {
         $html = '<' . $tag;
@@ -83,7 +83,7 @@ class HtmlHelper extends Helper {
         if($inline):
             return $output;
         else:
-            $this->view->stylesForLayout .= $output;
+            $this->stylesForLayout .= $output;
             return null;
         endif;
     }
@@ -104,7 +104,7 @@ class HtmlHelper extends Helper {
         if($inline):
             return $output;
         else:
-            $this->view->scriptsForLayout .= $output;
+            $this->scriptsForLayout .= $output;
             return null;
         endif;
     }
