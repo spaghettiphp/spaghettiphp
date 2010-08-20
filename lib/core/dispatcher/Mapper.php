@@ -1,10 +1,11 @@
 <?php
 
-class Mapper extends Object {
+class Mapper {
     protected $prefixes = array();
     protected $routes = array();
-    protected $here;
     protected $base;
+    protected $here = '/';
+    protected $domain = 'http://localhost';
     protected $root;
     protected static $instance;
 
@@ -17,10 +18,11 @@ class Mapper extends Object {
             endif;
         endif;
 
-        $start = strlen($this->base);
-        $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
-
-        $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
+        if(array_key_exists('REQUEST_URI', $_SERVER) && array_key_exists('HTTP_HOST', $_SERVER)):
+            $start = strlen($this->base);
+            $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
+            $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
+        endif;
     }
     public static function instance() {
         if(!isset(self::$instance)):
@@ -42,7 +44,7 @@ class Mapper extends Object {
         return $self->domain;
     }
     public static function normalize($url) {
-        if(!preg_match('/^[a-z]+:/', $url)):
+        if(!preg_match('/^[a-z]+:/i', $url)):
             $url = '/' . $url;
             while(strpos($url, '//') !== false):
                 $url = str_replace('//', '/', $url);
@@ -124,15 +126,16 @@ class Mapper extends Object {
         $prefixes = join('|', self::getPrefixes());
         
         $path = array();
-        $parts = array('here', 'prefix', 'controller', 'action', 'id', 'extension', 'params', 'queryString');
-        preg_match('/^\/(?:(' . $prefixes . ')(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i', $url, $reg);
+        $parts = array('here', 'prefix', 'controller', 'action', 'extension', 'params', 'queryString');
+        preg_match('/^\/(?:(' . $prefixes . ')(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i', $url, $reg);
+
         foreach($parts as $k => $key):
             $path[$key] = isset($reg[$k]) ? $reg[$k] : null;
         endforeach;
         
         $path['named'] = $path['params'] = array();
-        if(isset($reg[6])):
-            foreach(explode('/', $reg[6]) as $param):
+        if(isset($reg[5])):
+            foreach(explode('/', $reg[5]) as $param):
                 if(preg_match('/([^:]*):([^:]*)/', $param, $reg)):
                     $path['named'][$reg[1]] = urldecode($reg[2]);
                 elseif($param != ''):
@@ -168,10 +171,9 @@ class Mapper extends Object {
                 'prefix' => $here['prefix'],
                 'controller' => $here['controller'],
                 'action' => $here['action'],
-                'id' => $here['id'],
                 'params' => $here['params']
             ), $params, $path);
-            $nonParams = array('prefix', 'controller', 'action', 'id', 'params');
+            $nonParams = array('prefix', 'controller', 'action', 'params');
             $url = '';
             foreach($path as $key => $value):
                 if(!in_array($key, $nonParams)):
@@ -198,7 +200,7 @@ class Mapper extends Object {
             endif;
         endif;
         $url = self::normalize(self::base() . $url);
-        return $full ? self::base() . $url : $url;
+        return $full ? self::domain() . $url : $url;
     }
     public static function filterAction($action) {
         if(strpos($action, '_') !== false):

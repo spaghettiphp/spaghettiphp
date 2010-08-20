@@ -1,6 +1,10 @@
 <?php
 
-class Model extends Object {
+require 'lib/core/model/Connection.php';
+require 'lib/core/model/Exceptions.php';
+require 'lib/core/model/Behavior.php';
+
+class Model extends Hookable {
     public $belongsTo = array();
     public $hasMany = array();
     public $hasOne = array();
@@ -10,59 +14,105 @@ class Model extends Object {
     public $table;
     public $primaryKey;
     public $displayField;
-    public $connection;
-    public $conditions = array();
+    public $connection = 'default';
     public $order;
     public $limit;
     public $perPage = 20;
     public $validates = array();
     public $errors = array();
     public $associations = array(
-        'hasMany' => array('primaryKey', 'foreignKey', 'conditions', 'limit', 'order'),
-        'belongsTo' => array('primaryKey', 'foreignKey', 'conditions'),
-        'hasOne' => array('primaryKey', 'foreignKey', 'conditions')
+        'hasMany' => array('primaryKey', 'foreignKey', 'limit', 'order'),
+        'belongsTo' => array('primaryKey', 'foreignKey'),
+        'hasOne' => array('primaryKey', 'foreignKey')
     );
-    public $pagination = array();
+    public $pagination = array(
+        'totalRecords' => 0,
+        'totalPages' => 0,
+        'perPage' => 0,
+        'offset' => 0,
+        'page' => 0
+    );
     protected $conn;
+    protected $behaviors = array();
+    protected static $instances = array();
 
     public function __construct() {
-        if(!$this->connection):
-            $this->connection = Config::read('App.environment');
-        endif;
         if(is_null($this->table)):
-            $database = Config::read('database');
-            $this->table = $database[$this->connection]['prefix'] . Inflector::underscore(get_class($this));
+            $database = Connection::getConfig($this->connection);
+            $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        ClassRegistry::addObject(get_class($this), $this);
-        $this->createLinks();
+
+        $this->loadBehaviors($this->behaviors);
     }
-    public function __call($method, $condition) {
-        if(preg_match('/(all|first)By([\w]+)/', $method, $match)):
-            $field = Inflector::underscore($match[2]);
-            $params = array('conditions' => array($field => $condition[0]));
-            if(isset($condition[1])):
-                $params = array_merge($params, $condition[1]);
+    public function __call($method, $args) {
+        $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
+        if(preg_match($regex, $method, $output)):
+            $complement = Inflector::underscore($output['complement']);
+            $conditions = explode('_and_', $complement);
+            $params = array();
+
+            if($output['method'] == 'get'):
+                if(is_array($args[0])):
+                    $params['conditions'] = $args[0];
+                elseif(is_numeric($args[0])):
+                    $params['conditions']['id'] = $args[0];
+                endif;
+
+                $params['fields'][] = $conditions[0];
+                $result =  $this->first($params);
+
+                return $result[$conditions[0]];
+            else:
+                $params['conditions'] = array_combine($conditions, $args);
+
+                return $this->$output['method']($params);
             endif;
-            return $this->{$match[1]}($params);
+
         else:
-            trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
+            //trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
             return false;
         endif;
     }
+    public static function load($name) {
+        if(!array_key_exists($name, Model::$instances)):
+            if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
+                require_once 'app/models/' . Inflector::underscore($name) . '.php';
+            endif;
+            if(class_exists($name)):
+                Model::$instances[$name] = new $name();
+                // @todo remove this
+                Model::$instances[$name]->createLinks();
+            else:
+                throw new MissingModelException(array(
+                    'model' => $name
+                ));
+            endif;
+        endif;
+
+        return Model::$instances[$name];
+    }
+    /**
+     * @todo use static vars
+     */
     public function connection() {
         if(!$this->conn):
             $this->conn = Connection::get($this->connection);
         endif;
         return $this->conn;
     }
+    /**
+     * @todo refactor
+     */
     public function setSource($table) {
-        $db = $this->connection();
         if($table):
+            $db = $this->connection();
             $this->table = $table;
             $sources = $db->listSources();
             if(!in_array($this->table, $sources)):
-                $this->error('missingTable', array('model' => get_class($this), 'table' => $this->table));
+                throw new MissingTableException(array(
+                    'table' => $this->table
+                ));
                 return false;
             endif;
             if(empty($this->schema)):
@@ -71,6 +121,9 @@ class Model extends Object {
         endif;
         return true;
     }
+    /**
+     * @todo refactor
+     */
     public function describe() {
         $db = $this->connection();
         $schema = $db->describe($this->table);
@@ -85,15 +138,7 @@ class Model extends Object {
         return $this->schema = $schema;
     }
     public function loadModel($model) {
-        if(!isset($this->{$model})):
-            if($class =& ClassRegistry::load($model)):
-                $this->{$model} = $class;
-            else:
-                $this->error('missingModel', array('model' => $model));
-                return false;
-            endif;
-        endif;
-        return true;
+        return $this->{$model} = Model::load($model);
     }
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
@@ -109,7 +154,12 @@ class Model extends Object {
                 elseif(!isset($properties['className'])):
                     $associations[$key]['className'] = $key;
                 endif;
-                $this->loadModel($associations[$key]['className']);
+
+                $model = $associations[$key]['className'];
+                if(!isset($this->{$model})):
+                    $this->loadModel($model);
+                endif;
+
                 $associations[$key] = $this->generateAssociation($type, $associations[$key]);
             endforeach;
         endforeach;
@@ -120,15 +170,15 @@ class Model extends Object {
             if(!isset($association[$key])):
                 $data = null;
                 switch($key):
+                    case 'primaryKey':
+                        $data = $this->primaryKey;
+                        break;
                     case 'foreignKey':
                         if($type == 'belongsTo'):
                             $data = Inflector::underscore($association['className'] . 'Id');
                         else:
                             $data = Inflector::underscore(get_class($this)) . '_' . $this->primaryKey;
                         endif;
-                        break;
-                    case 'conditions':
-                        $data = array();
                         break;
                     default:
                         $data = null;
@@ -138,50 +188,59 @@ class Model extends Object {
         endforeach;
         return $association;
     }
+
+    protected function loadBehaviors($behaviors) {
+        foreach($this->behaviors as $key => $behavior):
+            $options = array();
+            if(!is_numeric($key)):
+                $options = $behavior;
+                $behavior = $key;
+            endif;
+            $this->loadBehavior($behavior, $options);
+        endforeach;
+    }
+    protected function loadBehavior($behavior, $options = array()) {
+        $behavior = Inflector::camelize($behavior);
+        Behavior::load($behavior);
+        return $this->{$behavior} = new $behavior($this, $options);
+    }
     public function query($query) {
-        $db = $this->connection();
-        return $db->query($query);
+        return $this->connection()->query($query);
     }
     public function fetch($query) {
-        $db = $this->connection();
-        return $db->fetchAll($query);
+        return $this->connection()->fetchAll($query);
     }
     public function begin() {
-        $db = $this->connection();
-        return $db->begin();
+        return $this->connection()->begin();
     }
     public function commit() {
-        $db = $this->connection();
-        return $db->commit();
+        return $this->connection()->commit();
     }
     public function rollback() {
-        $db = $this->connection();
-        return $db->rollback();
+        return $this->connection()->rollback();
     }
     public function all($params = array()) {
         $db = $this->connection();
-        $params = array_merge(
-            array(
-                'fields' => array_keys($this->schema),
-                'conditions' => isset($params['conditions']) ? array_merge($this->conditions, $params['conditions']) : $this->conditions,
-                'order' => $this->order,
-                'limit' => $this->limit,
-                'recursion' => $this->recursion
-            ),
-            $params
+        $params += array(
+            'table' => $this->table,
+            'fields' => '*',
+            'order' => $this->order,
+            'limit' => $this->limit,
+            'recursion' => $this->recursion
         );
-        $results = $db->read($this->table, $params);
+        $results = $db->read($params);
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
         endif;
+
         return $results;
     }
     public function first($params = array()) {
-        $params = array_merge(
-            array('limit' => 1),
-            $params
+        $params += array(
+            'limit' => 1
         );
         $results = $this->all($params);
+
         return empty($results) ? array() : $results[0];
     }
     public function dependent($results, $recursion = 0) {
@@ -194,15 +253,12 @@ class Model extends Object {
                     $params = array();
                     if($type == 'belongsTo'):
                         $params['conditions'] = array(
-                            $this->primaryKey => $result[$association['foreignKey']]
+                            $association["primaryKey"] => $result[$association['foreignKey']]
                         );
                         $params['recursion'] = $recursion - 1;
                     else:
-                        $params['conditions'] = array_merge(
-                            $association['conditions'],
-                            array(
-                                $association['foreignKey'] => $result[$this->primaryKey]
-                            )
+                        $params['conditions'] = array(
+                            $association['foreignKey'] => $result[$association["primaryKey"]]
                         );
                         $params['recursion'] = $recursion - 2;
                         if($type == 'hasMany'):
@@ -222,24 +278,21 @@ class Model extends Object {
     }
     public function count($params = array()) {
         $db = $this->connection();
-        $params = array_merge(
-            array('fields' => '*', 'conditions' => $this->conditions),
-            $params
-        );
-        return $db->count($this->table, $params);
+        $params = array_merge($params, array(
+            'fields' => '*',
+            'table' => $this->table,
+            'limit' => null
+        ));
+        return $db->count($params);
     }
     public function paginate($params = array()) {
-        $params = array_merge(
-            array(
-                'perPage' => $this->perPage,
-                'page' => 1
-            ),
-            $params
+        $params += array(
+            'perPage' => $this->perPage,
+            'page' => 1
         );
-        $page = !$params['page'] ? 1 : $params['page'];
         $offset = ($page - 1) * $params['perPage'];
-        $params['limit'] = $offset . ',' . $params['perPage'];
-
+        $params['offset'] = $offset;
+        $params['limit'] = $params['perPage'];
         $totalRecords = $this->count($params);
         $this->pagination = array(
             'totalRecords' => $totalRecords,
@@ -252,78 +305,104 @@ class Model extends Object {
         return $this->all($params);
     }
     public function toList($params = array()) {
-        $params = array_merge(
-            array(
-                'key' => $this->primaryKey,
-                'displayField' => $this->displayField
-            ),
-            $params
+        $db = $this->connection();
+        $params += array(
+            'key' => $this->primaryKey,
+            'displayField' => $this->displayField,
+            'table' => $this->table,
+            'order' => $this->order,
+            'limit' => $this->limit
         );
-        $all = $this->all($params);
+        $params['fields'] = array($params['key'], $params['displayField']);
+        $all = $db->read($params);
         $results = array();
         foreach($all as $result):
             $results[$result[$params['key']]] = $result[$params['displayField']];
         endforeach;
+
         return $results;
     }
-    public function exists($id) {
-        $conditions = array_merge(
-            $this->conditions,
-            array(
-                'conditions' => array(
-                    $this->primaryKey => $id
-                )
-            )
+    public function exists($conditions) {
+        $params = array(
+            'conditions' => $conditions
         );
-        $row = $this->first($conditions);
+        $row = $this->first($params);
+
         return !empty($row);
     }
     public function insert($data) {
         $db = $this->connection();
-        return $db->create($this->table, $data);
+        $params = array(
+            'values' => $data,
+            'table' => $this->table
+        );
+
+        return $db->create($params);
     }
     public function update($params, $data) {
         $db = $this->connection();
-        $params = array_merge(
-            array('conditions' => array(), 'order' => null, 'limit' => null),
-            $params
+        $params += array(
+            'values' => $data,
+            'table' => $this->table
         );
-        return $db->update($this->table, array_merge($params, compact('data')));
+
+        return $db->update($params);
     }
+    /**
+     * @todo refactor
+     */
     public function save($data) {
-        if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
-            $this->id = $data[$this->primaryKey];
-        elseif(!is_null($this->id)):
+        if(!is_null($this->id)):
             $data[$this->primaryKey] = $this->id;
         endif;
-        foreach($data as $field => $value):
-            if(!isset($this->schema[$field])):
-                unset($data[$field]);
-            endif;
-        endforeach;
+
+        // apply modified timestamp
         $date = date('Y-m-d H:i:s');
-        if(isset($this->schema['modified']) && !isset($data['modified'])):
+        if(!array_key_exists('modified', $data)):
             $data['modified'] = $date;
         endif;
-        $exists = $this->exists($this->id);
-        if(!$exists && isset($this->schema['created']) && !isset($data['created'])):
+
+        // verify if the record exists
+        $exists = $this->exists(array(
+            $this->primaryKey => $this->id
+        ));
+
+        // apply created timestamp
+        if(!$exists && !array_key_exists('created', $data)):
             $data['created'] = $date;
         endif;
-        if(!($data = $this->beforeSave($data))) return false;
-        if(!is_null($this->id) && $exists):
+
+        // apply beforeSave filter
+        $data = $this->fireFilter('beforeSave', $data);
+        if(!$data):
+            return false;
+        endif;
+
+        // filter fields that are not in the schema
+        $data = array_intersect_key($data, $this->schema);
+
+        // update a record if it already exists...
+        if($exists):
             $save = $this->update(array(
-                'conditions' => array($this->primaryKey => $this->id),
+                'conditions' => array(
+                    $this->primaryKey => $this->id
+                ),
                 'limit' => 1
             ), $data);
-            $created = false;
+        // or insert a new one if it doesn't
         else:
             $save = $this->insert($data);
-            $created = true;
             $this->id = $this->getInsertId();
         endif;
-        $this->afterSave($created);
+
+        // fire afterSave action
+        $this->fireAction('afterSave');
+
         return $save;
     }
+    /**
+     * @todo refactor
+     */
     public function validate($data) {
         $this->errors = array();
         $defaults = array(
@@ -339,7 +418,7 @@ class Model extends Object {
                 if(!is_array($rule)):
                     $rule = array('rule' => $rule);
                 endif;
-                $rule = array_merge($defaults, $rule);
+                $rule += $defaults;
                 if($rule['allowEmpty'] && empty($data[$field])):
                     continue;
                 endif;
@@ -357,6 +436,9 @@ class Model extends Object {
         endforeach;
         return empty($this->errors);
     }
+    /**
+     * @todo refactor
+     */
     public function callValidationMethod($params, $value) {
         $method = is_array($params) ? $params[0] : $params;
         $class = method_exists($this, $method) ? $this : 'Validation';
@@ -371,16 +453,14 @@ class Model extends Object {
             endif;
         endif;
     }
-    public function beforeSave($data) {
-        return $data;
-    }
-    public function afterSave($created) {
-        return $created;
-    }
     public function delete($id, $dependent = true) {
-        $db = $this->connection();
-        $params = array('conditions' => array($this->primaryKey => $id), 'limit' => 1);
-        if($this->exists($id) && $this->deleteAll($params)):
+        $params = array(
+            'conditions' => array(
+                $this->primaryKey => $id
+            ),
+            'limit' => 1
+        );
+        if($this->exists(array($this->primaryKey => $id)) && $this->deleteAll($params)):
             if($dependent):
                 $this->deleteDependent($id);
             endif;
@@ -391,31 +471,31 @@ class Model extends Object {
     public function deleteDependent($id) {
         foreach(array('hasOne', 'hasMany') as $type):
             foreach($this->{$type} as $model => $assoc):
-                $this->{$assoc['className']}->deleteAll(array('conditions' => array(
-                    $assoc['foreignKey'] => $id
-                )));
+                $this->{$assoc['className']}->deleteAll(array(
+                    'conditions' => array(
+                        $assoc['foreignKey'] => $id
+                    )
+                ));
             endforeach;
         endforeach;
         return true;
     }
     public function deleteAll($params = array()) {
         $db = $this->connection();
-        $params = array_merge(
-            array('conditions' => $this->conditions, 'order' => $this->order, 'limit' => $this->limit),
-            $params
+        $params += array(
+            'table' => $this->table,
+            'order' => $this->order,
+            'limit' => $this->limit
         );
-        return $db->delete($this->table, $params);
+        return $db->delete($params);
     }
     public function getInsertId() {
-        $db = $this->connection();
-        return $db->getInsertId();
+        return $this->connection()->insertId();
     }
     public function getAffectedRows() {
-        $db = $this->connection();
-        return $db->getAffectedRows();
+        return $this->connection()->affectedRows();
     }
-    public function escape($value, $column = null) {
-        $db = $this->connection();
-        return $db->value($value, $column);
+    public function escape($value) {
+        return $this->connection()->escape($value);
     }
 }

@@ -1,2 +1,0 @@
-<h1><?php echo $this->pageTitle = "Controller não encontrado" ?></h1>
-<p>Não foi possível encontrar o controller  <strong><?php echo Inflector::camelize($details["controller"]) ?>Controller</strong>. É possível que o arquivo <code>app/controllers/<?php echo Inflector::underscore($details["controller"]) ?>_controller.php</code> não exista, ou que a classe <strong><?php echo Inflector::camelize($details["controller"]) ?>Controller</strong> não esteja definida.</p>

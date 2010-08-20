@@ -1,2 +1,0 @@
-<h1><?php echo $this->pageTitle = "Erro na conexão com o banco de dados" ?></h1>
-<p>O Spaghetti* não conseguiu conectar ao seu banco de dados. Verifique se as configurações estão corretas, e que seu servidor está funcionando corretamente.</p>

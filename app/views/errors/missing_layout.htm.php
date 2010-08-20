@@ -1,2 +1,0 @@
-<h1><?php echo $this->pageTitle = "Layout não encontrado" ?></h1>
-<p>O layout <strong><?php echo $details["layout"] ?></strong> ainda não existe. Por favor, crie o arquivo <code>app/layouts/<?php echo "{$details['layout']}.{$details['extension']}" ?>.php</code></p>

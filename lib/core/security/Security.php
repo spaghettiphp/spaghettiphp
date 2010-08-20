@@ -1,6 +1,6 @@
 <?php
 
-class Security extends Object {
+class Security {
     public static function cipher($text, $key) {
         if(empty($key)):
             trigger_error('You cannot use an empty key for Security::cipher()', E_USER_WARNING);
@@ -20,7 +20,7 @@ class Security extends Object {
         endfor;
         return $output;
     }
-    public static function hash($text, $hash = null, $salt = false) {
+    public static function hash($text, $hash = null, $salt = true) {
         if($salt):
             if(is_string($salt)):
                 $text = $salt . $text;
@@ -28,6 +28,7 @@ class Security extends Object {
                 $text = Config::read('Security.salt') . $text;
             endif;
         endif;
+        
         switch($hash):
             case 'md5':
                 return md5($text);
@@ -37,7 +38,6 @@ class Security extends Object {
             default:
                 return sha1($text);
         endswitch;
-        return false;
     }
     public static function token(){
         return ($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']) . Session::id();
