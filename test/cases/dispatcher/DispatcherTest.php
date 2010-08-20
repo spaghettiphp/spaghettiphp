@@ -1,7 +1,7 @@
 <?php
 
 require_once 'PHPUnit/Framework.php';
-require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/bootstrap.php';
+require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/test.php';
 
 class ExistingController extends AppController {
     public $uses = array();
@@ -15,6 +15,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
         'action' => 'index',
         'extension' => 'htm',
         'params' => array(),
+        'named' => array(),
         'id' => null
     );
 
@@ -52,7 +53,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
     public function testDispatchShouldRenderOutputWhenContollerAndViewExist() {
         $expected = 'working';
         // create a test view
-        Filesystem::createDir('app/views/existing');
+        Filesystem::createDir('app/views/existing', 0777);
         Filesystem::write('app/views/existing/test.htm.php', $expected);
         
         $output = Dispatcher::dispatch(array(
@@ -71,8 +72,8 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
      */
     public function testDispatchShouldRenderOutputWhenViewExists() {
         // create a test view
-        Filesystem::createDir('app/views/missing');
-        Filesystem::write('app/views/missing/test.htm.php', '');
+        Filesystem::createDir('app/views/missing', 0777);
+        Filesystem::write('app/views/missing/test.htm.php', 'working');
         
         $output = Dispatcher::dispatch(array(
             'controller' => 'missing',

@@ -7,9 +7,6 @@ class AssetsHelper extends Helper {
         'script' => '/scripts/'
     );
     
-    public function __construct($view) {
-        parent::__construct($view);
-    }
     public function image($url) {
         return $this->asset($url, 'image');
     }

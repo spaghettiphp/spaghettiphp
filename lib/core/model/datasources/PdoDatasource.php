@@ -1,6 +1,6 @@
 <?php
 
-require 'lib/core/model/ValueParser.php';
+require_once 'lib/core/model/ValueParser.php';
 
 class PdoDatasource extends Datasource {
     protected $affectedRows;
