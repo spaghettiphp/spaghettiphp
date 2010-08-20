@@ -79,9 +79,19 @@ class MySqlDatasource extends PdoDatasource {
         return $limit;
     }
     public function count($params) {
+        $fields = '*';
+        if(array_key_exists('fields', $params)):
+            $fields = $params['fields'];
+            
+            if(is_array($params['fields'])):
+                $fields = $fields[0];
+            endif;
+        endif;
+        
         $params['fields'] = array(
-            'count' => 'COUNT(' . $this->alias($params['fields']) . ')'
+            'count' => 'COUNT(' . $fields . ')'
         );
+        
         $results = $this->read($params);
         
         return $results[0]['count'];
