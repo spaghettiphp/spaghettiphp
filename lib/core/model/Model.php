@@ -79,6 +79,7 @@ class Model extends Hookable {
             endif;
             if(class_exists($name)):
                 Model::$instances[$name] = new $name();
+                Model::$instances[$name]->connection();
                 Model::$instances[$name]->createLinks();
             else:
                 throw new MissingModelException(array(
@@ -232,6 +233,7 @@ class Model extends Hookable {
             'recursion' => $this->recursion
         );
         $results = $db->read($params);
+
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
         endif;
