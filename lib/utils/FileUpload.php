@@ -22,7 +22,7 @@ class FileUpload {
 
         if($this->validates($file)):
             if(!is_dir($path)):
-                Filesystem::createDir($path);
+                Filesystem::createDir($path, 0777);
             endif;
             if(move_uploaded_file($file['tmp_name'], $path . '/' . $name)):
                 return true;
