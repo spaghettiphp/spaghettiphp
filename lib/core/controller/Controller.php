@@ -88,7 +88,7 @@ class Controller {
         $output = '';
         if($this->autoRender):
             $this->beforeRender();
-            $output = $this->render();
+            $output = $this->render(View::path($request));
         endif;
 
         $this->componentEvent('shutdown');
