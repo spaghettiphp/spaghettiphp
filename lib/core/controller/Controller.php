@@ -80,15 +80,17 @@ class Controller {
         $this->componentEvent('initialize');
         $this->beforeFilter();
         $this->componentEvent('startup');
+        $view = View::path($request);
     
         if($this->hasAction($request['action'])):
             call_user_func_array(array($this, $request['action']), $request['params']);
+            $view = null;
         endif;
 
         $output = '';
         if($this->autoRender):
             $this->beforeRender();
-            $output = $this->render(View::path($request));
+            $output = $this->render($view);
         endif;
 
         $this->componentEvent('shutdown');
