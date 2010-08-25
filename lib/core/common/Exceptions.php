@@ -4,8 +4,8 @@ class SpaghettiException extends Exception {
     protected $status = 500;
     protected $details;
     
-    public function __construct($message, $code, $details = null, Exception $previous = null) {
-        parent::__construct($message, $code, $previous);
+    public function __construct($message, $code, $details = null) {
+        parent::__construct($message, $code);
         $this->details = $details;
     }
     public function header($status) {
