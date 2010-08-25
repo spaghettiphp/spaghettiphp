@@ -286,6 +286,7 @@ class Model extends Hookable {
         $params = array_merge($params, array(
             'fields' => '*',
             'table' => $this->table,
+            'offset' => null,
             'limit' => null
         ));
         return $db->count($params);
