@@ -12,7 +12,7 @@ class Dispatcher {
         catch(MissingControllerException $e) {
             if(Controller::hasViewForAction($request)):
                 $controller = new AppController();
-                return $controller->render(View::path($request));
+                return $controller->callAction($request);
             else:
                 throw $e;
             endif;

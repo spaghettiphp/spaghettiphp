@@ -32,7 +32,7 @@ class Model extends Hookable {
         'offset' => 0,
         'page' => 0
     );
-    protected $conn;
+    protected $connected = false;
     protected $behaviors = array();
     protected static $instances = array();
 
@@ -41,8 +41,6 @@ class Model extends Hookable {
             $database = Connection::getConfig($this->connection);
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
-        $this->setSource($this->table);
-
         $this->loadBehaviors($this->behaviors);
     }
     public function __call($method, $args) {
@@ -81,7 +79,7 @@ class Model extends Hookable {
             endif;
             if(class_exists($name)):
                 Model::$instances[$name] = new $name();
-                // @todo remove this
+                Model::$instances[$name]->connection();
                 Model::$instances[$name]->createLinks();
             else:
                 throw new MissingModelException(array(
@@ -96,10 +94,12 @@ class Model extends Hookable {
      * @todo use static vars
      */
     public function connection() {
-        if(!$this->conn):
-            $this->conn = Connection::get($this->connection);
+        if(!$this->connected):
+            $this->connected = true;
+            $this->setSource($this->table);
         endif;
-        return $this->conn;
+        
+        return Connection::get($this->connection);
     }
     /**
      * @todo refactor
@@ -120,6 +120,10 @@ class Model extends Hookable {
             endif;
         endif;
         return true;
+    }
+    public function schema() {
+        $this->connection();
+        return $this->schema;
     }
     /**
      * @todo refactor
@@ -229,6 +233,7 @@ class Model extends Hookable {
             'recursion' => $this->recursion
         );
         $results = $db->read($params);
+
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
         endif;
@@ -281,6 +286,7 @@ class Model extends Hookable {
         $params = array_merge($params, array(
             'fields' => '*',
             'table' => $this->table,
+            'offset' => null,
             'limit' => null
         ));
         return $db->count($params);
@@ -290,7 +296,7 @@ class Model extends Hookable {
             'perPage' => $this->perPage,
             'page' => 1
         );
-        $offset = ($page - 1) * $params['perPage'];
+        $offset = ($params['page'] - 1) * $params['perPage'];
         $params['offset'] = $offset;
         $params['limit'] = $params['perPage'];
         $totalRecords = $this->count($params);
@@ -362,6 +368,7 @@ class Model extends Hookable {
             $data['modified'] = $date;
         endif;
 
+        $db = $this->connection(); // yes, this is a hack
         // verify if the record exists
         $exists = $this->exists(array(
             $this->primaryKey => $this->id
