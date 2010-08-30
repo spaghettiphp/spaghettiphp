@@ -45,7 +45,7 @@ class Generator {
         if(Filesystem::isDir($destination)):
             $this->log('exists', $destination);
         else:
-            Filesystem::createDir($destination);
+            Filesystem::createDir($destination, 0777);
             $this->log('created', $destination);
         endif;
     }
