@@ -2,20 +2,13 @@
 
 class Debug {
     public static function reportErrors($level) {
-        switch($level):
-            case 3:
-                $level = E_ALL | E_STRICT;
-                break;
-            case 2:
-                $level = E_ALL | E_STRICT & ~E_NOTICE;
-                break;
-            case 1:
-                $level = E_ALL & ~E_NOTICE & ~E_DEPRECATED;
-                break;
-            default:
-                $level = 0;
-        endswitch;
-        ini_set('error_reporting', $level);
+        $levels = array(
+            0 => 0,
+            1 => E_ALL & ~E_NOTICE & ~E_DEPRECATED,
+            2 => E_ALL | E_STRICT & ~E_NOTICE,
+            3 => E_ALL | E_STRICT
+        );
+        ini_set('error_reporting', $levels[$level]);
     }
     public static function errorHandler($handler = null) {
         if(is_null($handler)):
