@@ -28,6 +28,7 @@ class Inflector {
             '/\\s+/' => $replace,
             '/^' . $replace . '+|' . $replace . '+$/' => ''
         );
+        
         return strtolower(preg_replace(array_keys($map), array_values($map), $string));
     }
     public static function hyphenToUnderscore($string) {

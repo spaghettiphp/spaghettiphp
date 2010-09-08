@@ -7,6 +7,7 @@ class Config {
         if(array_key_exists($key, self::$config)):
             return self::$config[$key];
         endif;
+        
         return null;
     }
     public static function write($key, $value) {

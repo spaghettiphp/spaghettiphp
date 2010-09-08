@@ -7,10 +7,12 @@ class String {
             $regex = '%(:' . $key . ')%';
             $string = preg_replace($regex, $value, $string);
         endforeach;
+        
         return $string;
     }
     public static function extract($string) {
         preg_match_all('%:([a-zA-Z-_]+)%', $string, $extracted);
+        
         return $extracted[1];
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+// @todo components should be replaced with plugins
 class Component {
     public static function load($name, $instance = false) {
         if(!class_exists($name) && Filesystem::exists('lib/components/' . $name . '.php')):
