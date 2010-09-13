@@ -95,8 +95,7 @@ class HtmlHelper extends Helper {
             endforeach;
         else:
             $attr = array(
-                'src' => $this->assets->script($src),
-                'type' => 'text/javascript'
+                'src' => $this->assets->script($src)
             );
             $output = $this->tag('script', null, $attr);
         endif;
