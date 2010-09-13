@@ -155,7 +155,7 @@ class Mapper {
             $path['action'] = $path['prefix'] . '_' . $path['action'];
         endif;
         if(empty($path['id'])) $path['id'] = null;
-        if(empty($path['extension'])) $path['extension'] = Config::read('App.defaultExtension');
+        if(empty($path['extension'])) $path['extension'] = 'html';
         if(!empty($path['queryString'])):
             parse_str($path['queryString'], $queryString);
             $path['named'] = array_merge($path['named'], $queryString);
