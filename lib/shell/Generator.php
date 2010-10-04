@@ -6,12 +6,15 @@ class Generator {
         $class = Inflector::camelize($type) . 'Generator';
         $path = 'lib/generators/' . $type;
         $file = $path . '/' . $class . '.php';
+        
         if(Filesystem::exists($file)):
             require_once $file;
             return $class;
         endif;
+        
         return false;
     }
+    
     public static function invoke($type, $args) {
         if($class = self::exists($type)):
             $generator = new $class;
@@ -23,13 +26,15 @@ class Generator {
             self::printUsage($type);
             return false;
         else:
-            return call_user_func_array(array(&$generator, 'start'), $args);
+            return call_user_func_array(array($generator, 'start'), $args);
         endif;
     }
+    
     public static function printUsage($type) {
         $type = Inflector::underscore($type);
         echo Filesystem::read('/lib/generators/' . $type . '/USAGE');
     }
+    
     public function renderTemplate($source, $destination, $data = array()) {
         if(!Filesystem::exists($destination)):
             $view = new View();
@@ -41,6 +46,7 @@ class Generator {
             $this->log('exists', $destination);
         endif;
     }
+    
     public function createDir($destination) {
         if(Filesystem::isDir($destination)):
             $this->log('exists', $destination);
@@ -49,6 +55,7 @@ class Generator {
             $this->log('created', $destination);
         endif;
     }
+    
     public function log($status, $message) {
         printf('%12s  %s' . PHP_EOL, $status, $message);
     }

@@ -1,10 +1,14 @@
 <?php
 
 class ModelGenerator extends Generator {
-    public function start() {
-        $args = func_get_args();
-        $model = Inflector::underscore(array_shift($args));
+    public function start($model) {
+        $model = Inflector::underscore($model);
         
+        $this->generateModel($model);
+        $this->generateMigration($model);
+    }
+    
+    protected function generateModel($model) {
         $template_dir = 'lib/generators/model/templates';
         $model_template = $template_dir . '/model.php';
         $destination = 'app/models/' . $model . '.php';
@@ -13,7 +17,10 @@ class ModelGenerator extends Generator {
         $this->renderTemplate($model_template, $destination, array(
             'model' => Inflector::camelize($model)
         ));
-        
-        return true;
+    }
+    
+    protected function generateMigration($model) {
+        $migration = 'create_' . $model;
+        self::invoke('migration', array($migration));
     }
 }
