@@ -5,35 +5,51 @@ require 'lib/core/model/Exceptions.php';
 require 'lib/core/model/Behavior.php';
 
 class Model extends Hookable {
-    public $belongsTo = array();
-    public $hasMany = array();
-    public $hasOne = array();
     public $id;
-    public $recursion = 0;
-    public $schema = array();
-    public $table;
-    public $primaryKey;
-    public $displayField;
-    public $connection = 'default';
-    public $order;
-    public $limit;
-    public $perPage = 20;
-    public $validates = array();
-    public $errors = array();
+    protected $primaryKey;
+    protected $schema = array();
+    protected $table;
+
     public $associations = array(
         'hasMany' => array('primaryKey', 'foreignKey', 'limit', 'order'),
         'belongsTo' => array('primaryKey', 'foreignKey'),
         'hasOne' => array('primaryKey', 'foreignKey')
     );
-    public $pagination = array(
-        'totalRecords' => 0,
-        'totalPages' => 0,
-        'perPage' => 0,
-        'offset' => 0,
-        'page' => 0
-    );
-    protected $connected = false;
+    protected $belongsTo = array();
+    protected $hasMany = array();
+    protected $hasOne = array();
+
     protected $behaviors = array();
+
+    protected $displayField;
+
+    protected $order;
+    protected $limit;
+    protected $recursion = 0;
+
+    protected $perPage = 20;
+    protected $pagination = array();
+
+    protected $validates = array();
+    protected $errors = array();
+
+    protected $connection = 'default';
+    protected $connected = false;
+
+    //protected $data = array();
+    
+    protected $beforeSave = array();
+    protected $beforeCreate = array();
+    protected $beforeUpdate = array();
+    protected $beforeDelete = array();
+    protected $beforeValidate = array();
+
+    protected $afterSave = array();
+    protected $afterCreate = array();
+    protected $afterUpdate = array();
+    protected $afterDelete = array();
+    protected $afterValidate = array();
+
     protected static $instances = array();
 
     public function __construct() {
