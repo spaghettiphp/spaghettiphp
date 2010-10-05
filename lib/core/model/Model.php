@@ -60,33 +60,20 @@ class Model extends Hookable {
         $this->loadBehaviors($this->behaviors);
     }
     public function __call($method, $args) {
-        $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
+        $regex = '/(?P<method>first|all)By(?P<fields>[\w]+)/';
         if(preg_match($regex, $method, $output)):
-            $complement = Inflector::underscore($output['complement']);
-            $conditions = explode('_and_', $complement);
-            $params = array();
+            $fields = Inflector::underscore($output['fields']);
+            $fields = explode('_and_', $fields);
 
-            if($output['method'] == 'get'):
-                if(is_array($args[0])):
-                    $params['conditions'] = $args[0];
-                elseif(is_numeric($args[0])):
-                    $params['conditions']['id'] = $args[0];
-                endif;
+            $conditions = array_slice($args, 0, count($fields));
 
-                $params['fields'][] = $conditions[0];
-                $result =  $this->first($params);
+            $params = array_slice($args, count($fields));
+            $params['conditions'] = array_combine($fields, $conditions);
 
-                return $result[$conditions[0]];
-            else:
-                $params['conditions'] = array_combine($conditions, $args);
-
-                return $this->$output['method']($params);
-            endif;
-
-        else:
-            //trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
-            return false;
+            return $this->$output['method']($params);
         endif;
+
+        throw new BadMethodCallException(get_class($this) . '::' . $method . ' does not exist.');
     }
     public static function load($name) {
         if(!array_key_exists($name, Model::$instances)):
