@@ -27,16 +27,22 @@ class Hookable {
 
         return $param;
     }
-    protected function getHook($hook, $type) {
-        if(is_string($hook)):
-            if(array_key_exists($hook, $this->{$type})):
-                $hook = $this->{$type}[$hook];
-            else:
-                $hook = array();
-            endif;
-        endif;
+    protected function getHook($name, $type) {
+        if(is_string($name)):
+            $hooks = array();
         
-        return $hook;
+            if(array_key_exists($name, $this->{$type})):
+                $hooks = $this->{$type}[$name];
+            endif;
+            
+            if(property_exists($this, $name)):
+                $hooks = array_merge($hooks, $this->{$name});
+            endif;
+
+            return $hooks;
+        else:
+            return $name;
+        endif;
     }
     protected function callHook($method, $params) {
         if(!is_callable($method)):
