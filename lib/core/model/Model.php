@@ -299,10 +299,12 @@ class Model extends Hookable {
             'perPage' => $this->perPage,
             'page' => 1
         );
-        $offset = ($params['page'] - 1) * $params['perPage'];
-        $params['offset'] = $offset;
+
+        $params['offset'] = ($params['page'] - 1) * $params['perPage'];
         $params['limit'] = $params['perPage'];
+
         $totalRecords = $this->count($params);
+
         $this->pagination = array(
             'totalRecords' => $totalRecords,
             'totalPages' => ceil($totalRecords / $params['perPage']),
@@ -314,7 +316,6 @@ class Model extends Hookable {
         return $this->all($params);
     }
     public function toList($params = array()) {
-        $db = $this->connection();
         $params += array(
             'key' => $this->primaryKey,
             'displayField' => $this->displayField,
@@ -323,7 +324,9 @@ class Model extends Hookable {
             'limit' => $this->limit
         );
         $params['fields'] = array($params['key'], $params['displayField']);
-        $all = $db->read($params);
+
+        $all = $this->connection()->read($params);
+
         $results = array();
         foreach($all as $result):
             $results[$result[$params['key']]] = $result[$params['displayField']];
