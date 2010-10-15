@@ -19,7 +19,7 @@
   *
   *  
   */
-class Http extends Object {
+class Http {
     /*
      *  Lista de retornos possíveis.
      *  Alguns servidores verificam esse cabeçalho para decidir qual o formato que os da-
