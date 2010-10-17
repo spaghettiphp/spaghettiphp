@@ -28,7 +28,7 @@ class Model extends Hookable {
     protected $recursion = 0;
 
     protected $perPage = 20;
-    protected $pagination = array();
+    public $pagination = array();
 
     protected $validates = array();
     protected $errors = array();
@@ -309,7 +309,7 @@ class Model extends Hookable {
             'totalRecords' => $totalRecords,
             'totalPages' => ceil($totalRecords / $params['perPage']),
             'perPage' => $params['perPage'],
-            'offset' => $offset,
+            'offset' => $params['offset'],
             'page' => $params['page']
         );
 
