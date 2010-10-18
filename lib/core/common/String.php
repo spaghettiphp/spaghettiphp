@@ -3,7 +3,6 @@
 class String {
     public static $start = ':';
     public static $end = '';
-
     public static function insert($string, $data) {
         asort($data);
         foreach($data as $key => $value):
@@ -14,7 +13,7 @@ class String {
         return $string;
     }
     public static function extract($string) {
-        preg_match_all('%:([a-zA-Z-_]+)%', $string, $extracted);
+        preg_match_all('%' . self::$start . '([a-zA-Z-_]+)' . self::$end . '%', $string, $extracted);
         
         return $extracted[1];
     }
