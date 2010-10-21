@@ -323,7 +323,10 @@ class Model extends Hookable {
             'order' => $this->order,
             'limit' => $this->limit
         );
-        $params['fields'] = array($params['key'], $params['displayField']);
+        
+        if(!array_key_exists('fields', $params)):
+            $params['fields'] = array($params['key'], $params['displayField']);
+        endif;
 
         $all = $this->connection()->read($params);
 
