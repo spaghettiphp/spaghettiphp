@@ -1,14 +1,12 @@
 <?php
 
 require 'lib/core/model/Connection.php';
+require 'lib/core/model/Table.php';
 require 'lib/core/model/Exceptions.php';
 require 'lib/core/model/Behavior.php';
 
 class Model extends Hookable {
     public $id;
-    protected $primaryKey;
-    protected $schema = array();
-    protected $table;
 
     public $associations = array(
         'hasMany' => array('primaryKey', 'foreignKey', 'limit', 'order'),
@@ -22,6 +20,8 @@ class Model extends Hookable {
     protected $behaviors = array();
 
     protected $displayField;
+    protected $table;
+    protected $connection = 'default';
 
     protected $order;
     protected $limit;
@@ -33,10 +33,7 @@ class Model extends Hookable {
     protected $validates = array();
     protected $errors = array();
 
-    protected $connection = 'default';
-    protected $connected = false;
-
-    //protected $data = array();
+    protected $data = array();
     
     protected $beforeSave = array();
     protected $beforeCreate = array();
@@ -50,18 +47,17 @@ class Model extends Hookable {
     protected $afterDelete = array();
     protected $afterValidate = array();
 
+    protected $_models = array();
+
     protected static $instances = array();
 
     public function __construct() {
-        if(is_null($this->table)):
-            $database = Connection::getConfig($this->connection);
-            $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
-        endif;
         $this->loadBehaviors($this->behaviors);
     }
+    
     public function __call($method, $args) {
         $regex = '/(?P<method>first|all)By(?P<fields>[\w]+)/';
-        if(preg_match($regex, $method, $output)):
+        if(preg_match($regex, $method, $output)) {
             $fields = Inflector::underscore($output['fields']);
             $fields = explode('_and_', $fields);
 
@@ -71,82 +67,71 @@ class Model extends Hookable {
             $params['conditions'] = array_combine($fields, $conditions);
 
             return $this->$output['method']($params);
-        endif;
+        }
 
         throw new BadMethodCallException(get_class($this) . '::' . $method . ' does not exist.');
     }
+    
+    public function __get($name) {
+        $attrs = array('_models');
+        
+        foreach($attrs as $attr) {
+            if(array_key_exists($name, $this->{$attr})) {
+                return $this->{$attr}[$name];
+            }
+        }
+    }
+    
     public static function load($name) {
-        if(!array_key_exists($name, Model::$instances)):
-            if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
-                require_once 'app/models/' . Inflector::underscore($name) . '.php';
-            endif;
-            if(class_exists($name)):
+        if(!array_key_exists($name, Model::$instances)) {
+            $filename = 'app/models/' . Inflector::underscore($name) . '.php';
+            if(!class_exists($name) && Filesystem::exists($filename)) {
+                require_once $filename;
+            }
+
+            if(class_exists($name)) {
                 Model::$instances[$name] = new $name();
-                Model::$instances[$name]->connection();
                 Model::$instances[$name]->createLinks();
-            else:
+            }
+            else {
                 throw new MissingModelException(array(
                     'model' => $name
                 ));
-            endif;
-        endif;
+            }
+        }
 
         return Model::$instances[$name];
     }
-    /**
-     * @todo use static vars
-     */
-    public function connection() {
-        if(!$this->connected):
-            $this->connected = true;
-            $this->setSource($this->table);
-        endif;
-        
-        return Connection::get($this->connection);
-    }
-    /**
-     * @todo refactor
-     */
-    public function setSource($table) {
-        if($table):
-            $db = $this->connection();
-            $this->table = $table;
-            $sources = $db->listSources();
-            if(!in_array($this->table, $sources)):
-                throw new MissingTableException(array(
-                    'table' => $this->table
-                ));
-                return false;
-            endif;
-            if(empty($this->schema)):
-                $this->describe();
-            endif;
-        endif;
-        return true;
-    }
-    public function schema() {
-        $this->connection();
-        return $this->schema;
-    }
-    /**
-     * @todo refactor
-     */
-    public function describe() {
-        $db = $this->connection();
-        $schema = $db->describe($this->table);
-        if(is_null($this->primaryKey)):
-            foreach($schema as $field => $describe):
-                if($describe['key'] == 'PRI'):
-                    $this->primaryKey = $field;
-                    break;
-                endif;
-            endforeach;
-        endif;
-        return $this->schema = $schema;
-    }
+
+    // @todo remove
     public function loadModel($model) {
-        return $this->{$model} = Model::load($model);
+        return $this->_models[$model] = Model::load($model);
     }
+
+    public function getConnection() {
+        return $this->connection;
+    }
+
+    public function connection() {
+        return Table::load($this)->connection();
+    }
+
+    protected function table() {
+        return Table::load($this)->name();
+    }
+
+    public function getTable() {
+        return $this->table;
+    }
+    
+    public function schema() {
+        return Table::load($this)->schema();
+    }
+
+    public function primaryKey() {
+        return Table::load($this)->primaryKey();
+    }
+
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
             $associations =& $this->{$type};
@@ -170,21 +155,21 @@ class Model extends Hookable {
                 $associations[$key] = $this->generateAssociation($type, $associations[$key]);
             endforeach;
         endforeach;
-        return true;
     }
+    
     public function generateAssociation($type, $association) {
         foreach($this->associations[$type] as $key):
             if(!isset($association[$key])):
                 $data = null;
                 switch($key):
                     case 'primaryKey':
-                        $data = $this->primaryKey;
+                        $data = $this->primaryKey();
                         break;
                     case 'foreignKey':
                         if($type == 'belongsTo'):
                             $data = Inflector::underscore($association['className'] . 'Id');
                         else:
-                            $data = Inflector::underscore(get_class($this)) . '_' . $this->primaryKey;
+                            $data = Inflector::underscore(get_class($this)) . '_' . $this->primaryKey();
                         endif;
                         break;
                     default:
@@ -206,30 +191,49 @@ class Model extends Hookable {
             $this->loadBehavior($behavior, $options);
         endforeach;
     }
+    
     protected function loadBehavior($behavior, $options = array()) {
         $behavior = Inflector::camelize($behavior);
         Behavior::load($behavior);
         return $this->{$behavior} = new $behavior($this, $options);
     }
+    
     public function query($query) {
         return $this->connection()->query($query);
     }
+    
     public function fetch($query) {
         return $this->connection()->fetchAll($query);
     }
+    
     public function begin() {
         return $this->connection()->begin();
     }
+    
     public function commit() {
         return $this->connection()->commit();
     }
+    
     public function rollback() {
         return $this->connection()->rollback();
     }
+
+    public function insertId() {
+        return $this->connection()->insertId();
+    }
+    
+    public function affectedRows() {
+        return $this->connection()->affectedRows();
+    }
+    
+    public function escape($value) {
+        return $this->connection()->escape($value);
+    }
+    
     public function all($params = array()) {
         $db = $this->connection();
         $params += array(
-            'table' => $this->table,
+            'table' => $this->table(),
             'fields' => '*',
             'order' => $this->order,
             'limit' => $this->limit,
@@ -240,9 +244,9 @@ class Model extends Hookable {
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
         endif;
-
         return $results;
     }
+    
     public function first($params = array()) {
         $params += array(
             'limit' => 1
@@ -251,6 +255,7 @@ class Model extends Hookable {
 
         return empty($results) ? array() : $results[0];
     }
+    
     public function dependent($results, $recursion = 0) {
         foreach(array_keys($this->associations) as $type):
             if($recursion < 0 and ($type != 'belongsTo' && $recursion <= 0)) continue;
@@ -261,7 +266,7 @@ class Model extends Hookable {
                     $params = array();
                     if($type == 'belongsTo'):
                         $params['conditions'] = array(
-                            $association["primaryKey"] => $result[$association['foreignKey']]
+                            $association['primaryKey'] => $result[$association['foreignKey']]
                         );
                         $params['recursion'] = $recursion - 1;
                     else:
@@ -284,16 +289,18 @@ class Model extends Hookable {
         endforeach;
         return $results;
     }
+    
     public function count($params = array()) {
         $db = $this->connection();
         $params = array_merge($params, array(
             'fields' => '*',
-            'table' => $this->table,
+            'table' => $this->table(),
             'offset' => null,
             'limit' => null
         ));
         return $db->count($params);
     }
+    
     public function paginate($params = array()) {
         $params += array(
             'perPage' => $this->perPage,
@@ -303,11 +310,11 @@ class Model extends Hookable {
         $params['offset'] = ($params['page'] - 1) * $params['perPage'];
         $params['limit'] = $params['perPage'];
 
-        $totalRecords = $this->count($params);
+        $count = $this->count($params);
 
         $this->pagination = array(
-            'totalRecords' => $totalRecords,
-            'totalPages' => ceil($totalRecords / $params['perPage']),
+            'totalRecords' => $count,
+            'totalPages' => ceil($count / $params['perPage']),
             'perPage' => $params['perPage'],
             'offset' => $offset,
             'page' => $params['page']
@@ -315,11 +322,12 @@ class Model extends Hookable {
 
         return $this->all($params);
     }
+    
     public function toList($params = array()) {
         $params += array(
-            'key' => $this->primaryKey,
+            'key' => $this->primaryKey(),
             'displayField' => $this->displayField,
-            'table' => $this->table,
+            'table' => $this->table(),
             'order' => $this->order,
             'limit' => $this->limit
         );
@@ -337,6 +345,7 @@ class Model extends Hookable {
 
         return $results;
     }
+    
     public function exists($conditions) {
         $params = array(
             'conditions' => $conditions
@@ -345,30 +354,30 @@ class Model extends Hookable {
 
         return !empty($row);
     }
+    
     public function insert($data) {
         $db = $this->connection();
         $params = array(
             'values' => $data,
-            'table' => $this->table
+            'table' => $this->table()
         );
 
         return $db->create($params);
     }
+    
     public function update($params, $data) {
         $db = $this->connection();
         $params += array(
             'values' => $data,
-            'table' => $this->table
+            'table' => $this->table()
         );
 
         return $db->update($params);
     }
-    /**
-     * @todo refactor
-     */
+
     public function save($data) {
         if(!is_null($this->id)):
-            $data[$this->primaryKey] = $this->id;
+            $data[$this->primaryKey()] = $this->id;
         endif;
 
         // apply modified timestamp
@@ -377,10 +386,9 @@ class Model extends Hookable {
             $data['modified'] = $date;
         endif;
 
-        $db = $this->connection(); // yes, this is a hack
         // verify if the record exists
         $exists = $this->exists(array(
-            $this->primaryKey => $this->id
+            $this->primaryKey() => $this->id
         ));
 
         // apply created timestamp
@@ -395,13 +403,13 @@ class Model extends Hookable {
         endif;
 
         // filter fields that are not in the schema
-        $data = array_intersect_key($data, $this->schema);
+        $data = array_intersect_key($data, $this->schema());
 
         // update a record if it already exists...
         if($exists):
             $save = $this->update(array(
                 'conditions' => array(
-                    $this->primaryKey => $this->id
+                    $this->primaryKey() => $this->id
                 ),
                 'limit' => 1
             ), $data);
@@ -416,9 +424,7 @@ class Model extends Hookable {
 
         return $save;
     }
-    /**
-     * @todo refactor
-     */
+
     public function validate($data) {
         $this->errors = array();
         $defaults = array(
@@ -452,9 +458,7 @@ class Model extends Hookable {
         endforeach;
         return empty($this->errors);
     }
-    /**
-     * @todo refactor
-     */
+
     public function callValidationMethod($params, $value) {
         $method = is_array($params) ? $params[0] : $params;
         $class = method_exists($this, $method) ? $this : 'Validation';
@@ -469,14 +473,15 @@ class Model extends Hookable {
             endif;
         endif;
     }
+    
     public function delete($id, $dependent = true) {
         $params = array(
             'conditions' => array(
-                $this->primaryKey => $id
+                $this->primaryKey() => $id
             ),
             'limit' => 1
         );
-        if($this->exists(array($this->primaryKey => $id)) && $this->deleteAll($params)):
+        if($this->exists(array($this->primaryKey() => $id)) && $this->deleteAll($params)):
             if($dependent):
                 $this->deleteDependent($id);
             endif;
@@ -484,6 +489,7 @@ class Model extends Hookable {
         endif;
         return false;
     }
+    
     public function deleteDependent($id) {
         foreach(array('hasOne', 'hasMany') as $type):
             foreach($this->{$type} as $model => $assoc):
@@ -496,22 +502,14 @@ class Model extends Hookable {
         endforeach;
         return true;
     }
+    
     public function deleteAll($params = array()) {
         $db = $this->connection();
         $params += array(
-            'table' => $this->table,
+            'table' => $this->table(),
             'order' => $this->order,
             'limit' => $this->limit
         );
         return $db->delete($params);
-    }
-    public function getInsertId() {
-        return $this->connection()->insertId();
-    }
-    public function getAffectedRows() {
-        return $this->connection()->affectedRows();
-    }
-    public function escape($value) {
-        return $this->connection()->escape($value);
     }
 }
