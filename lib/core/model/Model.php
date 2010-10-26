@@ -416,7 +416,7 @@ class Model extends Hookable {
         // or insert a new one if it doesn't
         else:
             $save = $this->insert($data);
-            $this->id = $this->getInsertId();
+            $this->id = $this->insertId();
         endif;
 
         // fire afterSave action
