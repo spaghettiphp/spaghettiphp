@@ -375,15 +375,19 @@ class Model extends Hookable {
         return $db->update($params);
     }
 
-    public function save($data) {
+    public function save($data = array()) {
+        if(!empty($data)) {
+            $this->data = $data;
+        }
+        
         if(!is_null($this->id)):
-            $data[$this->primaryKey()] = $this->id;
+            $this->data[$this->primaryKey()] = $this->id;
         endif;
 
         // apply modified timestamp
         $date = date('Y-m-d H:i:s');
-        if(!array_key_exists('modified', $data)):
-            $data['modified'] = $date;
+        if(!array_key_exists('modified', $this->data)):
+            $this->data['modified'] = $date;
         endif;
 
         // verify if the record exists
@@ -392,18 +396,18 @@ class Model extends Hookable {
         ));
 
         // apply created timestamp
-        if(!$exists && !array_key_exists('created', $data)):
-            $data['created'] = $date;
+        if(!$exists && !array_key_exists('created', $this->data)):
+            $this->data['created'] = $date;
         endif;
 
         // apply beforeSave filter
-        $data = $this->fireFilter('beforeSave', $data);
-        if(!$data):
+        $this->data = $this->fireFilter('beforeSave', $this->data);
+        if(!$this->data):
             return false;
         endif;
 
         // filter fields that are not in the schema
-        $data = array_intersect_key($data, $this->schema());
+        $this->data = array_intersect_key($this->data, $this->schema());
 
         // update a record if it already exists...
         if($exists):
@@ -412,10 +416,10 @@ class Model extends Hookable {
                     $this->primaryKey() => $this->id
                 ),
                 'limit' => 1
-            ), $data);
+            ), $this->data);
         // or insert a new one if it doesn't
         else:
-            $save = $this->insert($data);
+            $save = $this->insert($this->data);
             $this->id = $this->insertId();
         endif;
 
