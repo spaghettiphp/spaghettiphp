@@ -407,7 +407,7 @@ class Model extends Hookable {
         endif;
 
         // filter fields that are not in the schema
-        $this->data = array_intersect_key($this->data, $this->schema());
+        $data = array_intersect_key($this->data, $this->schema());
 
         // update a record if it already exists...
         if($exists):
@@ -416,10 +416,10 @@ class Model extends Hookable {
                     $this->primaryKey() => $this->id
                 ),
                 'limit' => 1
-            ), $this->data);
+            ), $data);
         // or insert a new one if it doesn't
         else:
-            $save = $this->insert($this->data);
+            $save = $this->insert($data);
             $this->id = $this->insertId();
         endif;
 
