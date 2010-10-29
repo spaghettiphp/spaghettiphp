@@ -234,7 +234,6 @@ class Model extends Hookable {
         $db = $this->connection();
         $params += array(
             'table' => $this->table(),
-            'fields' => '*',
             'order' => $this->order,
             'limit' => $this->limit,
             'recursion' => $this->recursion
@@ -249,6 +248,7 @@ class Model extends Hookable {
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
         endif;
+        
         return $results;
     }
     
@@ -298,7 +298,6 @@ class Model extends Hookable {
     public function count($params = array()) {
         $db = $this->connection();
         $params = array_merge($params, array(
-            'fields' => '*',
             'table' => $this->table(),
             'offset' => null,
             'limit' => null
