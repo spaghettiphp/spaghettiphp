@@ -25,9 +25,11 @@ class PdoDatasource extends Datasource {
         $this->config = $config;
         $this->connect();
     }
+    
     public function dsn() {
         return $this->config['dsn'];
     }
+    
     public function connect($dsn = null) {
         if(!$this->connection):
             if(is_null($dsn)):
@@ -39,27 +41,34 @@ class PdoDatasource extends Datasource {
         
         return $this->connection;
     }
+    
     public function disconnect() {
         $this->connected = false;
         $this->connection = null;
 
         return true;
     }
+    
     public function begin() {
         return $this->connection->beginTransaction();
     }
+    
     public function commit() {
         return $this->connection->commit();
     }
+    
     public function rollback() {
         return $this->connection->rollBack();
     }
+    
     public function insertId() {
         return $this->connection->lastInsertId();
     }
+    
     public function affectedRows() {
         return $this->affectedRows;
     }
+    
     public function alias($fields) {
         if(is_array($fields)):
             if(is_hash($fields)):
@@ -75,6 +84,7 @@ class PdoDatasource extends Datasource {
         
         return $fields;
     }
+    
     public function join($params) {
         if(is_array($params)):
             $params += array(
@@ -97,6 +107,7 @@ class PdoDatasource extends Datasource {
         
         return $join;
     }
+    
     public function order($order) {
         if(is_array($order)):
             $order = implode(',', $order);
@@ -104,9 +115,11 @@ class PdoDatasource extends Datasource {
         
         return $order;
     }
+    
     public function logQuery($sql) {
         return $this->lastQuery = $sql;
     }
+    
     public function query($sql, $values = array()) {
         $this->logQuery($sql);
         $query = $this->connection->prepare($sql);
@@ -117,9 +130,11 @@ class PdoDatasource extends Datasource {
 
         return $query;
     }
+    
     public function fetchAll($sql) {
         return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
+    
     public function escape($value) {
         if(is_null($value)):
             return 'NULL';
@@ -127,6 +142,7 @@ class PdoDatasource extends Datasource {
             return $this->connection->quote($value);
         endif;
     }
+    
     public function create($params) {
         $params += $this->params;
         
@@ -137,6 +153,7 @@ class PdoDatasource extends Datasource {
         
         return $query;
     }
+    
     public function read($params) {
         $params += $this->params;
         
@@ -147,13 +164,9 @@ class PdoDatasource extends Datasource {
         $sql = $this->renderSelect($params);
         $query = $this->query($sql, $values);
 
-        $results = array();
-        while($row = $query->fetch()):
-            $results []= $row;
-        endwhile;
-
-        return $results;
+        return $query;
     }
+    
     public function update($params) {
         $params += $this->params;
 
@@ -166,6 +179,7 @@ class PdoDatasource extends Datasource {
         
         return $query;
     }
+    
     public function delete($params) {
         $params += $this->params;
 

@@ -239,7 +239,12 @@ class Model extends Hookable {
             'limit' => $this->limit,
             'recursion' => $this->recursion
         );
-        $results = $db->read($params);
+
+        $query = $db->read($params);
+        $results = array();
+        while($result = $query->fetch()) {
+            $results []= $result;
+        }
 
         if($params['recursion'] >= 0):
             $results = $this->dependent($results, $params['recursion']);
@@ -342,7 +347,7 @@ class Model extends Hookable {
         $all = $this->connection()->read($params);
 
         $results = array();
-        foreach($all as $result) {
+        while($result = $all->fetch()) {
             if(is_array($params['displayField'])) {
                 $keys = array_flip($params['displayField']);
                 $value = array_intersect_key($result, $keys);

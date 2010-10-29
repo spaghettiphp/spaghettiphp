@@ -38,11 +38,7 @@ class MySqlDatasource extends PdoDatasource {
             $schema = array();
             foreach($columns as $column):
                 $schema[$column['Field']] = array(
-                    'type' => $this->column($column['Type']),
-                    'null' => $column['Null'] == 'YES' ? true : false,
-                    'default' => $column['Default'],
-                    'key' => $column['Key'],
-                    'extra' => $column['Extra']
+                    'key' => $column['Key']
                 );
             endforeach;
             $this->schema[$table] = $schema;
