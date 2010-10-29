@@ -332,16 +332,27 @@ class Model extends Hookable {
             'limit' => $this->limit
         );
         
-        if(!array_key_exists('fields', $params)):
-            $params['fields'] = array($params['key'], $params['displayField']);
-        endif;
+        if(!array_key_exists('fields', $params)) {
+            $params['fields'] = array_merge(
+                (array) $params['key'],
+                (array) $params['displayField']
+            );
+        }
 
         $all = $this->connection()->read($params);
 
         $results = array();
-        foreach($all as $result):
-            $results[$result[$params['key']]] = $result[$params['displayField']];
-        endforeach;
+        foreach($all as $result) {
+            if(is_array($params['displayField'])) {
+                $keys = array_flip($params['displayField']);
+                $value = array_intersect_key($result, $keys);
+            }
+            else {
+                $value = $result[$params['displayField']];
+            }
+            
+            $results[$result[$params['key']]] = $value;
+        }
 
         return $results;
     }
