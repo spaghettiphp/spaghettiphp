@@ -88,9 +88,9 @@ class MySqlDatasource extends PdoDatasource {
             'count' => 'COUNT(' . $fields . ')'
         );
         
-        $results = $this->read($params);
+        $results = $this->read($params)->fetch();
         
-        return $results[0]['count'];
+        return $results['count'];
     }
     public function renderInsert($params) {
         $sql = 'INSERT INTO ' . $params['table'];

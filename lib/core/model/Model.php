@@ -363,12 +363,9 @@ class Model extends Hookable {
     }
     
     public function exists($conditions) {
-        $params = array(
+        return (bool) $this->count(array(
             'conditions' => $conditions
-        );
-        $row = $this->first($params);
-
-        return !empty($row);
+        ));
     }
     
     public function insert($data) {
