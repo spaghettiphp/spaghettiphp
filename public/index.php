@@ -9,8 +9,9 @@ try {
     echo Dispatcher::dispatch();
 }
 catch(Exception $e) {
-    if(!($e instanceof SpaghettiException)):
+    if(!($e instanceof SpaghettiException)) {
         $e = new SpaghettiException('Uncaught Exception', $e->getCode(), $e->getMessage());
-    endif;
+    }
+
     echo $e->toString();
 }
