@@ -139,7 +139,7 @@ class Http {
         $self->curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
     endif;
     //Inicia a sessão curl
-    $ch = curl_init($url);
+    $ch = curl_init(Mapper::url($url, true));
     //Traz o resultado como string, ao invés de jogá-lo diretamente na saída
     $self->curlOptions[CURLOPT_RETURNTRANSFER] = true;
     //Coloca os arrays como opções do curl
