@@ -48,11 +48,18 @@ class Model extends Hookable {
     protected $afterValidate = array();
 
     protected $_models = array();
+    protected $_behaviors = array();
 
     protected static $instances = array();
 
-    public function __construct() {
-        $this->loadBehaviors($this->behaviors);
+    public function __construct($data = null) {
+        if(!is_null($data)) {
+            $this->id = $data['id'];
+            $this->data = $data;
+        }
+        else {
+            $this->loadBehaviors($this->behaviors);
+        }
     }
     
     public function __call($method, $args) {
@@ -71,15 +78,22 @@ class Model extends Hookable {
 
         throw new BadMethodCallException(get_class($this) . '::' . $method . ' does not exist.');
     }
+
+    public function __set($name, $value) {
+        // @todo shouldn't fail silently
+        $this->data[$name] = $value;
+    }
     
     public function __get($name) {
-        $attrs = array('_models');
+        $attrs = array('data', '_models', '_behaviors');
         
         foreach($attrs as $attr) {
             if(array_key_exists($name, $this->{$attr})) {
                 return $this->{$attr}[$name];
             }
         }
+        
+        throw new RuntimeException(get_class($this) . '->' . $name . ' does not exist.');
     }
     
     public static function load($name) {
@@ -101,11 +115,6 @@ class Model extends Hookable {
         }
 
         return Model::$instances[$name];
-    }
-
-    // @todo remove
-    public function loadModel($model) {
-        return $this->_models[$model] = Model::load($model);
     }
 
     public function getConnection() {
@@ -148,9 +157,9 @@ class Model extends Hookable {
                 endif;
 
                 $model = $associations[$key]['className'];
-                if(!isset($this->{$model})):
-                    $this->loadModel($model);
-                endif;
+                if(!array_key_exists($model, $this->_models)) {
+                    $this->_models[$model] = Model::load($model);
+                }
 
                 $associations[$key] = $this->generateAssociation($type, $associations[$key]);
             endforeach;
@@ -195,7 +204,7 @@ class Model extends Hookable {
     protected function loadBehavior($behavior, $options = array()) {
         $behavior = Inflector::camelize($behavior);
         Behavior::load($behavior);
-        return $this->{$behavior} = new $behavior($this, $options);
+        return $this->_behaviors[$behavior] = new $behavior($this, $options);
     }
     
     public function query($query) {
@@ -231,23 +240,29 @@ class Model extends Hookable {
     }
     
     public function all($params = array()) {
-        $db = $this->connection();
         $params += array(
             'table' => $this->table(),
             'order' => $this->order,
             'limit' => $this->limit,
-            'recursion' => $this->recursion
+            'recursion' => $this->recursion,
+            'orm' => false
         );
 
-        $query = $db->read($params);
+        $query = $this->connection()->read($params);
+
         $results = array();
         while($result = $query->fetch()) {
-            $results []= $result;
+            if($params['orm']) {
+                $results []= new self($result);
+            }
+            else {
+                $results []= $result;
+            }
         }
 
-        if($params['recursion'] >= 0):
+        if(!$params['orm'] && $params['recursion'] >= 0) {
             $results = $this->dependent($results, $params['recursion']);
-        endif;
+        }
         
         return $results;
     }
