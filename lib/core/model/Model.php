@@ -253,7 +253,8 @@ class Model extends Hookable {
         $results = array();
         while($result = $query->fetch()) {
             if($params['orm']) {
-                $results []= new self($result);
+                $self = get_class($this);
+                $results []= new $self($result);
             }
             else {
                 $results []= $result;
