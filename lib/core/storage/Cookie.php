@@ -50,7 +50,7 @@ class Cookie {
         $self = self::getInstance();
         $expires = $self->expire($expires);
         $path = Mapper::normalize(Mapper::base() . $self->path);
-        return setcookie($self->name . '[' . $name . ']', self::encrypt($value), $expires, $path, $self->domain, $self->secure);
+        return setcookie($self->name . '[' . $name . ']', self::encrypt($value), $expires, $path, $self->domain, $self->secure, true);
     }
     public static function encrypt($value) {
         $self = self::getInstance();
