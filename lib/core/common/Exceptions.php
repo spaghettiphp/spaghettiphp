@@ -56,7 +56,9 @@ class SpaghettiException extends Exception {
         return $this->details;
     }
     public function toString() {
-        ob_end_clean();
+        if(ob_get_level()) {
+            ob_end_clean();
+        }
         $this->header($this->status);
         if(Filesystem::exists('app/views/layouts/error.htm.php')):
             $view = new View();
