@@ -10,18 +10,21 @@ class Dispatcher {
             return $controller->callAction($request);
         }
         catch(MissingControllerException $e) {
-            if(Controller::hasViewForAction($request)):
+            if(Controller::hasViewForAction($request)) {
                 $controller = new AppController();
                 return $controller->callAction($request);
-            else:
+            }
+            else {
                 throw $e;
-            endif;
+            }
         }
     }
+    
     protected static function normalize($request) {
-        if(is_null($request)):
+        if(is_null($request)) {
             $request = Mapper::parse();
-        endif;
+        }
+
         $request['controller'] = Inflector::hyphenToUnderscore($request['controller']);
         $request['action'] = Inflector::hyphenToUnderscore($request['action']);
         

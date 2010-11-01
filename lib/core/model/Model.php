@@ -57,9 +57,7 @@ class Model extends Hookable {
             $this->id = $data['id'];
             $this->data = $data;
         }
-        else {
-            $this->loadBehaviors($this->behaviors);
-        }
+        $this->loadBehaviors($this->behaviors);
     }
     
     public function __call($method, $args) {
@@ -269,12 +267,10 @@ class Model extends Hookable {
     }
     
     public function first($params = array()) {
-        $params += array(
-            'limit' => 1
-        );
+        $params['limit'] = 1;
         $results = $this->all($params);
 
-        return empty($results) ? array() : $results[0];
+        return empty($results) ? null : $results[0];
     }
     
     public function dependent($results, $recursion = 0) {
@@ -384,23 +380,21 @@ class Model extends Hookable {
     }
     
     public function insert($data) {
-        $db = $this->connection();
         $params = array(
             'values' => $data,
             'table' => $this->table()
         );
 
-        return $db->create($params);
+        return $this->connection()->create($params);
     }
     
     public function update($params, $data) {
-        $db = $this->connection();
         $params += array(
             'values' => $data,
             'table' => $this->table()
         );
 
-        return $db->update($params);
+        return $this->connection()->update($params);
     }
 
     public function save($data = array()) {
