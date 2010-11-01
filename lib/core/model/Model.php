@@ -296,7 +296,7 @@ class Model extends Hookable {
                             $params['order'] = $association['order'];
                         endif;
                     endif;
-                    $result = $this->{$model}->all($params);
+                    $result = $this->_models[$model]->all($params);
                     if($type != 'hasMany' && !empty($result)):
                         $result = $result[0];
                     endif;
