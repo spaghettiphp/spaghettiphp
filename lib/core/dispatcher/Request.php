@@ -1,14 +1,19 @@
 <?php
 /**
-  * arrayToJson() - convert array into a json format
-  * arrayToXml() - todo
-  *
+-------------------------------------------- 
+  METHODS
+---------------------------------------------
+  * 
   * getAuthData() - returns auth data if is a authenticate request/false if not authenticate
   * getClientAccepts() - returns a list containing all format supported by client
   * getClientIp() - returns the client ip address
   * getOs() - returns an array containing info about the client operational system
   * getReferer()
   * getUserAgent() returns an array containing info about the client browser
+  * getStream() returns the file stream sent by a http request
+  * getData() returns the data sent by a http request
+  * getMethod() returns the http method used to sent the current request
+  * getHeaders() returns all headers from request, or just a specific one
   *
   * isAccepted($type) return true if is a 
   * isOs($os) returns true if is a specific operational system
@@ -19,9 +24,41 @@
   * isMobile() returns true if a request came from a mobile device
   * isSsl() returns true if is a secure connection
   * isWap() returns true if is a wap request
-  * 
+  *
+  *----
+  * OUTPUT METHODS
+  *----
+  * forceDownload() - forces download of the specified file
+  * toJson() - convert array into a json format
+  * toXml() - convert array into a xml format
+  *
+-------------------------------------------- 
+  CHANGELOG
+--------------------------------------------
+  * 14/08/2010
+  * [m] - toXml agora verifica o conteúdo do valor, e muda a exibição caso esteja
+  *     vazio, tiver caracteres especiais, ou for apenas texto simples
+  *
+  * 24/08/2010
+  * [+] - forceDownload() força o download do arquivo especificado
+  *
+  * 04/09/2010
+  * [m] - getRequestData() verifica o tipo do request antes de pegar os dados,
+  *     evitando, assim, devolver somente o $_REQUEST
+  *
+  * 24/10/2010
+  * [m] - toXml() verifica se tem atributos na chave e conserta a tag de fechamento
+  * [+] - endXmlTag() trata a tag de fechamento do xml
+  *
+  * 29/10/2010
+  * [m] - getRequestData() agora está funcionando corretamente para o método PUT
+  * [+] - getRequestHeaders() retorna os cabeçalhos da requisição
+  * [+] - getStream() retorna um php stream enviado via http
+  * [m] - getRequestData() renomeado para getData()
+  * [m] - getRequestMethod() renomeado para getMethod()
+  * [m] - getRequestHeaders() renomeado para getHeaders()
   */
-class Request extends Object{
+class Request{
     public static $userAgents = array(
         'chrome' => 'Chrome', //Chrome
         'firefox' => 'Firefox',
@@ -45,7 +82,7 @@ class Request extends Object{
     );
 
     public static $mobileOs = array(
-        'android'     => "Google OS",
+        'android'     => "Android",
         'blackberry' => "BlackBerry",
         'ericsson' => "Sony Ericsson",
         'iphone' => 'Iphone',
@@ -113,18 +150,21 @@ class Request extends Object{
     }
 
     /**
+      * Pega o IP do cliente que está acessando a aplicação
       * 
-      * 
-      * @return
+      * @return string IP
       */
     public static function getClientIp() {
         return $_SERVER['REMOTE_ADDR'];
     }
 
     /**
+      * Pega o Sistema Operacional do cliente que está acessando a aplicação, ou
+      * procura no texto informado em $httpUserAgent pelo sistema operacional
       * 
-      * 
-      * @return
+      * @param string $httpUserAgent String HTTP_USER_AGENT. Se não for informada, será
+      *     utilizada a informação do cliente que está acessando a aplicação
+      * @return array
       */
     public static function getOs($httpUserAgent = null) {
         if(empty($httpUserAgent)):
@@ -141,9 +181,9 @@ class Request extends Object{
     }
 
     /**
+      * Pega o endereço que enviou o usuário para essa página atual
       * 
-      * 
-      * @return
+      * @return string Url
       */
     public static function getReferer() {
         if(isset($_SERVER['HTTP_REFERER'])):
@@ -154,9 +194,15 @@ class Request extends Object{
     }
 
     /**
-      * 
-      * 
-      * @return
+      * Pega o nome amigável do navegador do cliente usado para acessaar a aplicação,
+      * ou, no parâmetro $httpUserAgent, caso este seja informado.
+      *
+      * @version    1.0
+      *         - Initial
+      *             1.1 14/08/2010
+      *         - Retorna só uma string
+      * @param string $httpUserAgent Texto do user_agent
+      * @return string
       */
     public static function getUserAgent($httpUserAgent = null) {
         if(empty($httpUserAgent)):
@@ -164,81 +210,181 @@ class Request extends Object{
         endif;
         
         preg_match('('.implode('|', self::$userAgents).')', $httpUserAgent, $out);
+
+        return reset($out);
+    }
+    
+    /**
+      * Pega os dados da requisição.
+      * 
+      * @version    1.0
+      *         - Initial
+      *             1.1 04/09/2010
+      *         - Retorna $_POST ou $_GET caso seja um desses, e nao só $_REQUEST
+      *             1.2 29/10/2010
+      *         - PUT agora está funcionando corretamente
+      *         - Renomeado para getData()
+      *
+      * @return array  Dados da requisição
+      */
+    public static function getData() {
+        $requestMethod = self::getMethod();
         
-        return $out;
+        switch($requestMethod):
+            case 'POST':
+                return $_POST;
+                break;
+        
+            case 'GET':
+                return $_GET;
+                break;
+        
+            case 'PUT':
+                /*$fp = fopen('php://input', 'r');
+                $output='';
+                while($out = fread($fp, 1024)):
+                    $output .= $out;
+                endwhile;
+                //Arquivo enviado via http request/2
+                if(self::getRequestHeaders('HTTP_X_FILENAME')):
+                    return $output;
+                else:
+                    parse_str(trim($output, '"'), $return);
+                    return $return;
+                endif;
+                return $output;/**/
+                
+                parse_str(trim(self::getStream(), '"'), $output);
+                
+                return $output;
+                break;
+        
+            default:
+                return $_REQUEST;
+                break;
+        endswitch;
+        
+    }
+    
+    public function getStream(){
+        $fp = fopen('php://input', 'r');
+        
+        $stream = '';
+        
+        while($output = fread($fp, 1024)):
+            $stream .= $output;
+        endwhile;
+        
+        return $stream;
+    }
+
+    /**
+      * Pega os cabeçalhos da requisição.
+      * 
+      * @version    1.0 29/10/2010
+      *         - Initial
+      *         
+      * @param string optional $header O cabeçalho desejado, ou todos os cabeçalhos caso
+      *     não seja informado.
+      * @return array  Headers da requisição. FALSE caso nada seja encontrado
+      */
+    public static function getHeaders($header = null) {
+        if(empty($header)):
+            return $_SERVER;
+        else:
+            if(isset($_SERVER[$header])):
+                return $_SERVER[$header];
+            else:
+                return false;
+            endif;
+        endif;
     }
     
     /**
-      * 
-      * 
-      * @return
-      */
-    public static function getRequestData() {
-        return $_REQUEST;
-    }
-    
-    /**
-      * 
+      * Pega o tipo da requisição
+      *
+      * @version    1.0
+      *          - Initial
+      *             1.1 29/10/2010
+      *          - Renomeado para getMethod()
       * 
       * @return
       */
-    public static function getRequestMethod() {
+    public static function getMethod() {
         return $_SERVER['REQUEST_METHOD'];
     }
     
-    /**
-        request type methods
-     **/
+    #
+    #   REQUEST TYPE METHODS
+    #
     
     /**
+      * É uma requisição ajax?
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @return boolean
       */
     public static function isAjax() {
         return array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
     }
 
     /**
+      * É uma requisição do tipo GET?
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @return boolean
       */
     public static function isGet() {
         return $_SERVER['REQUEST_METHOD'] === 'GET';
     }
 
     /**
+      * É uma requisição do tipo POST?
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @return boolean
       */
     public static function isPost() {
         return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
 
     /**
+      * É uma requisição do tipo PUT?
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @return boolean
       */
     public static function isPut() {
         return $_SERVER['REQUEST_METHOD'] === 'PUT';
     }
 
     /**
+      * É uma requisição do tipo DELETE?
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @return boolean
       */
     public static function isDelete() {
         return $_SERVER['REQUEST_METHOD'] === 'DELETE';
     }
 
     /**
+      * É uma requisição segura?
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @return boolean
       */
     public static function isSsl() {
         //if is a secure connection
@@ -246,9 +392,12 @@ class Request extends Object{
     }
 
     /**
+      * É uma requisição feita a partir de um cliente mobile?
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @return boolean
       */
     public static function isMobile() {
         foreach(self::$mobileOs as $slug => $name):
@@ -261,9 +410,12 @@ class Request extends Object{
     }
 
     /**
+      * É uma requisição a partir de um navegador WAP?
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @return boolean
       */
     public static function isWap() {
         //return preg_match("/wap\.|\.wap/i", );
@@ -274,12 +426,15 @@ class Request extends Object{
         return false;
     }
     
-    /**
-        Is information methods
-     **/
+    #
+    #   IS INFORMATION METHODS
+    #
     
     /**
       * Verifica se o tipo passado em $type é aceito pelo usuário requisitante.
+      * 
+      * @version    1.0
+      *          - Initial
       * 
       * @param string $type Tipo a ser verificado. $type pode ser no formato 'xml'
       *     por exemplo, ou no formato application/xml.
@@ -287,6 +442,7 @@ class Request extends Object{
       */
     public static function isAccepted($type) {
         $acceptList = self::getClientAccepts();
+        
         //if $type is accepted by requester
         return in_array($type, $acceptList) ||
                 array_key_exists($type, self::$accept) &&
@@ -297,6 +453,9 @@ class Request extends Object{
       * Verifica se o requisitante está usando um sistema operacional especificado
       * em $os
       * 
+      * @version    1.0
+      *          - Initial
+      * 
       * @param string $os Sistema operacional a ser verificado
       * @param string $stringHttpUserAgent Optional Caso não seja informado,
       *     será usado  a informação contida em $_SERVER['HTTP_USER_AGENT']
@@ -305,13 +464,17 @@ class Request extends Object{
       *     caso não seja.
       */
     public static function isOs($os, $stringHttpUserAgent = null) {
+        
         //if is a specific operation system
         return key(self::getOs($stringHttpUserAgent)) === $os;
     }
     
     /**
       * Diz se o user-agent é mesmo o que estamos procurando.
-      *
+      * 
+      * @version    1.0
+      *          - Initial
+      * 
       * Exemplo:
       * //Retorna true or false caso o usuário esteja usando o IE8
       * isUserAgent('ie8')
@@ -340,6 +503,9 @@ class Request extends Object{
     /**
       * É um acesso local?
       * 
+      * @version    1.0
+      *          - Initial
+      * 
       * @return bool TRUE se o requisitante estiver usando uma rede local
       */
     public static function isLocal(){
@@ -347,9 +513,16 @@ class Request extends Object{
     }
 
     /**
+      * Verifica se o Ip informado está dentro de um intervalo
       * 
-      * 
-      * @return
+      * @version    1.0
+      *          - Initial
+      *
+      * @param string $initialRange IP inicial
+      * @param string $endRange IP final
+      * @param string optional $userIp IP a ser verificado. Será o próprio IP da requisição,
+      *     caso não seja informado.
+      * @return boolean TRUE caso esteja dentro do intervalo, e FALSE caso não esteja.
       */
     public static function inIpRange($initialRange, $endRange, $userIp = null){
         if(empty($userIp)):
@@ -359,23 +532,25 @@ class Request extends Object{
         $userIp = self::ipToLong($userIp);
         $initialRange = self::ipToLong($initialRange);
         $endRange = self::ipToLong($endRange);
-//        pr($userIp);
-//        pr($initialRange);
-//        pr($endRange);
 
         return ($userIp >= $initialRange) && ($userIp <= $endRange);
     }
   
-    /**
-        return methods
-     **/
+    #
+    #    RETURN METHODS
+    #
     
     /**
+      * Transforma o valor informado para JSON
       * 
+      * @version    1.0
+      *          - Initial
+      * 
+      * @param mixed $input Valor inicial
       * 
       * @return
       */
-    public static function toJson(array $input) {
+    public static function toJson($input) {
         return json_encode($input);
     }
 
@@ -385,6 +560,12 @@ class Request extends Object{
       * @version
       *     1.0 - 28/05/2010
       *     - Versão final contendo várias melhorias.
+      *     1.1 - 14/08/2010
+      *     - Adicionada a verificação do tipo do conteúdo, pra saber está vazio, ou se
+      *     contém caracteres especiais, etc.
+      *     1.2 - 24/10/2010
+      *     - Verifica se há atributos na tag de abertura, e evita que eles sejam exibidos
+      *     na tag de fechamento.
       * @param array $array Array de dados
       * @param string $initialKey Chave inicial que irá encobrir o próximo nó do Xml
       * @return Xml
@@ -397,9 +578,12 @@ class Request extends Object{
         
         if(!empty($initialKey)):
             //A próxima chave do conjunto atual não é numérica
-            if(!is_numeric(reset(array_keys($array)))):
+            $array_keys = array_keys($array);
+            
+            if(!is_numeric(reset($array_keys))):
                 $output .= "<{$initialKey}>\n";
-                $end = "\n</{$initialKey}>";
+                //$end = "\n</{$initialKey}>";
+                $end = self::endXmlTag($initialKey);
             endif;
         endif;
 
@@ -411,7 +595,13 @@ class Request extends Object{
             if(is_array($val)):
                 $output .= self::toXml($val, $row);
             else:
-                $output .= "<{$row}>{$val}</{$row}>\n";
+                if(empty($val)):
+                    $output .= "<{$row} />\n";
+                elseif($val != $newVal = htmlspecialchars($val)):
+                    $output .= "<{$row}><![CDATA[" . $newVal."]]>".self::endXmlTag($row)."\n";
+                else:
+                    $output .= "<{$row}>{$val}". self::endXmlTag($row) ."\n";
+                endif;
             endif;
         endforeach;
         
@@ -420,20 +610,58 @@ class Request extends Object{
     }
 
     /**
+      * Transforma o IP informado em um LONG
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @param string $ip IP a ser transformado
+      * @return long
       */
     public static function ipToLong($ip){
         return ip2long($ip);
     }
-    /**
+    /** 
+      * Transforma o long informado em um IP
       * 
+      * @version    1.0
+      *          - Initial
       * 
-      * @return
+      * @param long $long Long a ser transformado para IP
+      * @return string
       */
     public static function longToIp($long){
         return long2ip($long);
+    }
+    
+    
+    /**
+      * Força o download do arquivo
+      * 
+      * @version    1.0
+      *          - Initial
+      * 
+      * @param $file O nome do arquivo, relativo a /SPAGHETTI_ROOT
+      */
+    public static function forceDownload($file){
+        $file = Filesystem::path($file);
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename='.basename($file));
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file));
+
+        ob_clean();
+        flush();
+        readfile($file);
+    }
+    
+    private static function endXmlTag($key){
+        return "</".preg_replace('(^([^ ]+) (.*)$)', '\1', $key).">";
     }
 }
 ?>
