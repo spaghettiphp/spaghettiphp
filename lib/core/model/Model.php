@@ -23,9 +23,10 @@ class Model extends Hookable {
     protected $table;
     protected $connection = 'default';
 
-    protected $order;
-    protected $limit;
-    protected $recursion = 0;
+    protected $defaultScope = array(
+        'recursion' => 0,
+        'orm' => false
+    );
 
     protected $perPage = 20;
     protected $pagination = array();
@@ -237,15 +238,27 @@ class Model extends Hookable {
         return $this->connection()->escape($value);
     }
     
-    public function all($params = array()) {
-        $params += array(
-            'table' => $this->table(),
-            'order' => $this->order,
-            'limit' => $this->limit,
-            'recursion' => $this->recursion,
-            'orm' => false
-        );
-
+    protected function scope($scope, $params, $defaults = array()) {
+        if(is_array($scope)) {
+            $params = $scope;
+            $scope = 'default';
+        }
+        
+        if($scope !== false) {
+            $scope_name = $scope . 'Scope';
+            $scope = $this->{$scope_name};
+        }
+        else {
+            $scope = array();
+        }
+        
+        return array_merge($defaults, $scope, $params);
+    }
+    
+    public function all($scope = null, $params = array()) {
+        $defaults = array( 'table' => $this->table() );
+        $params = $this->scope($scope, $params, $defaults);
+        
         $query = $this->connection()->read($params);
 
         $results = array();
@@ -266,9 +279,9 @@ class Model extends Hookable {
         return $results;
     }
     
-    public function first($params = array()) {
+    public function first($scope = null, $params = array()) {
         $params['limit'] = 1;
-        $results = $this->all($params);
+        $results = $this->all($scope, $params);
 
         return empty($results) ? null : $results[0];
     }
@@ -307,46 +320,44 @@ class Model extends Hookable {
         return $results;
     }
     
-    public function count($params = array()) {
-        $db = $this->connection();
-        $params = array_merge($params, array(
-            'table' => $this->table(),
-            'offset' => null,
-            'limit' => null
-        ));
-        return $db->count($params);
+    public function count($scope = null, $params = array()) {
+        $defaults = array( 'table' => $this->table() );
+        $params = $this->scope($scope, $params, $defaults);
+        unset($params['offset'], $params['limit']);
+        
+        return $this->connection()->count($params);
     }
     
-    public function paginate($params = array()) {
-        $params += array(
+    public function paginate($scope = null, $params = array()) {
+        $count = $this->count($scope, $params);
+
+        $defaults = array(
             'perPage' => $this->perPage,
             'page' => 1
         );
+        $params = $this->scope($scope, $params, $defaults);
 
         $params['offset'] = ($params['page'] - 1) * $params['perPage'];
         $params['limit'] = $params['perPage'];
-
-        $count = $this->count($params);
 
         $this->pagination = array(
             'totalRecords' => $count,
             'totalPages' => ceil($count / $params['perPage']),
             'perPage' => $params['perPage'],
-            'offset' => $offset,
+            'offset' => $params['offset'],
             'page' => $params['page']
         );
 
-        return $this->all($params);
+        return $this->all(false, $params);
     }
     
-    public function toList($params = array()) {
-        $params += array(
+    public function toList($scope = null, $params = array()) {
+        $defaults = array(
             'key' => $this->primaryKey(),
             'displayField' => $this->displayField,
-            'table' => $this->table(),
-            'order' => $this->order,
-            'limit' => $this->limit
+            'table' => $this->table()
         );
+        $params = $this->scope($scope, $params, $defaults);
         
         if(!array_key_exists('fields', $params)) {
             $params['fields'] = array_merge(
