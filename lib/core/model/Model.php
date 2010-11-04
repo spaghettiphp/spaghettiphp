@@ -29,7 +29,7 @@ class Model extends Hookable {
     );
 
     protected $perPage = 20;
-    protected $pagination = array();
+    public $pagination = array();
 
     protected $validates = array();
     protected $errors = array();

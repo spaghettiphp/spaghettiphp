@@ -210,7 +210,7 @@ class Controller {
         endif;
     }
     public function page($param = 'page') {
-        return $this->param($param, 1);
+        return (integer) $this->param($param, 1);
     }
     public function isXhr() {
         if(array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)):
