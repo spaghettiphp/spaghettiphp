@@ -543,9 +543,7 @@ class Model extends Hookable {
     public function deleteAll($params = array()) {
         $db = $this->connection();
         $params += array(
-            'table' => $this->table(),
-            'order' => $this->order,
-            'limit' => $this->limit
+            'table' => $this->table()
         );
         return $db->delete($params);
     }
