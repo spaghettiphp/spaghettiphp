@@ -28,7 +28,7 @@ class View {
         return $this->loadedHelpers[$helper] = new $helper_class($this);
     }
     public function render($action, $data = array(), $layout = false) {
-        $view_file = Loader::path('View', $this->filename($action));
+        $view_file = Filesystem::path('app/views/') . $this->filename($action);
         
         if(Filesystem::exists($view_file)):
             $output = $this->renderView($view_file, $data);
@@ -43,7 +43,7 @@ class View {
         endif;
     }
     public function renderLayout($layout, $content, $data) {
-        $layout_file = Loader::path('Layout', $this->filename($layout));
+        $layout_file = Filesystem::path('app/views/layouts/') . $this->filename($layout);
 
         if(Filesystem::exists($layout_file)):
             $this->contentForLayout = $content;
@@ -55,7 +55,7 @@ class View {
         endif;
     }
     public function element($element, $data = array()) {
-        $element_path = Loader::path('View', $this->elementName($element));
+        $element_path = Filesystem::path('app/views/') . $this->elementName($element);
         
         if(Filesystem::exists($element_path)):
             return $this->renderView($element_path, $data);
@@ -76,7 +76,7 @@ class View {
             $filename .= '.htm';
         endif;
 
-        return $filename;
+        return $filename . '.php';
     }
     protected function elementName($element) {
         return dirname($element) . '/_' . $this->filename(basename($element));

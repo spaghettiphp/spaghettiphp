@@ -1,8 +1,8 @@
 <?php
 
+require 'lib/core/common/Validation.php';
 require 'lib/core/model/Connection.php';
 require 'lib/core/model/Table.php';
-require 'lib/core/model/Exceptions.php';
 require 'lib/core/model/Behavior.php';
 
 class Model extends Hookable {

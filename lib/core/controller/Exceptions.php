@@ -15,11 +15,3 @@ class MissingActionException extends MissingException {
         parent::__construct($message, 0, $details);
     }
 }
-
-class MissingComponentException extends MissingException {
-    public function __construct($details = array()) {
-        $message = 'Missing Component';
-        $details = 'The component <code>' . $details['component'] . '</code> could not be found.';
-        parent::__construct($message, 0, $details);
-    }
-}

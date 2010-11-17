@@ -15,7 +15,7 @@ class Helper {
         endif;
         if(!class_exists($name)):
             $message = 'The helper <code>' . $name . '</code> was not found.';
-            throw new InternalErrorException('Missing Helper', 0, $message);
+            throw new RuntimeException('The helper <code>' . $name . '</code> was not found.');
         endif;        
     }
 }

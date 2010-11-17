@@ -1,12 +1,10 @@
 <?php
 
-require 'lib/core/controller/Component.php';
 require 'lib/core/controller/Exceptions.php';
 
 class Controller {
     protected $autoLayout = true;
     protected $autoRender = true;
-    protected $components = array();
     protected $data = array();
     protected $layout = 'default';
     protected $name = null;
@@ -30,7 +28,6 @@ class Controller {
         }
         
         array_map(array($this, 'loadModel'), $this->uses);
-        array_map(array($this, 'loadComponent'), $this->components);
         $this->data = array_merge_recursive($_POST, $_FILES);
     }
 
@@ -71,7 +68,7 @@ class Controller {
     }
     
     public static function hasViewForAction($request) {
-        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
+        return Filesystem::exists('app/views/' . $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
     }
     
     public function name() {
@@ -106,9 +103,7 @@ class Controller {
     
     protected function dispatch($request) {
         $this->params = $request;
-        $this->componentEvent('initialize');
         $this->beforeFilter();
-        $this->componentEvent('startup');
         $view = View::path($request);
     
         if($this->hasAction($request['action'])) {
@@ -122,7 +117,6 @@ class Controller {
             $output = $this->render($view);
         }
 
-        $this->componentEvent('shutdown');
         $this->afterFilter();
     
         return $output;
@@ -131,18 +125,6 @@ class Controller {
     protected function loadModel($model) {
         $model = Inflector::camelize($model);
         return $this->models[$model] = Model::load($model);
-    }
-    
-    protected function loadComponent($component) {
-        $component = Inflector::camelize($component) . 'Component';
-        return $this->{$component} = Component::load($component, true);
-    }
-    
-    protected function componentEvent($event) {
-        foreach($this->components as $component) {
-            $className = $component . 'Component';
-            $this->$className->{$event}($this);
-        }
     }
     
     protected function beforeFilter() { }

@@ -75,7 +75,3 @@ class SpaghettiException extends Exception {
 class MissingException extends SpaghettiException {
     protected $status = 404;
 }
-
-class InternalErrorException extends SpaghettiException {
-    protected $status = 500;
-}
