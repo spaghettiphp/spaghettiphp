@@ -17,10 +17,9 @@ class Behavior {
             require_once 'lib/behaviors/' . $name . '.php';
         endif;
         if(!class_exists($name)):
-            throw new MissingBehaviorException(array(
-                'behavior' => $name
-            ));
-        endif;        
+            $message = 'The behavior <code>' . $name . '</code> was not found.';
+            throw new InternalErrorException('Missing Behavior', 0, $message);
+        endif;
     }
     public function hasMethod($method) {
         $class = new ReflectionClass(get_class($this));

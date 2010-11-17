@@ -74,7 +74,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @testdox loadModel should throw exception if model doesn't exist
-     * @expectedException MissingModelException
+     * @expectedException InternalErrorException
      */
     public function testLoadModelShouldThrowExceptionIfModelDoesntExist() {
         $controller = Controller::load('MissingModelController', true);

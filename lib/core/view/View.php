@@ -49,8 +49,8 @@ class View {
             $this->contentForLayout = $content;
             return $this->renderView($layout_file, $data);
         else:
-            throw new MissingLayoutException(array(
-                'layout' => $this->filename($layout)
+            throw new MissingViewException(array(
+                'view' => $this->filename($layout)
             ));
         endif;
     }
@@ -60,8 +60,8 @@ class View {
         if(Filesystem::exists($element_path)):
             return $this->renderView($element_path, $data);
         else:
-            throw new MissingElementException(array(
-                'element' => $this->filename($element)
+            throw new MissingViewException(array(
+                'view' => $this->filename($element)
             ));
         endif;
     }

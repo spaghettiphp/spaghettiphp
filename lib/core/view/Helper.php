@@ -14,9 +14,8 @@ class Helper {
             require_once 'lib/helpers/' . $name . '.php';
         endif;
         if(!class_exists($name)):
-            throw new MissingHelperException(array(
-                'helper' => $name
-            ));
+            $message = 'The helper <code>' . $name . '</code> was not found.';
+            throw new InternalErrorException('Missing Helper', 0, $message);
         endif;        
     }
 }
