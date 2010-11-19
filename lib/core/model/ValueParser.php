@@ -4,7 +4,8 @@ class ValueParser {
     protected $conditions;
     protected $values;
     protected static $operators = array(
-        '=', '<>', '!=', '<=', '<', '>=', '>', '<=>', 'LIKE', 'REGEXP'
+        '=', '<>', '!=', '<=', '<', '>=', '>', '<=>', 'LIKE', 'REGEXP',
+        '&', '\|', '^', '~', '<<', '>>'
     );
     protected static $logical = array(
         'and', 'and not', 'or', 'or not', 'xor', 'not'
@@ -42,7 +43,7 @@ class ValueParser {
                     else:
                         $repeat = rtrim(str_repeat('?,', count($param)), ',');
                         $sql []= $field . ' IN(' . $repeat . ')';
-                        $values += array_values($param);
+                        $values = array_merge($values, array_values($param));
                     endif;
                 endif;
             else:

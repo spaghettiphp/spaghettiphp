@@ -69,7 +69,7 @@ class Model extends Hookable {
 
             $conditions = array_slice($args, 0, count($fields));
 
-            $params = array_slice($args, count($fields));
+            $params = $args[count($fields)];
             $params['conditions'] = array_combine($fields, $conditions);
 
             return $this->$output['method']($params);
