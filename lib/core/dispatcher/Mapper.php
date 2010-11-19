@@ -58,8 +58,8 @@ class Mapper {
         
         if(is_null($self->domain)) {
             if(array_key_exists('REQUEST_URI', $_SERVER)) {
-                $https = array_key_exists('HTTPS', $_SERVER) ? 's' : '';
-                $this->domain = 'http' . $s . '://' . $_SERVER['HTTP_HOST'];
+                $s = array_key_exists('HTTPS', $_SERVER) ? 's' : '';
+                $self->domain = 'http' . $s . '://' . $_SERVER['HTTP_HOST'];
             }
             else {
                 $self->domain = 'http://localhost';
@@ -101,7 +101,9 @@ class Mapper {
             if(!self::isHash($url)) {
                 $url = $base . $url;
             }
-            $url = self::here() . $url;
+            if($base == '/') {
+                $url = self::here() . $url;
+            }
         }
 
         $url = self::normalize(self::base() . $url);
