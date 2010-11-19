@@ -68,8 +68,12 @@ class Model extends Hookable {
             $fields = explode('_and_', $fields);
 
             $conditions = array_slice($args, 0, count($fields));
+            $params = array();
 
-            $params = $args[count($fields)];
+            if(array_key_exists(count($fields), $args)) {
+                $params = $args[count($fields)];
+            }
+
             $params['conditions'] = array_combine($fields, $conditions);
 
             return $this->$output['method']($params);

@@ -4,23 +4,40 @@ class Sluggable extends Behavior {
     protected $filters = array(
         'beforeSave' => 'slug'
     );
+    protected $defaults = array('title' => 'slug');
     
     public function slug($data) {
-        $data['slug'] = $this->getSlug($data['title']);
+        foreach($this->options as $title => $slug) {
+            if($this->shouldUpdateSlug($data, $title, $slug)) {
+                $data[$slug] = $this->getSlug($slug, $data[$title]);
+            }
+        }
+
         return $data;
     }
-    protected function getSlug($title, $number = null) {
-        $slug = Inflector::slug($title);
-        if(is_null($number)):
-            $number = 1;
-        else:
-            $slug = $slug . "-" . $number;
-        endif;
+    
+    protected function shouldUpdateSlug($data, $title, $slug) {
+        return (
+            is_null($this->model->id) &&
+            array_key_exists($title, $data) &&
+            !empty($data[$title])
+        );
+    }
+    
+    protected function getSlug($field, $title) {
+        $slug = $start = Inflector::slug($title);
+        $number = 1;
+
+        while($this->model->exists(array(
+            $field => $slug
+        ))) {
+            $slug = $start . '-' . ($number += 1);
+        }
         
-        if($this->model->exists(array('slug' => $slug))):
-            return $this->getSlug($title, $number + 1);
-        else:
-            return $slug;
-        endif;
+        return $slug;
+    }
+    
+    protected function options($options) {
+        return empty($options) ? $this->defaults : $options;
     }
 }
