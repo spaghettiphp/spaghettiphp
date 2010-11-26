@@ -8,6 +8,7 @@ class HtmlHelper extends Helper {
     public function __construct($view) {
         parent::__construct($view);
     }
+    
     public function openTag($tag, $attr = array(), $empty = false) {
         $html = '<' . $tag;
         $attr = $this->attr($attr);
@@ -18,9 +19,11 @@ class HtmlHelper extends Helper {
         
         return $html;
     }
+    
     public function closeTag($tag) {
         return '</' . $tag . '>';
     }
+    
     public function tag($tag, $content = '', $attr = array(), $empty = false) {
         $html = $this->openTag($tag, $attr, $empty);
         if(!$empty):
@@ -29,6 +32,7 @@ class HtmlHelper extends Helper {
         
         return $html;
     }
+    
     public function attr($attr) {
         $attributes = array();
         foreach($attr as $name => $value):
@@ -42,6 +46,7 @@ class HtmlHelper extends Helper {
         
         return join(' ', $attributes);
     }
+    
     public function link($text, $url = null, $attr = array(), $full = false) {
         if(is_null($url)):
             $url = $text;
@@ -51,6 +56,7 @@ class HtmlHelper extends Helper {
         
         return $this->tag('a', $text, $attr);
     }
+    
     public function image($src, $attr = array()) {
         $attr += array(
             'alt' => '',
@@ -61,52 +67,52 @@ class HtmlHelper extends Helper {
 
         return $this->tag('img', null, $attr, true);
     }
+    
     public function imagelink($src, $url, $img_attr = array(), $attr = array(), $full = false) {
         $image = $this->image($src, $img_attr);
         return $this->link($image, $url, $attr, $full);
     }
-    public function stylesheet($href, $inline = true) {
-        if(is_array($href)):
-            $output = '';
-            foreach($href as $tag):
-                $output .= $this->stylesheet($tag, true) . PHP_EOL;
-            endforeach;
-        else:
+    
+    public function stylesheet() {
+        list($href, $inline) = $this->normalizeArgs(func_get_args());
+        
+        $output = '';
+        foreach($href as $tag) {
             $attr = array(
-                'href' => $this->assets->stylesheet($href),
+                'href' => $this->assets->stylesheet($tag),
                 'rel' => 'stylesheet',
                 'type' => 'text/css'
             );
-            $output = $this->tag('link', null, $attr, true);
-        endif;
-        
-        if($inline):
+            $output .= $this->tag('link', null, $attr, true);
+        }
+
+        if($inline) {
             return $output;
-        else:
+        }
+        else {
             $this->stylesForLayout .= $output;
-            return null;
-        endif;
+        }
     }
-    public function script($src, $inline = true) {
-        if(is_array($src)):
-            $output = '';
-            foreach($src as $tag):
-                $output .= $this->script($tag, true) . PHP_EOL;
-            endforeach;
-        else:
-            $attr = array(
-                'src' => $this->assets->script($src)
-            );
-            $output = $this->tag('script', null, $attr);
-        endif;
+    
+    public function script() {
+        list($src, $inline) = $this->normalizeArgs(func_get_args());
         
-        if($inline):
+        $output = '';
+        foreach($src as $tag) {
+            $attr = array(
+                'src' => $this->assets->script($tag)
+            );
+            $output .= $this->tag('script', null, $attr);
+        }
+        
+        if($inline) {
             return $output;
-        else:
+        }
+        else {
             $this->scriptsForLayout .= $output;
-            return null;
-        endif;
+        }
     }
+    
     public function nestedList($list, $attr = array(), $type = 'ul') {
         $content = '';
         foreach($list as $k => $li):
@@ -121,10 +127,11 @@ class HtmlHelper extends Helper {
         
         return $this->tag($type, $content, $attr);
     }
+    
     public function charset($charset = null) {
-        if(is_null($charset)):
+        if(is_null($charset)) {
             $charset = Config::read('App.encoding');
-        endif;
+        }
         
         $attr = array(
             'http-equiv' => 'Content-type',
@@ -132,5 +139,22 @@ class HtmlHelper extends Helper {
         );
         
         return $this->tag('meta', null, $attr, true);
+    }
+    
+    protected function normalizeArgs($args) {
+        $bool = true;
+        
+        if(is_array($args[0])) {
+            list($args, $bool) = array(array_shift($args), array_shift($args));
+            
+            if(is_null($bool)) {
+                $bool = true;
+            }
+        }
+        else if(is_bool(end($args))) {
+            $bool = array_pop($args);
+        }
+        
+        return array($args, $bool);
     }
 }
