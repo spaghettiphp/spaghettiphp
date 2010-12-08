@@ -241,8 +241,12 @@ class Model extends Hookable {
     }
     
     protected function scope($scope, $params, $defaults = array()) {
-        if(is_array($scope) || is_null($scope)) {
-            $params = (array) $scope;
+        if(is_array($scope)) {
+            $params = $scope;
+            $scope = 'default';
+        }
+
+        if(is_null($scope)) {
             $scope = 'default';
         }
         
