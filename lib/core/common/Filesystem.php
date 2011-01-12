@@ -29,7 +29,7 @@ class Filesystem{
     }
     public static function getFiles($path = '', $pattern = '*') {
         $path = self::path($path);
-        return glob($path . $pattern);
+        return array_slice(scandir($path), 2);
     }
     public static function size($file, $rewrite = true) {
         if(!self::exists($file)):
