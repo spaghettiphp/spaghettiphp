@@ -3,11 +3,12 @@
 class SpaghettiException extends Exception {
     protected $status = 500;
     protected $details;
-    
+
     public function __construct($message, $code, $details = null) {
         parent::__construct($message, $code);
         $this->details = $details;
     }
+
     public function header($status) {
         $codes = array(
             100 => 'Continue',
@@ -52,23 +53,28 @@ class SpaghettiException extends Exception {
         );
         header('HTTP/1.1 ' . $status . ' ' . $codes[$status]);
     }
+
     public function getDetails() {
         return $this->details;
     }
+
     public function toString() {
         if(ob_get_level()) {
             ob_end_clean();
         }
+
         $this->header($this->status);
-        if(Filesystem::exists('app/views/layouts/error.htm.php')):
+
+        if(Filesystem::exists('app/views/layouts/error.htm.php')) {
             $view = new View();
             return  $view->renderView('app/views/layouts/error.htm.php', array(
                 'exception' => $this
             ));
-        else:
+        }
+        else {
             echo '<pre>';
             throw new Exception('error layout was not found');
-        endif;
+        }
     }
 }
 

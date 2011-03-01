@@ -6,27 +6,13 @@ require 'lib/core/model/Table.php';
 require 'lib/core/model/Behavior.php';
 
 class Model extends Hookable {
-    public $id;
-
-    public $associations = array(
-        'hasMany' => array('primaryKey', 'foreignKey', 'limit', 'order'),
-        'belongsTo' => array('primaryKey', 'foreignKey'),
-        'hasOne' => array('primaryKey', 'foreignKey')
-    );
-    protected $belongsTo = array();
-    protected $hasMany = array();
-    protected $hasOne = array();
-
     protected $behaviors = array();
 
     protected $displayField;
     protected $table;
     protected $connection = 'default';
 
-    protected $defaultScope = array(
-        'recursion' => 0,
-        'orm' => false
-    );
+    protected $defaultScope = array();
 
     protected $perPage = 20;
     public $pagination = array();
@@ -35,7 +21,7 @@ class Model extends Hookable {
     protected $errors = array();
 
     protected $data = array();
-    
+
     protected $beforeSave = array();
     protected $beforeCreate = array();
     protected $beforeUpdate = array();
@@ -48,19 +34,18 @@ class Model extends Hookable {
     protected $afterDelete = array();
     protected $afterValidate = array();
 
-    protected $_models = array();
     protected $_behaviors = array();
 
     protected static $instances = array();
 
     public function __construct($data = null) {
         if(!is_null($data)) {
-            $this->id = $data['id'];
             $this->data = $data;
         }
+
         $this->loadBehaviors($this->behaviors);
     }
-    
+
     public function __call($method, $args) {
         $regex = '/(?P<method>first|all)By(?P<fields>[\w]+)/';
         if(preg_match($regex, $method, $output)) {
@@ -86,19 +71,20 @@ class Model extends Hookable {
         // @todo shouldn't fail silently
         $this->data[$name] = $value;
     }
-    
+
     public function __get($name) {
-        $attrs = array('data', '_models', '_behaviors');
-        
+        $attrs = array('data', '_behaviors');
+
         foreach($attrs as $attr) {
             if(array_key_exists($name, $this->{$attr})) {
                 return $this->{$attr}[$name];
             }
         }
-        
+
         throw new RuntimeException(get_class($this) . '->' . $name . ' does not exist.');
     }
-    
+
+    // Model::load() only helps with performance and will be removed when we begin to use late static binding
     public static function load($name) {
         if(!array_key_exists($name, Model::$instances)) {
             $filename = 'app/models/' . Inflector::underscore($name) . '.php';
@@ -108,7 +94,6 @@ class Model extends Hookable {
 
             if(class_exists($name)) {
                 Model::$instances[$name] = new $name();
-                Model::$instances[$name]->createLinks();
             }
             else {
                 throw new RuntimeException('The model "' . $name . '" was not found.');
@@ -133,7 +118,7 @@ class Model extends Hookable {
     public function getTable() {
         return $this->table;
     }
-    
+
     public function schema() {
         return Table::load($this)->schema();
     }
@@ -142,88 +127,41 @@ class Model extends Hookable {
         return Table::load($this)->primaryKey();
     }
 
-    public function createLinks() {
-        foreach(array_keys($this->associations) as $type):
-            $associations =& $this->{$type};
-            foreach($associations as $key => $properties):
-                if(is_numeric($key)):
-                    unset($associations[$key]);
-                    if(is_array($properties)):
-                        $associations[$key = $properties['className']] = $properties;
-                    else:
-                        $associations[$key = $properties] = array('className' => $properties);
-                    endif;
-                elseif(!isset($properties['className'])):
-                    $associations[$key]['className'] = $key;
-                endif;
-
-                $model = $associations[$key]['className'];
-                if(!array_key_exists($model, $this->_models)) {
-                    $this->_models[$model] = Model::load($model);
-                }
-
-                $associations[$key] = $this->generateAssociation($type, $associations[$key]);
-            endforeach;
-        endforeach;
-    }
-    
-    public function generateAssociation($type, $association) {
-        foreach($this->associations[$type] as $key):
-            if(!isset($association[$key])):
-                $data = null;
-                switch($key):
-                    case 'primaryKey':
-                        $data = $this->primaryKey();
-                        break;
-                    case 'foreignKey':
-                        if($type == 'belongsTo'):
-                            $data = Inflector::underscore($association['className'] . 'Id');
-                        else:
-                            $data = Inflector::underscore(get_class($this)) . '_' . $this->primaryKey();
-                        endif;
-                        break;
-                    default:
-                        $data = null;
-                endswitch;
-                $association[$key] = $data;
-            endif;
-        endforeach;
-        return $association;
-    }
-
     protected function loadBehaviors($behaviors) {
-        foreach($this->behaviors as $key => $behavior):
+        foreach($this->behaviors as $key => $behavior) {
             $options = array();
-            if(!is_numeric($key)):
+
+            if(!is_numeric($key)) {
                 $options = $behavior;
                 $behavior = $key;
-            endif;
+            }
+
             $this->loadBehavior($behavior, $options);
-        endforeach;
+        }
     }
-    
+
     protected function loadBehavior($behavior, $options = array()) {
         $behavior = Inflector::camelize($behavior);
         Behavior::load($behavior);
         return $this->_behaviors[$behavior] = new $behavior($this, $options);
     }
-    
+
     public function query($query) {
         return $this->connection()->query($query);
     }
-    
+
     public function fetch($query) {
         return $this->connection()->fetchAll($query);
     }
-    
+
     public function begin() {
         return $this->connection()->begin();
     }
-    
+
     public function commit() {
         return $this->connection()->commit();
     }
-    
+
     public function rollback() {
         return $this->connection()->rollback();
     }
@@ -231,15 +169,16 @@ class Model extends Hookable {
     public function insertId() {
         return $this->connection()->insertId();
     }
-    
+
     public function affectedRows() {
         return $this->connection()->affectedRows();
     }
-    
+
     public function escape($value) {
         return $this->connection()->escape($value);
     }
-    
+
+    // scopes will be removed, DO NOT rely on this
     protected function scope($scope, $params, $defaults = array()) {
         if(is_array($scope)) {
             $params = $scope;
@@ -249,7 +188,7 @@ class Model extends Hookable {
         if(is_null($scope)) {
             $scope = 'default';
         }
-        
+
         if($scope !== false) {
             $scope_name = $scope . 'Scope';
             $scope = $this->{$scope_name};
@@ -257,83 +196,40 @@ class Model extends Hookable {
         else {
             $scope = array();
         }
-        
+
         return array_merge($defaults, $scope, $params);
     }
-    
+
     public function all($scope = null, $params = array()) {
         $defaults = array( 'table' => $this->table() );
         $params = $this->scope($scope, $params, $defaults);
-        
+
         $query = $this->connection()->read($params);
 
         $results = array();
         while($result = $query->fetch()) {
-            if($params['orm']) {
-                $self = get_class($this);
-                $results []= new $self($result);
-            }
-            else {
-                $results []= $result;
-            }
+            $self = get_class($this);
+            $results []= new $self($result);
         }
 
-        if(!$params['orm'] && $params['recursion'] >= 0) {
-            $results = $this->dependent($results, $params['recursion']);
-        }
-        
         return $results;
     }
-    
+
     public function first($scope = null, $params = array()) {
         $params['limit'] = 1;
         $results = $this->all($scope, $params);
 
         return empty($results) ? null : $results[0];
     }
-    
-    public function dependent($results, $recursion = 0) {
-        foreach(array_keys($this->associations) as $type):
-            if($recursion < 0 and ($type != 'belongsTo' && $recursion <= 0)) continue;
-            foreach($this->{$type} as $name => $association):
-                foreach($results as $key => $result):
-                    $name = Inflector::underscore($name);
-                    $model = $association['className'];
-                    $params = array();
-                    if($type == 'belongsTo'):
-                        $params['conditions'] = array(
-                            $association['primaryKey'] => $result[$association['foreignKey']]
-                        );
-                        $params['recursion'] = $recursion - 1;
-                    else:
-                        $params['conditions'] = array(
-                            $association['foreignKey'] => $result[$association["primaryKey"]]
-                        );
-                        $params['recursion'] = $recursion - 2;
-                        if($type == 'hasMany'):
-                            $params['limit'] = $association['limit'];
-                            $params['order'] = $association['order'];
-                        endif;
-                    endif;
-                    $result = $this->_models[$model]->all($params);
-                    if($type != 'hasMany' && !empty($result)):
-                        $result = $result[0];
-                    endif;
-                    $results[$key][$name] = $result;
-                endforeach;
-            endforeach;
-        endforeach;
-        return $results;
-    }
-    
+
     public function count($scope = null, $params = array()) {
         $defaults = array( 'table' => $this->table() );
         $params = $this->scope($scope, $params, $defaults);
         unset($params['offset'], $params['limit']);
-        
+
         return $this->connection()->count($params);
     }
-    
+
     public function paginate($scope = null, $params = array()) {
         $count = $this->count($scope, $params);
 
@@ -356,7 +252,8 @@ class Model extends Hookable {
 
         return $this->all(false, $params);
     }
-    
+
+    // be aware that toList will be removed
     public function toList($scope = null, $params = array()) {
         $defaults = array(
             'key' => $this->primaryKey(),
@@ -364,7 +261,7 @@ class Model extends Hookable {
             'table' => $this->table()
         );
         $params = $this->scope($scope, $params, $defaults);
-        
+
         if(!array_key_exists('fields', $params)) {
             $params['fields'] = array_merge(
                 (array) $params['key'],
@@ -383,19 +280,19 @@ class Model extends Hookable {
             else {
                 $value = $result[$params['displayField']];
             }
-            
+
             $results[$result[$params['key']]] = $value;
         }
 
         return $results;
     }
-    
+
     public function exists($conditions) {
         return (bool) $this->count(array(
             'conditions' => $conditions
         ));
     }
-    
+
     public function insert($data) {
         $params = array(
             'values' => $data,
@@ -404,7 +301,7 @@ class Model extends Hookable {
 
         return $this->connection()->create($params);
     }
-    
+
     public function update($params, $data) {
         $params += array(
             'values' => $data,
@@ -414,53 +311,72 @@ class Model extends Hookable {
         return $this->connection()->update($params);
     }
 
-    public function save($data = array()) {
-        if(!empty($data)) {
-            $this->data = $data;
-        }
-        
-        if(!is_null($this->id)):
-            $this->data[$this->primaryKey()] = $this->id;
-        endif;
-
+    public function save() {
         // apply modified timestamp
         $date = date('Y-m-d H:i:s');
-        if(!array_key_exists('modified', $this->data)):
+        if(!array_key_exists('modified', $this->data)) {
             $this->data['modified'] = $date;
-        endif;
+        }
+
+        $pk = $this->primaryKey();
 
         // verify if the record exists
-        $exists = $this->exists(array(
-            $this->primaryKey() => $this->id
-        ));
+        if(array_key_exists($pk, $this->data) && !is_null($this->data[$pk])) {
+            $exists = $this->exists(array(
+                $pk => $this->data[$pk]
+            ));
+        }
+        else {
+            $exists = false;
+        }
 
         // apply created timestamp
-        if(!$exists && !array_key_exists('created', $this->data)):
+        if(!$exists && !array_key_exists('created', $this->data)) {
             $this->data['created'] = $date;
-        endif;
+        }
+
+        if(!$this->validate()) {
+            return false;
+        }
 
         // apply beforeSave filter
         $this->data = $this->fireFilter('beforeSave', $this->data);
-        if(!$this->data):
+        if(!$this->data) {
             return false;
-        endif;
-
-        // filter fields that are not in the schema
-        $data = array_intersect_key($this->data, $this->schema());
+        }
 
         // update a record if it already exists...
-        if($exists):
+        if($exists) {
+            $this->data = $this->fireFilter('beforeUpdate', $this->data);
+            if(!$this->data) {
+                return false;
+            }
+
+            $data = array_intersect_key($this->data, $this->schema());
+
             $save = $this->update(array(
                 'conditions' => array(
-                    $this->primaryKey() => $this->id
+                    $pk => $this->data[$pk]
                 ),
                 'limit' => 1
             ), $data);
+
+            $this->fireAction('afterUpdate');
+        }
         // or insert a new one if it doesn't
-        else:
+        else {
+            $this->data = $this->fireFilter('beforeCreate', $this->data);
+            if(!$this->data) {
+                return false;
+            }
+
+            $data = array_intersect_key($this->data, $this->schema());
+
             $save = $this->insert($data);
-            $this->id = $this->insertId();
-        endif;
+            $this->data[$pk] = $this->insertId();
+
+            $this->fireAction('afterCreate');
+        }
 
         // fire afterSave action
         $this->fireAction('afterSave');
@@ -468,89 +384,99 @@ class Model extends Hookable {
         return $save;
     }
 
-    public function validate($data) {
+    public function validate() {
         $this->errors = array();
         $defaults = array(
             'required' => false,
             'allowEmpty' => false,
             'message' => null
         );
-        foreach($this->validates as $field => $rules):
-            if(!is_array($rules) || (is_array($rules) && isset($rules['rule']))):
+
+        $this->data = $this->fireFilter('beforeValidate', $this->data);
+        if(!$this->data) {
+            return false;
+        }
+
+        foreach($this->validates as $field => $rules) {
+            if(!is_array($rules) || (is_array($rules) && isset($rules['rule']))) {
                 $rules = array($rules);
-            endif;
-            foreach($rules as $rule):
-                if(!is_array($rule)):
+            }
+
+            foreach($rules as $rule) {
+                if(!is_array($rule)) {
                     $rule = array('rule' => $rule);
-                endif;
+                }
+
                 $rule += $defaults;
-                if($rule['allowEmpty'] && empty($data[$field])):
+
+                if($rule['allowEmpty'] && empty($this->data[$field])) {
                     continue;
-                endif;
-                $required = !isset($data[$field]) && $rule['required'];
-                if($required):
+                }
+
+                $required = !isset($this->data[$field]) && $rule['required'];
+
+                if($required) {
                     $this->errors[$field] = is_null($rule['message']) ? $rule['rule'] : $rule['message'];
-                elseif(isset($data[$field])):
-                    if(!$this->callValidationMethod($rule['rule'], $data[$field])):
+                }
+
+                elseif(isset($this->data[$field])) {
+                    if(!$this->callValidationMethod($rule['rule'], $this->data[$field])) {
                         $message = is_null($rule['message']) ? $rule['rule'] : $rule['message'];
                         $this->errors[$field] = $message;
                         break;
-                    endif;
-                endif;
-            endforeach;
-        endforeach;
+                    }
+                }
+            }
+        }
+
+        $this->fireAction('afterValidate');
+
         return empty($this->errors);
     }
 
     public function callValidationMethod($params, $value) {
         $method = is_array($params) ? $params[0] : $params;
         $class = method_exists($this, $method) ? $this : 'Validation';
-        if(is_array($params)):
+
+        if(is_array($params)) {
             $params[0] = $value;
             return call_user_func_array(array($class, $method), $params);
-        else:
-            if($class == 'Validation'):
+        }
+        else {
+            if($class == 'Validation') {
                 return Validation::$params($value);
-            else:
+            }
+            else {
                 return $this->$params($value);
-            endif;
-        endif;
+            }
+        }
     }
-    
-    public function delete($id, $dependent = true) {
+
+    public function delete() {
+        $pk = $this->primaryKey();
+        $conditions = array(
+            $pk => $this->data[$pk]
+        );
         $params = array(
-            'conditions' => array(
-                $this->primaryKey() => $id
-            ),
+            'conditions' => $conditions,
             'limit' => 1
         );
-        if($this->exists(array($this->primaryKey() => $id)) && $this->deleteAll($params)):
-            if($dependent):
-                $this->deleteDependent($id);
-            endif;
-            return true;
-        endif;
+
+        if($this->exists($conditions)) {
+            if($this->fireFilter('beforeDelete', $this->data[$pk])) {
+                return $this->deleteAll($params) && $this->fireAction('afterDelete');
+            }
+        }
+
         return false;
     }
-    
-    public function deleteDependent($id) {
-        foreach(array('hasOne', 'hasMany') as $type):
-            foreach($this->{$type} as $model => $assoc):
-                $this->{$assoc['className']}->deleteAll(array(
-                    'conditions' => array(
-                        $assoc['foreignKey'] => $id
-                    )
-                ));
-            endforeach;
-        endforeach;
-        return true;
-    }
-    
+
     public function deleteAll($params = array()) {
         $db = $this->connection();
         $params += array(
             'table' => $this->table()
         );
+
         return $db->delete($params);
     }
 }

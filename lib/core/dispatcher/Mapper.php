@@ -14,13 +14,13 @@ class Mapper {
             $c = __CLASS__;
             self::$instance = new $c;
         }
-        
+
         return self::$instance;
     }
-    
+
     public static function here() {
         $self = self::instance();
-        
+
         if(is_null($self->here)) {
             if(array_key_exists('REQUEST_URI', $_SERVER)) {
                 $start = strlen(self::base());
@@ -31,31 +31,31 @@ class Mapper {
                 $self->here = '/';
             }
         }
-        
+
         return $self->here;
     }
 
     public static function base() {
         $self = self::instance();
-        
+
         if(is_null($self->base)) {
             $self->base = dirname($_SERVER['PHP_SELF']);
-    
+
             if(basename($self->base) == 'public') {
                 $self->base = dirname($self->base);
             }
-    
+
             if($self->base == DIRECTORY_SEPARATOR || $self->base == '.') {
                 $self->base = '/';
             }
         }
-        
+
         return $self->base;
     }
 
     public static function domain() {
         $self = self::instance();
-        
+
         if(is_null($self->domain)) {
             if(array_key_exists('REQUEST_URI', $_SERVER)) {
                 $s = array_key_exists('HTTPS', $_SERVER) ? 's' : '';
@@ -65,10 +65,10 @@ class Mapper {
                 $self->domain = 'http://localhost';
             }
         }
-        
+
         return $self->domain;
     }
-    
+
     public static function normalize($url) {
         if(!self::isExternal($url)) {
             $url = preg_replace('%/+%', '/', $url);
@@ -80,7 +80,7 @@ class Mapper {
 
     public static function root($controller = null) {
         $self = self::instance();
-        
+
         if(is_null($controller)) {
             return $self->root;
         }
@@ -96,7 +96,7 @@ class Mapper {
         else if(is_array($url)) {
             return self::reverse($url);
         }
-        
+
         if(!self::isRoot($url)) {
             if(!self::isHash($url)) {
                 $url = $base . $url;
@@ -107,10 +107,10 @@ class Mapper {
         }
 
         $url = self::normalize(self::base() . $url);
-        
+
         return $full ? self::domain() . $url : $url;
     }
-    
+
     public static function isExternal($path) {
         return preg_match('/^[\w]+:/', $path);
     }
@@ -118,7 +118,7 @@ class Mapper {
     public static function isRoot($url) {
         return substr($url, 0, 1) == '/';
     }
-    
+
     public static function isHash($url) {
         return substr($url, 0, 1) == '#';
     }
@@ -148,32 +148,32 @@ class Mapper {
                 $url .= '/' . $value;
             }
         }
-        
+
         return $url;
     }
 
     public static function prefix($prefix) {
         self::instance()->prefixes []= $prefix;
     }
-    
+
     public static function unsetPrefix($prefix) {
         unset(self::instance()->prefixes[$prefix]);
     }
-    
+
     public static function prefixes() {
         return self::instance()->prefixes;
     }
-    
+
     public static function connect($url, $route) {
         $url = self::normalize($url);
         self::instance()->routes[$url] = rtrim($route, '/');
     }
-    
+
     public static function disconnect($url) {
         $url = rtrim($url, '/');
         unset(self::instance()->routes[$url]);
     }
-    
+
     public static function match($check, $url = null) {
         if(is_null($url)) {
             $url = self::here();
@@ -191,15 +191,15 @@ class Mapper {
                 break;
             }
         }
-        
+
         return self::normalize($url);
     }
-    
+
     public static function parse($url = null) {
         $here = self::normalize(is_null($url) ? self::here() : $url);
         $url = self::getRoute($here);
         $prefixes = join('|', self::prefixes());
-        
+
         $path = array();
         $parts = array('here', 'prefix', 'controller', 'action', 'extension', 'params', 'queryString');
         preg_match('/^\/(?:(' . $prefixes . ')(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i', $url, $reg);
@@ -207,7 +207,7 @@ class Mapper {
         foreach($parts as $k => $key) {
             $path[$key] = isset($reg[$k]) ? $reg[$k] : null;
         }
-        
+
         $path['named'] = $path['params'] = array();
         if(isset($reg[5])) {
             foreach(explode('/', $reg[5]) as $param) {
@@ -236,10 +236,10 @@ class Mapper {
             parse_str($path['queryString'], $queryString);
             $path['named'] = array_merge($path['named'], $queryString);
         }
-        
+
         return $path;
     }
-    
+
     public static function filterAction($action) {
         if(strpos($action, '_') !== false) {
             foreach(self::prefixes() as $prefix) {

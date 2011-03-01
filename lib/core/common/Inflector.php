@@ -4,12 +4,15 @@ class Inflector {
     public static function camelize($string) {
         return str_replace(' ', '', ucwords(str_replace(array('_', '-'), ' ', $string)));
     }
+
     public static function humanize($string) {
         return ucwords(str_replace(array('_', '-'), ' ', $string));
     }
+
     public static function underscore($string) {
         return strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $string));
     }
+
     public static function slug($string, $replace = '-') {
         $map = array(
             '/À|à|Á|á|å|Ã|â|Ã|ã/' => 'a',
@@ -28,9 +31,10 @@ class Inflector {
             '/\\s+/' => $replace,
             '/^' . $replace . '+|' . $replace . '+$/' => ''
         );
-        
+
         return strtolower(preg_replace(array_keys($map), array_values($map), $string));
     }
+
     public static function hyphenToUnderscore($string) {
         return str_replace('-', '_', $string);
     }

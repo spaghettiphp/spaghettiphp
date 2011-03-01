@@ -18,11 +18,11 @@ class Table {
         $model_name = get_class($model);
         $connection = $model->getConnection();
         $name = $connection . '.' . $model_name;
-        
+
         if(!array_key_exists($name, self::$cache)) {
             self::$cache[$name] = new self($connection, $model);
         }
-        
+
         return self::$cache[$name];
     }
 
@@ -39,7 +39,7 @@ class Table {
                 $this->table = $database['prefix'] . Inflector::underscore(get_class($this->model));
             }
         }
-        
+
         return $this->table;
     }
 
@@ -47,17 +47,18 @@ class Table {
         if($this->name() && is_null($this->schema)) {
             $db = $this->connection();
             $sources = $db->listSources();
-            if(!in_array($this->table, $sources)):
+            if(!in_array($this->table, $sources)) {
                 throw new MissingTableException(array(
                     'table' => $this->table
                 ));
                 return false;
-            endif;
-            if(empty($this->schema)):
+            }
+
+            if(empty($this->schema)) {
                 $this->describe();
-            endif;
+            }
         }
-        
+
         return $this->schema;
     }
 
@@ -70,14 +71,15 @@ class Table {
     protected function describe() {
         $db = $this->connection();
         $schema = $db->describe($this->table);
-        if(is_null($this->primaryKey)):
-            foreach($schema as $field => $describe):
-                if($describe['key'] == 'PRI'):
+        if(is_null($this->primaryKey)) {
+            foreach($schema as $field => $describe) {
+                if($describe['key'] == 'PRI') {
                     $this->primaryKey = $field;
                     break;
-                endif;
-            endforeach;
-        endif;
+                }
+            }
+        }
+
         return $this->schema = $schema;
     }
 }

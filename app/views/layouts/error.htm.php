@@ -14,7 +14,7 @@
             code { margin: 0px 4px; }
         </style>
     </head>
-    
+
     <body>
         <h1><?php echo $exception->getMessage() ?></h1>
         <dl>

@@ -8,9 +8,8 @@ This repository is for Spaghetti* developers. All users should download Spaghett
 
 h2. How to help
 
-* Find and "report bugs":http://github.com/spaghettiphp/spaghettiphp/issues
-* Fork our repository and start writing code!
-* Write tests
-* Write documentation
+* Find and "report bugs":https://github.com/spaghettiphp/spaghettiphp/issues and help us fix them
+* Fork our repository and start writing some code! Take a look at the "Roadmap":https://github.com/spaghettiphp/spaghettiphp/wiki/Roadmap to see where we're going.
+* Help us enhance our documentation
 
-See "our wiki":http://wiki.github.com/spaghettiphp/spaghettiphp/ for more information on development.
+See "our wiki":https://github.com/spaghettiphp/spaghettiphp/wiki/ for more information on development.

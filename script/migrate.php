@@ -21,7 +21,7 @@ CREATE TABLE `schema_migrations` (
   PRIMARY KEY (`version`)
 )
 ENGINE = InnoDB
-CHARACTER SET utf8 COLLATE utf8_general_ci;    
+CHARACTER SET utf8 COLLATE utf8_general_ci;
 EOT;
     $connection->query($sql);
 }

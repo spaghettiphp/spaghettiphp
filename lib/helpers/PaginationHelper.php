@@ -7,7 +7,7 @@ class PaginationHelper extends Helper {
         $this->model = Model::load($model);
         return $this;
     }
-    
+
     public function numbers($options = array()) {
         if(!$this->model) {
             return null;
@@ -39,7 +39,7 @@ class PaginationHelper extends Helper {
 
         return join($options['separator'], $numbers);
     }
-    
+
     public function next($text, $attr = array()) {
         if($this->hasNext()) {
             return $this->html->link($text, array(
@@ -47,7 +47,7 @@ class PaginationHelper extends Helper {
             ), $attr);
         }
     }
-    
+
     public function previous($text, $attr = array()) {
         if($this->hasPrevious()) {
             return $this->html->link($text, array(
@@ -55,7 +55,7 @@ class PaginationHelper extends Helper {
             ), $attr);
         }
     }
-    
+
     public function first($text, $attr = array()) {
         if($this->hasPrevious()) {
             return $this->html->link($text, array(
@@ -63,7 +63,7 @@ class PaginationHelper extends Helper {
             ), $attr);
         }
     }
-    
+
     public function last($text, $attr = array()) {
         if($this->hasNext()) {
             return $this->html->link($text, array(
@@ -71,7 +71,7 @@ class PaginationHelper extends Helper {
             ), $attr);
         }
     }
-    
+
     public function hasNext() {
         if($this->model) {
             return $this->page() < $this->pages();
@@ -89,13 +89,13 @@ class PaginationHelper extends Helper {
             return $this->model->pagination['page'];
         }
     }
-    
+
     public function pages() {
         if($this->model) {
             return $this->model->pagination['totalPages'];
         }
     }
-    
+
     public function records() {
         if($this->model) {
             return $this->model->pagination['totalRecords'];
