@@ -9,9 +9,12 @@ try {
     echo Dispatcher::dispatch();
 }
 catch(Exception $e) {
-    if(!($e instanceof SpaghettiException)) {
-        $e = new SpaghettiException('Uncaught Exception', $e->getCode(), $e->getMessage());
+    Debug::log((string) $e);
+    
+    if(Config::read('Debug.showErrors')) {
+        echo '<pre>', $e, '</pre>';
     }
-
-    echo $e->toString();
+    else {
+        // @todo do something to prevent white screen of death
+    }
 }

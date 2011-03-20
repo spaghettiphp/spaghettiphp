@@ -1,3 +1,3 @@
 <?php
 
-Config::write('Debug.level', 0);
+Config::write('Debug.showErrors', false);
