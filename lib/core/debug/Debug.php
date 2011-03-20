@@ -6,11 +6,16 @@ class Debug {
             $handler = array('Debug', 'handleError');
         }
 
-        set_error_handler($handler);
+        set_error_handler($handler, -1);
+        ini_set('error_log', SPAGHETTI_ROOT . '/log/error.log');
     }
 
     public static function handleError($code, $message, $file, $line) {
         throw new ErrorException($message, 0, $code, $file, $line);
+    }
+
+    public static function log($message) {
+        error_log($message);
     }
 
     public static function pr($data) {

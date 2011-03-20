@@ -10,7 +10,7 @@ try {
 }
 catch(Exception $e) {
     Debug::log((string) $e);
-    
+
     if(Config::read('Debug.showErrors')) {
         echo '<pre>', $e, '</pre>';
     }
