@@ -146,6 +146,10 @@ class Filesystem {
         return true;
     }
 
+    public static function filename($file) {
+        return pathinfo(strtolower($file), PATHINFO_FILENAME);
+    }
+
     public static function extension($file) {
         $extension = pathinfo(strtolower($file), PATHINFO_EXTENSION);
         if($extension) {
