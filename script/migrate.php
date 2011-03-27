@@ -14,6 +14,10 @@ function get_migration_version($migration) {
     return substr($migration, 0, 14);
 }
 
+function get_migration_name($migration) {
+    return Inflector::camelize(substr(Filesystem::filename($migration), 15));
+}
+
 function create_schema_migrations($connection) {
     $sql = <<<EOT
 CREATE TABLE `schema_migrations` (
@@ -27,6 +31,11 @@ EOT;
 }
 
 function should_migrate($migration, $connection) {
+    $ext = Filesystem::extension($migration);
+    if(!in_array($ext, array('php', 'sql'))) {
+        return false;
+    }
+
     $should_migrate = $connection->count(array(
         'table' => 'schema_migrations',
         'conditions' => array(
@@ -38,13 +47,23 @@ function should_migrate($migration, $connection) {
 
 function migrate($migration, $connection) {
     echo 'importing ' . $migration . '... ';
-    $connection->query(utf8_decode(Filesystem::read('db/migrations/' . $migration)));
+
+    $ext = Filesystem::extension($migration);
+    if($ext == 'php') {
+        require_once 'db/migrations/' . $migration;
+        $classname = get_migration_name($migration);
+        $classname::migrate($connection);
+    }
+    else {
+        $connection->query(utf8_decode(Filesystem::read('db/migrations/' . $migration)));
+    }
     $connection->create(array(
         'table' => 'schema_migrations',
         'values' => array(
             'version' => get_migration_version($migration)
         )
     ));
+
     echo 'done' . PHP_EOL;
 }
 
