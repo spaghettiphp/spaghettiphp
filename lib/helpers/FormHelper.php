@@ -1,5 +1,7 @@
 <?php
 
+require_once 'lib/core/security/Sanitize.php';
+
 class FormHelper extends Helper {
     public function create($action = null, $options = array()) {
         $options += array(
