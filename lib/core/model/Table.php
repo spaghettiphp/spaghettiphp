@@ -48,9 +48,7 @@ class Table {
             $db = $this->connection();
             $sources = $db->listSources();
             if(!in_array($this->table, $sources)) {
-                throw new MissingTableException(array(
-                    'table' => $this->table
-                ));
+                throw new MissingTableException($this->table . ' could not be founded on ' . $this->connection . '.');
                 return false;
             }
 
