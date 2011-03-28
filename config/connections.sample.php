@@ -16,14 +16,6 @@ Connection::add(array(
         'password' => '',
         'database' => 'spaghetti',
         'prefix' => ''
-    ),
-    'test' => array(
-        'driver' => 'MySql',
-        'host' => 'localhost',
-        'user' => 'root',
-        'password' => '',
-        'database' => 'spaghetti',
-        'prefix' => ''
     )
 ));
 
