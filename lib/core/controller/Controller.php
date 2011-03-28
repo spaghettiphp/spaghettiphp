@@ -65,9 +65,7 @@ class Controller extends Hookable {
             }
         }
         else {
-            throw new MissingControllerException(array(
-                'controller' => $name
-            ));
+            throw new MissingControllerException($name . ' could not be found');
         }
     }
 
@@ -87,10 +85,7 @@ class Controller extends Hookable {
             return $this->dispatch($request);
         }
         else {
-            throw new MissingActionException(array(
-                'controller' => $request['controller'],
-                'action' => $request['action']
-            ));
+            throw new MissingActionException('The action ' . $request['controller'] . '::' . $request['action'] . '() could not be found.');
         }
     }
 
