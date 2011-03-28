@@ -44,9 +44,7 @@ class View {
             return $output;
         }
         else {
-            throw new MissingViewException(array(
-                'view' => $this->filename($action)
-            ));
+            throw new MissingViewException($this->filename($action) . ' could not be found.');
         }
     }
 
@@ -58,9 +56,7 @@ class View {
             return $this->renderView($layout_file, $data);
         }
         else {
-            throw new MissingViewException(array(
-                'view' => $this->filename($layout)
-            ));
+            throw new MissingViewException($this->filename($layout) . ' could not be found.');
         }
     }
 
@@ -71,9 +67,7 @@ class View {
             return $this->renderView($element_path, $data);
         }
         else {
-            throw new MissingViewException(array(
-                'view' => $this->filename($element)
-            ));
+            throw new MissingViewException($this->filename($element) . ' could not be found');
         }
     }
 
