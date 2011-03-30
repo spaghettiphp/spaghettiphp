@@ -1,5 +1,8 @@
 <?php
 
+/*
+    Class: Mapper
+*/
 class Mapper {
     protected $prefixes = array();
     protected $routes = array();
@@ -195,6 +198,9 @@ class Mapper {
         return self::normalize($url);
     }
 
+    /*
+        Method: parse
+    */
     public static function parse($url = null) {
         $here = self::normalize(is_null($url) ? self::here() : $url);
         $url = self::getRoute($here);

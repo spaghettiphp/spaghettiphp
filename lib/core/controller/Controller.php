@@ -2,6 +2,55 @@
 
 require 'lib/core/controller/Exceptions.php';
 
+/*
+    Class: Controller
+
+    Controllers are the core of a web request. They provide actions that
+    will be executed and (generally) render a view that will be sent
+    back to the user.
+
+    An action is just a public method on your controller. They're available
+    automatically to the user throgh the <Mapper>. Any protected or private
+    method will NOT be accessible to requests.
+
+    By default, only your <AppController> will inherit Controller directly.
+    All other controllers will inherit AppController, that can contain
+    specific rules such as filtering and access control.
+
+    A typical controller will look something like this
+
+    (start code)
+    class ArticlesController extends AppController {
+        public function index() {
+            $this->articles = $this->Articles->all();
+        }
+
+        public function view($id = null) {
+            $this->article = $this->Articles->firstById($id);
+        }
+    }
+    (end)
+
+    By default, all actions render a view in app/views. A call to the
+    index action in the ArticlesController, for example, will render
+    the view app/views/articles/index.htm.php.
+
+    All controllers also can load models for you. By default, the
+    controller loads the model with the same. Be aware that, if the
+    model does not exist, the controller will throw an exception.
+    If you don't want the controller to load models, or if you want
+    to specific models, use <Controller::$uses>.
+
+    Dependencies:
+        - Model
+        - View
+        - Filesystem
+        - Inflector
+
+    Todo:
+        - Remove all current non-common dependencies. Controller should
+            be model and view agnostic.
+*/
 class Controller extends Hookable {
     protected $autoLayout = true;
     protected $autoRender = true;
@@ -35,10 +84,16 @@ class Controller extends Hookable {
         $this->data = array_merge_recursive($_POST, $_FILES);
     }
 
+    /*
+        Method: __set
+    */
     public function __set($name, $value) {
         $this->view[$name] = $value;
     }
 
+    /*
+        Method: __get
+    */
     public function __get($name) {
         $attrs = array('models', 'view');
 
@@ -51,11 +106,35 @@ class Controller extends Hookable {
         throw new RuntimeException(get_class($this) . '->' . $name . ' does not exist.');
     }
 
+    /*
+        Method: load
+
+        Loads a controller. Typically used by the Dispatcher.
+
+        Params:
+            $name - class name of the controller to be loaded.
+            $instance - true to return an instance of the controller,
+                false if you just want the class loaded.
+
+        Returns:
+            If $instance == false, returns true if the controller was
+            loaded. If $instance == true, returns an instance of the
+            controller.
+
+        Throws:
+            - MissingControllerException if the controller can't be
+            found.
+
+        Todo:
+            - Replace by auto-loading.
+    */
     public static function load($name, $instance = false) {
         $filename = 'app/controllers/' . Inflector::underscore($name) . '.php';
+
         if(!class_exists($name) && Filesystem::exists($filename)) {
             require_once $filename;
         }
+
         if(class_exists($name)) {
             if($instance) {
                 return new $name();
@@ -81,7 +160,7 @@ class Controller extends Hookable {
     }
 
     public function callAction($request) {
-        if($this->hasAction($request['action']) || Controller::hasViewForAction($request)) {
+        if($this->hasAction($request['action']) || self::hasViewForAction($request)) {
             return $this->dispatch($request);
         }
         else {
@@ -146,6 +225,17 @@ class Controller extends Hookable {
         return $view->render($action, $this->view, $layout);
     }
 
+    /*
+        Method: redirect
+
+        Redirects the user to another location.
+
+        Parameters:
+            $url - location to be redirected to.
+            $status - HTTP status code to be sent with the redirect
+                header.
+            $exit - if true, stops the execution of the controller.
+    */
     public function redirect($url, $status = null, $exit = true) {
         $this->autoRender = false;
         $codes = array(
@@ -198,6 +288,20 @@ class Controller extends Hookable {
         if($exit) $this->stop();
     }
 
+    /*
+        Method: set
+
+        Sets a value to be sent to the view. It is not commonly used
+        anymore, and was abandoned in favor of <Controller::__set>,
+        which is much more convenient and readable. Use this only if
+        you need extra performance.
+
+        Params:
+            $var - name of the variable to be sent to the view. Can
+                also be an array where the keys are the name of the
+                variables. In this case, $value will be ignored.
+            $value - value to be sent to the view.
+    */
     public function set($var, $value = null) {
         if(is_array($var)) {
             foreach($var as $key => $value) {
@@ -209,15 +313,53 @@ class Controller extends Hookable {
         }
     }
 
+    /*
+        Method: get
+
+        Gets a value of a variable sent to the view. It is not commonly
+        used anymore, and was abandoned in favor of <Controller::__get>,
+        which is much more convinent and readable. Use this only if you
+        need extra performance.
+
+        Params:
+            $var - name of the value to be read
+
+        Returns:
+            The value sent to the view. null if it was not defined yet.
+    */
     public function get($var) {
         if(array_key_exists($var, $this->view)) {
             return $this->view[$var];
         }
-        else {
-            return null;
-        }
     }
 
+    /*
+        Method: param
+
+        Returns the value of a param. Params could be the params sent
+        by the <Mapper> (check <Mapper::parse> for more info) or named
+        parameters in the URL.
+
+        Named parameters are just a pretty name for a query string. But
+        not only that, <Mapper> also understand an alternative notation
+        for named parameters. For example, both URLs are equivalent
+
+        > /articles/index?sort=title&order=asc
+        > /articles/index/sort:title/order:asc
+
+        Sometimes you want a value for a parameter even when it was not
+        set in the URL. For example, you would want to have a default
+        field to sort. Use the $default param to provide this default
+        value.
+
+        Params
+            $key - name of the param to be read.
+            $default - default value of the param if none was provided.
+
+        Returns:
+            The value of the param in the URL or the default value if
+            it was not provided.
+    */
     public function param($key, $default = null) {
         if(array_key_exists($key, $this->params['named'])) {
             return $this->params['named'][$key];
@@ -230,17 +372,51 @@ class Controller extends Hookable {
         }
     }
 
+    /*
+        Method: page
+
+        Returns the current page. Used for pagination. It is just a
+        conveniency method for calling Controller::param('page', 1).
+
+        Params:
+            $param - name of the param you use for pagination. Default
+            is 'page'.
+
+        Returns:
+            The value of the page param. 1 if it was not explicitly
+            defined.
+    */
     public function page($param = 'page') {
         return (integer) $this->param($param, 1);
     }
 
+    /*
+        Method: isXhr
+
+        Checks whether the request was made through XMLHttpRequest or
+        not.
+
+        Returns:
+            True if the request was made by a XMLHttpRequest (provided
+            that the correct HTTP_X_REQUESTED_WITH header was sent),
+            false otherwise.
+    */
     public function isXhr() {
         if(array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)) {
             return $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
         }
-        return false;
+        else {
+            return false;
+        }
     }
 
+    /*
+        Method: stop
+
+        Stops the execution of the controller. After this method is
+        called, no code will be executed anymore, and any rendered
+        output will be sent to the user.
+    */
     public function stop() {
         exit(0);
     }
