@@ -115,7 +115,7 @@ class Session {
         Throws:
             - RuntimeException if the session can't be started.
     */
-    public static function write($keu, $value) {
+    public static function write($key, $value) {
         if(!self::started() && !self::start()) {
             throw new RuntimeException('could not start session');
         }
@@ -248,6 +248,7 @@ class Session {
             throw new RuntimeException('could not start session');
         }
 
+        self::setCookieParams();
         session_regenerate_id();
     }
 
@@ -267,10 +268,6 @@ class Session {
             <Session::$options>
     */
     public static function option($option, $value) {
-        if(self::started()) {
-            throw new RuntimeException('cannot set options after the session is started');
-        }
-
         self::$options[$option] = $value;
     }
 
@@ -279,7 +276,7 @@ class Session {
 
         Set params for the session's cookie.
     */
-    protected static setCookieParams() {
+    protected static function setCookieParams() {
         session_set_cookie_params(
             self::$options['lifetime'],
             self::$options['path'],
