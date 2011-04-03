@@ -8,6 +8,7 @@ class View {
     public $contentForLayout;
     public $helpers = array('html', 'form');
     public $controller;
+    protected $layout;
     protected $loadedHelpers = array();
     protected $blocks = array();
     protected $lastBlock;
@@ -32,13 +33,14 @@ class View {
     }
 
     public function render($action, $data = array(), $layout = false) {
+        $this->layout = $layout;
         $view_file = Filesystem::path('app/views/') . $this->filename($action);
 
         if(Filesystem::exists($view_file)) {
             $output = $this->renderView($view_file, $data);
 
-            if($layout) {
-                $output = $this->renderLayout($layout, $output, $data);
+            if($this->layout) {
+                $output = $this->renderLayout($this->layout, $output, $data);
             }
 
             return $output;
