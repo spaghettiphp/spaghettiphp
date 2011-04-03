@@ -84,6 +84,9 @@ class Model extends Hookable {
         throw new RuntimeException(get_class($this) . '->' . $name . ' does not exist.');
     }
 
+    /*
+        Method: load
+    */
     // Model::load() only helps with performance and will be removed when we begin to use late static binding
     public static function load($name) {
         if(!array_key_exists($name, Model::$instances)) {

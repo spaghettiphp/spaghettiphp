@@ -238,7 +238,8 @@ class Session {
     /*
         Method: regenerate
 
-        Regenerates the current session's id.
+        Regenerates the current session's id. It also reapplies the
+        session's cookie options.
 
         Throws:
             - RuntimeException if the session can't be started.
@@ -255,7 +256,10 @@ class Session {
     /*
         Method: option
 
-        Sets options for the session's cookie.
+        Sets options for the session's cookie. Note that you have to
+        call this method before starting the session. If the session
+        was already started and you need to set new values for the
+        cookie, use <Session::regenerate>.
 
         Params:
             $option - option to be set.
@@ -265,7 +269,7 @@ class Session {
             - RuntimeException if the session was already started.
 
         See Also:
-            <Session::$options>
+            <Session::$options>, <Session::regenerate>
     */
     public static function option($option, $value) {
         self::$options[$option] = $value;

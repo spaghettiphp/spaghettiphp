@@ -52,19 +52,142 @@ require 'lib/core/controller/Exceptions.php';
             be model and view agnostic.
 */
 class Controller extends Hookable {
-    protected $autoLayout = true;
-    protected $autoRender = true;
-    protected $data = array();
-    protected $layout = 'default';
-    protected $name = null;
-    protected $params = array();
-    protected $uses = null;
-    protected $view = array();
-    protected $models = array();
+    /*
+        Variable: $render
+        
+        Specifies if the controller should render output automatically.
+        Usually this will be true, but if you want to generate custom
+        output you can set this to false.
+    */
+    protected $render = true;
 
-    protected $beforeRender = array();
+    /*
+        Variable: $data
+        
+        Contains $_POST and $_FILES data, merged into a single array.
+        This is what you should use when getting data from the user.
+        A common pattern is checking if there is data in this variable
+        like this
+        
+        (start code)
+        if(!empty($this->data)) {
+            new Articles($this->data)->save();
+        }
+        (end)
+    */
+    protected $data = array();
+
+    /*
+        Variable: $layout
+        
+        Layout used for rendering the current view. By default, 'default'
+        layout will be rendered. If you don't want a layout rendered
+        with your view, set this to false.
+    */
+    protected $layout = 'default';
+
+    /*
+        Variable: $beforeFilter
+        
+        beforeFilters are methods run before a controller action. They
+        may stop a action from running, for example when a user does not
+        have permission to access certain actions.
+        
+        (start code)
+        protected $beforeFilter = array('requireLogin');
+        
+        protected function requireLogin() {
+            if(!$this->loggedIn()) {
+                // Controller::redirect stops the action from running
+                // and redirects the user to a login page
+                $this->redirect('/users/login');
+            }
+        }
+        (end)
+    */
     protected $beforeFilter = array();
+
+    /*
+        Variable: $beforeRender
+        
+        beforeRenders are methods run after a controller action has been
+        executed, but before they render any output. You can use it to
+        suppress output for some reason.
+    */
+    protected $beforeRender = array();
+
+    /*
+        Variable: $afterFilter
+        
+        afterFilters are methods run after the controller executed an
+        action and sent output to the browser.
+    */
     protected $afterFilter = array();
+
+    /*
+        Variable: $uses
+        
+        Defines which models the controller will load. When null, the
+        controller will load only the model with the same name of the
+        controller. When an empty array, the controller won't load any
+        model.
+        
+        You can load as many models as you want, but be aware that this
+        can decrease your application's performance. So the rule is to
+        include here only models you need in all (or almost all)
+        actions, and manually load less used models.
+        
+        Be aware that, when we start using autoload, this feature will
+        be removed, so don't rely on this.
+        
+        See Also:
+            <Controller::loadModel>, <Model::load>
+    */
+    protected $uses = null;
+
+    /*
+        Variable: $name
+        
+        Defines the name of the controller. Shouldn't be used directly.
+        It is used just for loading a default model if none is provided
+        and will be removed in the near future.
+    */
+    protected $name = null;
+
+    /*
+        Variable: $params
+        
+        Keeps the parameters parsed by <Mapper>. Shouldn't be used
+        directly, use <Controller::param> instead.
+        
+        See Also:
+            <Controller::param>
+    */
+    protected $params = array();
+
+    /*
+        Variable: $view
+        
+        Data to be sent to views. Should not be used directly. Use the
+        appropriate methods for this.
+        
+        See Also:
+            <Controller::__get>, <Controller::__set>, <Controller::get>,
+            <Controller::set>
+    */
+    protected $view = array();
+
+    /*
+        Variable: $models
+        
+        Keeps the models attached to the controller. Shouldn't be used
+        directly. Use the appropriate methods for this. This will be
+        removed when we start using autoload.
+
+        See Also:
+            <Controller::__get>, <Controller::loadModel>, <Model::load>
+    */
+    protected $models = array();
 
     public function __construct() {
         if(is_null($this->name)) {
@@ -93,6 +216,9 @@ class Controller extends Hookable {
 
     /*
         Method: __get
+        
+        Throws:
+            - Runtime exception if the attribute does not exist.
     */
     public function __get($name) {
         $attrs = array('models', 'view');
@@ -190,7 +316,7 @@ class Controller extends Hookable {
         }
 
         $output = '';
-        if($this->autoRender) {
+        if($this->render) {
             $this->fireAction('beforeRender');
             $output = $this->render($view);
         }
@@ -200,8 +326,29 @@ class Controller extends Hookable {
         return $output;
     }
 
+    /*
+        Method: loadModel
+        
+        Loads a model and attaches it to the controller. It is not
+        considered a good practice to include all models you will ever
+        need in <Controller::$uses>. If you need models that are not
+        used throughout your controller, you can load them using this
+        method.
+        
+        Be aware, though, that is generally better to use <Model::load>
+        itself if you don't need to use the instance more than once in
+        your action, because it does not have the overhead to attach
+        the model to the controller. Also, this method will be removed
+        in the next versions in favor of autloading, so don't rely on
+        this.
+        
+        Params:
+            $model - camel-cased name of the model to be loaded.
+        
+        Returns:
+            The model's instance.
+    */
     protected function loadModel($model) {
-        $model = Inflector::camelize($model);
         return $this->models[$model] = Model::load($model);
     }
 
@@ -214,9 +361,9 @@ class Controller extends Hookable {
 
     public function render($action = null) {
         $view = new View;
-        $layout = $this->autoLayout ? $this->layout : false;
+        $layout = $this->layout;
         $view->controller = $this;
-        $this->autoRender = false;
+        $this->render = false;
 
         if(is_null($action)) {
             $action = Inflector::underscore($this->name) . '/' . $this->params['action'] . '.' . $this->params['extension'];
@@ -237,7 +384,7 @@ class Controller extends Hookable {
             $exit - if true, stops the execution of the controller.
     */
     public function redirect($url, $status = null, $exit = true) {
-        $this->autoRender = false;
+        $this->render = false;
         $codes = array(
             100 => 'Continue',
             101 => 'Switching Protocols',
