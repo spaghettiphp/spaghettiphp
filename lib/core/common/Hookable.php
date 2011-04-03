@@ -4,7 +4,7 @@ class Hookable {
     protected $actions = array();
     protected $filters = array();
 
-    public function register($type, $hook, $method) {
+    public function registerHook($type, $hook, $method) {
         if(!array_key_exists($hook, $this->{$type})) {
             $this->{$type}[$hook] = array();
         }
