@@ -40,7 +40,7 @@ class Behavior {
             }
         }
         else {
-            $this->model->register($type, $name, array($this, $method));
+            $this->model->registerHook($type, $name, array($this, $method));
         }
     }
 
