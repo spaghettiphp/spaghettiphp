@@ -42,10 +42,10 @@ require 'lib/core/controller/Exceptions.php';
     to specific models, use <Controller::$uses>.
 
     Dependencies:
-        - Model
-        - View
-        - Filesystem
-        - Inflector
+        - <Model>
+        - <View>
+        - <Filesystem>
+        - <Inflector>
 
     Todo:
         - Remove all current non-common dependencies. Controller should
@@ -54,7 +54,7 @@ require 'lib/core/controller/Exceptions.php';
 class Controller extends Hookable {
     /*
         Variable: $render
-        
+
         Specifies if the controller should render output automatically.
         Usually this will be true, but if you want to generate custom
         output you can set this to false.
@@ -63,12 +63,12 @@ class Controller extends Hookable {
 
     /*
         Variable: $data
-        
+
         Contains $_POST and $_FILES data, merged into a single array.
         This is what you should use when getting data from the user.
         A common pattern is checking if there is data in this variable
         like this
-        
+
         (start code)
         if(!empty($this->data)) {
             new Articles($this->data)->save();
@@ -79,7 +79,7 @@ class Controller extends Hookable {
 
     /*
         Variable: $layout
-        
+
         Layout used for rendering the current view. By default, 'default'
         layout will be rendered. If you don't want a layout rendered
         with your view, set this to false.
@@ -88,14 +88,14 @@ class Controller extends Hookable {
 
     /*
         Variable: $beforeFilter
-        
+
         beforeFilters are methods run before a controller action. They
         may stop a action from running, for example when a user does not
         have permission to access certain actions.
-        
+
         (start code)
         protected $beforeFilter = array('requireLogin');
-        
+
         protected function requireLogin() {
             if(!$this->loggedIn()) {
                 // Controller::redirect stops the action from running
@@ -109,7 +109,7 @@ class Controller extends Hookable {
 
     /*
         Variable: $beforeRender
-        
+
         beforeRenders are methods run after a controller action has been
         executed, but before they render any output. You can use it to
         suppress output for some reason.
@@ -118,7 +118,7 @@ class Controller extends Hookable {
 
     /*
         Variable: $afterFilter
-        
+
         afterFilters are methods run after the controller executed an
         action and sent output to the browser.
     */
@@ -126,20 +126,20 @@ class Controller extends Hookable {
 
     /*
         Variable: $uses
-        
+
         Defines which models the controller will load. When null, the
         controller will load only the model with the same name of the
         controller. When an empty array, the controller won't load any
         model.
-        
+
         You can load as many models as you want, but be aware that this
         can decrease your application's performance. So the rule is to
         include here only models you need in all (or almost all)
         actions, and manually load less used models.
-        
+
         Be aware that, when we start using autoload, this feature will
         be removed, so don't rely on this.
-        
+
         See Also:
             <Controller::loadModel>, <Model::load>
     */
@@ -147,7 +147,7 @@ class Controller extends Hookable {
 
     /*
         Variable: $name
-        
+
         Defines the name of the controller. Shouldn't be used directly.
         It is used just for loading a default model if none is provided
         and will be removed in the near future.
@@ -156,10 +156,10 @@ class Controller extends Hookable {
 
     /*
         Variable: $params
-        
+
         Keeps the parameters parsed by <Mapper>. Shouldn't be used
         directly, use <Controller::param> instead.
-        
+
         See Also:
             <Controller::param>
     */
@@ -167,10 +167,10 @@ class Controller extends Hookable {
 
     /*
         Variable: $view
-        
+
         Data to be sent to views. Should not be used directly. Use the
         appropriate methods for this.
-        
+
         See Also:
             <Controller::__get>, <Controller::__set>, <Controller::get>,
             <Controller::set>
@@ -179,7 +179,7 @@ class Controller extends Hookable {
 
     /*
         Variable: $models
-        
+
         Keeps the models attached to the controller. Shouldn't be used
         directly. Use the appropriate methods for this. This will be
         removed when we start using autoload.
@@ -189,6 +189,12 @@ class Controller extends Hookable {
     */
     protected $models = array();
 
+    /*
+        Method: __construct
+
+        Load models defined in <Controller::$uses> and sets
+        <Controller::$data>
+    */
     public function __construct() {
         if(is_null($this->name)) {
             $this->name = $this->name();
@@ -209,6 +215,21 @@ class Controller extends Hookable {
 
     /*
         Method: __set
+
+        Magic method to set values to be sent to the view. It enables
+        you to send values by setting instance variables in the
+        controller
+
+        (start code)
+        public function index() {
+            $this->articles = $this->Articles->all();
+            // will be available to the view as $articles
+        }
+        (end)
+
+        Params:
+            $name - name of the variable to be sent to the view.
+            $value - value to be sent to the view.
     */
     public function __set($name, $value) {
         $this->view[$name] = $value;
@@ -216,7 +237,30 @@ class Controller extends Hookable {
 
     /*
         Method: __get
-        
+
+        Magic methods to get values sent to the view. It enables you to
+        get values by using instance variables in the controller
+
+        (start code)
+        public function edit($id = null) {
+            $this->user = $this->Users->firstById($id);
+
+            if(!empty($this->data)) {
+                $this->user->updateAttributes($this->data);
+                $this->user->save();
+            }
+        }
+        (end)
+
+        This method also allows you to use the $this->Model syntax, but
+        this will be removed in the future.
+
+        Params:
+            $name - name of the value to be read.
+
+        Returns:
+            The value sent to the view, or the model instance.
+
         Throws:
             - Runtime exception if the attribute does not exist.
     */
@@ -328,23 +372,23 @@ class Controller extends Hookable {
 
     /*
         Method: loadModel
-        
+
         Loads a model and attaches it to the controller. It is not
         considered a good practice to include all models you will ever
         need in <Controller::$uses>. If you need models that are not
         used throughout your controller, you can load them using this
         method.
-        
+
         Be aware, though, that is generally better to use <Model::load>
         itself if you don't need to use the instance more than once in
         your action, because it does not have the overhead to attach
         the model to the controller. Also, this method will be removed
         in the next versions in favor of autloading, so don't rely on
         this.
-        
+
         Params:
             $model - camel-cased name of the model to be loaded.
-        
+
         Returns:
             The model's instance.
     */
@@ -352,6 +396,16 @@ class Controller extends Hookable {
         return $this->models[$model] = Model::load($model);
     }
 
+    /*
+        Method: setAction
+
+        Re-route the controller to execute another action. Note that it
+        does NOT stop the current action, so every statement after the
+        call to setAction will still be executed.
+
+        Params:
+            $action - new action to be executed.
+    */
     public function setAction($action) {
         $args = func_get_args();
         $this->params['action'] = array_shift($args);
@@ -359,6 +413,18 @@ class Controller extends Hookable {
         return call_user_func_array(array($this, $action), $args);
     }
 
+    /*
+        Method: render
+
+        Renders a view.
+
+        Params:
+            $action - action to render. null will render the current
+            action.
+
+        Returns:
+            The content rendered by the view.
+    */
     public function render($action = null) {
         $view = new View;
         $layout = $this->layout;
@@ -377,7 +443,7 @@ class Controller extends Hookable {
 
         Redirects the user to another location.
 
-        Parameters:
+        Params:
             $url - location to be redirected to.
             $status - HTTP status code to be sent with the redirect
                 header.
@@ -444,19 +510,19 @@ class Controller extends Hookable {
         you need extra performance.
 
         Params:
-            $var - name of the variable to be sent to the view. Can
+            $name - name of the variable to be sent to the view. Can
                 also be an array where the keys are the name of the
                 variables. In this case, $value will be ignored.
             $value - value to be sent to the view.
     */
-    public function set($var, $value = null) {
-        if(is_array($var)) {
-            foreach($var as $key => $value) {
+    public function set($name, $value = null) {
+        if(is_array($name)) {
+            foreach($name as $key => $value) {
                 $this->set($key, $value);
             }
         }
         else {
-            $this->view[$var] = $value;
+            $this->view[$name] = $value;
         }
     }
 
@@ -499,7 +565,7 @@ class Controller extends Hookable {
         field to sort. Use the $default param to provide this default
         value.
 
-        Params
+        Params:
             $key - name of the param to be read.
             $default - default value of the param if none was provided.
 
