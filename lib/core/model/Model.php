@@ -5,37 +5,39 @@ require 'lib/core/model/Connection.php';
 require 'lib/core/model/Table.php';
 require 'lib/core/model/Behavior.php';
 
+/*
+    Class: Model
+    
+    Dependencies:
+        - <Validation>
+        - <Connection>
+        - <Table>
+        - <Behavior>
+        - <Hookable>
+        - <Inflector>
+*/
 class Model extends Hookable {
     protected $behaviors = array();
-
     protected $displayField;
     protected $table;
     protected $connection = 'default';
-
     protected $defaultScope = array();
-
     protected $perPage = 20;
     public $pagination = array();
-
     protected $validates = array();
     protected $errors = array();
-
     protected $data = array();
-
     protected $beforeSave = array();
     protected $beforeCreate = array();
     protected $beforeUpdate = array();
     protected $beforeDelete = array();
     protected $beforeValidate = array();
-
     protected $afterSave = array();
     protected $afterCreate = array();
     protected $afterUpdate = array();
     protected $afterDelete = array();
     protected $afterValidate = array();
-
     protected $_behaviors = array();
-
     protected static $instances = array();
 
     public function __construct($data = null) {
